@@ -154,3 +154,18 @@ State the violation and suggest a compliant alternative before proceeding.
 Consolidate related decisions into a single structured plan. Request one approval per logical task, not one per micro-decision.
 
 > Principle: *Pause before action — but don't pause more than necessary.*
+
+---
+
+### 9. Use Chart.js for All Visualisations
+Always use the locally bundled `assets/js/chart.min.js` (Chart.js 4.4.9) for every chart or graph. Never use a CDN, an alternative charting library, or raw SVG/canvas for data visualisation unless Chart.js is genuinely incapable of the required chart type (e.g. Gantt — use frappe-gantt instead, already bundled).
+
+---
+
+### 10. Match Bar Geometry Precisely
+For every chart segment — bars, columns, horizontal bars, stacked segments — always specify:
+- **Width**: use `barThickness` (fixed px) or `maxBarThickness` + `barPercentage` + `categoryPercentage` (relative)
+- **Spacing**: use `barPercentage` and `categoryPercentage` to control gaps between bars and between groups
+- **Corner roundness**: use `borderRadius` (px) and `borderSkipped` (`'bottom'` for vertical bars, `'left'` for horizontal) to apply rounding only to the exposed end of each bar
+
+Never leave these at Chart.js defaults — always derive values from the Figma design or the `--dv-border-radius-bar` token in `dataviz.css`.

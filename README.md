@@ -53,6 +53,8 @@ Rules that Claude follows when generating any prototype. Enforced via `.claude/C
 6. **No assumptions** — ask a clarifying question rather than guessing when a requirement is ambiguous
 7. **Challenge design system violations** — flag and suggest a compliant alternative if a request would introduce inconsistency
 8. **Batch approvals** — consolidate related decisions into one plan; one approval per logical task
+9. **Use Chart.js for all visualisations** — always use the locally bundled `assets/js/chart.min.js`; never use a CDN or alternative charting library (except frappe-gantt for Gantt charts, which is already bundled)
+10. **Match bar geometry precisely** — always specify width (`barThickness` / `maxBarThickness`), spacing (`barPercentage`, `categoryPercentage`), and corner roundness (`borderRadius`, `borderSkipped`) for every chart segment; never leave these at Chart.js defaults
 
 ## Project Structure
 
