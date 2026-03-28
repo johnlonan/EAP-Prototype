@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input Field — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Input Field — wrapper
+       The wrapper handles all visual states (border, bg, shadow).
+       The native <input> inside is transparent/borderless.
+    -------------------------------------------------------- */
+    .input-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      height: 40px; /* default */
+      padding: 0 12px;
+      border-radius: var(--radius-field); /* 12px */
+      border: 1px solid var(--border-default);
+      background-color: var(--bg-primary);
+      overflow: hidden;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    /* Focus ring — applied via :focus-within */
+    .input-field:focus-within:not(.input-field--disabled):not(.input-field--view-only):not(.input-field--ghost):not(.input-field--ai-load) {
+      box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--border-default);
+    }
+
+    /* ---- Size: sm ---- */
+    .input-field--sm {
+      height: 32px;
+    }
+
+    /* ---- State: error ---- */
+    .input-field--error {
+      border-color: var(--color-error);
+    }
+
+    .input-field--error:focus-within {
+      box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--color-error);
+    }
+
+    /* ---- State: disabled / view-only ---- */
+    .input-field--disabled,
+    .input-field--view-only {
+      background-color: var(--bg-secondary);
+      border-color: var(--bg-secondary);
+      cursor: not-allowed;
+    }
+
+    /* ---- State: ghost (no border) ---- */
+    .input-field--ghost {
+      border-color: transparent;
+    }
+
+    /* ---- State: AI load ---- */
+    .input-field--ai-load {
+      background-color: var(--bg-secondary);
+      border-color: var(--color-accent);
+    }
+
+    /* ---- State: AI prefilled ---- */
+    .input-field--ai-prefilled {
+      border-color: #349b21; /* accent-500 */
+    }
+
+    /* ---- Icon slots ---- */
+    .input-field [data-icon] {
+      flex-shrink: 0;
+      color: var(--text-tertiary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .input-field--disabled [data-icon],
+    .input-field--view-only [data-icon] {
+      color: var(--text-disabled);
+    }
+
+    /* ---- Native input ---- */
+    .input-field__input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm); /* 14px default */
+      font-weight: 300; /* Light */
+      color: var(--text-primary);
+      line-height: 1.25rem; /* 20px */
+    }
+
+    .input-field__input::placeholder {
+      color: var(--text-tertiary);
+      font-weight: 300;
+    }
+
+    .input-field--sm .input-field__input {
+      font-size: var(--font-size-xs); /* 12px */
+    }
+
+    .input-field--disabled .input-field__input,
+    .input-field--view-only .input-field__input {
+      color: #a3a2a1;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .input-field--disabled .input-field__input::placeholder,
+    .input-field--view-only .input-field__input::placeholder {
+      color: #a3a2a1;
+    }
+
+    /* --------------------------------------------------------
+       Fieldset Legend
+    -------------------------------------------------------- */
+    .field-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .field-legend__title {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .field-legend__required {
+      font-size: var(--font-size-xs);
+      color: var(--color-error);
+      line-height: var(--line-height-5);
+    }
+
+    .field-legend__label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs); /* 12px */
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: var(--line-height-5); /* 20px */
+    }
+
+    .field-legend__optional {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      line-height: var(--line-height-5);
+    }
+
+    .field-legend__info {
+      color: var(--text-tertiary);
+      width: 12px;
+      height: 12px;
+      cursor: pointer;
+    }
+
+    .field-legend__description {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      line-height: var(--line-height-5);
+    }
+
+    /* --------------------------------------------------------
+       Text Input Fieldset (assembled: legend + input + help)
+    -------------------------------------------------------- */
+    .input-fieldset {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 284px;
+    }
+
+    .input-fieldset__help {
+      font-family: var(--font-sans);
+      font-size: 0.625rem; /* 10px */
+      color: var(--text-tertiary);
+      line-height: 1rem; /* 16px */
+    }
+
+    .input-fieldset__help--error {
+      color: var(--color-error);
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--space-6);
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      width: 220px;
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Input Field States — Default size -->
+    <div class="card">
+      <p class="section-title">Input Field States — Default (40px)</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">Default</span>
+          <div class="input-field">
+            <input type="text" class="input-field__input" placeholder="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Focused</span>
+          <!-- Simulated focus ring -->
+          <div class="input-field" style="box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--border-default);">
+            <input type="text" class="input-field__input" value="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Disabled</span>
+          <div class="input-field input-field--disabled">
+            <input type="text" class="input-field__input" placeholder="Input text" disabled>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">View Only</span>
+          <div class="input-field input-field--view-only">
+            <input type="text" class="input-field__input" value="Input text" readonly>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Error</span>
+          <div class="input-field input-field--error">
+            <input type="text" class="input-field__input" value="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Error Focused</span>
+          <div class="input-field input-field--error" style="box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--color-error);">
+            <input type="text" class="input-field__input" value="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Ghost</span>
+          <div class="input-field input-field--ghost">
+            <input type="text" class="input-field__input" placeholder="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">AI Load</span>
+          <div class="input-field input-field--ai-load">
+            <input type="text" class="input-field__input" placeholder="Input text" disabled>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">AI Prefilled</span>
+          <div class="input-field input-field--ai-prefilled">
+            <input type="text" class="input-field__input" value="Pre-filled content">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Input Field States — sm size -->
+    <div class="card">
+      <p class="section-title">Input Field States — sm (32px)</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">Default</span>
+          <div class="input-field input-field--sm">
+            <input type="text" class="input-field__input" placeholder="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Focused</span>
+          <div class="input-field input-field--sm" style="box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--border-default);">
+            <input type="text" class="input-field__input" value="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Disabled</span>
+          <div class="input-field input-field--sm input-field--disabled">
+            <input type="text" class="input-field__input" placeholder="Input text" disabled>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Error</span>
+          <div class="input-field input-field--sm input-field--error">
+            <input type="text" class="input-field__input" value="Input text">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">AI Prefilled</span>
+          <div class="input-field input-field--sm input-field--ai-prefilled">
+            <input type="text" class="input-field__input" value="Pre-filled content">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Input with icons -->
+    <div class="card">
+      <p class="section-title">Input Field — With Icons</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">Start icon</span>
+          <div class="input-field">
+            <span data-icon="search"></span>
+            <input type="text" class="input-field__input" placeholder="Search…">
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">End icon</span>
+          <div class="input-field">
+            <input type="text" class="input-field__input" placeholder="Pick a date">
+            <span data-icon="calendar"></span>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Start + End icons</span>
+          <div class="input-field">
+            <span data-icon="search"></span>
+            <input type="text" class="input-field__input" placeholder="Search…">
+            <span data-icon="close"></span>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Two end icons</span>
+          <div class="input-field">
+            <input type="text" class="input-field__input" placeholder="Message">
+            <span data-icon="calendar"></span>
+            <span data-icon="send"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Fieldset Legend variants -->
+    <div class="card">
+      <p class="section-title">Fieldset Legend</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">Basic</span>
+          <div class="field-legend">
+            <div class="field-legend__title">
+              <span class="field-legend__label">Title</span>
+              <span data-icon="circle-info" class="field-legend__info"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Required</span>
+          <div class="field-legend">
+            <div class="field-legend__title">
+              <span class="field-legend__required">*</span>
+              <span class="field-legend__label">Title</span>
+              <span data-icon="circle-info" class="field-legend__info"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Optional</span>
+          <div class="field-legend">
+            <div class="field-legend__title">
+              <span class="field-legend__label">Title</span>
+              <span class="field-legend__optional">(optional)</span>
+              <span data-icon="circle-info" class="field-legend__info"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">With description</span>
+          <div class="field-legend">
+            <div class="field-legend__title">
+              <span class="field-legend__label">Title</span>
+              <span data-icon="circle-info" class="field-legend__info"></span>
+            </div>
+            <p class="field-legend__description">Description text for this field</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Text Input Fieldset (assembled) -->
+    <div class="card">
+      <p class="section-title">Text Input Fieldset — Assembled</p>
+      <div class="row">
+
+        <div class="col" style="width: 284px;">
+          <span class="state-label">Default</span>
+          <div class="input-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <span class="field-legend__label">Title</span>
+                <span data-icon="circle-info" class="field-legend__info"></span>
+              </div>
+            </div>
+            <div class="input-field">
+              <input type="text" class="input-field__input" placeholder="Input text">
+            </div>
+          </div>
+        </div>
+
+        <div class="col" style="width: 284px;">
+          <span class="state-label">Required + Help text</span>
+          <div class="input-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <span class="field-legend__required">*</span>
+                <span class="field-legend__label">Email address</span>
+                <span data-icon="circle-info" class="field-legend__info"></span>
+              </div>
+            </div>
+            <div class="input-field">
+              <input type="email" class="input-field__input" placeholder="you@example.com">
+            </div>
+            <p class="input-fieldset__help">Enter a valid email address</p>
+          </div>
+        </div>
+
+        <div class="col" style="width: 284px;">
+          <span class="state-label">Error + Help text</span>
+          <div class="input-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <span class="field-legend__required">*</span>
+                <span class="field-legend__label">Email address</span>
+              </div>
+            </div>
+            <div class="input-field input-field--error">
+              <input type="email" class="input-field__input" value="invalid@">
+            </div>
+            <p class="input-fieldset__help input-fieldset__help--error">Please enter a valid email address</p>
+          </div>
+        </div>
+
+        <div class="col" style="width: 284px;">
+          <span class="state-label">With search icon + optional</span>
+          <div class="input-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <span class="field-legend__label">Search</span>
+                <span class="field-legend__optional">(optional)</span>
+              </div>
+            </div>
+            <div class="input-field">
+              <span data-icon="search"></span>
+              <input type="text" class="input-field__input" placeholder="Search…">
+              <span data-icon="close"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

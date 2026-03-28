@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collapse — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Collapse — single expandable panel
+       border-radius: 16px (var(--radius-2xl))
+       Header: bold 16px title + plus/minus icon right
+       Body: light 14px
+       Variants: default (no border) · bordered
+       Smooth height animation via max-height transition
+    -------------------------------------------------------- */
+
+    .collapse {
+      border-radius: var(--radius-2xl, 16px);
+      background-color: var(--bg-primary);
+      overflow: hidden;
+    }
+
+    /* ---- Bordered variant ---- */
+    .collapse--bordered {
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* ---- Header ---- */
+    .collapse__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+      gap: var(--space-3);
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      transition: background-color var(--transition-fast);
+    }
+
+    .collapse__header:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .collapse__title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-base); /* 16px */
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .collapse__icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: var(--text-tertiary);
+      transition: transform var(--transition-fast);
+    }
+
+    /* ---- Body ---- */
+    .collapse__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+
+    .collapse__body-inner {
+      padding: 0 20px 20px;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm); /* 14px */
+      font-weight: 300; /* Light */
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ---- Open state ---- */
+    .collapse--open .collapse__body {
+      max-height: 600px;
+    }
+
+    .collapse--open .collapse__icon {
+      transform: rotate(0deg);
+    }
+
+    /* Icon: shows plus when closed, minus when open */
+    .collapse__icon-open  { display: none; }
+    .collapse__icon-close { display: block; }
+
+    .collapse--open .collapse__icon-open  { display: block; }
+    .collapse--open .collapse__icon-close { display: none; }
+
+    /* ---- Divider line between header and body (bordered only) ---- */
+    .collapse--bordered.collapse--open .collapse__header {
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* ---- Filled variant (bg-secondary header) ---- */
+    .collapse--filled .collapse__header {
+      background-color: var(--bg-secondary);
+      border-radius: var(--radius-2xl, 16px) var(--radius-2xl, 16px) 0 0;
+    }
+
+    .collapse--filled.collapse--open .collapse__header {
+      border-radius: var(--radius-2xl, 16px) var(--radius-2xl, 16px) 0 0;
+    }
+
+    .collapse--filled:not(.collapse--open) .collapse__header {
+      border-radius: var(--radius-2xl, 16px);
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .demo-col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Default (no border) -->
+    <div class="card">
+      <p class="section-title">Default — No Border</p>
+      <div class="demo-col">
+
+        <div class="collapse js-collapse">
+          <button class="collapse__header" aria-expanded="false">
+            <span class="collapse__title">What is an incident?</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region">
+            <div class="collapse__body-inner">
+              An incident is an unplanned interruption to an IT service or a reduction in the quality of an IT service. It requires immediate attention to restore normal service operation.
+            </div>
+          </div>
+        </div>
+
+        <div class="collapse js-collapse collapse--open">
+          <button class="collapse__header" aria-expanded="true">
+            <span class="collapse__title">How do I escalate an incident?</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region" style="max-height: 600px;">
+            <div class="collapse__body-inner">
+              To escalate an incident, open the incident record and click "Escalate". Select the escalation path and provide a reason. The system will notify the appropriate team leads and update the priority.
+            </div>
+          </div>
+        </div>
+
+        <div class="collapse js-collapse">
+          <button class="collapse__header" aria-expanded="false">
+            <span class="collapse__title">What SLAs apply to P1 incidents?</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region">
+            <div class="collapse__body-inner">
+              P1 incidents must be acknowledged within 15 minutes and resolved within 4 hours. Automated notifications are sent every 30 minutes until resolution.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bordered -->
+    <div class="card">
+      <p class="section-title">Bordered</p>
+      <div class="demo-col">
+
+        <div class="collapse collapse--bordered js-collapse">
+          <button class="collapse__header" aria-expanded="false">
+            <span class="collapse__title">Service level agreements</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region">
+            <div class="collapse__body-inner">
+              SLAs define the expected service levels for each priority. Review the current SLA configuration in Settings → Service Management → SLAs.
+            </div>
+          </div>
+        </div>
+
+        <div class="collapse collapse--bordered js-collapse collapse--open">
+          <button class="collapse__header" aria-expanded="true">
+            <span class="collapse__title">Assignment rules</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region" style="max-height: 600px;">
+            <div class="collapse__body-inner">
+              Assignment rules automatically route incidents to the correct team based on category, location, and configuration item. Rules are evaluated in priority order until a match is found.
+            </div>
+          </div>
+        </div>
+
+        <div class="collapse collapse--bordered js-collapse">
+          <button class="collapse__header" aria-expanded="false">
+            <span class="collapse__title">Notification preferences</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region">
+            <div class="collapse__body-inner">
+              Configure how and when you receive notifications for incidents in your workspace. Options include email, push notifications, and Slack integration.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Filled header -->
+    <div class="card">
+      <p class="section-title">Filled Header</p>
+      <div class="demo-col">
+
+        <div class="collapse collapse--filled collapse--bordered js-collapse">
+          <button class="collapse__header" aria-expanded="false">
+            <span class="collapse__title">Advanced configuration</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region">
+            <div class="collapse__body-inner">
+              Access advanced settings to configure custom fields, workflow triggers, and integration endpoints for your incident management process.
+            </div>
+          </div>
+        </div>
+
+        <div class="collapse collapse--filled collapse--bordered js-collapse collapse--open">
+          <button class="collapse__header" aria-expanded="true">
+            <span class="collapse__title">Automation settings</span>
+            <span class="collapse__icon">
+              <span class="collapse__icon-close" data-icon="plus"></span>
+              <span class="collapse__icon-open" data-icon="minus"></span>
+            </span>
+          </button>
+          <div class="collapse__body" role="region" style="max-height: 600px;">
+            <div class="collapse__body-inner">
+              Automate repetitive tasks like initial triage, stakeholder notifications, and post-incident reviews. Automations can be triggered by time, event, or condition.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+
+      document.querySelectorAll('.js-collapse').forEach(el => {
+        const btn = el.querySelector('.collapse__header');
+        const body = el.querySelector('.collapse__body');
+
+        btn.addEventListener('click', () => {
+          const isOpen = el.classList.contains('collapse--open');
+          el.classList.toggle('collapse--open', !isOpen);
+          btn.setAttribute('aria-expanded', String(!isOpen));
+          if (!isOpen) {
+            body.style.maxHeight = '600px';
+          } else {
+            body.style.maxHeight = '0';
+          }
+          Horizon.initIcons();
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Avatar
+       Always circular (border-radius: 9999px).
+       Sizes: sm (32px) · md (40px) · lg (48px) · xl (64px) · 2xl (80px)
+       Types:
+         default — photo (img inside)
+         placeholder — initials on dark bg (#343331)
+         overflow — "+N" count on secondary bg (#e3e2df)
+       Status dot: bottom-right corner, 3 states: online/away/busy/offline
+       Group: overlapping stack, white ring border
+    -------------------------------------------------------- */
+
+    /* ---- Base ---- */
+    .avatar {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-radius: 9999px;
+      overflow: hidden;
+      background-color: var(--color-neutral-800, #343331);
+      /* default md */
+      width: 40px;
+      height: 40px;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: white;
+      user-select: none;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 9999px;
+    }
+
+    /* ---- Sizes ---- */
+    .avatar--sm  { width: 32px;  height: 32px;  font-size: 12px; }
+    .avatar--md  { width: 40px;  height: 40px;  font-size: var(--font-size-sm); }
+    .avatar--lg  { width: 48px;  height: 48px;  font-size: var(--font-size-base); }
+    .avatar--xl  { width: 64px;  height: 64px;  font-size: 1.25rem; }
+    .avatar--2xl { width: 80px;  height: 80px;  font-size: 1.5rem; }
+
+    /* ---- Type: placeholder (initials, dark bg — default) ---- */
+    /* dark bg is already the default */
+
+    /* ---- Type: overflow (+N count) ---- */
+    .avatar--overflow {
+      background-color: var(--color-neutral-200, #e3e2df);
+      color: var(--text-secondary);
+      font-size: var(--font-size-xs);
+    }
+    .avatar--sm.avatar--overflow  { font-size: 10px; }
+    .avatar--lg.avatar--overflow  { font-size: var(--font-size-sm); }
+    .avatar--xl.avatar--overflow  { font-size: var(--font-size-base); }
+    .avatar--2xl.avatar--overflow { font-size: 1.125rem; }
+
+    /* ---- Status dot wrapper — positioned outside overflow:hidden ---- */
+    .avatar-wrap {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+    }
+
+    .avatar-status {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      border-radius: 9999px;
+      border: 2px solid var(--bg-primary, white);
+      width: 10px;
+      height: 10px;
+    }
+
+    /* Status sizes scale with avatar */
+    .avatar--sm  ~ .avatar-status,
+    .avatar-wrap--sm .avatar-status  { width: 8px;  height: 8px;  bottom: 0; right: 0; border-width: 1.5px; }
+    .avatar--lg  ~ .avatar-status,
+    .avatar-wrap--lg .avatar-status  { width: 12px; height: 12px; }
+    .avatar--xl  ~ .avatar-status,
+    .avatar-wrap--xl .avatar-status  { width: 14px; height: 14px; bottom: 2px; right: 2px; }
+    .avatar--2xl ~ .avatar-status,
+    .avatar-wrap--2xl .avatar-status { width: 16px; height: 16px; bottom: 3px; right: 3px; border-width: 2.5px; }
+
+    /* Status colors */
+    .avatar-status--online  { background-color: #22c55e; }
+    .avatar-status--away    { background-color: #f59e0b; }
+    .avatar-status--busy    { background-color: #ef4444; }
+    .avatar-status--offline { background-color: var(--color-neutral-400, #9f9d9a); }
+
+    /* ---- Avatar Group ---- */
+    .avatar-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .avatar-group .avatar-wrap,
+    .avatar-group .avatar {
+      margin-left: -8px;
+      ring-offset: 0;
+      box-shadow: 0 0 0 2px white;
+    }
+
+    .avatar-group .avatar-wrap:first-child,
+    .avatar-group .avatar:first-child {
+      margin-left: 0;
+    }
+
+    .avatar-group--sm .avatar-wrap,
+    .avatar-group--sm .avatar {
+      margin-left: -6px;
+    }
+
+    .avatar-group--lg .avatar-wrap,
+    .avatar-group--lg .avatar {
+      margin-left: -12px;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      align-items: flex-start;
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Sizes — Placeholder (initials) -->
+    <div class="card">
+      <p class="section-title">Sizes — Placeholder (initials)</p>
+      <div class="row" style="align-items: flex-end;">
+        <div class="col">
+          <span class="state-label">sm — 32px</span>
+          <span class="avatar avatar--sm">AB</span>
+        </div>
+        <div class="col">
+          <span class="state-label">md — 40px</span>
+          <span class="avatar avatar--md">AB</span>
+        </div>
+        <div class="col">
+          <span class="state-label">lg — 48px</span>
+          <span class="avatar avatar--lg">AB</span>
+        </div>
+        <div class="col">
+          <span class="state-label">xl — 64px</span>
+          <span class="avatar avatar--xl">AB</span>
+        </div>
+        <div class="col">
+          <span class="state-label">2xl — 80px</span>
+          <span class="avatar avatar--2xl">AB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Types -->
+    <div class="card">
+      <p class="section-title">Types — md (40px)</p>
+      <div class="grid">
+
+        <div class="col">
+          <span class="state-label">Photo</span>
+          <span class="avatar avatar--md">
+            <!-- Placeholder photo using gradient -->
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="40" fill="#7ab8d0"/>
+              <circle cx="20" cy="15" r="7" fill="white" fill-opacity="0.9"/>
+              <ellipse cx="20" cy="34" rx="13" ry="9" fill="white" fill-opacity="0.9"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Placeholder (initials)</span>
+          <span class="avatar avatar--md">JD</span>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Overflow (+N)</span>
+          <span class="avatar avatar--md avatar--overflow">+4</span>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Icon fallback</span>
+          <span class="avatar avatar--md" style="color: rgba(255,255,255,0.8);">
+            <span data-icon="user" style="width:20px;height:20px;"></span>
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- With Status -->
+    <div class="card">
+      <p class="section-title">With Status — All states</p>
+      <div class="grid">
+
+        <div class="col">
+          <span class="state-label">Online</span>
+          <div class="avatar-wrap avatar-wrap--md">
+            <span class="avatar avatar--md">JD</span>
+            <span class="avatar-status avatar-status--online"></span>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Away</span>
+          <div class="avatar-wrap avatar-wrap--md">
+            <span class="avatar avatar--md">MK</span>
+            <span class="avatar-status avatar-status--away"></span>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Busy</span>
+          <div class="avatar-wrap avatar-wrap--md">
+            <span class="avatar avatar--md">SA</span>
+            <span class="avatar-status avatar-status--busy"></span>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Offline</span>
+          <div class="avatar-wrap avatar-wrap--md">
+            <span class="avatar avatar--md">RL</span>
+            <span class="avatar-status avatar-status--offline"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top: var(--space-6);">
+        <p class="state-label" style="margin-bottom: var(--space-3);">Status across sizes</p>
+        <div class="row" style="align-items: flex-end;">
+          <div class="avatar-wrap avatar-wrap--sm">
+            <span class="avatar avatar--sm">AB</span>
+            <span class="avatar-status avatar-status--online"></span>
+          </div>
+          <div class="avatar-wrap avatar-wrap--md">
+            <span class="avatar avatar--md">AB</span>
+            <span class="avatar-status avatar-status--online"></span>
+          </div>
+          <div class="avatar-wrap avatar-wrap--lg">
+            <span class="avatar avatar--lg">AB</span>
+            <span class="avatar-status avatar-status--online"></span>
+          </div>
+          <div class="avatar-wrap avatar-wrap--xl">
+            <span class="avatar avatar--xl">AB</span>
+            <span class="avatar-status avatar-status--online"></span>
+          </div>
+          <div class="avatar-wrap avatar-wrap--2xl">
+            <span class="avatar avatar--2xl">AB</span>
+            <span class="avatar-status avatar-status--online"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avatar Group -->
+    <div class="card">
+      <p class="section-title">Avatar Group</p>
+
+      <div class="col" style="margin-bottom: var(--space-4);">
+        <span class="state-label">md — 5 members</span>
+        <div class="avatar-group">
+          <span class="avatar avatar--md">JD</span>
+          <span class="avatar avatar--md">MK</span>
+          <span class="avatar avatar--md">SA</span>
+          <span class="avatar avatar--md">RL</span>
+          <span class="avatar avatar--md avatar--overflow">+3</span>
+        </div>
+      </div>
+
+      <div class="col" style="margin-bottom: var(--space-4);">
+        <span class="state-label">sm — compact</span>
+        <div class="avatar-group avatar-group--sm">
+          <span class="avatar avatar--sm">AB</span>
+          <span class="avatar avatar--sm">CD</span>
+          <span class="avatar avatar--sm">EF</span>
+          <span class="avatar avatar--sm avatar--overflow">+7</span>
+        </div>
+      </div>
+
+      <div class="col">
+        <span class="state-label">lg — with status</span>
+        <div class="avatar-group avatar-group--lg">
+          <div class="avatar-wrap avatar-wrap--lg">
+            <span class="avatar avatar--lg">JD</span>
+            <span class="avatar-status avatar-status--online"></span>
+          </div>
+          <div class="avatar-wrap avatar-wrap--lg">
+            <span class="avatar avatar--lg">MK</span>
+            <span class="avatar-status avatar-status--away"></span>
+          </div>
+          <div class="avatar-wrap avatar-wrap--lg">
+            <span class="avatar avatar--lg">SA</span>
+            <span class="avatar-status avatar-status--busy"></span>
+          </div>
+          <span class="avatar avatar--lg avatar--overflow">+2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color variants for placeholders -->
+    <div class="card">
+      <p class="section-title">Color Variants (team palette)</p>
+      <div class="row">
+        <span class="avatar avatar--md" style="background-color: #0e4e69;">DS</span>
+        <span class="avatar avatar--md" style="background-color: #1a6b3c;">MK</span>
+        <span class="avatar avatar--md" style="background-color: #5a3e8a;">RL</span>
+        <span class="avatar avatar--md" style="background-color: #c0392b;">SA</span>
+        <span class="avatar avatar--md" style="background-color: #b5420a;">JT</span>
+        <span class="avatar avatar--md" style="background-color: #943870;">AP</span>
+        <span class="avatar avatar--md" style="background-color: #0a6b5a;">LW</span>
+        <span class="avatar avatar--md" style="background-color: #8a5b00;">BN</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

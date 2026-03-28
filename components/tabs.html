@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabs — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Tabs — Default variant
+       Active tab: black text + 3px bottom indicator bar.
+       Inactive tab: tertiary text, no bar.
+    -------------------------------------------------------- */
+    .tabs {
+      display: flex;
+      align-items: center;
+    }
+
+    .tab {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 1px 12px;  /* md default */
+      height: 40px;       /* md default */
+      border-radius: var(--radius-field) var(--radius-field) 0 0;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm); /* 14px md default */
+      font-weight: var(--font-weight-normal);
+      color: var(--text-tertiary);
+      cursor: pointer;
+      border: none;
+      background: none;
+      white-space: nowrap;
+      transition: color var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .tab:hover:not(.tab--active):not(:disabled) {
+      color: var(--text-primary);
+    }
+
+    .tab--active {
+      color: var(--text-primary);
+    }
+
+    /* Active indicator bar */
+    .tab--active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      border-radius: 9999px;
+      background-color: var(--text-primary);
+    }
+
+    /* Disabled */
+    .tab:disabled,
+    .tab--disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Icon slot within tab */
+    .tab [data-icon] {
+      flex-shrink: 0;
+    }
+
+    /* ---- Size: xl ---- */
+    .tabs--xl .tab {
+      height: 56px;
+      padding: 1px 20px;
+      font-size: 22px;
+    }
+    .tabs--xl .tab [data-icon] { width: 20px; height: 20px; }
+
+    /* ---- Size: lg ---- */
+    .tabs--lg .tab {
+      height: 48px;
+      padding: 1px 16px;
+      font-size: var(--font-size-lg); /* 18px */
+    }
+    .tabs--lg .tab [data-icon] { width: 18px; height: 18px; }
+
+    /* ---- Size: md (default, already set) ---- */
+
+    /* ---- Size: sm ---- */
+    .tabs--sm .tab {
+      height: 32px;
+      padding: 1px 8px;
+      font-size: var(--font-size-xs); /* 12px */
+    }
+    .tabs--sm .tab [data-icon] { width: 14px; height: 14px; }
+
+    /* ---- Size: xs ---- */
+    .tabs--xs .tab {
+      height: 24px;
+      padding: 1px 6px;
+      font-size: 11px;
+    }
+    .tabs--xs .tab [data-icon] { width: 12px; height: 12px; }
+
+    /* --------------------------------------------------------
+       Tabs — Boxed variant
+       Container has bg + border. Active tab gets filled bg pill.
+    -------------------------------------------------------- */
+    .tabs--boxed {
+      background-color: #f9f8f6; /* neutral-50 */
+      border: 1px solid var(--color-neutral-300);
+      padding: 4px;
+      border-radius: 16px;
+    }
+
+    .tabs--boxed .tab {
+      border-radius: var(--radius-field); /* full round, not just top */
+      /* reset the bottom indicator — not used in boxed */
+    }
+
+    .tabs--boxed .tab--active::after {
+      display: none; /* no underline in boxed */
+    }
+
+    .tabs--boxed .tab--active {
+      background-color: var(--color-secondary); /* #e3e2df */
+      color: var(--text-primary);
+    }
+
+    .tabs--boxed .tab:hover:not(.tab--active):not(:disabled) {
+      background-color: var(--color-neutral-200);
+    }
+
+    /* Boxed sm — smaller inner radius */
+    .tabs--boxed.tabs--sm .tab {
+      border-radius: 8px;
+    }
+
+    .tabs--boxed.tabs--xs .tab {
+      border-radius: 8px;
+    }
+
+    /* --------------------------------------------------------
+       Tab content panel (for interactive demo)
+    -------------------------------------------------------- */
+    .tab-panels {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 16px;
+      margin-top: 0;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel--active { display: block; }
+
+    .tab-panel p {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      line-height: 1.6;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Default variant — all sizes -->
+    <div class="card">
+      <p class="section-title">Default Variant — All Sizes</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">xl</span>
+          <div class="tabs tabs--xl" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">lg</span>
+          <div class="tabs tabs--lg" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">md (default)</span>
+          <div class="tabs" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">sm</span>
+          <div class="tabs tabs--sm" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">xs</span>
+          <div class="tabs tabs--xs" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Boxed variant — all sizes -->
+    <div class="card">
+      <p class="section-title">Boxed Variant — All Sizes</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">xl</span>
+          <div class="tabs tabs--boxed tabs--xl" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">lg</span>
+          <div class="tabs tabs--boxed tabs--lg" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">md</span>
+          <div class="tabs tabs--boxed" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">sm</span>
+          <div class="tabs tabs--boxed tabs--sm" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">xs</span>
+          <div class="tabs tabs--boxed tabs--xs" role="tablist">
+            <button class="tab tab--active" role="tab" aria-selected="true">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+            <button class="tab" role="tab" aria-selected="false">Label</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Interactive — Default with content panels -->
+    <div class="card">
+      <p class="section-title">Interactive — Default with Content</p>
+      <div class="tabs js-tabs" role="tablist" data-tabs-group="demo1">
+        <button class="tab tab--active" role="tab" aria-selected="true" aria-controls="panel-overview" data-tab="panel-overview">Overview</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-details" data-tab="panel-details">Details</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-history" data-tab="panel-history">History</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-settings" data-tab="panel-settings">Settings</button>
+      </div>
+      <div class="tab-panels">
+        <div class="tab-panel tab-panel--active" id="panel-overview" role="tabpanel">
+          <p>Overview content. This tab panel is displayed when the Overview tab is active. Summary information would appear here.</p>
+        </div>
+        <div class="tab-panel" id="panel-details" role="tabpanel">
+          <p>Details content. Detailed breakdown of the selected item with all relevant fields and metadata.</p>
+        </div>
+        <div class="tab-panel" id="panel-history" role="tabpanel">
+          <p>History content. A timeline of changes and updates made to this record over time.</p>
+        </div>
+        <div class="tab-panel" id="panel-settings" role="tabpanel">
+          <p>Settings content. Configuration options and preferences for this item.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive — Boxed with content panels -->
+    <div class="card">
+      <p class="section-title">Interactive — Boxed with Content</p>
+      <div class="tabs tabs--boxed tabs--sm js-tabs" role="tablist" data-tabs-group="demo2">
+        <button class="tab tab--active" role="tab" aria-selected="true" aria-controls="panel2-all" data-tab="panel2-all">All</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel2-open" data-tab="panel2-open">Open</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel2-closed" data-tab="panel2-closed">Closed</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel2-pending" data-tab="panel2-pending">Pending</button>
+      </div>
+      <div class="tab-panels">
+        <div class="tab-panel tab-panel--active" id="panel2-all" role="tabpanel">
+          <p>Showing all 24 incidents across all statuses.</p>
+        </div>
+        <div class="tab-panel" id="panel2-open" role="tabpanel">
+          <p>Showing 8 open incidents requiring attention.</p>
+        </div>
+        <div class="tab-panel" id="panel2-closed" role="tabpanel">
+          <p>Showing 14 closed incidents resolved in the last 30 days.</p>
+        </div>
+        <div class="tab-panel" id="panel2-pending" role="tabpanel">
+          <p>Showing 2 incidents pending approval or additional information.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+
+      document.querySelectorAll('.js-tabs').forEach(tabList => {
+        tabList.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            // Deactivate all tabs in this group
+            tabList.querySelectorAll('.tab').forEach(t => {
+              t.classList.remove('tab--active');
+              t.setAttribute('aria-selected', 'false');
+            });
+
+            // Activate clicked tab
+            tab.classList.add('tab--active');
+            tab.setAttribute('aria-selected', 'true');
+
+            // Switch panels if present
+            const panelId = tab.dataset.tab;
+            if (panelId) {
+              const container = tabList.nextElementSibling;
+              if (container && container.classList.contains('tab-panels')) {
+                container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('tab-panel--active'));
+                const target = document.getElementById(panelId);
+                if (target) target.classList.add('tab-panel--active');
+              }
+            }
+          });
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

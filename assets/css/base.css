@@ -1,0 +1,103 @@
+/* ============================================================
+   Horizon 2.0 — Base Styles
+   Imports design tokens and applies global resets + defaults.
+   ============================================================ */
+
+@import url("tokens.css");
+
+/* --- Font faces -------------------------------------------- */
+@font-face {
+  font-family: "ServiceNow Sans";
+  src: url("../fonts/ServiceNowSans-Regular_3273201071.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ServiceNow Sans";
+  src: url("../fonts/ServiceNowSans-Medium_3053949501.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ServiceNow Sans";
+  src: url("../fonts/ServiceNowSans-Bold_3316267867.ttf") format("truetype");
+  font-weight: 600 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ServiceNow Sans Mono";
+  src: url("../fonts/ServiceNowSansMono-Regular_1413560908.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Reset ------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Base -------------------------------------------------- */
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+/* Icons — ensure inlined SVGs are always vertically centred */
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+[data-icon] svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* --- Typography scale -------------------------------------- */
+h1 { font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); line-height: var(--line-height-tight); }
+h2 { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); line-height: var(--line-height-tight); }
+h3 { font-size: var(--font-size-3xl); font-weight: var(--font-weight-semibold); line-height: var(--line-height-snug); }
+h4 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); line-height: var(--line-height-snug); }
+h5 { font-size: var(--font-size-xl);  font-weight: var(--font-weight-semibold); line-height: var(--line-height-normal); }
+h6 { font-size: var(--font-size-lg);  font-weight: var(--font-weight-semibold); line-height: var(--line-height-normal); }
+
+p  { line-height: var(--line-height-relaxed); }
+
+small { font-size: var(--font-size-sm); color: var(--text-secondary); }

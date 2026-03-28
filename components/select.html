@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Select — wrapper (mirrors input-field wrapper pattern)
+    -------------------------------------------------------- */
+    .select {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border-radius: var(--radius-field); /* 12px */
+      border: 1px solid var(--border-default);
+      background-color: var(--bg-primary);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    /* ---- Value / placeholder text ---- */
+    .select__value {
+      flex: 1;
+      min-width: 0;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm); /* 14px */
+      font-weight: 300; /* Light */
+      color: var(--text-tertiary); /* placeholder color */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25rem;
+    }
+
+    .select__value--selected {
+      color: var(--text-primary);
+    }
+
+    /* ---- Chevron ---- */
+    .select__chevron {
+      flex-shrink: 0;
+      color: var(--text-tertiary);
+      width: 16px;
+      height: 16px;
+      transition: transform var(--transition-fast);
+    }
+
+    /* ---- Focus ring ---- */
+    .select:focus,
+    .select--open:not(.select--disabled):not(.select--ghost) {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--border-default);
+    }
+
+    .select--open .select__chevron {
+      transform: rotate(180deg);
+    }
+
+    /* ---- States ---- */
+    .select--error {
+      border-color: var(--color-error);
+    }
+
+    .select--error:focus,
+    .select--error.select--open {
+      box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--color-error);
+    }
+
+    .select--disabled {
+      background-color: var(--bg-secondary);
+      border-color: var(--bg-secondary);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .select--disabled .select__value,
+    .select--disabled .select__chevron {
+      color: #a3a2a1;
+    }
+
+    .select--ghost {
+      border-color: transparent;
+    }
+
+    .select--ghost:focus,
+    .select--ghost.select--open {
+      box-shadow: none;
+    }
+
+    .select--ai {
+      border-color: var(--color-accent); /* green */
+    }
+
+    .select--ai-load {
+      background-color: var(--bg-secondary);
+      border-color: var(--color-accent);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .select--ai-load .select__value,
+    .select--ai-load .select__chevron {
+      color: #a3a2a1;
+    }
+
+    /* --------------------------------------------------------
+       Select — Dropdown panel
+    -------------------------------------------------------- */
+    .select__panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--color-neutral-300);
+      border-radius: var(--radius-field); /* 12px */
+      box-shadow: 0px 10px 15px 0px rgba(0,0,0,0.1), 0px 4px 6px 0px rgba(0,0,0,0.06);
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .select__panel[hidden] {
+      display: none;
+    }
+
+    /* ---- Search inside panel ---- */
+    .select__search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: var(--radius-md); /* 8px */
+      border: 1px solid var(--border-default);
+      background-color: var(--bg-primary);
+      margin-bottom: 4px;
+    }
+
+    .select__search-wrap [data-icon] {
+      flex-shrink: 0;
+      color: var(--text-tertiary);
+      width: 14px;
+      height: 14px;
+    }
+
+    .select__search {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs); /* 12px */
+      font-weight: 300;
+      color: var(--text-primary);
+    }
+
+    .select__search::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    /* ---- Option items ---- */
+    .select__option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: var(--radius-md); /* 8px */
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm); /* 14px */
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+
+    .select__option:hover {
+      background-color: var(--color-neutral-200);
+    }
+
+    .select__option--selected {
+      background-color: var(--color-neutral-200);
+      font-weight: var(--font-weight-normal);
+    }
+
+    .select__option [data-icon] {
+      flex-shrink: 0;
+      color: var(--color-primary);
+      width: 14px;
+      height: 14px;
+      margin-left: auto;
+    }
+
+    .select__option--empty {
+      color: var(--text-tertiary);
+      cursor: default;
+      justify-content: center;
+    }
+
+    .select__option--empty:hover {
+      background-color: transparent;
+    }
+
+    /* ---- Divider ---- */
+    .select__divider {
+      height: 1px;
+      background-color: var(--border-subtle);
+      margin: 4px 0;
+    }
+
+    /* --------------------------------------------------------
+       Select Fieldset
+    -------------------------------------------------------- */
+    .select-fieldset {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .select-fieldset__help {
+      font-family: var(--font-sans);
+      font-size: 0.625rem; /* 10px */
+      line-height: 1rem;
+      color: var(--text-tertiary);
+    }
+
+    .select-fieldset__help--error {
+      color: var(--color-error);
+    }
+
+    /* --------------------------------------------------------
+       Fieldset Legend (shared pattern)
+    -------------------------------------------------------- */
+    .field-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .field-legend__title {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .field-legend__required {
+      font-size: var(--font-size-xs);
+      color: var(--color-error);
+      line-height: var(--line-height-5);
+    }
+
+    .field-legend__label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: var(--line-height-5);
+    }
+
+    .field-legend__optional {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      line-height: var(--line-height-5);
+    }
+
+    .field-legend__info {
+      color: var(--text-tertiary);
+      width: 12px;
+      height: 12px;
+      cursor: pointer;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Select — all states -->
+    <div class="card">
+      <p class="section-title">Select — States</p>
+      <div class="grid">
+
+        <div class="col">
+          <span class="state-label">Default (placeholder)</span>
+          <div class="select" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+            <span class="select__value">Select an option</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+            <div class="select__panel" hidden role="listbox">
+              <div class="select__search-wrap">
+                <span data-icon="search"></span>
+                <input class="select__search" type="text" placeholder="Search…" autocomplete="off">
+              </div>
+              <div class="select__option" data-value="option-1">Option 1</div>
+              <div class="select__option" data-value="option-2">Option 2</div>
+              <div class="select__option" data-value="option-3">Option 3</div>
+              <div class="select__option" data-value="option-4">Option 4</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Open / Active</span>
+          <!-- Simulated open state -->
+          <div class="select select--open" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="true" style="z-index:10;">
+            <span class="select__value">Select an option</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+            <div class="select__panel" role="listbox">
+              <div class="select__search-wrap">
+                <span data-icon="search"></span>
+                <input class="select__search" type="text" placeholder="Search…" autocomplete="off">
+              </div>
+              <div class="select__option" data-value="option-1">Option 1</div>
+              <div class="select__option" data-value="option-2">Option 2</div>
+              <div class="select__option" data-value="option-3">Option 3</div>
+              <div class="select__option" data-value="option-4">Option 4</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Selected</span>
+          <div class="select" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+            <span class="select__value select__value--selected">Option 2</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+            <div class="select__panel" hidden role="listbox">
+              <div class="select__search-wrap">
+                <span data-icon="search"></span>
+                <input class="select__search" type="text" placeholder="Search…" autocomplete="off">
+              </div>
+              <div class="select__option" data-value="option-1">Option 1</div>
+              <div class="select__option select__option--selected" data-value="option-2">Option 2 <span data-icon="check"></span></div>
+              <div class="select__option" data-value="option-3">Option 3</div>
+              <div class="select__option" data-value="option-4">Option 4</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Disabled</span>
+          <div class="select select--disabled" tabindex="-1" role="combobox" aria-disabled="true">
+            <span class="select__value">Select an option</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Ghost</span>
+          <div class="select select--ghost" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+            <span class="select__value">Select an option</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+            <div class="select__panel" hidden role="listbox">
+              <div class="select__option" data-value="option-1">Option 1</div>
+              <div class="select__option" data-value="option-2">Option 2</div>
+              <div class="select__option" data-value="option-3">Option 3</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Error</span>
+          <div class="select select--error" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-invalid="true">
+            <span class="select__value select__value--selected">Option 1</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+            <div class="select__panel" hidden role="listbox">
+              <div class="select__option select__option--selected" data-value="option-1">Option 1 <span data-icon="check"></span></div>
+              <div class="select__option" data-value="option-2">Option 2</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Error Focused</span>
+          <div class="select select--error" tabindex="0" role="combobox" style="box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--color-error);">
+            <span class="select__value select__value--selected">Option 1</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">AI / Accent</span>
+          <div class="select select--ai" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+            <span class="select__value select__value--selected">AI-suggested value</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+            <div class="select__panel" hidden role="listbox">
+              <div class="select__option select__option--selected" data-value="ai-val">AI-suggested value <span data-icon="check"></span></div>
+              <div class="select__option" data-value="option-2">Option 2</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">AI Load</span>
+          <div class="select select--ai-load" tabindex="-1" role="combobox" aria-disabled="true">
+            <span class="select__value">Loading…</span>
+            <span data-icon="chevron-down" class="select__chevron"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Select Fieldset — Assembled -->
+    <div class="card">
+      <p class="section-title">Select Fieldset — Assembled</p>
+      <div class="grid">
+
+        <div class="col">
+          <span class="state-label">Default</span>
+          <div class="select-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <label class="field-legend__label">Category</label>
+                <span data-icon="circle-info" class="field-legend__info"></span>
+              </div>
+            </div>
+            <div class="select" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select__value">Select a category</span>
+              <span data-icon="chevron-down" class="select__chevron"></span>
+              <div class="select__panel" hidden role="listbox">
+                <div class="select__search-wrap">
+                  <span data-icon="search"></span>
+                  <input class="select__search" type="text" placeholder="Search…" autocomplete="off">
+                </div>
+                <div class="select__option" data-value="hardware">Hardware</div>
+                <div class="select__option" data-value="software">Software</div>
+                <div class="select__option" data-value="network">Network</div>
+                <div class="select__option" data-value="security">Security</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">With help text</span>
+          <div class="select-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <label class="field-legend__label">Priority</label>
+                <span data-icon="circle-info" class="field-legend__info"></span>
+              </div>
+            </div>
+            <div class="select" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select__value select__value--selected">High</span>
+              <span data-icon="chevron-down" class="select__chevron"></span>
+              <div class="select__panel" hidden role="listbox">
+                <div class="select__option" data-value="critical">Critical</div>
+                <div class="select__option select__option--selected" data-value="high">High <span data-icon="check"></span></div>
+                <div class="select__option" data-value="medium">Medium</div>
+                <div class="select__option" data-value="low">Low</div>
+              </div>
+            </div>
+            <p class="select-fieldset__help">Set the urgency level for this request</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Required + Error</span>
+          <div class="select-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <span class="field-legend__required">*</span>
+                <label class="field-legend__label">Assignment group</label>
+              </div>
+            </div>
+            <div class="select select--error" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-invalid="true">
+              <span class="select__value">Select a group</span>
+              <span data-icon="chevron-down" class="select__chevron"></span>
+              <div class="select__panel" hidden role="listbox">
+                <div class="select__option" data-value="g1">IT Support</div>
+                <div class="select__option" data-value="g2">Network Ops</div>
+              </div>
+            </div>
+            <p class="select-fieldset__help select-fieldset__help--error">Please select an assignment group</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Optional</span>
+          <div class="select-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <label class="field-legend__label">Sub-category</label>
+                <span class="field-legend__optional">(optional)</span>
+              </div>
+            </div>
+            <div class="select" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select__value">Select a sub-category</span>
+              <span data-icon="chevron-down" class="select__chevron"></span>
+              <div class="select__panel" hidden role="listbox">
+                <div class="select__option" data-value="email">Email</div>
+                <div class="select__option" data-value="vpn">VPN</div>
+                <div class="select__option" data-value="printer">Printer</div>
+              </div>
+            </div>
+            <p class="select-fieldset__help">Help text</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Disabled</span>
+          <div class="select-fieldset">
+            <div class="field-legend">
+              <div class="field-legend__title">
+                <label class="field-legend__label">Region</label>
+              </div>
+            </div>
+            <div class="select select--disabled" tabindex="-1" role="combobox" aria-disabled="true">
+              <span class="select__value">North America</span>
+              <span data-icon="chevron-down" class="select__chevron"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+      initSelects();
+    });
+
+    function initSelects() {
+      document.querySelectorAll('.select:not(.select--disabled):not(.select--ai-load)').forEach(select => {
+        const panel = select.querySelector('.select__panel');
+        const valueEl = select.querySelector('.select__value');
+        const searchInput = select.querySelector('.select__search');
+        if (!panel) return;
+
+        // Toggle open/close on click
+        select.addEventListener('click', (e) => {
+          // Don't close when clicking inside the panel
+          if (e.target.closest('.select__panel') && !e.target.closest('.select__option')) return;
+
+          const isOpen = !panel.hidden;
+          closeAllSelects();
+          if (!isOpen) {
+            openSelect(select, panel, searchInput);
+          }
+        });
+
+        // Handle option selection
+        panel.querySelectorAll('.select__option:not(.select__option--empty)').forEach(option => {
+          option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const value = option.dataset.value;
+            const text = option.textContent.trim();
+
+            // Update value display
+            valueEl.textContent = text;
+            valueEl.classList.add('select__value--selected');
+
+            // Update selected state
+            panel.querySelectorAll('.select__option').forEach(o => {
+              o.classList.remove('select__option--selected');
+              const check = o.querySelector('[data-icon="check"]');
+              if (check) check.remove();
+            });
+            option.classList.add('select__option--selected');
+            const checkSpan = document.createElement('span');
+            checkSpan.setAttribute('data-icon', 'check');
+            option.appendChild(checkSpan);
+            Horizon.initIcons();
+
+            closeAllSelects();
+          });
+        });
+
+        // Search filter
+        if (searchInput) {
+          searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            panel.querySelectorAll('.select__option').forEach(option => {
+              const match = option.textContent.trim().toLowerCase().includes(query);
+              option.style.display = match ? '' : 'none';
+            });
+          });
+          searchInput.addEventListener('click', e => e.stopPropagation());
+        }
+
+        // Keyboard: Escape closes
+        select.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeAllSelects();
+        });
+      });
+
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.select')) closeAllSelects();
+      });
+    }
+
+    function openSelect(select, panel, searchInput) {
+      panel.hidden = false;
+      select.setAttribute('aria-expanded', 'true');
+      select.classList.add('select--open');
+      if (searchInput) {
+        searchInput.value = '';
+        select.querySelectorAll('.select__option').forEach(o => o.style.display = '');
+        searchInput.focus();
+      }
+    }
+
+    function closeAllSelects() {
+      document.querySelectorAll('.select--open').forEach(s => {
+        const p = s.querySelector('.select__panel');
+        if (p) p.hidden = true;
+        s.setAttribute('aria-expanded', 'false');
+        s.classList.remove('select--open');
+      });
+    }
+  </script>
+
+</body>
+</html>

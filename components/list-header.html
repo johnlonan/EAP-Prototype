@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List Header — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       List Header
+       Full-width header for list/table views.
+       Layout: [Title + count badge] ... [search·filter·settings | layout switcher | data actions]
+       pb: 16px
+       Title: 24px semibold
+       Count badge: sm pill, secondary style
+       Action groups separated by 8px gap between groups.
+    -------------------------------------------------------- */
+
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding-bottom: 16px;
+      width: 100%;
+    }
+
+    /* Left: title + badge */
+    .list-header__left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .list-header__title {
+      font-family: var(--font-sans);
+      font-size: 1.5rem; /* 24px */
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      white-space: nowrap;
+      margin: 0;
+    }
+
+    /* Count badge — pill shape, tertiary/secondary neutral */
+    .list-header__count {
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 9999px;
+      background-color: var(--color-neutral-200, #edece9);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: var(--font-weight-normal);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Right: grouped actions */
+    .list-header__right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    /* Separator between action groups */
+    .list-header__sep {
+      width: 1px;
+      height: 20px;
+      background-color: var(--border-subtle);
+      margin: 0 var(--space-1);
+      flex-shrink: 0;
+    }
+
+    /* ---- Button base (sm / ghost) for icon buttons ---- */
+    .lh-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 32px;
+      border-radius: var(--radius-lg);
+      border: 1px solid transparent;
+      background-color: transparent;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+      padding: 0 8px;
+    }
+
+    .lh-btn:hover {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .lh-btn--active {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    /* Icon only */
+    .lh-btn--iconic {
+      width: 32px;
+      padding: 0;
+    }
+
+    .lh-btn [data-icon] {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Primary / secondary action buttons */
+    .lh-btn--primary {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    .lh-btn--primary:hover {
+      background-color: var(--color-primary-hover);
+      color: white;
+    }
+
+    .lh-btn--secondary {
+      background-color: var(--bg-primary);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .lh-btn--secondary:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    /* ---- Layout switcher icons ---- */
+    .layout-switcher {
+      display: flex;
+      align-items: center;
+      background-color: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .layout-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .layout-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .layout-btn--active {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .layout-btn [data-icon] {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Placeholder table body */
+    .placeholder-list {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: var(--space-4);
+    }
+
+    .placeholder-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .placeholder-row:last-child {
+      border-bottom: none;
+    }
+
+    .ph-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      background-color: var(--bg-secondary);
+      flex-shrink: 0;
+    }
+
+    .ph-line {
+      height: 10px;
+      border-radius: 4px;
+      background-color: var(--bg-secondary);
+      flex: 1;
+    }
+
+    .ph-line--sm { flex: 0 0 80px; }
+    .ph-line--xs { flex: 0 0 50px; }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Full list header -->
+    <div class="card">
+      <p class="section-title">Full — All Action Groups</p>
+
+      <div class="list-header js-list-header">
+        <!-- Left: title + count -->
+        <div class="list-header__left">
+          <h2 class="list-header__title">Active Incidents</h2>
+          <span class="list-header__count">247</span>
+        </div>
+
+        <!-- Right: actions -->
+        <div class="list-header__right">
+          <!-- Group 1: Search · Filter · Settings -->
+          <button class="lh-btn lh-btn--iconic" title="Search">
+            <span data-icon="search"></span>
+          </button>
+          <button class="lh-btn lh-btn--iconic" title="Filter">
+            <span data-icon="filter"></span>
+          </button>
+          <button class="lh-btn lh-btn--iconic" title="Settings">
+            <span data-icon="settings"></span>
+          </button>
+
+          <div class="list-header__sep"></div>
+
+          <!-- Group 2: Layout switcher -->
+          <div class="layout-switcher">
+            <button class="layout-btn layout-btn--active js-layout-btn" data-layout="list" title="List view">
+              <span data-icon="layout-list"></span>
+            </button>
+            <button class="layout-btn js-layout-btn" data-layout="grid" title="Grid view">
+              <span data-icon="layout-grid"></span>
+            </button>
+          </div>
+
+          <div class="list-header__sep"></div>
+
+          <!-- Group 3: Data actions -->
+          <button class="lh-btn lh-btn--secondary">
+            <span data-icon="download"></span>Export
+          </button>
+          <button class="lh-btn lh-btn--primary">
+            <span data-icon="plus"></span>Create
+          </button>
+        </div>
+      </div>
+
+      <!-- Placeholder list body -->
+      <div class="placeholder-list">
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 220px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+          <div class="ph-line--xs ph-line"></div>
+        </div>
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 180px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+          <div class="ph-line--xs ph-line"></div>
+        </div>
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 260px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+          <div class="ph-line--xs ph-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple — title + single action -->
+    <div class="card">
+      <p class="section-title">Simple — Title + Single Action</p>
+      <div class="list-header">
+        <div class="list-header__left">
+          <h2 class="list-header__title">Change Requests</h2>
+          <span class="list-header__count">18</span>
+        </div>
+        <div class="list-header__right">
+          <button class="lh-btn lh-btn--primary">
+            <span data-icon="plus"></span>New Request
+          </button>
+        </div>
+      </div>
+      <div class="placeholder-list">
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 200px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+        </div>
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 160px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Title + search + filter only -->
+    <div class="card">
+      <p class="section-title">Title + Search + Filter</p>
+      <div class="list-header">
+        <div class="list-header__left">
+          <h2 class="list-header__title">Service Catalog</h2>
+        </div>
+        <div class="list-header__right">
+          <button class="lh-btn">
+            <span data-icon="search"></span>Search
+          </button>
+          <button class="lh-btn">
+            <span data-icon="filter"></span>Filter
+          </button>
+        </div>
+      </div>
+      <div class="placeholder-list">
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 240px;"></div>
+        </div>
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 190px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No count, more actions -->
+    <div class="card">
+      <p class="section-title">Extended Actions</p>
+      <div class="list-header">
+        <div class="list-header__left">
+          <h2 class="list-header__title">Assets</h2>
+          <span class="list-header__count">1,204</span>
+        </div>
+        <div class="list-header__right">
+          <button class="lh-btn lh-btn--iconic" title="Search"><span data-icon="search"></span></button>
+          <button class="lh-btn lh-btn--iconic" title="Filter"><span data-icon="filter"></span></button>
+          <button class="lh-btn lh-btn--iconic" title="Settings"><span data-icon="settings"></span></button>
+          <button class="lh-btn lh-btn--iconic" title="More"><span data-icon="more-horizontal"></span></button>
+
+          <div class="list-header__sep"></div>
+
+          <div class="layout-switcher">
+            <button class="layout-btn layout-btn--active js-layout-btn" data-layout="list" title="List view">
+              <span data-icon="layout-list"></span>
+            </button>
+            <button class="layout-btn js-layout-btn" data-layout="grid" title="Grid view">
+              <span data-icon="layout-grid"></span>
+            </button>
+          </div>
+
+          <div class="list-header__sep"></div>
+
+          <button class="lh-btn lh-btn--secondary"><span data-icon="download"></span>Export</button>
+          <button class="lh-btn lh-btn--primary"><span data-icon="plus"></span>Add Asset</button>
+        </div>
+      </div>
+      <div class="placeholder-list">
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 200px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+          <div class="ph-line--xs ph-line"></div>
+        </div>
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 280px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+          <div class="ph-line--xs ph-line"></div>
+        </div>
+        <div class="placeholder-row">
+          <div class="ph-circle"></div>
+          <div class="ph-line" style="max-width: 150px;"></div>
+          <div class="ph-line--sm ph-line"></div>
+          <div class="ph-line--xs ph-line"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+
+      // Layout switcher toggle
+      document.querySelectorAll('.js-list-header, .card').forEach(card => {
+        card.querySelectorAll('.js-layout-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const switcher = btn.closest('.layout-switcher');
+            switcher.querySelectorAll('.js-layout-btn').forEach(b => b.classList.remove('layout-btn--active'));
+            btn.classList.add('layout-btn--active');
+          });
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

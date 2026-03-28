@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Split Button — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Split Button base
+       Structure: [main | divider | drop]
+       overflow-hidden on wrapper clips children to border-radius
+    -------------------------------------------------------- */
+    .split-btn {
+      display: inline-flex;
+      align-items: stretch;
+      height: 40px;
+      border-radius: var(--radius-field); /* 12px */
+      overflow: hidden;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+    }
+
+    .split-btn__main,
+    .split-btn__drop {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: 1.8;
+      white-space: nowrap;
+      transition: background-color var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .split-btn__main {
+      gap: 6px;
+      padding: 0 12px;
+    }
+
+    .split-btn__drop {
+      padding: 0 10px;
+    }
+
+    .split-btn__drop svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .split-btn__main svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .split-btn__divider {
+      width: 1px;
+      flex-shrink: 0;
+      align-self: stretch;
+    }
+
+    /* Disabled */
+    .split-btn:has(button:disabled) {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* Focus */
+    .split-btn__main:focus-visible,
+    .split-btn__drop:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
+
+    /* --------------------------------------------------------
+       Color variants
+    -------------------------------------------------------- */
+
+    /* Primary */
+    .split-btn-primary .split-btn__main  { background-color: var(--color-primary); color: var(--color-primary-content); }
+    .split-btn-primary .split-btn__drop  { background-color: var(--color-primary); color: var(--color-primary-content); }
+    .split-btn-primary .split-btn__divider { background-color: rgba(255,255,255,0.3); }
+    .split-btn-primary .split-btn__main:hover  { background-color: var(--color-primary-hover); }
+    .split-btn-primary .split-btn__drop:hover  { background-color: var(--color-primary-hover); }
+    .split-btn-primary .split-btn__main:active { background-color: var(--color-primary-active); }
+    .split-btn-primary .split-btn__drop:active { background-color: var(--color-primary-active); }
+
+    /* Secondary */
+    .split-btn-secondary .split-btn__main  { background-color: var(--color-secondary); color: var(--color-secondary-content); }
+    .split-btn-secondary .split-btn__drop  { background-color: var(--color-secondary); color: var(--color-secondary-content); }
+    .split-btn-secondary .split-btn__divider { background-color: var(--border-default); }
+    .split-btn-secondary .split-btn__main:hover  { background-color: var(--color-secondary-hover); }
+    .split-btn-secondary .split-btn__drop:hover  { background-color: var(--color-secondary-hover); }
+    .split-btn-secondary .split-btn__main:active { background-color: var(--color-secondary-active); }
+    .split-btn-secondary .split-btn__drop:active { background-color: var(--color-secondary-active); }
+
+    /* Accent */
+    .split-btn-accent .split-btn__main  { background-color: var(--color-accent); color: var(--color-accent-content); }
+    .split-btn-accent .split-btn__drop  { background-color: var(--color-accent); color: var(--color-accent-content); }
+    .split-btn-accent .split-btn__divider { background-color: rgba(0,0,0,0.2); }
+    .split-btn-accent .split-btn__main:hover  { background-color: var(--color-accent-hover); }
+    .split-btn-accent .split-btn__drop:hover  { background-color: var(--color-accent-hover); }
+
+    /* Neutral */
+    .split-btn-neutral .split-btn__main  { background-color: var(--color-neutral); color: var(--color-neutral-content); }
+    .split-btn-neutral .split-btn__drop  { background-color: var(--color-neutral); color: var(--color-neutral-content); }
+    .split-btn-neutral .split-btn__divider { background-color: rgba(255,255,255,0.2); }
+    .split-btn-neutral .split-btn__main:hover  { background-color: var(--color-neutral-hover); }
+    .split-btn-neutral .split-btn__drop:hover  { background-color: var(--color-neutral-hover); }
+
+    /* Error / Destructive */
+    .split-btn-error .split-btn__main  { background-color: var(--color-error); color: var(--color-error-content); }
+    .split-btn-error .split-btn__drop  { background-color: var(--color-error); color: var(--color-error-content); }
+    .split-btn-error .split-btn__divider { background-color: rgba(255,255,255,0.3); }
+    .split-btn-error .split-btn__main:hover  { background-color: var(--color-error-hover); }
+    .split-btn-error .split-btn__drop:hover  { background-color: var(--color-error-hover); }
+
+    /* Ghost */
+    .split-btn-ghost .split-btn__main  { background-color: transparent; color: var(--text-primary); }
+    .split-btn-ghost .split-btn__drop  { background-color: transparent; color: var(--text-primary); }
+    .split-btn-ghost .split-btn__divider { background-color: var(--border-default); }
+    .split-btn-ghost .split-btn__main:hover  { background-color: var(--color-ghost-hover); }
+    .split-btn-ghost .split-btn__drop:hover  { background-color: var(--color-ghost-hover); }
+
+    /* Primary AI — gradient on wrapper spans full width end-to-end */
+    .split-btn-primary-ai {
+      background: linear-gradient(113deg, #86f673 0%, #71d5fe 100%);
+    }
+    .split-btn-primary-ai .split-btn__main,
+    .split-btn-primary-ai .split-btn__drop {
+      background: transparent;
+      color: var(--text-primary);
+    }
+    .split-btn-primary-ai .split-btn__divider { background-color: rgba(0,0,0,0.15); }
+    .split-btn-primary-ai .split-btn__main:hover { background-color: rgba(0,0,0,0.08); }
+    .split-btn-primary-ai .split-btn__drop:hover  { background-color: rgba(0,0,0,0.08); }
+    .split-btn-primary-ai .split-btn__main:active { background-color: rgba(0,0,0,0.16); }
+    .split-btn-primary-ai .split-btn__drop:active  { background-color: rgba(0,0,0,0.16); }
+
+    /* Secondary AI — muted gradient on wrapper spans full width end-to-end */
+    .split-btn-secondary-ai {
+      background-image: linear-gradient(113deg, rgba(134,246,115,0.4) 0%, rgba(113,213,254,0.4) 100%);
+      background-color: var(--bg-primary);
+    }
+    .split-btn-secondary-ai .split-btn__main,
+    .split-btn-secondary-ai .split-btn__drop {
+      background: transparent;
+      color: var(--text-primary);
+    }
+    .split-btn-secondary-ai .split-btn__divider { background-color: rgba(0,0,0,0.12); }
+    .split-btn-secondary-ai .split-btn__main:hover { background-color: rgba(0,0,0,0.06); }
+    .split-btn-secondary-ai .split-btn__drop:hover  { background-color: rgba(0,0,0,0.06); }
+    .split-btn-secondary-ai .split-btn__main:active { background-color: rgba(0,0,0,0.12); }
+    .split-btn-secondary-ai .split-btn__drop:active  { background-color: rgba(0,0,0,0.12); }
+
+    /* --------------------------------------------------------
+       Sizes
+    -------------------------------------------------------- */
+    .split-btn-xl { height: 56px; font-size: 1.375rem; border-radius: var(--radius-field); }
+    .split-btn-xl .split-btn__main { padding: 0 20px; gap: 8px; }
+    .split-btn-xl .split-btn__drop { padding: 0 16px; }
+    .split-btn-xl .split-btn__main svg,
+    .split-btn-xl .split-btn__drop svg { width: 24px; height: 24px; }
+
+    .split-btn-lg { height: 48px; font-size: var(--font-size-lg); border-radius: var(--radius-field); }
+    .split-btn-lg .split-btn__main { padding: 0 16px; gap: 6px; }
+    .split-btn-lg .split-btn__drop { padding: 0 12px; }
+
+    /* md is default */
+
+    .split-btn-sm {
+      height: 32px;
+      font-size: var(--font-size-xs);
+      border-radius: var(--radius-lg); /* 8px */
+    }
+    .split-btn-sm .split-btn__main { padding: 0 10px; gap: 4px; }
+    .split-btn-sm .split-btn__drop { padding: 0 8px; }
+    .split-btn-sm .split-btn__main svg,
+    .split-btn-sm .split-btn__drop svg { width: 16px; height: 16px; }
+
+    .split-btn-xs {
+      height: 24px;
+      font-size: 0.6875rem;
+      border-radius: var(--radius-lg); /* 8px */
+    }
+    .split-btn-xs .split-btn__main { padding: 0 8px; gap: 4px; }
+    .split-btn-xs .split-btn__drop { padding: 0 6px; }
+    .split-btn-xs .split-btn__main svg,
+    .split-btn-xs .split-btn__drop svg { width: 12px; height: 12px; }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Color variants -->
+    <div class="card">
+      <p class="section-title">Color Variants</p>
+      <div class="row">
+
+        <div class="split-btn split-btn-primary">
+          <button class="split-btn__main">
+            <span data-icon="bookmark"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+        <div class="split-btn split-btn-secondary">
+          <button class="split-btn__main">
+            <span data-icon="bookmark"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+        <div class="split-btn split-btn-accent">
+          <button class="split-btn__main">
+            <span data-icon="bookmark"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+        <div class="split-btn split-btn-neutral">
+          <button class="split-btn__main">
+            <span data-icon="bookmark"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+        <div class="split-btn split-btn-error">
+          <button class="split-btn__main">
+            <span data-icon="bookmark"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+        <div class="split-btn split-btn-ghost">
+          <button class="split-btn__main">
+            <span data-icon="bookmark"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AI variants -->
+    <div class="card">
+      <p class="section-title">AI Variants</p>
+      <div class="row">
+
+        <div class="split-btn split-btn-primary-ai">
+          <button class="split-btn__main">
+            <span data-icon="star"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+        <div class="split-btn split-btn-secondary-ai">
+          <button class="split-btn__main">
+            <span data-icon="star"></span>
+            Split Button
+          </button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options">
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sizes -->
+    <div class="card">
+      <p class="section-title">Sizes (Primary)</p>
+      <div class="row">
+
+        <div class="split-btn split-btn-primary split-btn-xl">
+          <button class="split-btn__main"><span data-icon="bookmark"></span>Split Button</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options"><span data-icon="chevron-down"></span></button>
+        </div>
+
+        <div class="split-btn split-btn-primary split-btn-lg">
+          <button class="split-btn__main"><span data-icon="bookmark"></span>Split Button</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options"><span data-icon="chevron-down"></span></button>
+        </div>
+
+        <div class="split-btn split-btn-primary">
+          <button class="split-btn__main"><span data-icon="bookmark"></span>Split Button</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options"><span data-icon="chevron-down"></span></button>
+        </div>
+
+        <div class="split-btn split-btn-primary split-btn-sm">
+          <button class="split-btn__main"><span data-icon="bookmark"></span>Split</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options"><span data-icon="chevron-down"></span></button>
+        </div>
+
+        <div class="split-btn split-btn-primary split-btn-xs">
+          <button class="split-btn__main"><span data-icon="bookmark"></span>Split</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options"><span data-icon="chevron-down"></span></button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="card">
+      <p class="section-title">Disabled</p>
+      <div class="row">
+
+        <div class="split-btn split-btn-primary">
+          <button class="split-btn__main" disabled><span data-icon="bookmark"></span>Split Button</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options" disabled><span data-icon="chevron-down"></span></button>
+        </div>
+
+        <div class="split-btn split-btn-secondary">
+          <button class="split-btn__main" disabled><span data-icon="bookmark"></span>Split Button</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options" disabled><span data-icon="chevron-down"></span></button>
+        </div>
+
+        <div class="split-btn split-btn-ghost">
+          <button class="split-btn__main" disabled><span data-icon="bookmark"></span>Split Button</button>
+          <div class="split-btn__divider"></div>
+          <button class="split-btn__drop" aria-label="More options" disabled><span data-icon="chevron-down"></span></button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

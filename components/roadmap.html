@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+
+    :root {
+      --rm-label-w: 188px;
+      --rm-at-risk: #c2540a;   /* matches --kb-priority-high in kanban */
+    }
+
+    /* ── Page ─────────────────────────────────────────────── */
+    .rm-page {
+      padding: var(--space-6);
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .rm-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .rm-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      line-height: var(--line-height-tight);
+    }
+
+    .rm-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    .rm-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    /* Legend */
+    .rm-legend {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .rm-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+    }
+
+    .rm-legend-pip {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    /* Nav */
+    .rm-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .rm-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-primary);
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .rm-nav-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .rm-nav-btn [data-icon] { width: 14px; height: 14px; }
+
+    .rm-window-label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      min-width: 196px;
+      text-align: center;
+    }
+
+    /* ── Board ────────────────────────────────────────────── */
+    .rm-board {
+      background: var(--surface-primary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Row base ─────────────────────────────────────────── */
+    .rm-row {
+      display: flex;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .rm-row:last-child { border-bottom: none; }
+
+    .rm-label {
+      flex-shrink: 0;
+      width: var(--rm-label-w);
+      min-width: var(--rm-label-w);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-3);
+      background: var(--surface-primary);
+    }
+
+    .rm-timeline {
+      flex: 1;
+      position: relative;
+      min-width: 0;
+    }
+
+    /* ── Axis row ─────────────────────────────────────────── */
+    .rm-axis .rm-label {
+      height: 54px;
+      background: var(--bg-secondary);
+      align-items: flex-end;
+      padding-bottom: 8px;
+    }
+
+    .rm-axis-label {
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .rm-axis-tl {
+      height: 54px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .rm-quarters {
+      display: flex;
+      height: 22px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+    }
+
+    .rm-quarter {
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-2);
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-tertiary);
+      border-right: 1px solid var(--border-default);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .rm-quarter:last-child { border-right: none; }
+
+    .rm-months {
+      display: flex;
+      height: 32px;
+    }
+
+    .rm-month {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      border-right: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .rm-month:last-child { border-right: none; }
+    .rm-month.is-now {
+      color: var(--color-info);
+      font-weight: var(--font-weight-semibold);
+      background: rgba(42, 110, 220, 0.05);
+    }
+
+    /* ── Track row ────────────────────────────────────────── */
+    .rm-track .rm-label {
+      height: 34px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      user-select: none;
+      gap: var(--space-2);
+      transition: background var(--transition-fast);
+    }
+    .rm-track .rm-label:hover { background: var(--bg-tertiary); }
+
+    .rm-track-tl { height: 34px; background: var(--bg-secondary); }
+
+    .rm-track-name {
+      flex: 1;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-secondary);
+    }
+
+    .rm-chevron [data-icon] { width: 14px; height: 14px; color: var(--text-tertiary); }
+
+    /* ── Initiative row ───────────────────────────────────── */
+    .rm-ini .rm-label {
+      height: 40px;
+      padding-left: var(--space-6);
+    }
+
+    .rm-ini-name {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .rm-ini-tl { height: 40px; position: relative; }
+
+    .rm-ini.collapsed { display: none; }
+
+    /* ── Grid columns (background lines) ─────────────────── */
+    .rm-grid {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      pointer-events: none;
+    }
+
+    .rm-gcol {
+      flex: 1;
+      border-right: 1px solid var(--border-subtle);
+    }
+    .rm-gcol:last-child { border-right: none; }
+    .rm-gcol.q-start    { border-left: 1px solid var(--border-default); }
+
+    /* ── Bar ──────────────────────────────────────────────── */
+    .rm-bar {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 26px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-2);
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: default;
+      z-index: 1;
+      transition: filter var(--transition-fast);
+    }
+    .rm-bar:hover { filter: brightness(0.9); }
+
+    .rm-bar-text { overflow: hidden; text-overflow: ellipsis; }
+
+    .rm-bar.s-on-track { background: var(--color-success);              color: #fff; }
+    .rm-bar.s-at-risk  { background: var(--rm-at-risk);                 color: #fff; }
+    .rm-bar.s-delayed  { background: var(--color-error);                color: #fff; }
+    .rm-bar.s-planned  { background: var(--color-info);                 color: #fff; }
+    .rm-bar.s-complete { background: var(--color-neutral-400, #c2c1be); color: var(--text-secondary); }
+
+    /* ── Today marker ─────────────────────────────────────── */
+    #rm-today {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--color-info);
+      pointer-events: none;
+      z-index: 5;
+      display: none;
+    }
+
+    #rm-today::after {
+      content: 'Today';
+      position: absolute;
+      top: 28px;
+      left: 5px;
+      font-size: 10px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-info);
+      font-family: var(--font-sans);
+      white-space: nowrap;
+      background: var(--surface-primary);
+      padding: 1px 5px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-info);
+      line-height: 14px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="rm-page">
+
+    <!-- Header -->
+    <div class="rm-header">
+      <div>
+        <h1 class="rm-title">Product Roadmap</h1>
+        <p class="rm-subtitle">15 initiatives · 3 tracks · FY2026–2027</p>
+      </div>
+      <div class="rm-header-right">
+        <div class="rm-legend">
+          <div class="rm-legend-item">
+            <div class="rm-legend-pip" style="background:var(--color-success)"></div>On Track
+          </div>
+          <div class="rm-legend-item">
+            <div class="rm-legend-pip" style="background:var(--rm-at-risk)"></div>At Risk
+          </div>
+          <div class="rm-legend-item">
+            <div class="rm-legend-pip" style="background:var(--color-error)"></div>Delayed
+          </div>
+          <div class="rm-legend-item">
+            <div class="rm-legend-pip" style="background:var(--color-info)"></div>Planned
+          </div>
+        </div>
+        <div class="rm-nav">
+          <button class="rm-nav-btn" id="rm-prev" title="Previous quarter">
+            <span data-icon="chevron-left"></span>
+          </button>
+          <span class="rm-window-label" id="rm-window-label"></span>
+          <button class="rm-nav-btn" id="rm-next" title="Next quarter">
+            <span data-icon="chevron-right"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Board -->
+    <div class="rm-board" id="rm-board">
+      <div id="rm-rows"></div>
+      <div id="rm-today"></div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ── Config ───────────────────────────────────────────────────────── */
+    const WIN = 12;
+    let winYear  = 2026;
+    let winMonth = 3; // March 2026 — today is visible in first column
+
+    /* ── Data ─────────────────────────────────────────────────────────── */
+    const TRACKS = [
+      { id: 'platform', label: 'Platform', collapsed: false },
+      { id: 'mobile',   label: 'Mobile',   collapsed: false },
+      { id: 'data',     label: 'Data',     collapsed: false },
+    ];
+
+    const INITIATIVES = [
+      // Platform
+      { track: 'platform', label: 'API Gateway v3',          start: '2026-03', end: '2026-06', status: 'on-track' },
+      { track: 'platform', label: 'Auth Service Refactor',    start: '2026-05', end: '2026-08', status: 'at-risk'  },
+      { track: 'platform', label: 'Platform Observability',   start: '2026-07', end: '2026-10', status: 'planned'  },
+      { track: 'platform', label: 'Compliance Tooling',       start: '2026-10', end: '2026-12', status: 'planned'  },
+      { track: 'platform', label: 'Edge Caching Layer',       start: '2027-01', end: '2027-02', status: 'planned'  },
+      // Mobile
+      { track: 'mobile',   label: 'iOS App Redesign',             start: '2026-03', end: '2026-06', status: 'on-track' },
+      { track: 'mobile',   label: 'Push Notification Overhaul',   start: '2026-04', end: '2026-06', status: 'delayed'  },
+      { track: 'mobile',   label: 'Android SDK Update',           start: '2026-07', end: '2026-09', status: 'planned'  },
+      { track: 'mobile',   label: 'Offline Mode Support',         start: '2026-09', end: '2027-01', status: 'planned'  },
+      { track: 'mobile',   label: 'Mobile Analytics SDK',         start: '2026-12', end: '2027-02', status: 'planned'  },
+      // Data
+      { track: 'data',     label: 'Data Warehouse Migration',     start: '2026-03', end: '2026-07', status: 'at-risk'  },
+      { track: 'data',     label: 'Real-time Analytics',          start: '2026-06', end: '2026-10', status: 'planned'  },
+      { track: 'data',     label: 'ML Feature Store',             start: '2026-09', end: '2026-12', status: 'planned'  },
+      { track: 'data',     label: 'Reporting Dashboard v2',       start: '2026-11', end: '2027-02', status: 'planned'  },
+      { track: 'data',     label: 'Data Governance Framework',    start: '2027-02', end: '2027-02', status: 'planned'  },
+    ];
+
+    /* ── Month math ───────────────────────────────────────────────────── */
+    const MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const QTR_OF    = [0,1,1,1,2,2,2,3,3,3,4,4,4]; // 1-indexed month → quarter
+
+    function absM(y, m) { return y * 12 + (m - 1); }
+
+    function parseYM(s) {
+      const [y, m] = s.split('-').map(Number);
+      return { y, m };
+    }
+
+    function windowMonths() {
+      const out = [];
+      for (let i = 0; i < WIN; i++) {
+        const a = absM(winYear, winMonth) + i;
+        out.push({ y: Math.floor(a / 12), m: (a % 12) + 1 });
+      }
+      return out;
+    }
+
+    // Returns CSS inline style string for a bar, or null if fully outside window.
+    function barStyle(startStr, endStr) {
+      const s    = parseYM(startStr);
+      const e    = parseYM(endStr);
+      const base = absM(winYear, winMonth);
+      const l    = absM(s.y, s.m) - base;
+      const r    = absM(e.y, e.m) - base + 1; // +1 for inclusive end month
+
+      if (r <= 0 || l >= WIN) return null;
+
+      const cl = Math.max(l, 0);
+      const cr = Math.min(r, WIN);
+      const lp = ((cl / WIN) * 100).toFixed(3);
+      const wp = (((cr - cl) / WIN) * 100).toFixed(3);
+      return `left:calc(${lp}% + 2px);width:calc(${wp}% - 4px);`;
+    }
+
+    // Returns today's offset as a percentage (0–100) within the window, or null if out of view.
+    function todayPct() {
+      const now  = new Date();
+      const y    = now.getFullYear();
+      const m    = now.getMonth() + 1;
+      const d    = now.getDate();
+      const days = new Date(y, m, 0).getDate();
+      const frac = (absM(y, m) - absM(winYear, winMonth) + (d - 0.5) / days) / WIN;
+      return (frac >= 0 && frac <= 1) ? frac * 100 : null;
+    }
+
+    /* ── Quarter grouping ─────────────────────────────────────────────── */
+    function quarterGroups(months) {
+      const groups = [];
+      let cur = null;
+      months.forEach(({ y, m }) => {
+        const lbl = `Q${QTR_OF[m]} ${y}`;
+        if (!cur || cur.lbl !== lbl) { cur = { lbl, count: 1 }; groups.push(cur); }
+        else cur.count++;
+      });
+      return groups;
+    }
+
+    function isQStart(months, i) {
+      if (i === 0) return false;
+      return QTR_OF[months[i].m] !== QTR_OF[months[i - 1].m] ||
+             months[i].y !== months[i - 1].y;
+    }
+
+    /* ── Render ───────────────────────────────────────────────────────── */
+    function render() {
+      const months  = windowMonths();
+      const qGroups = quarterGroups(months);
+      const now     = new Date();
+      const nowY    = now.getFullYear();
+      const nowM    = now.getMonth() + 1;
+
+      // Update nav label
+      const f = months[0], l = months[months.length - 1];
+      document.getElementById('rm-window-label').textContent =
+        `${MON_SHORT[f.m - 1]} ${f.y} — ${MON_SHORT[l.m - 1]} ${l.y}`;
+
+      // Grid lines — reused in every row's timeline
+      const gridCols = months.map(({ m }, i) =>
+        `<div class="rm-gcol${isQStart(months, i) ? ' q-start' : ''}"></div>`
+      ).join('');
+
+      let html = '';
+
+      /* ── Axis ── */
+      const qCells = qGroups.map(q =>
+        `<div class="rm-quarter" style="flex:${q.count}">${q.lbl}</div>`
+      ).join('');
+
+      const mCells = months.map(({ y, m }) =>
+        `<div class="rm-month${y === nowY && m === nowM ? ' is-now' : ''}">${MON_SHORT[m - 1]}</div>`
+      ).join('');
+
+      html += `
+        <div class="rm-row rm-axis">
+          <div class="rm-label">
+            <span class="rm-axis-label">Initiatives</span>
+          </div>
+          <div class="rm-timeline rm-axis-tl">
+            <div class="rm-quarters">${qCells}</div>
+            <div class="rm-months">${mCells}</div>
+          </div>
+        </div>`;
+
+      /* ── Tracks + initiatives ── */
+      TRACKS.forEach(track => {
+        const inits = INITIATIVES.filter(i => i.track === track.id);
+        const icon  = track.collapsed ? 'chevron-right' : 'chevron-down';
+
+        html += `
+          <div class="rm-row rm-track" data-track="${track.id}">
+            <div class="rm-label" style="gap:var(--space-2);">
+              <span class="rm-track-name">${track.label}</span>
+              <span class="rm-chevron"><span data-icon="${icon}"></span></span>
+            </div>
+            <div class="rm-timeline rm-track-tl">
+              <div class="rm-grid">${gridCols}</div>
+            </div>
+          </div>`;
+
+        inits.forEach(ini => {
+          const style = barStyle(ini.start, ini.end);
+          const bar   = style
+            ? `<div class="rm-bar s-${ini.status}" style="${style}"
+                    title="${ini.label} · ${ini.start} → ${ini.end}">
+                 <span class="rm-bar-text">${ini.label}</span>
+               </div>`
+            : '';
+
+          html += `
+            <div class="rm-row rm-ini${track.collapsed ? ' collapsed' : ''}" data-track="${track.id}">
+              <div class="rm-label" style="padding-left:var(--space-6);">
+                <span class="rm-ini-name" title="${ini.label}">${ini.label}</span>
+              </div>
+              <div class="rm-timeline rm-ini-tl">
+                <div class="rm-grid">${gridCols}</div>
+                ${bar}
+              </div>
+            </div>`;
+        });
+      });
+
+      document.getElementById('rm-rows').innerHTML = html;
+
+      /* ── Today marker ── */
+      const pct    = todayPct();
+      const marker = document.getElementById('rm-today');
+      if (pct !== null) {
+        // Position relative to board: label column + border + pct% of remaining timeline width
+        marker.style.left = `calc(var(--rm-label-w) + 1px + ${(pct / 100).toFixed(5)} * (100% - var(--rm-label-w) - 2px))`;
+        marker.style.display = 'block';
+      } else {
+        marker.style.display = 'none';
+      }
+
+      Horizon.initIcons();
+      bindEvents();
+    }
+
+    /* ── Events ───────────────────────────────────────────────────────── */
+    function bindEvents() {
+      document.querySelectorAll('.rm-track').forEach(row => {
+        row.querySelector('.rm-label').addEventListener('click', () => {
+          const track = TRACKS.find(t => t.id === row.dataset.track);
+          track.collapsed = !track.collapsed;
+          render();
+        });
+      });
+    }
+
+    document.getElementById('rm-prev').addEventListener('click', () => {
+      winMonth -= 3;
+      if (winMonth < 1) { winMonth += 12; winYear--; }
+      render();
+    });
+
+    document.getElementById('rm-next').addEventListener('click', () => {
+      winMonth += 3;
+      if (winMonth > 12) { winMonth -= 12; winYear++; }
+      render();
+    });
+
+    /* ── Init ─────────────────────────────────────────────────────────── */
+    render();
+  </script>
+</body>
+</html>

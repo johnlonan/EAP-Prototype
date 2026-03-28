@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Button Iconic — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Button Iconic base
+    -------------------------------------------------------- */
+    .btn-iconic {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius-field); /* 12px — square default */
+      cursor: pointer;
+      transition: background-color var(--transition-fast), opacity var(--transition-fast);
+    }
+
+    .btn-iconic:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    .btn-iconic:disabled,
+    .btn-iconic[aria-disabled="true"] {
+      opacity: 0.35;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    .btn-iconic svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* Shape: round */
+    .btn-iconic.btn-circle {
+      border-radius: var(--radius-full);
+    }
+
+    /* --------------------------------------------------------
+       Color variants — reuse same tokens as button
+    -------------------------------------------------------- */
+    .btn-iconic.btn-primary   { background-color: var(--color-primary);   color: var(--color-primary-content); }
+    .btn-iconic.btn-primary:hover   { background-color: var(--color-primary-hover); }
+    .btn-iconic.btn-primary:active  { background-color: var(--color-primary-active); }
+
+    .btn-iconic.btn-secondary { background-color: var(--color-secondary); color: var(--color-secondary-content); }
+    .btn-iconic.btn-secondary:hover  { background-color: var(--color-secondary-hover); }
+    .btn-iconic.btn-secondary:active { background-color: var(--color-secondary-active); }
+
+    .btn-iconic.btn-accent    { background-color: var(--color-accent);    color: var(--color-accent-content); }
+    .btn-iconic.btn-accent:hover  { background-color: var(--color-accent-hover); }
+    .btn-iconic.btn-accent:active { background-color: var(--color-accent-active); }
+
+    .btn-iconic.btn-error     { background-color: var(--color-error);     color: var(--color-error-content); }
+    .btn-iconic.btn-error:hover  { background-color: var(--color-error-hover); }
+    .btn-iconic.btn-error:active { background-color: var(--color-error-active); }
+
+    .btn-iconic.btn-neutral   { background-color: var(--color-neutral);   color: var(--color-neutral-content); }
+    .btn-iconic.btn-neutral:hover  { background-color: var(--color-neutral-hover); }
+    .btn-iconic.btn-neutral:active { background-color: var(--color-neutral-active); }
+
+    .btn-iconic.btn-ghost     { background-color: transparent; color: var(--text-primary); }
+    .btn-iconic.btn-ghost:hover  { background-color: var(--color-ghost-hover); }
+    .btn-iconic.btn-ghost:active { background-color: var(--color-ghost-active); }
+
+    /* --------------------------------------------------------
+       Sizes
+    -------------------------------------------------------- */
+    .btn-iconic.btn-xl { width: 56px; height: 56px; }
+    .btn-iconic.btn-xl svg { width: 24px; height: 24px; }
+
+    .btn-iconic.btn-lg { width: 48px; height: 48px; }
+    .btn-iconic.btn-lg svg { width: 20px; height: 20px; }
+
+    /* md is default */
+
+    .btn-iconic.btn-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-lg); /* 8px */
+    }
+    .btn-iconic.btn-sm svg { width: 16px; height: 16px; }
+
+    .btn-iconic.btn-xs {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-lg); /* 8px */
+    }
+    .btn-iconic.btn-xs svg { width: 12px; height: 12px; }
+
+    /* Round overrides radius for sm/xs too */
+    .btn-iconic.btn-circle { border-radius: var(--radius-full) !important; }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .col-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+
+    .sub-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Color variants — Square -->
+    <div class="card">
+      <p class="section-title">Color Variants</p>
+      <div class="col-2">
+        <div>
+          <p class="sub-label">Square</p>
+          <div class="row">
+            <button class="btn-iconic btn-primary" aria-label="Primary">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-secondary" aria-label="Secondary">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-accent" aria-label="Accent">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-error" aria-label="Destructive">
+              <span data-icon="close"></span>
+            </button>
+            <button class="btn-iconic btn-neutral" aria-label="Neutral">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-ghost" aria-label="Ghost">
+              <span data-icon="plus"></span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <p class="sub-label">Round</p>
+          <div class="row">
+            <button class="btn-iconic btn-primary btn-circle" aria-label="Primary">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-secondary btn-circle" aria-label="Secondary">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-accent btn-circle" aria-label="Accent">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-error btn-circle" aria-label="Destructive">
+              <span data-icon="close"></span>
+            </button>
+            <button class="btn-iconic btn-neutral btn-circle" aria-label="Neutral">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-ghost btn-circle" aria-label="Ghost">
+              <span data-icon="plus"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sizes -->
+    <div class="card">
+      <p class="section-title">Sizes</p>
+      <div class="col-2">
+        <div>
+          <p class="sub-label">Square</p>
+          <div class="row">
+            <button class="btn-iconic btn-primary btn-xl" aria-label="XL">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary btn-lg" aria-label="LG">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary" aria-label="MD">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary btn-sm" aria-label="SM">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary btn-xs" aria-label="XS">
+              <span data-icon="plus"></span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <p class="sub-label">Round</p>
+          <div class="row">
+            <button class="btn-iconic btn-primary btn-circle btn-xl" aria-label="XL">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary btn-circle btn-lg" aria-label="LG">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary btn-circle" aria-label="MD">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary btn-circle btn-sm" aria-label="SM">
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-primary btn-circle btn-xs" aria-label="XS">
+              <span data-icon="plus"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="card">
+      <p class="section-title">Disabled</p>
+      <div class="col-2">
+        <div>
+          <p class="sub-label">Square</p>
+          <div class="row">
+            <button class="btn-iconic btn-primary" aria-label="Primary" disabled>
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-secondary" aria-label="Secondary" disabled>
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-accent" aria-label="Accent" disabled>
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-error" aria-label="Destructive" disabled>
+              <span data-icon="close"></span>
+            </button>
+            <button class="btn-iconic btn-ghost" aria-label="Ghost" disabled>
+              <span data-icon="plus"></span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <p class="sub-label">Round</p>
+          <div class="row">
+            <button class="btn-iconic btn-primary btn-circle" aria-label="Primary" disabled>
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-secondary btn-circle" aria-label="Secondary" disabled>
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-accent btn-circle" aria-label="Accent" disabled>
+              <span data-icon="plus"></span>
+            </button>
+            <button class="btn-iconic btn-error btn-circle" aria-label="Destructive" disabled>
+              <span data-icon="close"></span>
+            </button>
+            <button class="btn-iconic btn-ghost btn-circle" aria-label="Ghost" disabled>
+              <span data-icon="plus"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeline — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Timeline
+       Mark: 40px circle (dark #343331 bg, white check icon)
+       Connector: 2px line between marks
+       Content: white box, border-radius 8px,
+                box-shadow 0 1px 2px rgba(0,0,0,0.05), 8px 16px pad
+       Variants: vertical (marks stacked) and horizontal (marks in row)
+       Mark states: completed (dark + check), active (primary ring), pending (light)
+    -------------------------------------------------------- */
+
+    /* ---- Mark ---- */
+    .tl-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 9999px;
+      background-color: var(--color-neutral-800, #343331);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tl-mark [data-icon] {
+      width: 18px;
+      height: 18px;
+      color: white;
+    }
+
+    .tl-mark--active {
+      background-color: var(--color-primary, #0e4e69);
+      box-shadow: 0 0 0 3px rgba(14, 78, 105, 0.2);
+    }
+
+    .tl-mark--pending {
+      background-color: var(--color-neutral-200, #edece9);
+    }
+
+    .tl-mark--pending [data-icon] {
+      color: var(--text-tertiary);
+    }
+
+    .tl-mark__number {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: var(--font-weight-semibold);
+      color: white;
+    }
+
+    .tl-mark--pending .tl-mark__number {
+      color: var(--text-tertiary);
+    }
+
+    /* ---- Connector line ---- */
+    .tl-connector {
+      background-color: var(--color-neutral-300, #e3e2df);
+      flex-shrink: 0;
+    }
+
+    .tl-connector--completed {
+      background-color: var(--color-neutral-800, #343331);
+    }
+
+    /* ---- Content box ---- */
+    .tl-content {
+      background-color: var(--bg-primary, white);
+      border-radius: var(--radius-lg, 8px);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.05);
+      padding: 8px 16px;
+    }
+
+    .tl-content__label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm, 14px);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+
+    .tl-content__sublabel {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ====================================================
+       VERTICAL TIMELINE
+    ==================================================== */
+    .timeline-v {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .timeline-v__step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .timeline-v__track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .timeline-v .tl-connector {
+      width: 2px;
+      height: 32px;
+    }
+
+    .timeline-v__content {
+      flex: 1;
+      padding-top: 8px;
+      padding-bottom: 24px;
+    }
+
+    .timeline-v__step:last-child .timeline-v__content {
+      padding-bottom: 0;
+    }
+
+    /* ====================================================
+       HORIZONTAL TIMELINE
+    ==================================================== */
+    .timeline-h {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .timeline-h__step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      position: relative;
+    }
+
+    .timeline-h__track {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+    }
+
+    .timeline-h .tl-connector {
+      height: 2px;
+      flex: 1;
+    }
+
+    .timeline-h__content {
+      text-align: center;
+      max-width: 120px;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      align-items: flex-start;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Vertical Timeline -->
+    <div class="card">
+      <p class="section-title">Vertical Timeline</p>
+      <div class="demo-row">
+
+        <!-- All completed -->
+        <div>
+          <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 16px;">All steps completed</p>
+          <div class="timeline-v">
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="tl-connector tl-connector--completed"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Incident Created</div>
+                  <div class="tl-content__sublabel">Mar 27, 2026 · 09:15 AM</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="tl-connector tl-connector--completed"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Assigned to Team</div>
+                  <div class="tl-content__sublabel">Mar 27, 2026 · 09:32 AM</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="tl-connector tl-connector--completed"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Diagnostics Run</div>
+                  <div class="tl-content__sublabel">Mar 27, 2026 · 10:05 AM</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark">
+                  <span data-icon="check"></span>
+                </div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Resolved</div>
+                  <div class="tl-content__sublabel">Mar 27, 2026 · 11:48 AM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- In progress (active step) -->
+        <div>
+          <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 16px;">In progress — active step</p>
+          <div class="timeline-v">
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="tl-connector tl-connector--completed"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Change Request Submitted</div>
+                  <div class="tl-content__sublabel">Mar 25, 2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="tl-connector tl-connector--completed"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">CAB Review</div>
+                  <div class="tl-content__sublabel">Mar 26, 2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark tl-mark--active">
+                  <span data-icon="more-horizontal"></span>
+                </div>
+                <div class="tl-connector"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Implementation</div>
+                  <div class="tl-content__sublabel">In progress · Mar 27, 2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark tl-mark--pending">
+                  <span class="tl-mark__number">4</span>
+                </div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Post-Implementation Review</div>
+                  <div class="tl-content__sublabel">Pending</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Numbered steps -->
+        <div>
+          <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 16px;">Numbered steps</p>
+          <div class="timeline-v">
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark">
+                  <span class="tl-mark__number">1</span>
+                </div>
+                <div class="tl-connector tl-connector--completed"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Identify the problem</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark tl-mark--active">
+                  <span class="tl-mark__number">2</span>
+                </div>
+                <div class="tl-connector"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Root cause analysis</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark tl-mark--pending">
+                  <span class="tl-mark__number">3</span>
+                </div>
+                <div class="tl-connector"></div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Fix and verify</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-v__step">
+              <div class="timeline-v__track">
+                <div class="tl-mark tl-mark--pending">
+                  <span class="tl-mark__number">4</span>
+                </div>
+              </div>
+              <div class="timeline-v__content">
+                <div class="tl-content">
+                  <div class="tl-content__label">Close and document</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Horizontal Timeline -->
+    <div class="card">
+      <p class="section-title">Horizontal Timeline</p>
+      <div class="timeline-h">
+        <!-- Step 1 (completed) -->
+        <div class="timeline-h__step">
+          <div class="timeline-h__track">
+            <div class="tl-connector" style="height: 2px; flex: 1; background: transparent;"></div>
+            <div class="tl-mark" style="flex-shrink: 0;">
+              <span data-icon="check"></span>
+            </div>
+            <div class="tl-connector tl-connector--completed" style="height: 2px; flex: 1;"></div>
+          </div>
+          <div class="timeline-h__content">
+            <div class="tl-content">
+              <div class="tl-content__label">Created</div>
+              <div class="tl-content__sublabel">Mar 25</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 (completed) -->
+        <div class="timeline-h__step">
+          <div class="timeline-h__track">
+            <div class="tl-connector tl-connector--completed" style="height: 2px; flex: 1;"></div>
+            <div class="tl-mark" style="flex-shrink: 0;">
+              <span data-icon="check"></span>
+            </div>
+            <div class="tl-connector tl-connector--completed" style="height: 2px; flex: 1;"></div>
+          </div>
+          <div class="timeline-h__content">
+            <div class="tl-content">
+              <div class="tl-content__label">Reviewed</div>
+              <div class="tl-content__sublabel">Mar 26</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 (active) -->
+        <div class="timeline-h__step">
+          <div class="timeline-h__track">
+            <div class="tl-connector tl-connector--completed" style="height: 2px; flex: 1;"></div>
+            <div class="tl-mark tl-mark--active" style="flex-shrink: 0;">
+              <span data-icon="more-horizontal"></span>
+            </div>
+            <div class="tl-connector" style="height: 2px; flex: 1;"></div>
+          </div>
+          <div class="timeline-h__content">
+            <div class="tl-content">
+              <div class="tl-content__label">In Progress</div>
+              <div class="tl-content__sublabel">Mar 27</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 (pending) -->
+        <div class="timeline-h__step">
+          <div class="timeline-h__track">
+            <div class="tl-connector" style="height: 2px; flex: 1;"></div>
+            <div class="tl-mark tl-mark--pending" style="flex-shrink: 0;">
+              <span class="tl-mark__number">4</span>
+            </div>
+            <div class="tl-connector" style="height: 2px; flex: 1; background: transparent;"></div>
+          </div>
+          <div class="timeline-h__content">
+            <div class="tl-content">
+              <div class="tl-content__label">Closed</div>
+              <div class="tl-content__sublabel">Pending</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

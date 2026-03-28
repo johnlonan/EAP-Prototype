@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Side Navigation — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Side Navigation
+       Expanded: 288px wide, full height, border-right 1px neutral-300
+       Collapsed: 52px wide (icon-only rail)
+       Structure:
+         - Top: hamburger (52px) + logo
+         - Nav items: 40px, 10px pad, 8px radius
+         - Active item: full pill (9999px) with neutral-400 bg
+         - Tree section: vertical divider + indented chat list
+         - Bottom: notifications + profile row
+    -------------------------------------------------------- */
+
+    .sidenav {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background-color: var(--bg-primary, white);
+      border-right: 1px solid var(--color-neutral-300, #e3e2df);
+      width: 288px;
+      transition: width var(--transition-fast);
+      overflow: hidden;
+    }
+
+    .sidenav--collapsed {
+      width: 52px;
+    }
+
+    /* ---- Top section ---- */
+    .sidenav__top {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .sidenav__top::-webkit-scrollbar { display: none; }
+
+    /* ---- Header row (hamburger + logo) ---- */
+    .sidenav__header {
+      display: flex;
+      align-items: center;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .sidenav__menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg, 8px);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      flex-shrink: 0;
+      margin: 6px;
+      transition: background-color var(--transition-fast);
+    }
+
+    .sidenav__menu-btn:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .sidenav__menu-btn [data-icon] {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidenav__logo {
+      position: absolute;
+      left: 52px;
+      display: flex;
+      align-items: center;
+      height: 52px;
+      padding: 8px 6px;
+      white-space: nowrap;
+      opacity: 1;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidenav--collapsed .sidenav__logo {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .sidenav__logo-text {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    /* ---- Nav items list ---- */
+    .sidenav__nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px 6px;
+    }
+
+    .sidenav__item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+      border-radius: var(--radius-lg, 8px);
+      padding: 0 10px;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm, 14px);
+      color: var(--text-primary);
+      white-space: nowrap;
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: left;
+    }
+
+    .sidenav__item:hover:not(.sidenav__item--active) {
+      background-color: var(--color-neutral-200, #edece9);
+    }
+
+    .sidenav__item--active {
+      background-color: var(--color-neutral-400, #c2c1be);
+      border-radius: 9999px;
+    }
+
+    .sidenav__item [data-icon] {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .sidenav__item__label {
+      flex: 1;
+      opacity: 1;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidenav--collapsed .sidenav__item__label {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    .sidenav__item__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background-color: var(--color-success, #52cb3d);
+      flex-shrink: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidenav--collapsed .sidenav__item__dot {
+      opacity: 0;
+    }
+
+    /* ---- Tree section (recent chats) ---- */
+    .sidenav__tree {
+      display: flex;
+      align-items: flex-start;
+      padding-left: 12px;
+      padding-right: 0;
+    }
+
+    .sidenav__tree-line {
+      width: 1px;
+      background-color: var(--border-subtle, #e3e2df);
+      align-self: stretch;
+      flex-shrink: 0;
+      margin: 0 7.5px;
+    }
+
+    .sidenav__tree-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .sidenav__chat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 4px 8px;
+      border-radius: var(--radius-lg, 8px);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm, 14px);
+      color: var(--text-primary);
+    }
+
+    .sidenav__chat-item:hover {
+      background-color: var(--color-neutral-200, #edece9);
+    }
+
+    .sidenav__chat-item__text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .sidenav__see-all {
+      height: 28px;
+      padding: 0 12px;
+      border-radius: var(--radius-lg, 8px);
+      background-color: var(--color-neutral-200, #edece9);
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .sidenav__see-all:hover {
+      background-color: var(--color-neutral-300, #d9d8d5);
+    }
+
+    /* ---- Horizontal divider ---- */
+    .sidenav__divider {
+      height: 1px;
+      background-color: var(--border-subtle, #e3e2df);
+      margin: 0 6px;
+    }
+
+    /* ---- Bottom section ---- */
+    .sidenav__bottom {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    /* ---- Profile row ---- */
+    .sidenav__profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 56px;
+      padding: 6px 8px;
+    }
+
+    .sidenav__avatar {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .sidenav__avatar-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      background-color: var(--color-neutral-800, #343331);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: var(--font-weight-semibold);
+      color: white;
+    }
+
+    .sidenav__avatar-status {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background-color: #52cb3d;
+      border: 1.5px solid white;
+    }
+
+    .sidenav__profile-name {
+      flex: 1;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm, 14px);
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 1;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidenav--collapsed .sidenav__profile-name {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+
+    .sidenav__profile-more {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-md, 6px);
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast), opacity var(--transition-fast);
+    }
+
+    .sidenav__profile-more:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .sidenav--collapsed .sidenav__profile-more {
+      opacity: 0;
+    }
+
+    .sidenav__profile-more [data-icon] {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .demo-row {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .demo-col { display: flex; flex-direction: column; gap: var(--space-2); }
+
+    .demo-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-2);
+    }
+
+    .demo-frame {
+      height: 600px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background-color: var(--bg-primary);
+    }
+
+    .toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-primary);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      cursor: pointer;
+      margin-bottom: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Expanded state -->
+    <div class="card">
+      <p class="section-title">Side Navigation — Expanded (Home active)</p>
+      <button class="toggle-btn js-toggle" data-target="sidenav-main">
+        <span data-icon="panel-left"></span>Toggle collapsed
+      </button>
+      <div class="demo-frame">
+        <nav class="sidenav" id="sidenav-main" aria-label="Primary navigation">
+          <!-- Header -->
+          <div class="sidenav__header">
+            <button class="sidenav__menu-btn" aria-label="Toggle navigation">
+              <span data-icon="menu"></span>
+            </button>
+            <div class="sidenav__logo">
+              <span class="sidenav__logo-text">ServiceNow</span>
+            </div>
+          </div>
+
+          <!-- Top nav -->
+          <div class="sidenav__top">
+            <div class="sidenav__nav">
+              <!-- Active item -->
+              <button class="sidenav__item sidenav__item--active">
+                <span data-icon="home"></span>
+                <span class="sidenav__item__label">Home</span>
+              </button>
+
+              <!-- Regular items -->
+              <button class="sidenav__item">
+                <span data-icon="message"></span>
+                <span class="sidenav__item__label">Prep for a 1 on 1</span>
+              </button>
+
+              <button class="sidenav__item">
+                <span data-icon="user"></span>
+                <span class="sidenav__item__label">Onboarding Buddy</span>
+              </button>
+
+              <button class="sidenav__item">
+                <span data-icon="history"></span>
+                <span class="sidenav__item__label">Recent chats</span>
+              </button>
+
+              <!-- Tree: recent chat items -->
+              <div class="sidenav__tree">
+                <div class="sidenav__tree-line"></div>
+                <div class="sidenav__tree-list">
+                  <div class="sidenav__chat-item">
+                    <span class="sidenav__chat-item__text">Lorem ipsum dolor sit amet consectetur.</span>
+                    <div class="sidenav__item__dot"></div>
+                  </div>
+                  <div class="sidenav__chat-item">
+                    <span class="sidenav__chat-item__text">Euismod blandit proin donec id morbi.</span>
+                    <div class="sidenav__item__dot"></div>
+                  </div>
+                  <div class="sidenav__chat-item">
+                    <span class="sidenav__chat-item__text">Consectetur adipiscing elit sed do eiusmod.</span>
+                  </div>
+                  <button class="sidenav__see-all">See all</button>
+                </div>
+              </div>
+
+              <div class="sidenav__divider"></div>
+
+              <button class="sidenav__item">
+                <span data-icon="search"></span>
+                <span class="sidenav__item__label">Enterprise search</span>
+              </button>
+
+              <button class="sidenav__item">
+                <span data-icon="layers"></span>
+                <span class="sidenav__item__label">My canvas</span>
+              </button>
+
+              <button class="sidenav__item">
+                <span data-icon="inbox"></span>
+                <span class="sidenav__item__label">Inbox</span>
+              </button>
+
+              <button class="sidenav__item">
+                <span data-icon="org-chart"></span>
+                <span class="sidenav__item__label">Org chart</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom nav -->
+          <div class="sidenav__bottom">
+            <div class="sidenav__nav" style="gap: 0; padding: 0 6px 0;">
+              <button class="sidenav__item">
+                <span data-icon="bell"></span>
+                <span class="sidenav__item__label">Notifications</span>
+                <div class="sidenav__item__dot"></div>
+              </button>
+            </div>
+            <div class="sidenav__profile">
+              <div class="sidenav__avatar">
+                <div class="sidenav__avatar-img">RS</div>
+                <div class="sidenav__avatar-status"></div>
+              </div>
+              <span class="sidenav__profile-name">Renee Simmons</span>
+              <button class="sidenav__profile-more" aria-label="Profile options">
+                <span data-icon="more-vertical"></span>
+              </button>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Collapsed rail -->
+    <div class="card">
+      <p class="section-title">Collapsed Rail (52px)</p>
+      <div class="demo-frame" style="width: 52px;">
+        <nav class="sidenav sidenav--collapsed" aria-label="Primary navigation collapsed">
+          <div class="sidenav__header">
+            <button class="sidenav__menu-btn" aria-label="Expand navigation">
+              <span data-icon="menu"></span>
+            </button>
+          </div>
+          <div class="sidenav__top">
+            <div class="sidenav__nav">
+              <button class="sidenav__item sidenav__item--active" title="Home">
+                <span data-icon="home"></span>
+              </button>
+              <button class="sidenav__item" title="Prep for a 1 on 1">
+                <span data-icon="message"></span>
+              </button>
+              <button class="sidenav__item" title="Onboarding Buddy">
+                <span data-icon="user"></span>
+              </button>
+              <button class="sidenav__item" title="Recent chats">
+                <span data-icon="history"></span>
+              </button>
+              <div class="sidenav__divider"></div>
+              <button class="sidenav__item" title="Enterprise search">
+                <span data-icon="search"></span>
+              </button>
+              <button class="sidenav__item" title="My canvas">
+                <span data-icon="layers"></span>
+              </button>
+              <button class="sidenav__item" title="Inbox">
+                <span data-icon="inbox"></span>
+              </button>
+              <button class="sidenav__item" title="Org chart">
+                <span data-icon="org-chart"></span>
+              </button>
+            </div>
+          </div>
+          <div class="sidenav__bottom">
+            <div class="sidenav__nav" style="padding: 0 6px 0;">
+              <button class="sidenav__item" title="Notifications">
+                <span data-icon="bell"></span>
+              </button>
+            </div>
+            <div class="sidenav__profile">
+              <div class="sidenav__avatar">
+                <div class="sidenav__avatar-img">RS</div>
+                <div class="sidenav__avatar-status"></div>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+
+      // Toggle collapsed
+      document.querySelectorAll('.js-toggle').forEach(btn => {
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        btn.addEventListener('click', () => {
+          target.classList.toggle('sidenav--collapsed');
+        });
+      });
+
+      // Nav item click to set active
+      document.querySelectorAll('.sidenav__item').forEach(item => {
+        item.addEventListener('click', () => {
+          const nav = item.closest('.sidenav');
+          nav.querySelectorAll('.sidenav__item').forEach(i => i.classList.remove('sidenav__item--active'));
+          item.classList.add('sidenav__item--active');
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

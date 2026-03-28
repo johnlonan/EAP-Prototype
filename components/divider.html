@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Divider — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Divider
+       A 1px line that separates content.
+       Horizontal: full-width line, 16px container height.
+       Vertical:   full-height line, 16px container width.
+       Variants: subtle (var(--border-subtle)) · strong (higher contrast)
+    -------------------------------------------------------- */
+
+    /* ---- Horizontal ---- */
+    .divider {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 16px; /* visual breathing room */
+    }
+
+    .divider__line {
+      flex: 1;
+      height: 1px;
+      background-color: var(--border-subtle);
+    }
+
+    /* ---- With label ---- */
+    .divider--labeled {
+      gap: var(--space-3);
+    }
+
+    .divider__label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ---- Strong variant ---- */
+    .divider--strong .divider__line {
+      background-color: var(--border-default);
+    }
+
+    /* ---- Vertical ---- */
+    .divider--vertical {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      width: 16px;
+      height: 100%;
+      min-height: 40px;
+    }
+
+    .divider--vertical .divider__line {
+      flex: 1;
+      width: 1px;
+      height: auto;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .demo-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .demo-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+
+    .vertical-demo {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      height: 40px;
+    }
+
+    .demo-text {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      padding: 0 var(--space-3);
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Horizontal -->
+    <div class="card">
+      <p class="section-title">Horizontal — Subtle</p>
+      <div class="demo-row">
+
+        <div class="demo-item">
+          <span class="state-label">Default</span>
+          <div class="divider"><div class="divider__line"></div></div>
+        </div>
+
+        <div class="demo-item">
+          <span class="state-label">With label — centered</span>
+          <div class="divider divider--labeled">
+            <div class="divider__line"></div>
+            <span class="divider__label">OR</span>
+            <div class="divider__line"></div>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <span class="state-label">With label — left-aligned</span>
+          <div class="divider divider--labeled">
+            <span class="divider__label">Section</span>
+            <div class="divider__line"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Horizontal Strong -->
+    <div class="card">
+      <p class="section-title">Horizontal — Strong</p>
+      <div class="demo-row">
+
+        <div class="demo-item">
+          <span class="state-label">Default</span>
+          <div class="divider divider--strong"><div class="divider__line"></div></div>
+        </div>
+
+        <div class="demo-item">
+          <span class="state-label">With label</span>
+          <div class="divider divider--strong divider--labeled">
+            <div class="divider__line"></div>
+            <span class="divider__label">Section</span>
+            <div class="divider__line"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Vertical -->
+    <div class="card">
+      <p class="section-title">Vertical</p>
+      <div class="demo-row">
+
+        <div class="demo-item">
+          <span class="state-label">Subtle</span>
+          <div class="vertical-demo">
+            <span class="demo-text">Left content</span>
+            <div class="divider divider--vertical"><div class="divider__line"></div></div>
+            <span class="demo-text">Right content</span>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <span class="state-label">Strong</span>
+          <div class="vertical-demo">
+            <span class="demo-text">Left content</span>
+            <div class="divider divider--vertical divider--strong"><div class="divider__line"></div></div>
+            <span class="demo-text">Right content</span>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <span class="state-label">In a button toolbar</span>
+          <div class="vertical-demo" style="height: 32px;">
+            <button style="display:inline-flex;align-items:center;padding:0 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-primary);font-size:var(--font-size-sm);cursor:pointer;">Bold</button>
+            <div class="divider divider--vertical" style="margin: 0 4px;"><div class="divider__line"></div></div>
+            <button style="display:inline-flex;align-items:center;padding:0 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-primary);font-size:var(--font-size-sm);cursor:pointer;">Italic</button>
+            <div class="divider divider--vertical" style="margin: 0 4px;"><div class="divider__line"></div></div>
+            <button style="display:inline-flex;align-items:center;padding:0 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-lg);background:var(--bg-primary);font-size:var(--font-size-sm);cursor:pointer;">Underline</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

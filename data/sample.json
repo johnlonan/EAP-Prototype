@@ -1,0 +1,11 @@
+{
+  "example": {
+    "title": "Sample Prototype",
+    "description": "Replace this with your prototype's mock data.",
+    "items": [
+      { "id": 1, "label": "Item One", "status": "active" },
+      { "id": 2, "label": "Item Two", "status": "inactive" },
+      { "id": 3, "label": "Item Three", "status": "active" }
+    ]
+  }
+}

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Calendar / Date Picker
+       Container: white bg, border-radius: 16px, shadow xl
+       Year header: prev/next ghost-circle-sm buttons flanking year text
+       Month label: 10px centered above grid
+       Day grid: 7 cols × 7 rows (1 header row + 6 day rows)
+                 Col/row size: 32px. Day header: 20px tall.
+       Day cell: border-radius: 8px, hover bg, selected: primary
+       Range selection: highlighted range bg
+       Single-month and dual-month (range picker) variants.
+    -------------------------------------------------------- */
+
+    /* ---- Container ---- */
+    .cal {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--bg-primary, white);
+      border: 1px solid var(--color-neutral-300, #e3e2df);
+      border-radius: var(--radius-2xl, 16px);
+      box-shadow: 0px 20px 25px 0px rgba(0,0,0,0.10), 0px 8px 10px 0px rgba(0,0,0,0.06);
+      padding: 8px 16px;
+      user-select: none;
+    }
+
+    /* ---- Year header ---- */
+    .cal__year-header {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 4px 0;
+    }
+
+    .cal__nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      border: none;
+      background-color: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast);
+    }
+
+    .cal__nav-btn:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .cal__nav-btn [data-icon] {
+      width: 14px;
+      height: 14px;
+    }
+
+    .cal__year-label {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs); /* 12px */
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+    }
+
+    /* ---- Month container (1 or 2 months side by side) ---- */
+    .cal__months {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    /* ---- Single month column ---- */
+    .cal__month {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .cal__month-label {
+      font-family: var(--font-sans);
+      font-size: 10px;
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    /* ---- Day grid ---- */
+    .cal__grid {
+      display: grid;
+      grid-template-columns: repeat(7, 32px);
+      width: 224px;
+    }
+
+    /* Day header row */
+    .cal__day-header {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-sans);
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    /* Day cell */
+    .cal__day {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: var(--text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+
+    .cal__day:empty {
+      cursor: default;
+    }
+
+    .cal__day:not(:empty):hover {
+      background-color: var(--color-neutral-200, #edece9);
+    }
+
+    /* Selected day */
+    .cal__day--selected {
+      background-color: var(--color-primary, #0e4e69) !important;
+      color: white !important;
+      border-radius: 8px;
+    }
+
+    /* Range start / end */
+    .cal__day--range-start {
+      background-color: var(--color-primary, #0e4e69) !important;
+      color: white !important;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .cal__day--range-end {
+      background-color: var(--color-primary, #0e4e69) !important;
+      color: white !important;
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* Range middle (between start and end) */
+    .cal__day--range-mid {
+      background-color: #cde2eb;
+      color: var(--color-primary, #0e4e69);
+      border-radius: 0;
+    }
+
+    /* Today */
+    .cal__day--today {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary, #0e4e69);
+    }
+    .cal__day--today.cal__day--selected,
+    .cal__day--today.cal__day--range-start,
+    .cal__day--today.cal__day--range-end {
+      color: white;
+    }
+
+    /* Disabled / outside month */
+    .cal__day--outside {
+      color: var(--text-tertiary);
+      cursor: default;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-3);
+    }
+
+    .demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: flex-start;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Single Month — date picker -->
+    <div class="card">
+      <p class="section-title">Single Month — Date Picker</p>
+      <p class="state-label">Click a date to select</p>
+      <div class="cal js-cal" data-mode="single" data-year="2026" data-month="3">
+        <div class="cal__year-header">
+          <button class="cal__nav-btn js-prev-month" aria-label="Previous month">
+            <span data-icon="chevron-left"></span>
+          </button>
+          <span class="cal__year-label js-month-year-label">April 2026</span>
+          <button class="cal__nav-btn js-next-month" aria-label="Next month">
+            <span data-icon="chevron-right"></span>
+          </button>
+        </div>
+        <div class="cal__months">
+          <div class="cal__month">
+            <div class="cal__grid js-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dual Month — Range picker -->
+    <div class="card">
+      <p class="section-title">Dual Month — Range Picker</p>
+      <p class="state-label">Click start and end dates to select a range</p>
+      <div class="cal js-cal" data-mode="range" data-year="2026" data-month="3">
+        <div class="cal__year-header">
+          <button class="cal__nav-btn js-prev-month" aria-label="Previous">
+            <span data-icon="chevron-left"></span>
+          </button>
+          <span class="cal__year-label js-month-year-label">April – May 2026</span>
+          <button class="cal__nav-btn js-next-month" aria-label="Next">
+            <span data-icon="chevron-right"></span>
+          </button>
+        </div>
+        <div class="cal__months">
+          <div class="cal__month">
+            <div class="cal__month-label js-month-label-1"></div>
+            <div class="cal__grid js-grid-1"></div>
+          </div>
+          <div class="cal__month">
+            <div class="cal__month-label js-month-label-2"></div>
+            <div class="cal__grid js-grid-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const DAYS = ['M','T','W','T','F','S','S'];
+
+      function daysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+      }
+
+      // Returns weekday index 0=Mon … 6=Sun
+      function startDayOfMonth(year, month) {
+        let d = new Date(year, month, 1).getDay(); // 0=Sun
+        return (d === 0) ? 6 : d - 1;
+      }
+
+      function buildGrid(grid, year, month, state) {
+        grid.innerHTML = '';
+
+        // Day headers
+        DAYS.forEach(d => {
+          const h = document.createElement('div');
+          h.className = 'cal__day-header';
+          h.textContent = d;
+          grid.appendChild(h);
+        });
+
+        const start = startDayOfMonth(year, month);
+        const total = daysInMonth(year, month);
+        const today = new Date();
+
+        // Empty cells before day 1
+        for (let i = 0; i < start; i++) {
+          const e = document.createElement('div');
+          e.className = 'cal__day';
+          grid.appendChild(e);
+        }
+
+        for (let day = 1; day <= total; day++) {
+          const cell = document.createElement('div');
+          cell.className = 'cal__day';
+          cell.textContent = day;
+          cell.dataset.date = `${year}-${month}-${day}`;
+
+          const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+          if (isToday) cell.classList.add('cal__day--today');
+
+          // Apply selection state
+          updateCellStyle(cell, year, month, day, state);
+
+          cell.addEventListener('click', () => {
+            if (!cell.textContent) return;
+            handleDayClick(year, month, day, state);
+          });
+
+          grid.appendChild(cell);
+        }
+      }
+
+      function dateVal(y, m, d) {
+        return new Date(y, m, d).getTime();
+      }
+
+      function updateCellStyle(cell, year, month, day, state) {
+        cell.classList.remove('cal__day--selected','cal__day--range-start','cal__day--range-end','cal__day--range-mid');
+
+        if (state.mode === 'single') {
+          if (state.selected && state.selected.y === year && state.selected.m === month && state.selected.d === day) {
+            cell.classList.add('cal__day--selected');
+          }
+        } else if (state.mode === 'range') {
+          if (!state.start && !state.end) return;
+          const v = dateVal(year, month, day);
+          const sv = state.start ? dateVal(state.start.y, state.start.m, state.start.d) : null;
+          const ev = state.end ? dateVal(state.end.y, state.end.m, state.end.d) : null;
+
+          if (sv && ev) {
+            if (v === sv) cell.classList.add('cal__day--range-start');
+            else if (v === ev) cell.classList.add('cal__day--range-end');
+            else if (v > sv && v < ev) cell.classList.add('cal__day--range-mid');
+          } else if (sv) {
+            if (v === sv) cell.classList.add('cal__day--selected');
+          }
+        }
+      }
+
+      function handleDayClick(year, month, day, state) {
+        if (state.mode === 'single') {
+          state.selected = { y: year, m: month, d: day };
+          state.refresh();
+        } else {
+          if (!state.start || state.end) {
+            state.start = { y: year, m: month, d: day };
+            state.end = null;
+            state.refresh();
+          } else {
+            const sv = dateVal(state.start.y, state.start.m, state.start.d);
+            const ev = dateVal(year, month, day);
+            if (ev < sv) {
+              state.end = state.start;
+              state.start = { y: year, m: month, d: day };
+            } else {
+              state.end = { y: year, m: month, d: day };
+            }
+            state.refresh();
+          }
+        }
+      }
+
+      // Initialize single-month calendar
+      document.querySelectorAll('.js-cal').forEach(calEl => {
+        const mode = calEl.dataset.mode || 'single';
+        let year = parseInt(calEl.dataset.year) || 2026;
+        let month = parseInt(calEl.dataset.month) || 3; // April (0-indexed)
+
+        const state = { mode, selected: null, start: null, end: null };
+
+        function refresh() {
+          Horizon.initIcons();
+
+          if (mode === 'single') {
+            const grid = calEl.querySelector('.js-grid');
+            const label = calEl.querySelector('.js-month-year-label');
+            if (label) label.textContent = `${MONTHS[month]} ${year}`;
+            if (grid) buildGrid(grid, year, month, state);
+          } else {
+            // Dual month
+            const m2 = (month + 1) % 12;
+            const y2 = month === 11 ? year + 1 : year;
+
+            const label = calEl.querySelector('.js-month-year-label');
+            if (label) label.textContent = `${MONTHS[month]} – ${MONTHS[m2]} ${year}`;
+
+            const ml1 = calEl.querySelector('.js-month-label-1');
+            const ml2 = calEl.querySelector('.js-month-label-2');
+            if (ml1) ml1.textContent = MONTHS[month];
+            if (ml2) ml2.textContent = MONTHS[m2];
+
+            const g1 = calEl.querySelector('.js-grid-1');
+            const g2 = calEl.querySelector('.js-grid-2');
+            if (g1) buildGrid(g1, year, month, state);
+            if (g2) buildGrid(g2, y2, m2, state);
+          }
+          Horizon.initIcons();
+        }
+
+        state.refresh = refresh;
+
+        calEl.querySelector('.js-prev-month').addEventListener('click', () => {
+          month--;
+          if (month < 0) { month = 11; year--; }
+          refresh();
+        });
+
+        calEl.querySelector('.js-next-month').addEventListener('click', () => {
+          month++;
+          if (month > 11) { month = 0; year++; }
+          refresh();
+        });
+
+        // Set default selection for demo
+        if (mode === 'single') {
+          state.selected = { y: 2026, m: 3, d: 18 };
+        } else {
+          state.start = { y: 2026, m: 3, d: 18 };
+          state.end = { y: 2026, m: 3, d: 25 };
+        }
+
+        refresh();
+      });
+    });
+  </script>
+
+</body>
+</html>

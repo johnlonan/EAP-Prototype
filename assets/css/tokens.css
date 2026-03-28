@@ -1,0 +1,170 @@
+/* ============================================================
+   Horizon 2.0 — Design Tokens
+   Source: Figma > -ALPHA- Horizon 2.0 > Foundations
+   ============================================================ */
+
+:root {
+
+  /* ----------------------------------------------------------
+     Typography
+  ---------------------------------------------------------- */
+  --font-sans: "ServiceNow Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "ServiceNow Sans Mono", "SF Mono", "Fira Code", monospace;
+
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --font-size-xs:   0.75rem;   /* 12px */
+  --font-size-sm:   0.875rem;  /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg:   1.125rem;  /* 18px */
+  --font-size-xl:   1.25rem;   /* 20px */
+  --font-size-2xl:  1.5rem;    /* 24px */
+  --font-size-3xl:  1.875rem;  /* 30px */
+  --font-size-4xl:  2.25rem;   /* 36px */
+  --font-size-5xl:  3rem;      /* 48px */
+
+  --line-height-tight:  1.25;
+  --line-height-snug:   1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-4: 1rem;    /* 16px */
+  --line-height-5: 1.25rem; /* 20px */
+
+  /* ----------------------------------------------------------
+     Semantic / Brand Colors
+  ---------------------------------------------------------- */
+
+  /* Primary — dark teal */
+  --color-primary:         #0e4e69;
+  --color-primary-content: #ffffff;
+
+  /* Secondary — warm light gray */
+  --color-secondary:         #e3e2df;
+  --color-secondary-content: #343331;
+
+  /* Accent — vibrant green */
+  --color-accent:         #68e353;
+  --color-accent-content: #000000;
+
+  /* Neutral */
+  --color-neutral:         #343331;
+  --color-neutral-content: #ffffff;
+  --color-neutral-50:      #141412;
+  --color-neutral-100:     #1a1917;
+  --color-neutral-200:     #edece9;
+  --color-neutral-300:     #e3e2df;
+  --color-neutral-400:     #c2c1be;
+
+  /* Status */
+  --color-info:            #2a6edc;
+  --color-info-content:    #f4f9ff;
+  --color-success:         #00834f;
+  --color-success-content: #f1fcf5;
+  --color-warning:         #8d6e00;
+  --color-warning-content: #fffbc9;
+  --color-error:           #e2161c;
+  --color-error-content:   #fff7f6;
+
+  /* ----------------------------------------------------------
+     Background
+  ---------------------------------------------------------- */
+  --bg-primary:   #ffffff;
+  --bg-secondary: #f4f3f0;
+  --bg-tertiary:  #edece9;
+  --bg-inverted:  #171614;
+  --bg-dark:      #0d0d0c;
+
+  /* Base scale (DaisyUI-style) */
+  --base-100: #ffffff;
+  --base-200: #f4f3f0;
+  --base-300: #edece9;
+  --base-content: #000000;
+
+  /* ----------------------------------------------------------
+     Text
+  ---------------------------------------------------------- */
+  --text-primary:   #000000;
+  --text-secondary: #4d4c4a;
+  --text-tertiary:  #656462;
+  --text-inverted:  #ffffff;
+  --text-disabled:  #c2c1be;
+
+  /* ----------------------------------------------------------
+     Surface
+  ---------------------------------------------------------- */
+  --surface-primary:   #ffffff;
+  --surface-secondary: #e3e2df;
+
+  /* ----------------------------------------------------------
+     Border
+  ---------------------------------------------------------- */
+  --border-subtle:  #edece9;
+  --border-default: #8a8986;
+  --border-strong:  #00273c;
+
+  /* ----------------------------------------------------------
+     Spacing
+  ---------------------------------------------------------- */
+  --space-1:  0.25rem;   /* 4px */
+  --space-2:  0.5rem;    /* 8px */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-5:  1.25rem;   /* 20px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+
+  /* ----------------------------------------------------------
+     Button State Colors
+  ---------------------------------------------------------- */
+  --color-primary-hover:    #003b54;
+  --color-primary-active:   #00273c;
+
+  --color-secondary-hover:  #d4d3d0;
+  --color-secondary-active: #c5c4c1;
+
+  --color-accent-hover:     #4fd63b;
+  --color-accent-active:    #38c224;
+
+  --color-error-hover:      #c41116;
+  --color-error-active:     #a50e13;
+
+  --color-neutral-hover:    #272624;
+  --color-neutral-active:   #1a1917;
+
+  --color-ghost-hover:      rgba(0, 0, 0, 0.06);
+  --color-ghost-active:     rgba(0, 0, 0, 0.12);
+
+  --color-link:             #2d637d;
+  --color-link-hover:       #003b54;
+
+  /* ----------------------------------------------------------
+     Border Radius
+  ---------------------------------------------------------- */
+  --radius-sm:    0.25rem;  /* 4px */
+  --radius-md:    0.375rem; /* 6px */
+  --radius-field: 0.75rem;  /* 12px — buttons & form fields */
+  --radius-lg:    0.5rem;   /* 8px */
+  --radius-xl:    0.75rem;  /* 12px */
+  --radius-2xl:   1rem;     /* 16px */
+  --radius-full:  9999px;
+
+  /* ----------------------------------------------------------
+     Shadows
+  ---------------------------------------------------------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* ----------------------------------------------------------
+     Transitions
+  ---------------------------------------------------------- */
+  --transition-fast:   100ms ease;
+  --transition-base:   200ms ease;
+  --transition-slow:   300ms ease;
+}

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrollbar — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Scrollbar — Custom CSS styling
+       Thumb: 4px wide, rgba(0,0,0,0.1), fully rounded.
+       Track: transparent, 4px padding (total track = 12px).
+       Uses ::-webkit-scrollbar pseudo-elements (Chrome/Safari/Edge).
+       Firefox uses scrollbar-width + scrollbar-color.
+    -------------------------------------------------------- */
+
+    /* Applied to any element with .custom-scrollbar */
+    .custom-scrollbar {
+      /* Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 12px;   /* vertical: total track width */
+      height: 12px;  /* horizontal: total track height */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.15);
+      border-radius: 9999px;
+      /* Creates the 4px padding by using a transparent border */
+      border: 4px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0, 0, 0, 0.25);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:active {
+      background-color: rgba(0, 0, 0, 0.35);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    /* ---- On dark backgrounds ---- */
+    .custom-scrollbar--light {
+      scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    }
+
+    .custom-scrollbar--light::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      background-clip: padding-box;
+    }
+
+    .custom-scrollbar--light::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ---- Scrollbar representation (static design spec) ---- */
+    .scrollbar-spec {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .scrollbar-spec__track {
+      width: 12px;
+      border-radius: 9999px;
+      background: transparent;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scrollbar-spec__thumb {
+      width: 4px;
+      height: 80px;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 9999px;
+      flex-shrink: 0;
+    }
+
+    /* Horizontal spec */
+    .scrollbar-spec--horizontal {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .scrollbar-spec--horizontal .scrollbar-spec__track {
+      width: 88px;
+      height: 12px;
+      padding: 4px;
+      flex-direction: row;
+    }
+
+    .scrollbar-spec--horizontal .scrollbar-spec__thumb {
+      width: 80px;
+      height: 4px;
+    }
+
+    /* --------------------------------------------------------
+       Demo containers
+    -------------------------------------------------------- */
+    .scroll-demo {
+      overflow: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-primary);
+    }
+
+    .scroll-demo--vertical {
+      height: 200px;
+      width: 320px;
+    }
+
+    .scroll-demo--horizontal {
+      width: 320px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .scroll-demo--both {
+      height: 200px;
+      width: 320px;
+    }
+
+    .scroll-content {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .scroll-content--vertical {
+      padding: 16px;
+      min-height: 500px;
+    }
+
+    .scroll-content--horizontal {
+      padding: 16px;
+      white-space: nowrap;
+      width: 900px;
+    }
+
+    .scroll-content--both {
+      padding: 16px;
+      width: 700px;
+      min-height: 500px;
+    }
+
+    .scroll-content p + p {
+      margin-top: 8px;
+    }
+
+    .dark-demo {
+      background: #1e1e1e;
+      border-color: #333;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+
+    /* Code block for CSS spec */
+    .code-block {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--text-primary);
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .code-block .c-comment { color: var(--text-tertiary); }
+    .code-block .c-selector { color: #0e4e69; }
+    .code-block .c-property { color: #5a3e8a; }
+    .code-block .c-value { color: #1a6b3c; }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Design spec (static) -->
+    <div class="card">
+      <p class="section-title">Design Spec</p>
+      <div class="grid">
+
+        <div class="col">
+          <span class="state-label">Vertical — thumb</span>
+          <div class="scrollbar-spec">
+            <div class="scrollbar-spec__track">
+              <div class="scrollbar-spec__thumb"></div>
+            </div>
+          </div>
+          <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top:4px;">4px thumb · 12px track · rgba(0,0,0,0.1)</p>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Horizontal — thumb</span>
+          <div class="scrollbar-spec scrollbar-spec--horizontal">
+            <div class="scrollbar-spec__track">
+              <div class="scrollbar-spec__thumb"></div>
+            </div>
+          </div>
+          <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top:4px;">4px thumb · 12px track · rgba(0,0,0,0.1)</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live demos -->
+    <div class="card">
+      <p class="section-title">Live Demos</p>
+      <div class="grid">
+
+        <div class="col">
+          <span class="state-label">Vertical scroll</span>
+          <div class="scroll-demo scroll-demo--vertical custom-scrollbar">
+            <div class="scroll-content scroll-content--vertical">
+              <p>Scroll content line 1</p>
+              <p>Scroll content line 2</p>
+              <p>Scroll content line 3</p>
+              <p>Scroll content line 4</p>
+              <p>Scroll content line 5</p>
+              <p>Scroll content line 6</p>
+              <p>Scroll content line 7</p>
+              <p>Scroll content line 8</p>
+              <p>Scroll content line 9</p>
+              <p>Scroll content line 10</p>
+              <p>Scroll content line 11</p>
+              <p>Scroll content line 12</p>
+              <p>Scroll content line 13</p>
+              <p>Scroll content line 14</p>
+              <p>Scroll content line 15</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Horizontal scroll</span>
+          <div class="scroll-demo scroll-demo--horizontal custom-scrollbar">
+            <div class="scroll-content scroll-content--horizontal">
+              Column A &nbsp;&nbsp;&nbsp; Column B &nbsp;&nbsp;&nbsp; Column C &nbsp;&nbsp;&nbsp; Column D &nbsp;&nbsp;&nbsp; Column E &nbsp;&nbsp;&nbsp; Column F &nbsp;&nbsp;&nbsp; Column G &nbsp;&nbsp;&nbsp; Column H
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Both axes</span>
+          <div class="scroll-demo scroll-demo--both custom-scrollbar">
+            <div class="scroll-content scroll-content--both">
+              <p>This container scrolls both vertically and horizontally. The content is wider and taller than the container.</p>
+              <p>Row 2 — more content here that extends the width of this container beyond its bounds.</p>
+              <p>Row 3 — the scrollbar thumb is 4px, styled with rgba(0,0,0,0.1) fill.</p>
+              <p>Row 4 — the track is transparent with 4px padding creating visual breathing room.</p>
+              <p>Row 5 — hover the thumb to see it darken slightly to rgba(0,0,0,0.25).</p>
+              <p>Row 6 — active/drag state darkens further to rgba(0,0,0,0.35).</p>
+              <p>Row 7 — this styling works in Chrome, Safari, and Edge browsers.</p>
+              <p>Row 8 — Firefox uses scrollbar-width: thin with scrollbar-color.</p>
+              <p>Row 9 — the corner where both scrollbars meet has a transparent background.</p>
+              <p>Row 10 — end of demo content.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">On dark background</span>
+          <div class="scroll-demo scroll-demo--vertical custom-scrollbar custom-scrollbar--light dark-demo">
+            <div class="scroll-content scroll-content--vertical" style="color: rgba(255,255,255,0.8);">
+              <p>Dark surface scroll</p>
+              <p>Light scrollbar thumb</p>
+              <p>rgba(255,255,255,0.3)</p>
+              <p>More content...</p>
+              <p>More content...</p>
+              <p>More content...</p>
+              <p>More content...</p>
+              <p>More content...</p>
+              <p>More content...</p>
+              <p>More content...</p>
+              <p>More content...</p>
+              <p>More content...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CSS Usage -->
+    <div class="card">
+      <p class="section-title">CSS Usage</p>
+      <div class="code-block">
+<span class="c-comment">/* Add .custom-scrollbar to any scrollable element */</span>
+<span class="c-selector">.custom-scrollbar</span> {
+  <span class="c-comment">/* Firefox */</span>
+  <span class="c-property">scrollbar-width:</span> <span class="c-value">thin</span>;
+  <span class="c-property">scrollbar-color:</span> <span class="c-value">rgba(0, 0, 0, 0.15) transparent</span>;
+}
+
+<span class="c-selector">.custom-scrollbar::-webkit-scrollbar</span> {
+  <span class="c-property">width:</span> <span class="c-value">12px</span>;   <span class="c-comment">/* vertical track width */</span>
+  <span class="c-property">height:</span> <span class="c-value">12px</span>;  <span class="c-comment">/* horizontal track height */</span>
+}
+
+<span class="c-selector">.custom-scrollbar::-webkit-scrollbar-track</span> {
+  <span class="c-property">background:</span> <span class="c-value">transparent</span>;
+}
+
+<span class="c-selector">.custom-scrollbar::-webkit-scrollbar-thumb</span> {
+  <span class="c-property">background-color:</span> <span class="c-value">rgba(0, 0, 0, 0.15)</span>;
+  <span class="c-property">border-radius:</span> <span class="c-value">9999px</span>;
+  <span class="c-property">border:</span> <span class="c-value">4px solid transparent</span>;  <span class="c-comment">/* creates 4px padding */</span>
+  <span class="c-property">background-clip:</span> <span class="c-value">padding-box</span>;
+}
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+/* ============================================================
+   Horizon 2.0 — Data Visualization Tokens
+   Source: Figma > AI-CT Janus > Horizon 2.0 DataViz Explorations
+   Node: 431-3042
+   ============================================================ */
+
+:root {
+
+  /* ----------------------------------------------------------
+     Data Series Colors
+     9-stop categorical palette for charts with multiple series.
+     Order reflects recommended usage sequence.
+  ---------------------------------------------------------- */
+  --dv-color-1: #008A01;   /* Positive Green  */
+  --dv-color-2: #E81C1C;   /* Negative Red    */
+  --dv-color-3: #EA7117;   /* Orange          */
+  --dv-color-4: #F03E8B;   /* Pink            */
+  --dv-color-5: #EF3EFF;   /* Fuchsia         */
+  --dv-color-6: #B835E6;   /* Orchid          */
+  --dv-color-7: #099FDB;   /* Light Blue      */
+  --dv-color-8: #0669FF;   /* Blue            */
+  --dv-color-9: #7857FF;   /* Purple          */
+
+  /* ----------------------------------------------------------
+     Semantic Colors
+     Use ONLY when data represents performance or state —
+     not as general series colors.
+  ---------------------------------------------------------- */
+  --dv-semantic-positive:       #007A01;   /* Green       */
+  --dv-semantic-positive-light: #0FA610;   /* Light green */
+  --dv-semantic-negative:       #E42338;   /* Red         */
+  --dv-semantic-warning:        #FD9700;   /* Orange      */
+  --dv-semantic-warning-alt:    #F1C21B;   /* Yellow — avoid on light bg (not a11y) */
+  --dv-semantic-info:           #0079CC;   /* Blue        */
+
+  /* ----------------------------------------------------------
+     Directional Trend Colors
+     positive-green / negative-red used for +/- trend indicators.
+  ---------------------------------------------------------- */
+  --dv-trend-positive: #008A01;
+  --dv-trend-negative: #E81C1C;
+
+  /* ----------------------------------------------------------
+     AI Colors
+     Use ONLY when the data or insight is AI-generated.
+  ---------------------------------------------------------- */
+  --dv-ai-bg:        #71D5FE;
+  --dv-ai-fg:        #86F673;
+  --dv-ai-container: #172B3E;
+
+  /* ----------------------------------------------------------
+     Structural / Supportive Elements
+  ---------------------------------------------------------- */
+  --dv-grid-line:          #BABABB;   /* Grid lines — light mode           */
+  --dv-grid-line-dark:     #5A5A5A;   /* Grid lines — dark mode            */
+  --dv-tooltip-bg:         #1E293B;   /* Tooltip background — light mode   */
+  --dv-tooltip-bg-dark:    #27272A;   /* Tooltip background — dark mode    */
+  --dv-container-light:    #FFFFFF;
+  --dv-container-dark:     #000000;
+
+  /* ----------------------------------------------------------
+     Text inside charts
+  ---------------------------------------------------------- */
+  --dv-text-primary:    #000000;   /* Main data labels — light mode     */
+  --dv-text-secondary:  #656462;   /* Secondary labels / axis — light   */
+  --dv-text-inverted:   #FFFFFF;   /* Main data labels — dark mode      */
+  --dv-text-muted:      #C2C1BF;   /* Secondary labels / axis — dark    */
+  --dv-text-icon:       #656462;   /* Menu icons — light mode           */
+  --dv-text-icon-dark:  #C2C1BF;   /* Menu icons — dark mode            */
+
+  /* ----------------------------------------------------------
+     Neutral Ramp — Light mode (500–950)
+  ---------------------------------------------------------- */
+  --dv-neutral-500: #92918F;
+  --dv-neutral-600: #656462;
+  --dv-neutral-700: #4D4C4B;
+  --dv-neutral-800: #343332;
+  --dv-neutral-900: #232221;
+  --dv-neutral-950: #171615;
+
+  /* ----------------------------------------------------------
+     Neutral Ramp — Dark mode (50–500)
+  ---------------------------------------------------------- */
+  --dv-neutral-50:  #F8F9FA;
+  --dv-neutral-100: #F3F3F3;
+  --dv-neutral-200: #EEEEED;
+  --dv-neutral-300: #E1E1E0;
+  --dv-neutral-400: #C2C1BF;
+
+  /* ----------------------------------------------------------
+     Color Ramps (full 10-stop scales)
+     Shade 5 is always the "main" accessible color.
+     🚫 = not WCAG AA accessible on that background.
+  ---------------------------------------------------------- */
+
+  /* Green (positive) */
+  --dv-green-1: #3BD13B;   /* 🚫 light */
+  --dv-green-2: #26BF26;   /* 🚫 light */
+  --dv-green-3: #1BB21B;   /* 🚫 light */
+  --dv-green-4: #0FA610;
+  --dv-green-5: #008A01;   /* main */
+  --dv-green-6: #007A01;
+  --dv-green-7: #006900;
+  --dv-green-8: #005C00;   /* 🚫 dark */
+  --dv-green-9: #004F00;   /* 🚫 dark */
+  --dv-green-10:#004200;   /* 🚫 dark */
+
+  /* Red (negative) */
+  --dv-red-1: #FF5C5C;
+  --dv-red-2: #FF5454;
+  --dv-red-3: #FA4646;
+  --dv-red-4: #F03030;
+  --dv-red-5: #E81C1C;     /* main */
+  --dv-red-6: #DB1A1A;
+  --dv-red-7: #CC1010;
+  --dv-red-8: #B20000;     /* 🚫 dark */
+  --dv-red-9: #9C0000;     /* 🚫 dark */
+  --dv-red-10:#8C0000;     /* 🚫 dark */
+
+  /* Light Blue (Blue 1) */
+  --dv-blue1-5: #099FDB;   /* main — full ramp not extracted from Figma */
+
+  /* Blue (Blue 2) */
+  --dv-blue2-5: #0669FF;   /* main */
+
+  /* Violet / Purple */
+  --dv-violet-5: #7857FF;  /* main */
+
+  /* Orchid / Purple 1 */
+  --dv-orchid-5: #B835E6;  /* main */
+
+  /* Fuchsia / Pink 1 */
+  --dv-fuchsia-5: #EF3EFF; /* main */
+
+  /* Pink / Light Pink 1 */
+  --dv-pink-5: #F03E8B;    /* main */
+
+  /* Orange */
+  --dv-orange-5: #EA7117;  /* main */
+
+  /* Yellow */
+  --dv-yellow-5: #F1C21B;  /* main — 🚫 light bg, ok dark bg */
+  --dv-yellow-10:#B68E00;  /* a11y on both */
+
+  /* ----------------------------------------------------------
+     Chart.js default config helpers
+     Reference these in JS via getComputedStyle(root).getPropertyValue()
+  ---------------------------------------------------------- */
+  --dv-font-family: "ServiceNow Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --dv-font-size-axis: 11px;
+  --dv-font-size-label: 12px;
+  --dv-font-size-title: 13px;
+  --dv-border-radius-bar: 4px;  /* rounded bar tops */
+}

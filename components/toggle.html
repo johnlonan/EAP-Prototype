@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toggle — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Toggle — base
+    -------------------------------------------------------- */
+    .toggle-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      font-family: var(--font-sans);
+    }
+
+    .toggle-label--disabled {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    /* Hide native checkbox */
+    .toggle-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    /* Track */
+    .toggle-track {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      /* md default */
+      width: 40px;
+      height: 25px;
+      padding: 2px 4px;
+      border-radius: var(--radius-field); /* 12px */
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      transition: background-color var(--transition-base), border-color var(--transition-base);
+      overflow: hidden;
+    }
+
+    /* Handle */
+    .toggle-handle {
+      width: 16px;
+      height: 16px;
+      border-radius: var(--radius-full);
+      background-color: var(--border-default); /* #8a8986 gray when off */
+      flex-shrink: 0;
+      transform: translateX(0);
+      transition: transform var(--transition-base), background-color var(--transition-base), box-shadow var(--transition-base);
+    }
+
+    /* On state — md */
+    .toggle-input:checked + .toggle-track {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .toggle-input:checked + .toggle-track .toggle-handle {
+      transform: translateX(16px); /* track inner width - handle width = (40-4-4) - 16 = 16 */
+      background-color: var(--color-primary-content); /* white */
+      box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1), 0px 1px 2px -1px rgba(0,0,0,0.1);
+    }
+
+    /* Hover (off state) */
+    .toggle-label:not(.toggle-label--disabled) .toggle-input:not(:checked) + .toggle-track:hover {
+      border-color: var(--color-primary);
+    }
+
+    /* Label text */
+    .toggle-text {
+      font-size: var(--font-size-xs); /* 12px — all sizes use same label */
+      line-height: var(--line-height-5); /* 20px */
+      color: var(--text-primary);
+      font-weight: var(--font-weight-normal);
+    }
+
+    /* --------------------------------------------------------
+       Sizes
+    -------------------------------------------------------- */
+
+    /* sm */
+    .toggle-sm .toggle-track {
+      width: 33px;
+      height: 20px;
+      padding: 2px 4px;
+      border-radius: 11.5px;
+    }
+
+    .toggle-sm .toggle-handle {
+      width: 13px;
+      height: 13px;
+    }
+
+    .toggle-sm .toggle-input:checked + .toggle-track .toggle-handle {
+      transform: translateX(12px); /* (33-4-4) - 13 = 12 */
+    }
+
+    /* xs */
+    .toggle-xs .toggle-track {
+      width: 26px;
+      height: 16px;
+      padding: 2px;
+      border-radius: 11px;
+    }
+
+    .toggle-xs .toggle-handle {
+      width: 10px;
+      height: 10px;
+    }
+
+    .toggle-xs .toggle-input:checked + .toggle-track .toggle-handle {
+      transform: translateX(12px); /* (26-2-2) - 10 = 12 */
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--space-10);
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- States -->
+    <div class="card">
+      <p class="section-title">States</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">Off</span>
+          <label class="toggle-label">
+            <input type="checkbox" class="toggle-input">
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">Label</span>
+          </label>
+        </div>
+
+        <div class="col">
+          <span class="state-label">On</span>
+          <label class="toggle-label">
+            <input type="checkbox" class="toggle-input" checked>
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">Label</span>
+          </label>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Disabled (off)</span>
+          <label class="toggle-label toggle-label--disabled">
+            <input type="checkbox" class="toggle-input" disabled>
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">Label</span>
+          </label>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Disabled (on)</span>
+          <label class="toggle-label toggle-label--disabled">
+            <input type="checkbox" class="toggle-input" checked disabled>
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">Label</span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sizes -->
+    <div class="card">
+      <p class="section-title">Sizes</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">md (default) — 40×25px</span>
+          <label class="toggle-label">
+            <input type="checkbox" class="toggle-input">
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">Off</span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" class="toggle-input" checked>
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">On</span>
+          </label>
+        </div>
+
+        <div class="col">
+          <span class="state-label">sm — 33×20px</span>
+          <label class="toggle-label toggle-sm">
+            <input type="checkbox" class="toggle-input">
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">Off</span>
+          </label>
+          <label class="toggle-label toggle-sm">
+            <input type="checkbox" class="toggle-input" checked>
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">On</span>
+          </label>
+        </div>
+
+        <div class="col">
+          <span class="state-label">xs — 26×16px</span>
+          <label class="toggle-label toggle-xs">
+            <input type="checkbox" class="toggle-input">
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">Off</span>
+          </label>
+          <label class="toggle-label toggle-xs">
+            <input type="checkbox" class="toggle-input" checked>
+            <span class="toggle-track"><span class="toggle-handle"></span></span>
+            <span class="toggle-text">On</span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Interactive — click to toggle -->
+    <div class="card">
+      <p class="section-title">Interactive</p>
+      <div class="col" style="gap: var(--space-4);">
+        <label class="toggle-label">
+          <input type="checkbox" class="toggle-input">
+          <span class="toggle-track"><span class="toggle-handle"></span></span>
+          <span class="toggle-text">Enable notifications</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" class="toggle-input" checked>
+          <span class="toggle-track"><span class="toggle-handle"></span></span>
+          <span class="toggle-text">Dark mode</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" class="toggle-input">
+          <span class="toggle-track"><span class="toggle-handle"></span></span>
+          <span class="toggle-text">Auto-save</span>
+        </label>
+        <label class="toggle-label toggle-label--disabled">
+          <input type="checkbox" class="toggle-input" disabled>
+          <span class="toggle-track"><span class="toggle-handle"></span></span>
+          <span class="toggle-text">Analytics (disabled)</span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

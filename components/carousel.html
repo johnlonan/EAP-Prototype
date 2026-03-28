@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Carousel
+       Slides: horizontal overflow-scroll, snap-x
+       Each slide: 100% wide, 208px tall, border-radius: 16px
+       Variant 1 — Dots pagination (below slides)
+       Variant 2 — Next/prev arrow buttons (overlaid left/right center)
+       Variant 3 — Number indicator (overlaid bottom-right)
+    -------------------------------------------------------- */
+
+    /* ---- Base ---- */
+    .carousel {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: var(--radius-2xl, 16px);
+    }
+
+    .carousel__track {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Firefox */
+      border-radius: var(--radius-2xl, 16px);
+    }
+
+    .carousel__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel__slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 208px;
+      scroll-snap-align: start;
+      border-radius: var(--radius-2xl, 16px);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .carousel__slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Slide placeholder (colored blocks for demo) */
+    .carousel__slide-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* ---- Dots pagination ---- */
+    .carousel__dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding-top: 12px;
+    }
+
+    .carousel__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background-color: var(--color-neutral-300, #c8c7c4);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: width var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .carousel__dot--active {
+      width: 20px;
+      background-color: var(--color-primary, #0e4e69);
+    }
+
+    /* ---- Number indicator (overlaid) ---- */
+    .carousel__counter {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background-color: rgba(0, 0, 0, 0.45);
+      color: white;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+      padding: 3px 10px;
+      border-radius: 9999px;
+      pointer-events: none;
+    }
+
+    /* ---- Prev/Next buttons (overlaid) ---- */
+    .carousel__nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      pointer-events: none;
+    }
+
+    .carousel__nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      border: none;
+      background-color: white;
+      color: var(--text-primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      cursor: pointer;
+      pointer-events: all;
+      transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .carousel__nav-btn:hover {
+      background-color: var(--bg-secondary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .carousel__nav-btn [data-icon] {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ---- Disabled nav button ---- */
+    .carousel__nav-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Demo slide colors */
+    .slide-1 { background: linear-gradient(135deg, #0e4e69 0%, #49788f 100%); }
+    .slide-2 { background: linear-gradient(135deg, #1a6b3c 0%, #4a9e6f 100%); }
+    .slide-3 { background: linear-gradient(135deg, #5a3e8a 0%, #8a68c0 100%); }
+    .slide-4 { background: linear-gradient(135deg, #b5420a 0%, #e07040 100%); }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Variant 1: Dots pagination -->
+    <div class="card">
+      <p class="section-title">Dots Pagination</p>
+      <div data-carousel="dots">
+        <div class="carousel">
+          <div class="carousel__track js-track">
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-1">
+                <span>Slide 1 — Incident Overview</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-2">
+                <span>Slide 2 — Resolution Trends</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-3">
+                <span>Slide 3 — Team Performance</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-4">
+                <span>Slide 4 — SLA Compliance</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel__dots js-dots">
+          <button class="carousel__dot carousel__dot--active js-dot" data-index="0" aria-label="Go to slide 1"></button>
+          <button class="carousel__dot js-dot" data-index="1" aria-label="Go to slide 2"></button>
+          <button class="carousel__dot js-dot" data-index="2" aria-label="Go to slide 3"></button>
+          <button class="carousel__dot js-dot" data-index="3" aria-label="Go to slide 4"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variant 2: Next/Prev arrows -->
+    <div class="card">
+      <p class="section-title">Next / Prev Navigation</p>
+      <div data-carousel="arrows">
+        <div class="carousel">
+          <div class="carousel__track js-track">
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-2">
+                <span>Slide 1 — Dashboard Metrics</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-3">
+                <span>Slide 2 — Alert Summary</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-1">
+                <span>Slide 3 — Capacity Report</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-4">
+                <span>Slide 4 — Change Schedule</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel__nav">
+            <button class="carousel__nav-btn js-prev" disabled aria-label="Previous slide">
+              <span data-icon="chevron-left"></span>
+            </button>
+            <button class="carousel__nav-btn js-next" aria-label="Next slide">
+              <span data-icon="chevron-right"></span>
+            </button>
+          </div>
+        </div>
+        <div class="carousel__dots js-dots">
+          <button class="carousel__dot carousel__dot--active js-dot" data-index="0"></button>
+          <button class="carousel__dot js-dot" data-index="1"></button>
+          <button class="carousel__dot js-dot" data-index="2"></button>
+          <button class="carousel__dot js-dot" data-index="3"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Variant 3: Number counter (overlaid) -->
+    <div class="card">
+      <p class="section-title">Number Counter</p>
+      <div data-carousel="counter">
+        <div class="carousel" style="position: relative;">
+          <div class="carousel__track js-track">
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-3">
+                <span>Slide 1 — Network Overview</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-4">
+                <span>Slide 2 — Hardware Status</span>
+              </div>
+            </div>
+            <div class="carousel__slide">
+              <div class="carousel__slide-placeholder slide-1">
+                <span>Slide 3 — Cloud Resources</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel__nav">
+            <button class="carousel__nav-btn js-prev" disabled aria-label="Previous slide">
+              <span data-icon="chevron-left"></span>
+            </button>
+            <button class="carousel__nav-btn js-next" aria-label="Next slide">
+              <span data-icon="chevron-right"></span>
+            </button>
+          </div>
+
+          <div class="carousel__counter js-counter">1 / 3</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+
+      document.querySelectorAll('[data-carousel]').forEach(carouselWrap => {
+        const track = carouselWrap.querySelector('.js-track');
+        const slides = track ? track.querySelectorAll('.carousel__slide') : [];
+        const dots = carouselWrap.querySelectorAll('.js-dot');
+        const prevBtn = carouselWrap.querySelector('.js-prev');
+        const nextBtn = carouselWrap.querySelector('.js-next');
+        const counter = carouselWrap.querySelector('.js-counter');
+        const total = slides.length;
+        let current = 0;
+
+        function goTo(index) {
+          if (index < 0 || index >= total) return;
+          current = index;
+          track.scrollTo({ left: track.clientWidth * index, behavior: 'smooth' });
+          dots.forEach((d, i) => d.classList.toggle('carousel__dot--active', i === index));
+          if (prevBtn) prevBtn.disabled = index === 0;
+          if (nextBtn) nextBtn.disabled = index === total - 1;
+          if (counter) counter.textContent = `${index + 1} / ${total}`;
+        }
+
+        dots.forEach((dot, i) => {
+          dot.addEventListener('click', () => goTo(i));
+        });
+
+        if (prevBtn) prevBtn.addEventListener('click', () => goTo(current - 1));
+        if (nextBtn) nextBtn.addEventListener('click', () => goTo(current + 1));
+
+        // Sync dots on scroll
+        track.addEventListener('scroll', () => {
+          const newIndex = Math.round(track.scrollLeft / track.clientWidth);
+          if (newIndex !== current) {
+            current = newIndex;
+            dots.forEach((d, i) => d.classList.toggle('carousel__dot--active', i === newIndex));
+            if (prevBtn) prevBtn.disabled = newIndex === 0;
+            if (nextBtn) nextBtn.disabled = newIndex === total - 1;
+            if (counter) counter.textContent = `${newIndex + 1} / ${total}`;
+          }
+        }, { passive: true });
+
+        // Init nav btn state
+        if (nextBtn && total <= 1) nextBtn.disabled = true;
+      });
+    });
+  </script>
+
+</body>
+</html>

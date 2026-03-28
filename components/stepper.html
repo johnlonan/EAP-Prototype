@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stepper — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Stepper
+       Step indicator: 32px circle (border-radius 9999px)
+       Step states: completed (dark fill + check), active (primary fill),
+                    pending (neutral-200 bg, neutral text)
+       Separator track: 8px wide, with active/completed fill overlay
+       Label: 16px font-weight-normal below/beside the step
+       Variants: horizontal and vertical
+       8 color variants
+    -------------------------------------------------------- */
+
+    /* ---- Step indicator ---- */
+    .step-indicator {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: var(--font-weight-semibold);
+      transition: background-color var(--transition-fast);
+    }
+
+    .step-indicator [data-icon] {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Pending */
+    .step-indicator--pending {
+      background-color: var(--color-neutral-200, #edece9);
+      color: var(--text-tertiary);
+    }
+
+    /* Active */
+    .step-indicator--active {
+      background-color: var(--color-primary, #0e4e69);
+      color: white;
+    }
+
+    /* Completed */
+    .step-indicator--completed {
+      background-color: var(--color-neutral-800, #343331);
+      color: white;
+    }
+
+    /* ---- Color modifiers for active state ---- */
+    .stepper--success .step-indicator--active { background-color: var(--color-success, #16a34a); }
+    .stepper--warning .step-indicator--active { background-color: var(--color-warning, #d97706); }
+    .stepper--error   .step-indicator--active { background-color: var(--color-error, #dc2626); }
+    .stepper--info    .step-indicator--active { background-color: var(--color-info, #2563eb); }
+    .stepper--purple  .step-indicator--active { background-color: #7c3aed; }
+    .stepper--orange  .step-indicator--active { background-color: #ea580c; }
+    .stepper--teal    .step-indicator--active { background-color: #0d9488; }
+
+    /* ---- Track segment ---- */
+    .step-track {
+      background-color: var(--color-neutral-200, #edece9);
+      position: relative;
+      overflow: hidden;
+      border-radius: 9999px;
+    }
+
+    .step-track__fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: var(--color-neutral-800, #343331);
+      border-radius: 9999px;
+    }
+
+    /* ---- Step label ---- */
+    .step-label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm, 14px);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-secondary);
+    }
+
+    .step-label--active {
+      color: var(--text-primary);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .step-label--completed {
+      color: var(--text-secondary);
+    }
+
+    .step-sublabel {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ====================================================
+       HORIZONTAL STEPPER
+    ==================================================== */
+    .stepper-h {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .stepper-h__step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .stepper-h__row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Track between steps */
+    .stepper-h__track {
+      height: 4px;
+      flex: 1;
+    }
+
+    .stepper-h__track .step-track__fill {
+      height: 100%;
+      width: 100%;
+    }
+
+    .stepper-h__label {
+      text-align: center;
+      max-width: 100px;
+    }
+
+    /* ====================================================
+       VERTICAL STEPPER
+    ==================================================== */
+    .stepper-v {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stepper-v__step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .stepper-v__spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .stepper-v__track {
+      width: 4px;
+      flex: 1;
+      min-height: 32px;
+    }
+
+    .stepper-v__track .step-track__fill {
+      width: 100%;
+      height: 100%;
+    }
+
+    .stepper-v__content {
+      flex: 1;
+      padding-top: 4px;
+      padding-bottom: 28px;
+    }
+
+    .stepper-v__step:last-child .stepper-v__content {
+      padding-bottom: 0;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      align-items: flex-start;
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Horizontal stepper — step 2 active -->
+    <div class="card">
+      <p class="section-title">Horizontal Stepper</p>
+      <p class="state-label">Step 2 active, step 1 completed</p>
+      <div class="stepper-h">
+
+        <!-- Step 1 — completed -->
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track" style="background: transparent;"></div>
+            <div class="step-indicator step-indicator--completed">
+              <span data-icon="check"></span>
+            </div>
+            <div class="step-track stepper-h__track">
+              <div class="step-track__fill"></div>
+            </div>
+          </div>
+          <div class="stepper-h__label">
+            <div class="step-label step-label--completed">Create Request</div>
+          </div>
+        </div>
+
+        <!-- Step 2 — active -->
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track">
+              <div class="step-track__fill"></div>
+            </div>
+            <div class="step-indicator step-indicator--active">2</div>
+            <div class="step-track stepper-h__track"></div>
+          </div>
+          <div class="stepper-h__label">
+            <div class="step-label step-label--active">CAB Review</div>
+          </div>
+        </div>
+
+        <!-- Step 3 — pending -->
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track"></div>
+            <div class="step-indicator step-indicator--pending">3</div>
+            <div class="step-track stepper-h__track"></div>
+          </div>
+          <div class="stepper-h__label">
+            <div class="step-label">Implementation</div>
+          </div>
+        </div>
+
+        <!-- Step 4 — pending -->
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track"></div>
+            <div class="step-indicator step-indicator--pending">4</div>
+            <div class="step-track stepper-h__track" style="background: transparent;"></div>
+          </div>
+          <div class="stepper-h__label">
+            <div class="step-label">Close</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Horizontal — all complete -->
+    <div class="card">
+      <p class="section-title">Horizontal — All Completed</p>
+      <div class="stepper-h">
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track" style="background: transparent;"></div>
+            <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+            <div class="step-track stepper-h__track"><div class="step-track__fill"></div></div>
+          </div>
+          <div class="stepper-h__label"><div class="step-label step-label--completed">Submitted</div></div>
+        </div>
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track"><div class="step-track__fill"></div></div>
+            <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+            <div class="step-track stepper-h__track"><div class="step-track__fill"></div></div>
+          </div>
+          <div class="stepper-h__label"><div class="step-label step-label--completed">Approved</div></div>
+        </div>
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track"><div class="step-track__fill"></div></div>
+            <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+            <div class="step-track stepper-h__track"><div class="step-track__fill"></div></div>
+          </div>
+          <div class="stepper-h__label"><div class="step-label step-label--completed">Deployed</div></div>
+        </div>
+        <div class="stepper-h__step">
+          <div class="stepper-h__row">
+            <div class="step-track stepper-h__track"><div class="step-track__fill"></div></div>
+            <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+            <div class="step-track stepper-h__track" style="background: transparent;"></div>
+          </div>
+          <div class="stepper-h__label"><div class="step-label step-label--completed">Verified</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vertical steppers -->
+    <div class="card">
+      <p class="section-title">Vertical Stepper</p>
+      <div class="demo-row">
+
+        <!-- Primary, step 3 active -->
+        <div>
+          <p class="state-label">Primary — step 3 active</p>
+          <div class="stepper-v">
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+                <div class="step-track stepper-v__track"><div class="step-track__fill"></div></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label step-label--completed">Incident Opened</div>
+                <div class="step-sublabel">Mar 27 · 09:15 AM</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+                <div class="step-track stepper-v__track"><div class="step-track__fill"></div></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label step-label--completed">Assigned</div>
+                <div class="step-sublabel">Mar 27 · 09:32 AM</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--active">3</div>
+                <div class="step-track stepper-v__track"></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label step-label--active">Investigation</div>
+                <div class="step-sublabel">In progress</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--pending">4</div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label">Resolution</div>
+                <div class="step-sublabel">Pending</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success color variant -->
+        <div>
+          <p class="state-label">Success color variant</p>
+          <div class="stepper-v stepper--success">
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+                <div class="step-track stepper-v__track"><div class="step-track__fill"></div></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label step-label--completed">Planning</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--active">2</div>
+                <div class="step-track stepper-v__track"></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label step-label--active">Development</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--pending">3</div>
+                <div class="step-track stepper-v__track"></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label">Testing</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--pending">4</div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label">Release</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning color variant -->
+        <div>
+          <p class="state-label">Warning color variant</p>
+          <div class="stepper-v stepper--warning">
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--completed"><span data-icon="check"></span></div>
+                <div class="step-track stepper-v__track"><div class="step-track__fill"></div></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label step-label--completed">Alert Triggered</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--active">2</div>
+                <div class="step-track stepper-v__track"></div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label step-label--active">Escalation</div>
+              </div>
+            </div>
+            <div class="stepper-v__step">
+              <div class="stepper-v__spine">
+                <div class="step-indicator step-indicator--pending">3</div>
+              </div>
+              <div class="stepper-v__content">
+                <div class="step-label">Resolution</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Interactive horizontal stepper -->
+    <div class="card">
+      <p class="section-title">Interactive</p>
+      <div id="interactive-stepper">
+        <div class="stepper-h js-stepper-h">
+          <div class="stepper-h__step js-h-step" data-step="0">
+            <div class="stepper-h__row">
+              <div class="step-track stepper-h__track" style="background: transparent;"></div>
+              <div class="step-indicator step-indicator--active js-h-indicator">1</div>
+              <div class="step-track stepper-h__track js-h-track"></div>
+            </div>
+            <div class="stepper-h__label">
+              <div class="step-label step-label--active js-h-label">Details</div>
+            </div>
+          </div>
+          <div class="stepper-h__step js-h-step" data-step="1">
+            <div class="stepper-h__row">
+              <div class="step-track stepper-h__track js-h-track-in"></div>
+              <div class="step-indicator step-indicator--pending js-h-indicator">2</div>
+              <div class="step-track stepper-h__track js-h-track"></div>
+            </div>
+            <div class="stepper-h__label">
+              <div class="step-label js-h-label">Review</div>
+            </div>
+          </div>
+          <div class="stepper-h__step js-h-step" data-step="2">
+            <div class="stepper-h__row">
+              <div class="step-track stepper-h__track js-h-track-in"></div>
+              <div class="step-indicator step-indicator--pending js-h-indicator">3</div>
+              <div class="step-track stepper-h__track js-h-track"></div>
+            </div>
+            <div class="stepper-h__label">
+              <div class="step-label js-h-label">Submit</div>
+            </div>
+          </div>
+          <div class="stepper-h__step js-h-step" data-step="3">
+            <div class="stepper-h__row">
+              <div class="step-track stepper-h__track js-h-track-in"></div>
+              <div class="step-indicator step-indicator--pending js-h-indicator">4</div>
+              <div class="step-track stepper-h__track" style="background: transparent;"></div>
+            </div>
+            <div class="stepper-h__label">
+              <div class="step-label js-h-label">Confirm</div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 24px;">
+          <button id="step-prev" disabled
+            style="height:32px; padding: 0 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); background: var(--bg-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer;">
+            ← Prev
+          </button>
+          <button id="step-next"
+            style="height:32px; padding: 0 16px; border-radius: var(--radius-lg); border: none; background: var(--color-primary); color: white; font-family: var(--font-sans); font-size: 13px; cursor: pointer;">
+            Next →
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+
+      // Interactive stepper
+      let currentStep = 0;
+      const totalSteps = 4;
+      const prevBtn = document.getElementById('step-prev');
+      const nextBtn = document.getElementById('step-next');
+      const steps = document.querySelectorAll('.js-h-step');
+
+      function updateStepper() {
+        steps.forEach((step, i) => {
+          const indicator = step.querySelector('.js-h-indicator');
+          const label = step.querySelector('.js-h-label');
+          const trackOut = step.querySelector('.js-h-track');
+          const trackIn = step.querySelector('.js-h-track-in');
+
+          indicator.className = 'step-indicator';
+          label.className = 'step-label';
+
+          if (i < currentStep) {
+            indicator.classList.add('step-indicator--completed');
+            indicator.innerHTML = '<span data-icon="check"></span>';
+            label.classList.add('step-label--completed');
+            if (trackOut) trackOut.innerHTML = '<div class="step-track__fill"></div>';
+            if (trackIn) trackIn.innerHTML = '<div class="step-track__fill"></div>';
+          } else if (i === currentStep) {
+            indicator.classList.add('step-indicator--active');
+            indicator.textContent = i + 1;
+            label.classList.add('step-label--active');
+            if (trackOut) trackOut.innerHTML = '';
+            if (trackIn) trackIn.innerHTML = '<div class="step-track__fill"></div>';
+          } else {
+            indicator.classList.add('step-indicator--pending');
+            indicator.textContent = i + 1;
+            if (trackOut) trackOut.innerHTML = '';
+            if (trackIn) trackIn.innerHTML = '';
+          }
+        });
+
+        prevBtn.disabled = currentStep === 0;
+        nextBtn.textContent = currentStep === totalSteps - 1 ? 'Finish ✓' : 'Next →';
+        nextBtn.disabled = false;
+        if (currentStep === totalSteps - 1) {
+          nextBtn.style.background = 'var(--color-success, #16a34a)';
+        } else {
+          nextBtn.style.background = 'var(--color-primary)';
+        }
+
+        Horizon.initIcons();
+      }
+
+      prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) { currentStep--; updateStepper(); }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps - 1) { currentStep++; updateStepper(); }
+        else {
+          currentStep = 0;
+          nextBtn.style.background = 'var(--color-primary)';
+          updateStepper();
+        }
+      });
+
+      updateStepper();
+    });
+  </script>
+
+</body>
+</html>

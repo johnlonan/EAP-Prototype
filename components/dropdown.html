@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropdown — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Dropdown — Trigger Button
+       Uses the secondary button style. Goes "active" when open.
+    -------------------------------------------------------- */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown__trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 16px;
+      background-color: var(--color-secondary);
+      color: var(--color-secondary-content);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+      border: none;
+      border-radius: var(--radius-field);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .dropdown__trigger:hover {
+      background-color: var(--color-secondary-hover);
+    }
+
+    /* Active / open state */
+    .dropdown__trigger[aria-expanded="true"] {
+      background-color: var(--border-default); /* #8a8986 — neutral-500 from Figma */
+      color: var(--text-primary);
+    }
+
+    .dropdown__trigger [data-icon] {
+      transition: transform var(--transition-fast);
+    }
+
+    .dropdown__trigger[aria-expanded="true"] [data-icon] {
+      transform: rotate(180deg);
+    }
+
+    /* --------------------------------------------------------
+       Dropdown — Panel
+    -------------------------------------------------------- */
+    .dropdown__panel {
+      position: absolute;
+      z-index: 100;
+      min-width: 201px;
+      background-color: var(--surface-primary);
+      border: 1px solid var(--color-neutral-300);
+      border-radius: var(--radius-2xl);
+      box-shadow: 0px 10px 15px 0px rgba(0,0,0,0.1), 0px 4px 6px 0px rgba(0,0,0,0.1);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Hidden state */
+    .dropdown__panel[hidden] {
+      display: none;
+    }
+
+    /* Placement — bottom-start (default) */
+    .dropdown__panel {
+      top: calc(100% + 8px);
+      left: 0;
+    }
+
+    /* Placement — bottom-end */
+    .dropdown--end .dropdown__panel {
+      left: auto;
+      right: 0;
+    }
+
+    /* Placement — bottom-center */
+    .dropdown--center .dropdown__panel {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Placement — top-start */
+    .dropdown--top .dropdown__panel {
+      top: auto;
+      bottom: calc(100% + 8px);
+    }
+
+    /* Placement — top-end */
+    .dropdown--top.dropdown--end .dropdown__panel {
+      top: auto;
+      bottom: calc(100% + 8px);
+      left: auto;
+      right: 0;
+    }
+
+    /* --------------------------------------------------------
+       Dropdown — List Items
+    -------------------------------------------------------- */
+    .dropdown__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px;
+      border-radius: var(--radius-lg);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--line-height-5); /* 20px */
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color var(--transition-fast);
+      user-select: none;
+    }
+
+    .dropdown__item:hover {
+      background-color: var(--color-neutral-200); /* #edece9 */
+    }
+
+    .dropdown__item:active,
+    .dropdown__item--selected {
+      background-color: var(--color-neutral-300); /* #e3e2df */
+    }
+
+    .dropdown__item--selected:hover {
+      background-color: var(--color-secondary-hover);
+    }
+
+    .dropdown__item__label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dropdown__item [data-icon] {
+      flex-shrink: 0;
+      color: var(--text-secondary);
+    }
+
+    .dropdown__item__check {
+      flex-shrink: 0;
+      color: var(--text-primary);
+    }
+
+    /* --------------------------------------------------------
+       Dropdown — Divider
+    -------------------------------------------------------- */
+    .dropdown__divider {
+      height: 1px;
+      background-color: var(--border-subtle);
+      margin: 6px 0;
+      flex-shrink: 0;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background-color: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--space-6);
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+
+    /* Give room for panel to open downward */
+    .dropdown-demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--space-6);
+      padding-bottom: 180px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Trigger states -->
+    <div class="card">
+      <p class="section-title">Trigger Button States</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">Closed (default)</span>
+          <button class="dropdown__trigger" aria-expanded="false">
+            Button
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Open (active)</span>
+          <button class="dropdown__trigger" aria-expanded="true">
+            Button
+            <span data-icon="chevron-down"></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- List item states -->
+    <div class="card">
+      <p class="section-title">List Item States</p>
+      <div class="row">
+
+        <div class="col">
+          <span class="state-label">Default</span>
+          <div style="display:flex;flex-direction:column;gap:0;min-width:201px;padding:8px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-2xl);">
+            <div class="dropdown__item">
+              <span class="dropdown__item__label">Option</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Hover</span>
+          <div style="display:flex;flex-direction:column;gap:0;min-width:201px;padding:8px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-2xl);">
+            <div class="dropdown__item" style="background-color:var(--color-neutral-200);">
+              <span class="dropdown__item__label">Option</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">Selected</span>
+          <div style="display:flex;flex-direction:column;gap:0;min-width:201px;padding:8px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-2xl);">
+            <div class="dropdown__item dropdown__item--selected">
+              <span class="dropdown__item__label">Option</span>
+              <span data-icon="check" class="dropdown__item__check"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">With start icon</span>
+          <div style="display:flex;flex-direction:column;gap:0;min-width:201px;padding:8px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-2xl);">
+            <div class="dropdown__item">
+              <span class="dropdown__item__label">
+                <span data-icon="star"></span>
+                Option
+              </span>
+            </div>
+            <div class="dropdown__item dropdown__item--selected">
+              <span class="dropdown__item__label">
+                <span data-icon="bookmark"></span>
+                Option
+              </span>
+              <span data-icon="check" class="dropdown__item__check"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="state-label">With divider</span>
+          <div style="display:flex;flex-direction:column;gap:0;min-width:201px;padding:8px;border:1px solid var(--color-neutral-300);border-radius:var(--radius-2xl);">
+            <div class="dropdown__item"><span class="dropdown__item__label">Option A</span></div>
+            <div class="dropdown__item"><span class="dropdown__item__label">Option B</span></div>
+            <div class="dropdown__divider"></div>
+            <div class="dropdown__item"><span class="dropdown__item__label">Option C</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Interactive dropdowns -->
+    <div class="card">
+      <p class="section-title">Interactive — Placements</p>
+      <div class="dropdown-demo-row">
+
+        <!-- Default: bottom-start -->
+        <div class="col">
+          <span class="state-label">Bottom start (default)</span>
+          <div class="dropdown" data-dropdown>
+            <button class="dropdown__trigger" aria-haspopup="listbox" aria-expanded="false">
+              Button
+              <span data-icon="chevron-down"></span>
+            </button>
+            <div class="dropdown__panel" role="listbox" hidden>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item dropdown__item--selected" role="option">
+                <span class="dropdown__item__label">Option</span>
+                <span data-icon="check" class="dropdown__item__check"></span>
+              </div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom-end -->
+        <div class="col">
+          <span class="state-label">Bottom end</span>
+          <div class="dropdown dropdown--end" data-dropdown>
+            <button class="dropdown__trigger" aria-haspopup="listbox" aria-expanded="false">
+              Button
+              <span data-icon="chevron-down"></span>
+            </button>
+            <div class="dropdown__panel" role="listbox" hidden>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item dropdown__item--selected" role="option">
+                <span class="dropdown__item__label">Option</span>
+                <span data-icon="check" class="dropdown__item__check"></span>
+              </div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- With divider and icons -->
+        <div class="col">
+          <span class="state-label">With icons + divider</span>
+          <div class="dropdown" data-dropdown>
+            <button class="dropdown__trigger" aria-haspopup="listbox" aria-expanded="false">
+              Button
+              <span data-icon="chevron-down"></span>
+            </button>
+            <div class="dropdown__panel" role="listbox" hidden>
+              <div class="dropdown__item" role="option">
+                <span class="dropdown__item__label"><span data-icon="star"></span>Starred</span>
+              </div>
+              <div class="dropdown__item dropdown__item--selected" role="option">
+                <span class="dropdown__item__label"><span data-icon="bookmark"></span>Bookmarked</span>
+                <span data-icon="check" class="dropdown__item__check"></span>
+              </div>
+              <div class="dropdown__divider"></div>
+              <div class="dropdown__item" role="option">
+                <span class="dropdown__item__label"><span data-icon="search"></span>Search</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Top placement (needs bottom padding on wrapper) -->
+    <div class="card" style="padding-top: 200px; position: relative;">
+      <p class="section-title" style="position:absolute;top:var(--space-8);left:var(--space-8);">Interactive — Top Placement</p>
+      <div class="row">
+
+        <div class="col">
+          <div class="dropdown dropdown--top" data-dropdown>
+            <button class="dropdown__trigger" aria-haspopup="listbox" aria-expanded="false">
+              Button
+              <span data-icon="chevron-down"></span>
+            </button>
+            <div class="dropdown__panel" role="listbox" hidden>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item dropdown__item--selected" role="option">
+                <span class="dropdown__item__label">Option</span>
+                <span data-icon="check" class="dropdown__item__check"></span>
+              </div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+            </div>
+          </div>
+          <span class="state-label">Top start</span>
+        </div>
+
+        <div class="col">
+          <div class="dropdown dropdown--top dropdown--end" data-dropdown>
+            <button class="dropdown__trigger" aria-haspopup="listbox" aria-expanded="false">
+              Button
+              <span data-icon="chevron-down"></span>
+            </button>
+            <div class="dropdown__panel" role="listbox" hidden>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item dropdown__item--selected" role="option">
+                <span class="dropdown__item__label">Option</span>
+                <span data-icon="check" class="dropdown__item__check"></span>
+              </div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+              <div class="dropdown__item" role="option"><span class="dropdown__item__label">Option</span></div>
+            </div>
+          </div>
+          <span class="state-label">Top end</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Dropdown init — toggle panel on trigger click, close on outside click
+    document.addEventListener('DOMContentLoaded', function () {
+      function closeAll(except) {
+        document.querySelectorAll('[data-dropdown]').forEach(function (dd) {
+          if (dd === except) return;
+          var trigger = dd.querySelector('.dropdown__trigger');
+          var panel = dd.querySelector('.dropdown__panel');
+          if (trigger) trigger.setAttribute('aria-expanded', 'false');
+          if (panel) panel.hidden = true;
+        });
+      }
+
+      document.querySelectorAll('[data-dropdown]').forEach(function (dd) {
+        var trigger = dd.querySelector('.dropdown__trigger');
+        var panel = dd.querySelector('.dropdown__panel');
+        if (!trigger || !panel) return;
+
+        trigger.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var isOpen = trigger.getAttribute('aria-expanded') === 'true';
+          closeAll(dd);
+          trigger.setAttribute('aria-expanded', String(!isOpen));
+          panel.hidden = isOpen;
+        });
+      });
+
+      document.addEventListener('click', function () {
+        closeAll(null);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAll(null);
+      });
+    });
+  </script>
+
+</body>
+</html>

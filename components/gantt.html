@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gantt — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/frappe-gantt.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/frappe-gantt.umd.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+
+    /* ── Remap frappe-gantt tokens → Horizon tokens ─────────── */
+    :root {
+      --rm-at-risk:                #c2540a;   /* matches kanban + roadmap */
+
+      --g-bar-color:               var(--color-info);
+      --g-bar-border:              transparent;
+      --g-tick-color-thick:        var(--border-default);
+      --g-tick-color:              var(--border-subtle);
+      --g-actions-background:      var(--bg-tertiary);
+      --g-border-color:            var(--border-subtle);
+      --g-text-muted:              var(--text-tertiary);
+      --g-text-dark:               var(--text-primary);
+      --g-text-light:              #ffffff;
+      --g-progress-color:          rgba(255,255,255,0.25);
+      --g-handle-color:            rgba(255,255,255,0.55);
+      --g-header-background:       var(--surface-primary);
+      --g-row-color:               var(--surface-primary);
+      --g-row-border-color:        var(--border-subtle);
+      --g-today-highlight:         var(--color-info);
+      --g-popup-actions:           var(--bg-tertiary);
+      --g-weekend-highlight-color: var(--bg-secondary);
+      --g-arrow-color:             var(--text-tertiary);
+      --g-expected-progress:       transparent;
+    }
+
+    /* ── Page ─────────────────────────────────────────────── */
+    .gt-page {
+      padding: var(--space-6);
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .gt-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .gt-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      line-height: var(--line-height-tight);
+    }
+
+    .gt-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    .gt-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    /* Legend */
+    .gt-legend {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .gt-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+    }
+
+    .gt-legend-pip {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    /* View switcher */
+    .gt-view-switcher {
+      display: flex;
+      align-items: center;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-field);
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .gt-view-btn {
+      padding: 5px var(--space-3);
+      border-radius: calc(var(--radius-field) - 3px);
+      border: none;
+      background: transparent;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      font-family: var(--font-sans);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast);
+      white-space: nowrap;
+    }
+    .gt-view-btn:hover  { color: var(--text-primary); }
+    .gt-view-btn.active {
+      background: var(--surface-primary);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Board ────────────────────────────────────────────── */
+    .gt-board {
+      background: var(--surface-primary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    /* ── frappe-gantt overrides ───────────────────────────── */
+
+    /* Hide the built-in view mode selector */
+    .gantt-container .side-header { display: none !important; }
+
+    /* Container */
+    .gantt-container {
+      font-family: var(--font-sans) !important;
+      border-radius: var(--radius-lg) !important;
+    }
+
+    /* Bar labels */
+    .gantt .bar-label {
+      font-family: var(--font-sans) !important;
+      font-size: 11px !important;
+    }
+
+    /* Rounded bars */
+    .gantt .bar-wrapper .bar { border-radius: var(--radius-md) !important; }
+
+    /* ── Status bar colors ────────────────────────────────── */
+    .gantt .bar-wrapper.s-on-track .bar { fill: var(--color-success) !important; outline-color: var(--color-success) !important; }
+    .gantt .bar-wrapper.s-at-risk  .bar { fill: var(--rm-at-risk) !important;    outline-color: var(--rm-at-risk) !important;    }
+    .gantt .bar-wrapper.s-delayed  .bar { fill: var(--color-error) !important;   outline-color: var(--color-error) !important;   }
+    .gantt .bar-wrapper.s-planned  .bar { fill: var(--color-info) !important;    outline-color: var(--color-info) !important;    }
+
+    /* White text on all coloured bars */
+    .gantt .bar-wrapper.s-on-track .bar-label,
+    .gantt .bar-wrapper.s-at-risk  .bar-label,
+    .gantt .bar-wrapper.s-delayed  .bar-label,
+    .gantt .bar-wrapper.s-planned  .bar-label { fill: #ffffff !important; }
+
+    /* Progress fill — semi-transparent dark overlay */
+    .gantt .bar-wrapper.s-on-track .bar-progress,
+    .gantt .bar-wrapper.s-at-risk  .bar-progress,
+    .gantt .bar-wrapper.s-delayed  .bar-progress,
+    .gantt .bar-wrapper.s-planned  .bar-progress { fill: rgba(0,0,0,0.18) !important; }
+
+    /* ── Group header rows ────────────────────────────────── */
+    .gantt .bar-wrapper.group-header              { cursor: default !important; }
+    .gantt .bar-wrapper.group-header .bar         { fill: var(--bg-secondary) !important; outline: none !important; }
+    .gantt .bar-wrapper.group-header .bar-label   { fill: var(--text-secondary) !important; font-weight: 600 !important; font-size: 11px !important; text-anchor: start !important; }
+    .gantt .bar-wrapper.group-header .bar-progress { fill: transparent !important; }
+    .gantt .bar-wrapper.group-header .handle      { display: none !important; }
+
+    /* ── Today indicator ──────────────────────────────────── */
+    .gantt-container .current-highlight      { background: var(--color-info) !important; opacity: 0.8; }
+    .gantt-container .current-ball-highlight { background: var(--color-info) !important; }
+    .gantt-container .current-date-highlight { background: var(--color-info) !important; }
+
+    /* ── Popup ────────────────────────────────────────────── */
+    .gantt-container .popup-wrapper {
+      font-family: var(--font-sans) !important;
+      border-radius: var(--radius-lg) !important;
+      border: 1px solid var(--border-subtle) !important;
+      box-shadow: var(--shadow-lg) !important;
+      padding: var(--space-3) var(--space-4) !important;
+    }
+
+    .gantt-container .popup-wrapper .title   { font-size: var(--font-size-sm) !important; }
+    .gantt-container .popup-wrapper .subtitle,
+    .gantt-container .popup-wrapper .details { font-size: var(--font-size-xs) !important; }
+
+  </style>
+</head>
+<body>
+  <div class="gt-page">
+
+    <!-- Header -->
+    <div class="gt-header">
+      <div>
+        <h1 class="gt-title">Platform Sprint — Gantt</h1>
+        <p class="gt-subtitle">12 tasks · 3 tracks · Mar 2026 – Feb 2027</p>
+      </div>
+      <div class="gt-header-right">
+        <div class="gt-legend">
+          <div class="gt-legend-item">
+            <div class="gt-legend-pip" style="background:var(--color-success)"></div>On Track
+          </div>
+          <div class="gt-legend-item">
+            <div class="gt-legend-pip" style="background:var(--rm-at-risk)"></div>At Risk
+          </div>
+          <div class="gt-legend-item">
+            <div class="gt-legend-pip" style="background:var(--color-error)"></div>Delayed
+          </div>
+          <div class="gt-legend-item">
+            <div class="gt-legend-pip" style="background:var(--color-info)"></div>Planned
+          </div>
+        </div>
+        <div class="gt-view-switcher">
+          <button class="gt-view-btn" data-view="Week">Week</button>
+          <button class="gt-view-btn active" data-view="Month">Month</button>
+          <button class="gt-view-btn" data-view="Year">Year</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Board -->
+    <div class="gt-board">
+      <div id="gantt"></div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ── Tasks ────────────────────────────────────────────────────── */
+    const TASKS = [
+
+      // ── Platform ──────────────────────────────────────────────────
+      {
+        id: 'grp-platform', name: '  PLATFORM',
+        start: '2026-03-01', end: '2027-02-28',
+        progress: 0, custom_class: 'group-header',
+      },
+      {
+        id: 'p1', name: 'API Gateway v3',
+        start: '2026-03-01', end: '2026-06-30',
+        progress: 75, custom_class: 's-on-track',
+      },
+      {
+        id: 'p2', name: 'Auth Service Refactor',
+        start: '2026-05-01', end: '2026-08-31',
+        progress: 30, custom_class: 's-at-risk',
+        dependencies: 'p1',
+      },
+      {
+        id: 'p3', name: 'Platform Observability',
+        start: '2026-07-01', end: '2026-10-31',
+        progress: 0, custom_class: 's-planned',
+        dependencies: 'p1',
+      },
+      {
+        id: 'p4', name: 'Compliance Tooling',
+        start: '2026-10-01', end: '2026-12-31',
+        progress: 0, custom_class: 's-planned',
+        dependencies: 'p3',
+      },
+      {
+        id: 'p5', name: 'Edge Caching Layer',
+        start: '2027-01-01', end: '2027-02-28',
+        progress: 0, custom_class: 's-planned',
+        dependencies: 'p4',
+      },
+
+      // ── Mobile ────────────────────────────────────────────────────
+      {
+        id: 'grp-mobile', name: '  MOBILE',
+        start: '2026-03-01', end: '2027-02-28',
+        progress: 0, custom_class: 'group-header',
+      },
+      {
+        id: 'm1', name: 'iOS App Redesign',
+        start: '2026-03-01', end: '2026-06-30',
+        progress: 80, custom_class: 's-on-track',
+      },
+      {
+        id: 'm2', name: 'Push Notification Overhaul',
+        start: '2026-04-01', end: '2026-06-30',
+        progress: 20, custom_class: 's-delayed',
+      },
+      {
+        id: 'm3', name: 'Android SDK Update',
+        start: '2026-07-01', end: '2026-09-30',
+        progress: 0, custom_class: 's-planned',
+        dependencies: 'm1',
+      },
+      {
+        id: 'm4', name: 'Offline Mode Support',
+        start: '2026-09-01', end: '2027-01-31',
+        progress: 0, custom_class: 's-planned',
+      },
+
+      // ── Data ──────────────────────────────────────────────────────
+      {
+        id: 'grp-data', name: '  DATA',
+        start: '2026-03-01', end: '2027-02-28',
+        progress: 0, custom_class: 'group-header',
+      },
+      {
+        id: 'd1', name: 'Data Warehouse Migration',
+        start: '2026-03-01', end: '2026-07-31',
+        progress: 40, custom_class: 's-at-risk',
+      },
+      {
+        id: 'd2', name: 'Real-time Analytics',
+        start: '2026-06-01', end: '2026-10-31',
+        progress: 0, custom_class: 's-planned',
+        dependencies: 'd1',
+      },
+      {
+        id: 'd3', name: 'ML Feature Store',
+        start: '2026-09-01', end: '2026-12-31',
+        progress: 0, custom_class: 's-planned',
+        dependencies: 'd2',
+      },
+    ];
+
+    /* ── Init ─────────────────────────────────────────────────────── */
+    const gantt = new Gantt('#gantt', TASKS, {
+      view_mode:              'Month',
+      date_format:            'YYYY-MM-DD',
+      bar_height:             28,
+      padding:                16,
+      arrow_curve:            5,
+      show_expected_progress: false,
+      today_button:           false,
+      view_mode_select:       false,
+      popup: ({ task }) => {
+        if (task.custom_class === 'group-header') return '';
+        const fmt = d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return `
+          <div style="min-width:190px;font-family:var(--font-sans)">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px">${task.name}</div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px">
+              ${fmt(task._start)} → ${fmt(task._end)}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="flex:1;height:4px;background:var(--border-subtle);border-radius:99px;overflow:hidden">
+                <div style="width:${task.progress}%;height:100%;background:var(--color-info);border-radius:99px"></div>
+              </div>
+              <span style="font-size:11px;font-weight:600;color:var(--text-secondary)">${task.progress}%</span>
+            </div>
+          </div>`;
+      },
+    });
+
+    /* ── View switcher ────────────────────────────────────────────── */
+    document.querySelectorAll('.gt-view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.gt-view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        gantt.change_view_mode(btn.dataset.view);
+      });
+    });
+  </script>
+</body>
+</html>
