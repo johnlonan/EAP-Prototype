@@ -48,6 +48,15 @@ When the designer asks to wire components into a full page:
 - Inline or import the relevant components
 - Use `base.css` for layout; add page-level styles in a `<style>` block
 
+### 6. Responsive layout (prototype pages)
+All prototype pages must be responsive by default using the container system in `base.css`:
+- Set `background: var(--bg-secondary)` on `<body>` so the page background fills the viewport
+- Wrap page content in `<div class="container">` — this centres the content and applies the correct max-width at each breakpoint:
+  - ≥ 640px → 576px · ≥ 768px → 672px · ≥ 1024px → 768px · ≥ 1280px → 1024px · ≥ 1536px → 1152px
+- Use named fixed-width containers (e.g. `container-4xl`) only when the Figma design specifies a fixed canvas width
+- Never set a hard pixel width on the outermost page wrapper — always let the container handle it
+- All container width values are available as CSS custom properties (`--container-xs` through `--container-7xl`) in `tokens.css`
+
 ---
 
 ## File naming conventions

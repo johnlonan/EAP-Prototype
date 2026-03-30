@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omnibar — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    body {
+      background: var(--bg-secondary);
+      padding: var(--space-8) var(--space-4);
+      min-height: 100vh;
+    }
+
+    .showcase {
+      max-width: 840px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-10);
+    }
+
+    .state-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .state-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ══ Omnibar shell ════════════════════════════════════════
+       Outer: --bg-tertiary pill, 8px padding, shadow-xl
+       Inner: white card, soft shadow
+    ═════════════════════════════════════════════════════════ */
+    .omni {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--bg-tertiary);
+      border-radius: 48px;
+      padding: 8px;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .omni-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--bg-tertiary);
+      border-radius: 40px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    /* ── Label row (default state) ────────────────────────── */
+    .omni-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: var(--space-4) var(--space-6);
+      font-size: var(--font-size-base);
+      color: var(--text-tertiary);
+      font-weight: var(--font-weight-normal);
+      line-height: var(--line-height-normal);
+    }
+
+    /* ── Suggestion carousel ──────────────────────────────── */
+    .omni-carousel-wrap {
+      height: 24px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .omni-carousel {
+      display: flex;
+      flex-direction: column;
+      animation: omni-cycle 16s ease-in-out infinite;
+    }
+
+    .omni-carousel-item {
+      height: 24px;
+      line-height: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+
+    @keyframes omni-cycle {
+      0%,  18% { transform: translateY(0);     }
+      22%,  43% { transform: translateY(-24px); }
+      47%,  68% { transform: translateY(-48px); }
+      72%,  93% { transform: translateY(-72px); }
+      97%, 100% { transform: translateY(0);     }
+    }
+
+    /* ── Text input area ──────────────────────────────────── */
+    .omni-text {
+      padding: var(--space-3) var(--space-6) 4px;
+      font-size: var(--font-size-base);
+      color: var(--text-primary);
+      line-height: var(--line-height-normal);
+      font-weight: var(--font-weight-normal);
+    }
+
+    .omni-text--expanded {
+      padding-bottom: var(--space-2);
+    }
+
+    /* ── Blinking cursor ──────────────────────────────────── */
+    .omni-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: var(--text-primary);
+      vertical-align: text-bottom;
+      border-radius: 1px;
+      animation: omni-blink 1s step-end infinite;
+      margin-left: 1px;
+    }
+
+    @keyframes omni-blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ── Toolbar ──────────────────────────────────────────── */
+    .omni-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      padding: var(--space-4);
+    }
+
+    .omni-toolbar--compact {
+      height: 56px;
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .omni-lh {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── Icon-only ghost button ───────────────────────────── */
+    .omni-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: background var(--transition-fast), color var(--transition-fast);
+      flex-shrink: 0;
+      padding: 0;
+    }
+
+    .omni-icon-btn:hover {
+      background: var(--color-ghost-hover);
+      color: var(--text-primary);
+    }
+
+    .omni-icon-btn [data-icon] {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── Send / submit button ─────────────────────────────── */
+    .omni-send {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: var(--color-accent);
+      color: var(--color-accent-content);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      transition: background var(--transition-fast);
+    }
+
+    .omni-send:hover {
+      background: var(--color-accent-hover);
+    }
+
+    .omni-send [data-icon] {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── Web search pill ──────────────────────────────────── */
+    .omni-web-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 var(--space-4);
+      background: var(--color-info-content);
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-family: var(--font-sans);
+      font-weight: var(--font-weight-normal);
+      color: var(--color-info);
+      white-space: nowrap;
+      transition: background var(--transition-fast);
+    }
+
+    .omni-web-pill:hover {
+      background: #dceeff;
+    }
+
+    .omni-web-pill [data-icon] {
+      width: 16px;
+      height: 16px;
+    }
+
+    .omni-web-pill .pill-close {
+      opacity: 0.6;
+    }
+
+    /* ── Attachment strip ─────────────────────────────────── */
+    .omni-attach-strip {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3) 0;
+      flex-wrap: wrap;
+    }
+
+    .omni-doc-chip {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-2);
+      min-width: 0;
+      flex: 1;
+      max-width: 180px;
+    }
+
+    .omni-doc-icon {
+      width: 40px;
+      height: 40px;
+      background: #cbe4ff;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .omni-doc-icon [data-icon] {
+      width: 16px;
+      height: 16px;
+      color: var(--color-info);
+    }
+
+    .omni-doc-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      line-height: 16px;
+      font-size: var(--font-size-xs);
+      white-space: nowrap;
+    }
+
+    .omni-doc-name {
+      color: var(--text-primary);
+      font-weight: var(--font-weight-normal);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .omni-doc-type {
+      color: var(--text-tertiary);
+      font-weight: var(--font-weight-normal);
+    }
+
+    .omni-doc-remove {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .omni-doc-remove [data-icon] {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* ── Alert banner ─────────────────────────────────────── */
+    .omni-alert {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-error-content);
+      border-bottom: 1px solid var(--color-error);
+    }
+
+    .omni-alert [data-icon] {
+      width: 24px;
+      height: 24px;
+      color: var(--color-error);
+      flex-shrink: 0;
+    }
+
+    .omni-alert-text {
+      flex: 1;
+      font-size: var(--font-size-base);
+      color: var(--color-error);
+      line-height: var(--line-height-normal);
+    }
+
+    .omni-alert-close {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--color-error);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .omni-alert-close [data-icon] {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ── Slimline variant ─────────────────────────────────── */
+    .omni-slimline {
+      border-radius: 36px;
+    }
+
+    .omni-slimline .omni-card {
+      border-radius: 28px;
+    }
+
+    .omni-slimline-placeholder {
+      flex: 1;
+      font-size: var(--font-size-base);
+      color: var(--text-tertiary);
+      font-weight: var(--font-weight-normal);
+      padding: 0 var(--space-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .omni-slimline-text {
+      flex: 1;
+      font-size: var(--font-size-base);
+      color: var(--text-primary);
+      font-weight: var(--font-weight-normal);
+      padding: 0 var(--space-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Section divider ──────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: var(--space-4) 0 0;
+    }
+
+    .section-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      margin-bottom: var(--space-6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- ════════════════════════════════════════════
+         LARGE VARIANT (Home page)
+    ════════════════════════════════════════════ -->
+    <div class="section-title">Large — Home page</div>
+
+    <!-- Default -->
+    <div class="state-group">
+      <div class="state-label">Default</div>
+      <div class="omni">
+        <div class="omni-card">
+          <div class="omni-label">
+            <span>Try asking&nbsp;</span>
+            <div class="omni-carousel-wrap">
+              <div class="omni-carousel">
+                <div class="omni-carousel-item">"Show my tasks due today"</div>
+                <div class="omni-carousel-item">"What is the next company holiday"</div>
+                <div class="omni-carousel-item">"Parental leave policy"</div>
+                <div class="omni-carousel-item">"How can I update my benefits"</div>
+              </div>
+            </div>
+          </div>
+          <div class="omni-toolbar">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Attach file">
+                <span data-icon="plus" style="width:20px;height:20px"></span>
+              </button>
+            </div>
+            <button class="omni-send" title="Start voice input">
+              <span data-icon="microphone" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing -->
+    <div class="state-group">
+      <div class="state-label">Typing</div>
+      <div class="omni">
+        <div class="omni-card">
+          <div class="omni-text">
+            Show me all open incidents assigned to my team<span class="omni-cursor"></span>
+          </div>
+          <div class="omni-toolbar">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Back">
+                <span data-icon="chevron-left" style="width:20px;height:20px"></span>
+              </button>
+              <button class="omni-icon-btn" title="Attach file">
+                <span data-icon="plus" style="width:20px;height:20px"></span>
+              </button>
+            </div>
+            <button class="omni-send" title="Send">
+              <span data-icon="send" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expanded (long query) -->
+    <div class="state-group">
+      <div class="state-label">Expanded</div>
+      <div class="omni">
+        <div class="omni-card">
+          <div class="omni-text omni-text--expanded">
+            Show me all approvals for my team in the last week and filter by recency. Make sure to check for priority based off of both region and cost centres. I'd like to prioritize the Asia Pacific teams for time off requests and ensure that they have adequate support for any logistics.<span class="omni-cursor"></span>
+          </div>
+          <div class="omni-toolbar" style="padding: var(--space-3);">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Back">
+                <span data-icon="chevron-left" style="width:20px;height:20px"></span>
+              </button>
+              <button class="omni-icon-btn" title="Attach file">
+                <span data-icon="plus" style="width:20px;height:20px"></span>
+              </button>
+            </div>
+            <button class="omni-send" title="Send">
+              <span data-icon="send" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- With web search pill -->
+    <div class="state-group">
+      <div class="state-label">Web search active</div>
+      <div class="omni">
+        <div class="omni-card">
+          <div class="omni-text">
+            What is the current status of the ServiceNow platform?<span class="omni-cursor"></span>
+          </div>
+          <div class="omni-toolbar">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Back">
+                <span data-icon="chevron-left" style="width:20px;height:20px"></span>
+              </button>
+              <button class="omni-web-pill" title="Remove web search">
+                <span data-icon="globe" style="width:16px;height:16px"></span>
+                <span>Include web</span>
+                <span data-icon="close" style="width:16px;height:16px" class="pill-close"></span>
+              </button>
+            </div>
+            <button class="omni-send" title="Send">
+              <span data-icon="send" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- With attachments -->
+    <div class="state-group">
+      <div class="state-label">With attachments</div>
+      <div class="omni">
+        <div class="omni-card">
+          <div class="omni-attach-strip">
+            <div class="omni-doc-chip">
+              <div class="omni-doc-icon">
+                <span data-icon="document" style="width:16px;height:16px"></span>
+              </div>
+              <div class="omni-doc-meta">
+                <span class="omni-doc-name">attachment.pdf</span>
+                <span class="omni-doc-type">PDF · 1.2 MB</span>
+              </div>
+              <button class="omni-doc-remove">
+                <span data-icon="close" style="width:10px;height:10px"></span>
+              </button>
+            </div>
+            <div class="omni-doc-chip">
+              <div class="omni-doc-icon">
+                <span data-icon="document" style="width:16px;height:16px"></span>
+              </div>
+              <div class="omni-doc-meta">
+                <span class="omni-doc-name">report-q2.pdf</span>
+                <span class="omni-doc-type">PDF · 3.4 MB</span>
+              </div>
+              <button class="omni-doc-remove">
+                <span data-icon="close" style="width:10px;height:10px"></span>
+              </button>
+            </div>
+          </div>
+          <div class="omni-text" style="padding-top: var(--space-2);">
+            Summarise these documents<span class="omni-cursor"></span>
+          </div>
+          <div class="omni-toolbar" style="padding: var(--space-3) var(--space-4);">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Back">
+                <span data-icon="chevron-left" style="width:20px;height:20px"></span>
+              </button>
+              <button class="omni-icon-btn" title="Attach more">
+                <span data-icon="plus" style="width:20px;height:20px"></span>
+              </button>
+            </div>
+            <button class="omni-send" title="Send">
+              <span data-icon="send" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert state -->
+    <div class="state-group">
+      <div class="state-label">Alert</div>
+      <div class="omni">
+        <div class="omni-card">
+          <div class="omni-alert">
+            <span data-icon="alert-circle" style="width:24px;height:24px"></span>
+            <span class="omni-alert-text">Only 20 files can be uploaded within a single conversation</span>
+            <button class="omni-alert-close">
+              <span data-icon="close" style="width:16px;height:16px"></span>
+            </button>
+          </div>
+          <div class="omni-label">
+            <span>Try asking&nbsp;</span>
+            <div class="omni-carousel-wrap">
+              <div class="omni-carousel" style="animation-delay: -4s;">
+                <div class="omni-carousel-item">"Show my tasks due today"</div>
+                <div class="omni-carousel-item">"What is the next company holiday"</div>
+                <div class="omni-carousel-item">"Parental leave policy"</div>
+                <div class="omni-carousel-item">"How can I update my benefits"</div>
+              </div>
+            </div>
+          </div>
+          <div class="omni-toolbar">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Attach file">
+                <span data-icon="plus" style="width:20px;height:20px"></span>
+              </button>
+            </div>
+            <button class="omni-send" title="Start voice input">
+              <span data-icon="microphone" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         SLIMLINE VARIANT (Chat page)
+    ════════════════════════════════════════════ -->
+    <hr class="section-divider">
+    <div class="section-title" style="margin-top: var(--space-4);">Slimline — Chat page</div>
+
+    <!-- Default -->
+    <div class="state-group">
+      <div class="state-label">Default</div>
+      <div class="omni omni-slimline">
+        <div class="omni-card">
+          <div class="omni-toolbar omni-toolbar--compact">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Attach file">
+                <span data-icon="plus" style="width:20px;height:20px"></span>
+              </button>
+              <span class="omni-slimline-placeholder">Ask a follow-up…</span>
+            </div>
+            <button class="omni-send" title="Start voice input">
+              <span data-icon="microphone" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing -->
+    <div class="state-group">
+      <div class="state-label">Typing</div>
+      <div class="omni omni-slimline">
+        <div class="omni-card">
+          <div class="omni-toolbar omni-toolbar--compact">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Attach file">
+                <span data-icon="plus" style="width:20px;height:20px"></span>
+              </button>
+              <span class="omni-slimline-text">Summarise the last 5 incidents<span class="omni-cursor"></span></span>
+            </div>
+            <button class="omni-send" title="Send">
+              <span data-icon="send" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- With web search -->
+    <div class="state-group">
+      <div class="state-label">Web search active</div>
+      <div class="omni omni-slimline">
+        <div class="omni-card">
+          <div class="omni-toolbar omni-toolbar--compact">
+            <div class="omni-lh">
+              <button class="omni-icon-btn" title="Back">
+                <span data-icon="chevron-left" style="width:20px;height:20px"></span>
+              </button>
+              <button class="omni-web-pill" title="Remove web search">
+                <span data-icon="globe" style="width:16px;height:16px"></span>
+                <span>Include web</span>
+                <span data-icon="close" style="width:16px;height:16px" class="pill-close"></span>
+              </button>
+            </div>
+            <button class="omni-send" title="Send">
+              <span data-icon="send" style="width:20px;height:20px"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Dismiss alert banner
+    document.querySelectorAll('.omni-alert-close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.omni-alert').style.display = 'none';
+      });
+    });
+
+    // Remove web search pill
+    document.querySelectorAll('.omni-web-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        pill.style.display = 'none';
+      });
+    });
+
+    // Remove attachment chips
+    document.querySelectorAll('.omni-doc-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const chip = btn.closest('.omni-doc-chip');
+        chip.style.opacity = '0';
+        chip.style.transition = 'opacity 150ms ease';
+        setTimeout(() => chip.remove(), 150);
+      });
+    });
+  </script>
+</body>
+</html>

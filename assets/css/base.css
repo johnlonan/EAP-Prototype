@@ -101,3 +101,61 @@ h6 { font-size: var(--font-size-lg);  font-weight: var(--font-weight-semibold); 
 p  { line-height: var(--line-height-relaxed); }
 
 small { font-size: var(--font-size-sm); color: var(--text-secondary); }
+
+/* --- Responsive container ---------------------------------- */
+/*
+ * Centred max-width content wrapper following the Figma breakpoint spec:
+ *   ≥ 640px  → max-width 576px   (--container-xl)
+ *   ≥ 768px  → max-width 672px   (--container-2xl)
+ *   ≥ 1024px → max-width 768px   (--container-3xl)
+ *   ≥ 1280px → max-width 1024px  (--container-5xl)
+ *   ≥ 1536px → max-width 1152px  (--container-6xl)
+ *
+ * Usage: wrap prototype page content in <div class="container">
+ * The page background (--bg-secondary) fills the viewport;
+ * the container centres on top of it with auto gutters.
+ */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: var(--container-xl); /* 576px */
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .container { max-width: var(--container-2xl); } /* 672px */
+}
+
+@media (min-width: 1024px) {
+  .container { max-width: var(--container-3xl); } /* 768px */
+}
+
+@media (min-width: 1280px) {
+  .container { max-width: var(--container-5xl); } /* 1024px */
+}
+
+@media (min-width: 1536px) {
+  .container { max-width: var(--container-6xl); } /* 1152px */
+}
+
+/* Fixed-width named containers — centred, no responsive behaviour */
+.container-xs  { width: var(--container-xs);  margin-left: auto; margin-right: auto; }
+.container-sm  { width: var(--container-sm);  margin-left: auto; margin-right: auto; }
+.container-md  { width: var(--container-md);  margin-left: auto; margin-right: auto; }
+.container-lg  { width: var(--container-lg);  margin-left: auto; margin-right: auto; }
+.container-xl  { width: var(--container-xl);  margin-left: auto; margin-right: auto; }
+.container-2xl { width: var(--container-2xl); margin-left: auto; margin-right: auto; }
+.container-3xl { width: var(--container-3xl); margin-left: auto; margin-right: auto; }
+.container-4xl { width: var(--container-4xl); margin-left: auto; margin-right: auto; }
+.container-5xl { width: var(--container-5xl); margin-left: auto; margin-right: auto; }
+.container-6xl { width: var(--container-6xl); margin-left: auto; margin-right: auto; }
+.container-7xl { width: var(--container-7xl); margin-left: auto; margin-right: auto; }

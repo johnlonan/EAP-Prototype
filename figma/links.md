@@ -114,6 +114,32 @@ radial-progress: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Hor
 stepper: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=1154-8076&m=dev
 stepper examples: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=1154-8627&m=dev (don't create component for this)
 
+conversation: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=333-2997&m=dev
+
+
+Omnibar: 
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-7867&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8320&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8386&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8427&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8447&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8325&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8334&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=21949-24169&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8415&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8309&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8340&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-7837&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8210&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8297&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8287&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8282&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=19841-8458&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=4657-15630&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=302-1810&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=302-1667&m=dev
+
+
 
 
 * Visualizations
@@ -130,6 +156,10 @@ single-horizontal-with-tabs: https://www.figma.com/design/yMk82e5IovEP1hOOduaTnH
 pareto: https://www.figma.com/design/yMk82e5IovEP1hOOduaTnH/AI-CT---Janus---Horizon-2.0-DataViz-Explorations?node-id=195-11236&m=dev
 
 
+* Breakdowns
+containers: https://www.figma.com/design/QCczk1RjplydYWDFIYKtDY/-ALPHA--Horizon-2.0--%3E-Foundations?node-id=2062-5047&m=dev
+
+breakdown-with-container-examples: https://www.figma.com/design/QCczk1RjplydYWDFIYKtDY/-ALPHA--Horizon-2.0--%3E-Foundations?node-id=4727-406&m=dev
 
 
 * Icons
