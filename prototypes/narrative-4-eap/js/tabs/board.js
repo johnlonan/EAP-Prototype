@@ -47,8 +47,9 @@ EAP.renderWorkflowBoard = function() {
 
 // Feature PI kanban
 EAP.renderFeatureBoard = function() {
-  var pis = EAP.features.pis, bl = EAP.features.backlog;
-  var cols = [{ id: 'backlog', name: 'Backlog', active: false, items: bl }].concat(pis);
+  var pis = EAP.features.pis, bl = EAP.features.backlog();
+  var piCols = pis.map(function(pi) { return {id:pi.id, name:pi.name, active:pi.active, items: EAP.features.byPI(pi.id)}; });
+  var cols = [{ id: 'backlog', name: 'Backlog', active: false, items: bl }].concat(piCols);
   var h = '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:10px;padding:4px 2px 16px;width:100%;">';
 
   cols.forEach(function(pi) {

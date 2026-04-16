@@ -104,10 +104,10 @@ EAP.toggleHierarchy = function(id) {
 
 EAP.getBacklogData = function() {
   var s = EAP.state;
-  if (s.level === 'Epic')       return EAP.epics.backlog;
-  if (s.level === 'Capability') return EAP.capabilities.backlog;
-  if (s.level === 'Feature')    return EAP.features.backlog;
-  if (s.level === 'WorkItem')   return EAP.workItems.backlog; // returns {Story:[], Defect:[], CaseTask:[]}
+  if (s.level === 'Epic')       return typeof EAP.epics.backlog === 'function' ? EAP.epics.backlog() : EAP.epics.backlog;
+  if (s.level === 'Capability') return typeof EAP.capabilities.backlog === 'function' ? EAP.capabilities.backlog() : EAP.capabilities.backlog;
+  if (s.level === 'Feature')    return typeof EAP.features.backlog === 'function' ? EAP.features.backlog() : EAP.features.backlog;
+  if (s.level === 'WorkItem')   return EAP.workItems.backlog;
   return [];
 };
 
@@ -120,10 +120,29 @@ EAP.getBacklogFlat = function() {
 
 EAP.getListGroups = function() {
   var s = EAP.state;
-  if (s.level === 'Epic')       return EAP.epics.groups;
-  if (s.level === 'Capability') return EAP.capabilities.groups;
-  if (s.level === 'Feature')    return EAP.features.pis;
-  if (s.level === 'WorkItem')   return EAP.workItems.sprints;
+  if (s.level === 'Epic') {
+    // Resolve epicIds to actual epic objects
+    return EAP.epics.groups.map(function(g) {
+      return {id:g.id, name:g.name, type:g.type, items: g.epicIds.map(function(eid) {
+        return EAP.epics.all.filter(function(e){return e.id===eid;})[0];
+      }).filter(Boolean)};
+    });
+  }
+  if (s.level === 'Capability') {
+    return EAP.capabilities.groups.map(function(g) {
+      return {id:g.id, name:g.name, type:g.type, items: g.capIds.map(function(cid) {
+        return EAP.capabilities.all.filter(function(c){return c.id===cid;})[0];
+      }).filter(Boolean)};
+    });
+  }
+  if (s.level === 'Feature') {
+    // Build PI groups from consolidated feature array
+    return EAP.features.pis.map(function(pi) {
+      var items = EAP.features.byPI(pi.id);
+      return {id:pi.id, name:pi.name, dates:pi.dates, active:pi.active, capPct:pi.capPct, totalPts:pi.totalPts, donePts:pi.donePts, items:items};
+    });
+  }
+  if (s.level === 'WorkItem') return EAP.workItems.sprints;
   return [];
 };
 
