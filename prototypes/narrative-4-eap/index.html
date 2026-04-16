@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Agile Planning | Digital Banking ART</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/chart.min.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <div id="floating-bar" style="display:none;"></div>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="page-shell">
+  <nav id="left-nav" aria-label="Primary navigation"></nav>
+  <main class="content-viewport" style="display:flex; flex-direction:column;">
+    <div id="chrome-bar" class="chrome"></div>
+    <div id="filter-bar" class="fbar"></div>
+    <div id="content-area" class="content-area"></div>
+  </main>
+</div>
+
+<script src="../shared/nav.js"></script>
+<script>renderNav('board', { avatar: '../../assets/images/avatar-james.png', name: 'Ananya Krishnan', links: { 0: 'index.html', 3: 'index.html', 4: 'index.html' } });</script>
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/render.js"></script>
+<script src="js/interactions.js"></script>
+<script>
+  // Initialize
+  EAP.state.openAccordions['pi26'] = true;
+  EAP.initInteractions();
+  EAP.render();
+</script>
+</body>
+</html>
