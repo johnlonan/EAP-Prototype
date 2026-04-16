@@ -47,7 +47,7 @@ EAP.defaultLevel = {'portfolio':'Epic','solution-train':'Capability','art':'Feat
 // ═══════════════════════════════════════════════════════
 EAP.goals = [
   {id:'g1', name:'Become top digital bank in UK by 2027', state:'On Track', pct:42},
-  {id:'g2', name:'Reduce operating costs by 18% by end of 2026', state:'Behind', pct:12}
+  {id:'g2', name:'Reduce operating costs by 18% by end of 2026', state:'At Risk', pct:12}
 ];
 
 EAP.epics = {
@@ -286,7 +286,7 @@ EAP.hierarchy = [
       {id:'e3', type:'epic', name:'Open Banking API Programme', state:'Review', pct:0, pts:0, owner:'Raj', team:'Digital Banking ART',
         children: []}
     ]},
-  {id:'g2', type:'goal', name:'Reduce operating costs by 18% by end of 2026', state:'Behind', pct:12, pts:72, owner:'', team:'',
+  {id:'g2', type:'goal', name:'Reduce operating costs by 18% by end of 2026', state:'At Risk', pct:12, pts:72, owner:'', team:'',
     children: [
       {id:'e2', type:'epic', name:'Customer Self-Service Expansion', state:'Funnel', pct:0, pts:0, owner:'Priya', team:'Digital Banking ART',
         children: [
@@ -396,10 +396,33 @@ EAP.insights = {
   },
   'art-Feature-Hierarchy': {
     signals: [
-      {level:'urgent', title:'Customer Self-Service Expansion has no Features defined', desc:'Primary Epic for Goal 2 (cost reduction). Goal 2 already behind at 12%.', action:'Start scoping'},
-      {level:'watch',  title:'Next-Gen Mobile Banking has 3 backlog Features with no team', desc:'Epic on track but delivery risk growing.', action:'Assign teams'},
-      {level:'watch',  title:'Cost reduction goal behind at 12%', desc:'vs 42% for digital bank goal. Imbalance growing.', action:'Review goal allocation'},
-      {level:'ok',     title:'Digital bank goal on track at 42%', desc:'PI 26 commitments align with targets.', action:''}
+      {level:'urgent', title:'Goal 2 at risk — only 12% progress vs 42% for Goal 1', desc:'Cost reduction goal falling behind. No Features in execution for Customer Self-Service Expansion Epic. Strategic imbalance growing.', action:'Rebalance portfolio'},
+      {level:'urgent', title:'Customer Self-Service Expansion has 0 Features defined', desc:'This is the primary Epic for Goal 2. Without scoping, the goal cannot recover this PI.', action:'Start scoping'},
+      {level:'watch',  title:'Open Banking API Programme in Review with no breakdown', desc:'PSD3 deadline Q3 2026. Without Capability/Feature breakdown, delivery timeline is unknown.', action:'Break down into Capabilities'},
+      {level:'watch',  title:'Next-Gen Mobile Banking has 3 unassigned backlog Features', desc:'Epic at 42% but pipeline thinning. Teams will have nothing to pull in PI 27.', action:'Assign teams'},
+      {level:'ok',     title:'Goal 1 on track at 42%', desc:'Digital bank goal progressing. PI 26 commitments aligned. 4 of 7 Features in execution.', action:''}
+    ]
+  },
+  // Team-level insights — no gauge or team capacity (that's ART-level)
+  'team-WorkItem-Backlog': {
+    signals: [
+      {level:'urgent', title:'3 Stories have no acceptance criteria', desc:'Cannot be estimated or tested before Sprint 3.', action:'Define AC'},
+      {level:'watch',  title:'2 Defects older than 14 days in backlog', desc:'Ageing defects reduce backlog quality.', action:'Prioritise or close'},
+      {level:'ok',     title:'Story estimation consistent with team average', desc:'No anomalies detected.', action:''}
+    ]
+  },
+  'team-WorkItem-List': {
+    signals: [
+      {level:'urgent', title:'Auth API integration blocked Day 2', desc:'Past team average resolution: 1.4 days. Escalation window closing.', action:'Escalate'},
+      {level:'watch',  title:'At current pace 3 Stories may not complete Sprint 2', desc:'7 days left, 4 Stories not started or blocked.', action:'Flag standup'},
+      {level:'ok',     title:'Defect count within normal range', desc:'Consistent with last 3 sprints.', action:''}
+    ]
+  },
+  'team-WorkItem-Board': {
+    signals: [
+      {level:'urgent', title:'1 Story blocked in Sprint 2', desc:'Auth API dependency unresolved. Blocks 2 downstream items.', action:'Escalate'},
+      {level:'watch',  title:'In Progress column has 3 items, Done has 1', desc:'Flow bottleneck — items not completing.', action:'Review WIP limits'},
+      {level:'ok',     title:'Sprint velocity on track', desc:'Burn rate consistent with commitment.', action:''}
     ]
   }
 };

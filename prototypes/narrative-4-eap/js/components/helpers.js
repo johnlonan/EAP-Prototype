@@ -13,7 +13,7 @@ EAP._TH0 = '<th style="width:24px;padding:8px 4px"></th>';
 EAP._typeColors = { goal:'#374151', epic:'#6d28d9', capability:'#0369a1', feature:'#0d9488', story:'#6B7280', defect:'#DC2626',
   Goal:'#374151', Epic:'#6d28d9', Capability:'#0369a1', Feature:'#0d9488', Story:'#6B7280', Defect:'#DC2626', 'Case Task':'#6B7280', 'Work Item':'#6B7280' };
 
-// Type cell — icon + label, no coloured pill
+// Type cell — icon + label
 EAP.typeCell = function(type) {
   if (!type) return '';
   var key = type.toLowerCase();
@@ -34,17 +34,12 @@ EAP.pbar = function(p, st) {
 // Subtle pill (for board cards)
 EAP.subtlePill = function(st) {
   var m = {
-    Funnel: 'rgba(0,0,0,0.04);color:var(--text-tertiary)',
-    Backlog: 'rgba(0,0,0,0.04);color:var(--text-tertiary)',
-    Implementation: 'rgba(154,52,18,0.08);color:#9a3412',
-    Blocked: 'rgba(140,29,29,0.08);color:#8c1d1d',
-    'In Progress': 'rgba(30,64,175,0.08);color:#1e40af',
-    Done: 'rgba(22,101,52,0.08);color:#166534',
-    Analysis: 'rgba(109,40,217,0.08);color:#6d28d9',
-    Draft: 'rgba(0,0,0,0.04);color:var(--text-tertiary)',
-    Planned: 'rgba(0,0,0,0.04);color:var(--text-tertiary)',
-    'To Do': 'rgba(0,0,0,0.04);color:var(--text-tertiary)',
-    'In Review': 'rgba(109,40,217,0.08);color:#6d28d9'
+    Funnel: 'rgba(0,0,0,0.04);color:#6B7280', Backlog: 'rgba(0,0,0,0.04);color:#6B7280',
+    Implementation: 'rgba(154,52,18,0.08);color:#9a3412', Blocked: 'rgba(140,29,29,0.08);color:#DC2626',
+    'In Progress': 'rgba(30,64,175,0.08);color:#2563EB', Done: 'rgba(22,101,52,0.08);color:#16A34A',
+    Analysis: 'rgba(109,40,217,0.08);color:#6d28d9', Draft: 'rgba(0,0,0,0.04);color:#6B7280',
+    Planned: 'rgba(0,0,0,0.04);color:#6B7280', 'To Do': 'rgba(0,0,0,0.04);color:#6B7280',
+    'In Review': 'rgba(109,40,217,0.08);color:#6d28d9', 'At Risk': 'rgba(217,119,6,0.08);color:#D97706'
   };
   return '<span style="display:inline-flex;font-size:9px;font-weight:400;padding:2px 6px;border-radius:9999px;white-space:nowrap;background:' + (m[st] || m.Funnel) + '">' + st + '</span>';
 };
@@ -60,6 +55,11 @@ EAP.bkCols = function() {
     h: EAP._TH0 + '<th>Name</th><th>Type</th><th>State</th><th>Size</th><th>WSJF</th><th>Parent</th><th>ART</th>',
     r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Capability') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td><span class="par">' + (i.art || '—') + '</span></td>'; }
   };
+  if (s.level === 'WorkItem') return {
+    h: EAP._TH0 + '<th>Name</th><th>Type</th><th>State</th><th>Pts</th><th>Owner</th><th>Team</th>',
+    r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Story') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + (i.pts || '') + '</span></td><td><span class="par">' + (i.owner || '—') + '</span></td><td><span class="tm">' + (i.team || '—') + '</span></td>'; }
+  };
+  // Feature
   return {
     h: EAP._TH0 + '<th>Name</th><th>Type</th><th>State</th><th>Size</th><th>WSJF</th><th>Parent</th><th>Team</th>',
     r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Feature') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td><span class="tm">' + (i.team || '—') + '</span></td>'; }
@@ -81,6 +81,7 @@ EAP.lsCols = function() {
     h: EAP._TH0 + '<th>Name</th><th>State</th><th>% Complete</th><th>Pts</th><th>Owner</th><th>Team</th>',
     r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td>' + EAP.pbar(i.pct, i.state) + '</td><td><span class="sz">' + (i.pts || '') + '</span></td><td><span class="par">' + (i.owner || '') + '</span></td><td><span class="tm">' + (i.team || '') + '</span></td>'; }
   };
+  // Feature
   return {
     h: EAP._TH0 + '<th>Name</th><th>State</th><th>Progress</th><th>Size</th><th>WSJF</th><th>Parent</th><th>Team</th>',
     r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td>' + EAP.pbar(i.pct, i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.parent || '') + '</span></td><td><span class="tm">' + (i.team || '') + '</span></td>'; }

@@ -62,7 +62,7 @@ EAP.renderFilterBar = function() {
       levels.map(function(l) { return '<option value="' + l.value + '"' + (s.level === l.value ? ' selected' : '') + '>' + l.label + '</option>'; }).join('') +
       '</select>';
 
-    if (s.tab === 'Board' && s.level === 'WorkItem') {
+    if ((s.tab === 'Board' || s.tab === 'List') && s.level === 'WorkItem') {
       h += '<div class="fbar-sep"></div><span class="fbar-label">PI</span>' +
         '<select class="fbar-select" id="pi-select"><option>PI 26 — Current</option><option>PI 25</option><option>PI 24</option></select>';
     }

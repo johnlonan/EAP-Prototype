@@ -4,8 +4,18 @@
 var EAP = EAP || {};
 
 // Board styles (shared across sub-views)
-var CS = 'background:rgba(255,255,255,0.6);border:1px solid rgba(0,0,0,0.1);border-radius:10px;padding:10px;margin-bottom:6px;cursor:grab;transition:box-shadow 0.15s ease;';
+var CS = 'background:rgba(255,255,255,0.65);border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:10px 10px 8px;margin-bottom:6px;cursor:grab;transition:box-shadow 0.15s ease;';
+var CS_BLOCKED = 'background:rgba(220,38,38,0.03);border:1px solid rgba(220,38,38,0.15);border-left:3px solid #DC2626;border-radius:8px;padding:10px 10px 8px;margin-bottom:6px;cursor:grab;';
+var CS_ATRISK = 'background:rgba(217,119,6,0.03);border:1px solid rgba(217,119,6,0.12);border-left:3px solid #D97706;border-radius:8px;padding:10px 10px 8px;margin-bottom:6px;cursor:grab;';
+var CS_DONE = 'background:rgba(22,163,74,0.03);border:1px solid rgba(22,163,74,0.1);border-left:3px solid #16A34A;border-radius:8px;padding:10px 10px 8px;margin-bottom:6px;cursor:grab;opacity:0.7;';
 var CB = 'background:rgba(255,255,255,0.3);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.4);border-top:none;border-radius:0 0 12px 12px;padding:8px;min-height:100px;flex:1;';
+
+function cardStyle(item) {
+  if (item.state === 'Blocked' || item.blocked) return CS_BLOCKED;
+  if (item.state === 'Done' || item.state === 'Complete') return CS_DONE;
+  if (item.atRisk) return CS_ATRISK;
+  return CS;
+}
 function colHd(isActive) {
   return 'padding:8px 12px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between;' +
     (isActive ? 'background:var(--color-primary);color:#fff;' : 'background:rgba(14,78,105,0.12);color:var(--text-primary);');
@@ -36,8 +46,12 @@ EAP.renderWorkflowBoard = function() {
     h += '<div style="' + colHd(false) + '"><span style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;">' + c + '</span><span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;">' + items.length + '</span></div>';
     h += '<div style="' + CB + '">';
     items.forEach(function(i) {
-      h += '<div style="' + CS + '"><div class="item-nm" style="font-size:12px;margin-bottom:6px;">' + i.name + '</div>' + EAP.subtlePill(i.state);
-      if (i.wsjf) h += ' <span class="wsjf" style="margin-left:4px;">' + i.wsjf + '</span>';
+      h += '<div style="' + cardStyle(i) + '">';
+      h += '<div class="item-nm" style="font-size:12px;margin-bottom:6px;">' + i.name + '</div>';
+      h += '<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">' + EAP.subtlePill(i.state);
+      if (i.wsjf) h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;">WSJF ' + i.wsjf + '</span>';
+      h += '</div>';
+      if (i.pct > 0) h += '<div style="margin-top:6px;">' + EAP.pbar(i.pct, i.state) + '</div>';
       h += '</div>';
     });
     h += '</div></div>';
@@ -60,11 +74,19 @@ EAP.renderFeatureBoard = function() {
     h += '<span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;margin-left:6px;">' + items.length + '</span></div>';
     h += '<div style="' + CB + '">';
     items.forEach(function(f) {
-      var bc = f.state === 'Blocked' ? '#dc2626' : f.state === 'Done' || f.state === 'Complete' ? '#16a34a' : 'rgba(0,0,0,0.08)';
-      h += '<div style="' + CS + 'border-left:3px solid ' + bc + ';" id="fcard-' + f.id + '">';
-      h += '<div class="item-nm" style="font-size:12px;margin-bottom:5px;">' + f.name + '</div>';
+      h += '<div style="' + cardStyle(f) + '" id="fcard-' + f.id + '">';
+      // Blocked banner
+      if (f.blocked || f.state === 'Blocked') {
+        h += '<div style="font-size:10px;font-weight:500;color:#DC2626;margin-bottom:4px;display:flex;align-items:center;gap:4px;">' + EAP.icon('info', 12) + ' ' + (f.blockReason || 'Blocked') + '</div>';
+      }
+      // At risk banner
+      if (f.atRisk && f.state !== 'Blocked') {
+        h += '<div style="font-size:10px;font-weight:500;color:#D97706;margin-bottom:4px;">' + (f.openDefects ? f.openDefects + ' open defects' : 'At risk') + '</div>';
+      }
+      h += '<div class="item-nm" style="font-size:12px;margin-bottom:6px;">' + f.name + '</div>';
       h += '<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">' + EAP.subtlePill(f.state);
       if (f.team) h += '<span class="tm">' + f.team + '</span>';
+      if (f.pts) h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;">' + f.pts + 'pt</span>';
       h += '</div>';
       if (f.pct > 0) h += '<div style="margin-top:6px;">' + EAP.pbar(f.pct, f.state) + '</div>';
       h += '</div>';
@@ -82,17 +104,40 @@ EAP.renderWIGrid = function() {
   var h = '<div style="flex:1;overflow:auto;">';
 
   teams.forEach(function(team) {
-    h += '<div style="margin-bottom:14px;"><div style="padding:6px 12px;background:rgba(14,78,105,0.15);color:var(--text-primary);border-radius:8px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">' + team + '</div>';
+    // Get team capacity data
+    var cap = EAP.teamCapacity[team] || {};
+    h += '<div style="margin-bottom:16px;"><div style="padding:8px 12px;background:rgba(14,78,105,0.15);color:#374151;border-radius:8px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">' +
+      '<span>' + team + '</span></div>';
     h += '<div style="display:flex;gap:8px;width:100%;">';
     cols.forEach(function(sp) {
       var items = (sp.items || []).filter(function(i) { return i.team === team; });
       var isA = !!sp.active;
+      // Sprint capacity for this team
+      var spKey = sp.id === 'backlog' ? null : sp.id.replace('sp','sp');
+      var capVal = sp.id === 'sp2' ? cap.sp2 : sp.id === 'sp3' ? cap.sp3 : sp.id === 'sp4' ? cap.sp4 : sp.id === 'sp5' ? cap.ip : null;
+      var capColor = capVal >= 100 ? '#DC2626' : capVal >= 85 ? '#D97706' : 'var(--color-primary)';
+
       h += '<div style="flex:1;min-width:140px;">';
-      h += '<div style="' + colHd(isA) + 'border-radius:8px 8px 0 0;padding:6px 10px;"><span style="font-size:10px;font-weight:500;">' + sp.name + '</span><span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;">' + items.length + '</span></div>';
+      h += '<div style="' + colHd(isA) + 'border-radius:8px 8px 0 0;padding:6px 10px;flex-direction:column;align-items:stretch;gap:4px;">';
+      h += '<div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:10px;font-weight:500;">' + sp.name + '</span><span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;">' + items.length + '</span></div>';
+      // Capacity bar per sprint (not for backlog)
+      if (capVal !== null && capVal !== undefined) {
+        h += '<div style="display:flex;align-items:center;gap:4px;"><div style="flex:1;height:3px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;"><div style="height:100%;width:' + Math.min(capVal, 100) + '%;background:' + capColor + ';border-radius:2px;opacity:0.6;"></div></div><span style="font-size:9px;font-family:var(--font-mono);color:' + (isA ? 'rgba(255,255,255,0.7)' : capColor) + ';">' + capVal + '%</span></div>';
+      }
+      h += '</div>';
       h += '<div style="' + CB + 'border-radius:0 0 8px 8px;padding:6px;min-height:50px;">';
       items.forEach(function(wi) {
-        h += '<div style="' + CS + 'padding:8px;font-size:11px;"><div style="font-weight:500;color:var(--text-secondary);line-height:1.3;margin-bottom:4px;">' + wi.name + '</div>' + EAP.subtlePill(wi.state);
-        if (wi.pts) h += ' <span class="sz">' + wi.pts + 'pt</span>';
+        var wiStyle = (wi.blocked || wi.state === 'Blocked') ? CS_BLOCKED : CS;
+        h += '<div style="' + wiStyle + 'padding:8px;font-size:11px;">';
+        if (wi.blocked || wi.state === 'Blocked') {
+          h += '<div style="font-size:9px;font-weight:500;color:#DC2626;margin-bottom:3px;">' + (wi.blockReason || 'Blocked') + '</div>';
+        }
+        h += '<div style="font-weight:500;color:#374151;line-height:1.3;margin-bottom:4px;">' + wi.name + '</div>';
+        h += '<div style="display:flex;align-items:center;gap:4px;">' + EAP.subtlePill(wi.state);
+        if (wi.pts) h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;">' + wi.pts + 'pt</span>';
+        if (wi.owner) h += '<span style="font-size:10px;color:#9CA3AF;">' + wi.owner + '</span>';
+        h += '</div>';
+        if (wi.pct > 0) h += '<div style="margin-top:4px;">' + EAP.pbar(wi.pct, wi.state) + '</div>';
         h += '</div>';
       });
       h += '</div></div>';
