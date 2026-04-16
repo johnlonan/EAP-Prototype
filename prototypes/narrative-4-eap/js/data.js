@@ -204,86 +204,87 @@ EAP.workItems = {
 };
 
 // ── Hierarchy (Goal → Epic → Capability → Feature → Story) ──
+// Each node: id, type, name, state, pct, pts, owner, team, children
 EAP.hierarchy = [
-  { id: 'g1', type: 'goal', name: 'Become top digital bank in UK by 2027', prog: 'On Track 42%',
+  { id:'g1', type:'goal', name:'Become top digital bank in UK by 2027', state:'On Track', pct:42, pts:28, owner:'', team:'',
     children: [
-      { id: 'e1', type: 'epic', name: 'Next-Gen Mobile Banking Platform', prog: 'In Progress 38%',
+      { id:'e1', type:'epic', name:'Next-Gen Mobile Banking Platform', state:'Implementation', pct:38, pts:18, owner:'Ananya', team:'Digital Banking ART',
         children: [
-          { id: 'c1', type: 'capability', name: 'Seamless Authentication', prog: '65%',
+          { id:'c1', type:'capability', name:'Seamless Authentication', state:'Implementation', pct:65, pts:10, owner:'Ananya', team:'Auth',
             children: [
-              { id: 'f1', type: 'feature', name: 'Fingerprint Login Redesign', prog: 'In Progress 65%',
+              { id:'f1', type:'feature', name:'Fingerprint Login Redesign', state:'In Progress', pct:65, pts:10, owner:'Ananya', team:'Auth',
                 children: [
-                  { id: 's1', type: 'story', name: 'Build biometric prompt UI (5pts)', prog: 'Done' },
-                  { id: 's2', type: 'story', name: 'Handle fallback to PIN (3pts)', prog: 'In Progress' },
-                  { id: 's3', type: 'story', name: 'Error state on failed scan (2pts)', prog: 'To Do' },
-                  { id: 'd1', type: 'defect', name: 'DEF-001: Biometric fails on iOS 17.4', prog: 'Open High' }
+                  { id:'s1', type:'story', name:'Build biometric prompt UI', state:'Done', pct:100, pts:5, owner:'Kiran', team:'Auth' },
+                  { id:'s2', type:'story', name:'Handle fallback to PIN', state:'In Progress', pct:50, pts:3, owner:'Kiran', team:'Auth' },
+                  { id:'s3', type:'story', name:'Error state on failed scan', state:'To Do', pct:0, pts:2, owner:'Dev2', team:'Auth' },
+                  { id:'d1', type:'defect', name:'DEF-001: Biometric fails on iOS 17.4', state:'Blocked', pct:0, pts:0, owner:'Dev3', team:'Auth' }
                 ]
               },
-              { id: 'f2', type: 'feature', name: 'Enhanced Biometric Auth Flow', prog: 'Backlog', children: [] }
+              { id:'f2', type:'feature', name:'Enhanced Biometric Auth Flow', state:'Backlog', pct:0, pts:0, owner:'', team:'', children:[] }
             ]
           },
-          { id: 'c2', type: 'capability', name: 'Real-time Risk and Fraud', prog: '30%',
+          { id:'c2', type:'capability', name:'Real-time Risk and Fraud', state:'In Progress', pct:30, pts:16, owner:'Ananya', team:'Fraud',
             children: [
-              { id: 'f3', type: 'feature', name: 'Real-time Fraud Alerts', prog: 'At Risk 30%',
+              { id:'f3', type:'feature', name:'Real-time Fraud Alerts', state:'In Progress', pct:30, pts:16, owner:'Ananya', team:'Fraud',
                 children: [
-                  { id: 's4', type: 'story', name: 'Fraud detection webhook (8pts)', prog: 'In Progress' },
-                  { id: 's5', type: 'story', name: 'Alert delivery service (8pts)', prog: 'At Risk' },
-                  { id: 'd2', type: 'defect', name: 'DEF-002: Alert not firing card-not-present', prog: 'Open High' }
+                  { id:'s4', type:'story', name:'Fraud detection webhook', state:'In Progress', pct:30, pts:8, owner:'Dev3', team:'Fraud' },
+                  { id:'s5', type:'story', name:'Alert delivery service', state:'In Progress', pct:10, pts:8, owner:'Dev4', team:'Fraud' },
+                  { id:'d2', type:'defect', name:'DEF-002: Alert not firing card-not-present', state:'Blocked', pct:0, pts:0, owner:'Dev3', team:'Fraud' }
                 ]
               }
             ]
           },
-          { id: 'c3', type: 'capability', name: 'Seamless Payments', prog: '20%',
+          { id:'c3', type:'capability', name:'Seamless Payments', state:'Blocked', pct:20, pts:13, owner:'Ananya', team:'Payments',
             children: [
-              { id: 'f4', type: 'feature', name: 'Payment Confirmation Flow', prog: 'Blocked 20%',
+              { id:'f4', type:'feature', name:'Payment Confirmation Flow', state:'Blocked', pct:20, pts:13, owner:'Ananya', team:'Payments',
                 children: [
-                  { id: 's6', type: 'story', name: 'Auth API integration (8pts)', prog: 'Blocked' },
-                  { id: 's7', type: 'story', name: 'Confirmation screen UI (5pts)', prog: 'In Progress' }
+                  { id:'s6', type:'story', name:'Auth API integration', state:'Blocked', pct:10, pts:8, owner:'Kiran', team:'Payments' },
+                  { id:'s7', type:'story', name:'Confirmation screen UI', state:'In Progress', pct:40, pts:5, owner:'Kiran', team:'Payments' }
                 ]
               },
-              { id: 'f5', type: 'feature', name: 'Scheduled Payment Manager', prog: 'Backlog', children: [] }
+              { id:'f5', type:'feature', name:'Scheduled Payment Manager', state:'Backlog', pct:0, pts:0, owner:'', team:'', children:[] }
             ]
           },
-          { id: 'c4', type: 'capability', name: 'Customer Account Visibility', prog: '100%',
+          { id:'c4', type:'capability', name:'Customer Account Visibility', state:'Done', pct:100, pts:13, owner:'Ananya', team:'Mobile',
             children: [
-              { id: 'f6', type: 'feature', name: 'Balance on Home Screen', prog: 'Complete 100%',
+              { id:'f6', type:'feature', name:'Balance on Home Screen', state:'Done', pct:100, pts:13, owner:'Ananya', team:'Mobile',
                 children: [
-                  { id: 's8', type: 'story', name: 'Balance widget build (8pts)', prog: 'Done' },
-                  { id: 's9', type: 'story', name: 'Refresh on app resume (5pts)', prog: 'Done' }
+                  { id:'s8', type:'story', name:'Balance widget build', state:'Done', pct:100, pts:8, owner:'Dev4', team:'Mobile' },
+                  { id:'s9', type:'story', name:'Refresh on app resume', state:'Done', pct:100, pts:5, owner:'Dev4', team:'Mobile' }
                 ]
               }
             ]
           }
         ]
       },
-      { id: 'e2', type: 'epic', name: 'Customer Self-Service Expansion', prog: 'Not Started 0%',
+      { id:'e2', type:'epic', name:'Customer Self-Service Expansion', state:'Funnel', pct:0, pts:0, owner:'Raj', team:'Digital Banking ART',
         children: [
-          { id: 'f7', type: 'feature', name: 'Transaction Dispute Resolution', prog: 'Backlog', children: [] },
-          { id: 'f8', type: 'feature', name: 'Account Statement Export PDF', prog: 'Backlog', children: [] }
+          { id:'f7', type:'feature', name:'Transaction Dispute Resolution', state:'Backlog', pct:0, pts:0, owner:'', team:'Accounts', children:[] },
+          { id:'f8', type:'feature', name:'Account Statement Export PDF', state:'Backlog', pct:0, pts:0, owner:'', team:'Accounts', children:[] }
         ]
       }
     ]
   },
-  { id: 'g2', type: 'goal', name: 'Reduce operating costs by 18% by end of 2026', prog: 'Behind 12%',
+  { id:'g2', type:'goal', name:'Reduce operating costs by 18% by end of 2026', state:'Behind', pct:12, pts:72, owner:'', team:'',
     children: [
-      { id: 'e3', type: 'epic', name: 'Process Automation Platform', prog: 'In Progress 25%',
+      { id:'e3', type:'epic', name:'Process Automation Platform', state:'In Progress', pct:25, pts:26, owner:'Priya', team:'Digital Banking ART',
         children: [
-          { id: 'c5', type: 'capability', name: 'Self-Service Account Management', prog: '40%',
+          { id:'c5', type:'capability', name:'Self-Service Account Management', state:'In Progress', pct:40, pts:13, owner:'Priya', team:'Accounts',
             children: [
-              { id: 'f9', type: 'feature', name: 'Account Statement Export PDF', prog: 'In Progress 40%',
+              { id:'f9', type:'feature', name:'Account Statement Export PDF', state:'In Progress', pct:40, pts:13, owner:'Priya', team:'Accounts',
                 children: [
-                  { id: 's20', type: 'story', name: 'PDF generation service (8pts)', prog: 'In Progress' },
-                  { id: 's21', type: 'story', name: 'Statement template design (5pts)', prog: 'To Do' }
+                  { id:'s20', type:'story', name:'PDF generation service', state:'In Progress', pct:50, pts:8, owner:'Dev4', team:'Accounts' },
+                  { id:'s21', type:'story', name:'Statement template design', state:'To Do', pct:0, pts:5, owner:'Dev2', team:'Accounts' }
                 ]
               }
             ]
           },
-          { id: 'c6', type: 'capability', name: 'Automated Onboarding', prog: '15%',
+          { id:'c6', type:'capability', name:'Automated Onboarding', state:'Funnel', pct:0, pts:13, owner:'Raj', team:'Onboard',
             children: [
-              { id: 'f11', type: 'feature', name: 'Streamlined Onboarding Flow', prog: 'Not Started',
+              { id:'f11', type:'feature', name:'Streamlined Onboarding Flow', state:'Funnel', pct:0, pts:13, owner:'Raj', team:'Onboard',
                 children: [
-                  { id: 's22', type: 'story', name: 'KYC automation service (8pts)', prog: 'To Do' },
-                  { id: 's23', type: 'story', name: 'Document verification API (5pts)', prog: 'To Do' }
+                  { id:'s22', type:'story', name:'KYC automation service', state:'To Do', pct:0, pts:8, owner:'Dev3', team:'Onboard' },
+                  { id:'s23', type:'story', name:'Document verification API', state:'To Do', pct:0, pts:5, owner:'Dev2', team:'Onboard' }
                 ]
               }
             ]

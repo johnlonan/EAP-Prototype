@@ -207,6 +207,10 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ins-a { font-size: 10px; font-weight: 500; color: var(--color-primary); cursor: pointer; margin-top: 4px; display: inline-block; text-decoration: none; }
 .ins-a:hover { text-decoration: underline; }
 
+/* ═══ HIERARCHY TABLE ═══ */
+.hier-tbl { table-layout: fixed; }
+.hier-tbl th { background: rgba(255,255,255,0.6); }
+
 /* ═══ CONTEXT DROPDOWN ═══ */
 .ctx-row { border-bottom: 1px solid rgba(0,0,0,0.03); }
 .ctx-row:last-child { border-bottom: none; }
