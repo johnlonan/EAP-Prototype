@@ -7,7 +7,7 @@ EAP.renderInsights = function() {
   var el = document.getElementById('insights-panel');
   if (!el) return;
   var d = EAP.getInsights();
-  var h = '<div class="ins-hd"><span class="ins-hd-lbl">Insights</span><button class="ins-x" onclick="EAP.toggleInsights()">×</button></div><div class="ins-scroll">';
+  var h = '<div class="ins-hd"><span class="ins-hd-lbl">Insights</span><button class="ins-x" onclick="EAP.toggleInsights()">' + EAP.icon('x', 14) + '</button></div><div class="ins-scroll">';
 
   if (d.gauge) {
     h += '<div class="ins-gauge"><div class="ins-gauge-lbl">' + d.gauge.label + '</div>' +

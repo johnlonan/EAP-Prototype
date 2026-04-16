@@ -52,8 +52,9 @@ EAP.renderFilterBar = function() {
       '<div class="fbar-sep"></div><span class="fbar-label">Show</span>' +
       ['Capability', 'Feature', 'Story'].map(function(lv) {
         var checked = !s.hierHide[lv];
-        return '<label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary);cursor:pointer;white-space:nowrap;">' +
-          '<input type="checkbox" ' + (checked ? 'checked' : '') + ' data-hier-check="' + lv + '" style="accent-color:var(--color-primary);margin:0;width:13px;height:13px;">' + lv + '</label>';
+        var iconName = checked ? 'check-square' : 'square';
+        return '<span class="hier-check-pill' + (checked ? ' checked' : '') + '" data-hier-check="' + lv + '">' +
+          EAP.icon(iconName, 14) + ' ' + lv + '</span>';
       }).join('') +
       '<div class="fbar-spacer"></div>';
   } else {
@@ -67,16 +68,16 @@ EAP.renderFilterBar = function() {
     }
 
     h += '<div class="fbar-sep"></div>' +
-      '<button class="fbar-filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</button>' +
-      '<span class="fbar-chip' + (s.mineOnly ? ' on' : '') + '" id="mine-toggle">Mine only' + (s.mineOnly ? ' <span class="cx">×</span>' : '') + '</span>' +
+      '<button class="fbar-filter">' + EAP.icon('filter', 14) + 'Filter</button>' +
+      '<span class="fbar-chip' + (s.mineOnly ? ' on' : '') + '" id="mine-toggle">Mine only' + (s.mineOnly ? ' <span class="cx">' + EAP.icon('x', 12) + '</span>' : '') + '</span>' +
       '<div class="fbar-spacer"></div>';
   }
 
   // Right-side toggles
-  if (s.tab === 'List') h += '<span class="fbar-vtog' + (s.splitView ? ' on' : '') + '" id="split-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>Split</span>';
+  if (s.tab === 'List') h += '<span class="fbar-vtog' + (s.splitView ? ' on' : '') + '" id="split-toggle">' + EAP.icon('columns', 14) + ' Split</span>';
   if (s.tab === 'Board' && s.level === 'WorkItem') h += '<span class="fbar-vtog' + (s.boardView === 'track' ? ' on' : '') + '" id="track-toggle">Track</span>';
   if (s.tab === 'Board' && (s.level === 'Feature' || s.level === 'WorkItem')) h += '<span class="fbar-vtog' + (s.showDeps ? ' on' : '') + '" id="deps-toggle">Dependencies</span>';
-  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>';
+  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('info', 14) + ' Insights</span>';
 
   el.innerHTML = h;
 
@@ -93,11 +94,12 @@ EAP.renderFilterBar = function() {
   var db = document.getElementById('deps-toggle');
   if (db) db.addEventListener('click', function() { EAP.state.showDeps = !EAP.state.showDeps; EAP.render(); });
 
-  // Hierarchy checkboxes
-  document.querySelectorAll('[data-hier-check]').forEach(function(cb) {
-    cb.addEventListener('change', function() {
+  // Hierarchy show/hide toggles
+  document.querySelectorAll('[data-hier-check]').forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      var lv = pill.dataset.hierCheck;
       EAP.state.hierHide = EAP.state.hierHide || {};
-      EAP.state.hierHide[cb.dataset.hierCheck] = !cb.checked;
+      EAP.state.hierHide[lv] = !EAP.state.hierHide[lv];
       EAP.render();
     });
   });

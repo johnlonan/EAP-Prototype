@@ -3,11 +3,24 @@
    ═══════════════════════════════════════════════════════ */
 var EAP = EAP || {};
 
-// Drag grip SVG
-EAP._G = '<span class="dg"><svg width="8" height="12" viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/><circle cx="2" cy="6" r="1.2"/><circle cx="6" cy="6" r="1.2"/><circle cx="2" cy="10" r="1.2"/><circle cx="6" cy="10" r="1.2"/></svg></span>';
-EAP._GT = '<td style="width:20px;padding:8px 4px">' + EAP._G + '</td>';
-EAP._ADD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-EAP._TH0 = '<th style="width:20px;padding:8px 4px"></th>';
+// Drag grip
+EAP._G = '<span class="dg">' + (EAP.icon ? EAP.icon.grip(12) : '') + '</span>';
+EAP._GT = '<td style="width:24px;padding:8px 4px">' + EAP._G + '</td>';
+EAP._ADD = EAP.icon ? EAP.icon('plus', 12) : '';
+EAP._TH0 = '<th style="width:24px;padding:8px 4px"></th>';
+
+// Type icon colours
+EAP._typeColors = { goal:'#374151', epic:'#6d28d9', capability:'#0369a1', feature:'#0d9488', story:'#6B7280', defect:'#DC2626',
+  Goal:'#374151', Epic:'#6d28d9', Capability:'#0369a1', Feature:'#0d9488', Story:'#6B7280', Defect:'#DC2626', 'Case Task':'#6B7280', 'Work Item':'#6B7280' };
+
+// Type cell — icon + label, no coloured pill
+EAP.typeCell = function(type) {
+  if (!type) return '';
+  var key = type.toLowerCase();
+  var color = EAP._typeColors[type] || '#6B7280';
+  var iconHtml = EAP.icon ? EAP.icon(key, 14) : '';
+  return '<span class="type-cell" style="color:' + color + ';">' + iconHtml + ' ' + type + '</span>';
+};
 
 // State pill
 EAP.pill = function(st) { return '<span class="st-pill ' + EAP.stateClass(st) + '">' + st + '</span>'; };
@@ -36,24 +49,24 @@ EAP.subtlePill = function(st) {
   return '<span style="display:inline-flex;font-size:9px;font-weight:400;padding:2px 6px;border-radius:9999px;white-space:nowrap;background:' + (m[st] || m.Funnel) + '">' + st + '</span>';
 };
 
-// Backlog column definitions (shared between Backlog tab and List split panel)
+// ── Backlog column definitions ─────────────────────────
 EAP.bkCols = function() {
   var s = EAP.state;
   if (s.level === 'Epic') return {
     h: EAP._TH0 + '<th>Name</th><th>Type</th><th>State</th><th>Size</th><th>WSJF</th><th>ART</th>',
-    r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td><span class="tm">' + (i.type || 'Epic') + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.art || '—') + '</span></td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Epic') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.art || '—') + '</span></td>'; }
   };
   if (s.level === 'Capability') return {
     h: EAP._TH0 + '<th>Name</th><th>Type</th><th>State</th><th>Size</th><th>WSJF</th><th>Parent</th><th>ART</th>',
-    r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td><span class="tm">' + (i.type || 'Capability') + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td><span class="par">' + (i.art || '—') + '</span></td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Capability') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td><span class="par">' + (i.art || '—') + '</span></td>'; }
   };
   return {
     h: EAP._TH0 + '<th>Name</th><th>Type</th><th>State</th><th>Size</th><th>WSJF</th><th>Parent</th><th>Team</th>',
-    r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td><span class="tm">' + (i.type || 'Feature') + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td><span class="tm">' + (i.team || '—') + '</span></td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Feature') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="sz">' + i.size + '</span></td><td><span class="wsjf">' + i.wsjf + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td><span class="tm">' + (i.team || '—') + '</span></td>'; }
   };
 };
 
-// List view column definitions (for items inside PI/Sprint accordions)
+// ── List view column definitions ───────────────────────
 EAP.lsCols = function() {
   var s = EAP.state;
   if (s.level === 'Epic') return {

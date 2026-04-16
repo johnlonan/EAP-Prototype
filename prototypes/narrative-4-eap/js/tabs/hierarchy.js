@@ -13,7 +13,7 @@ EAP.renderHierarchy = function() {
   }
   EAP.hierarchy.forEach(initOpen);
 
-  // Flatten the tree into rows with depth + visibility
+  // Flatten tree
   var rows = [];
   function flatten(node, depth, parentVisible) {
     var hide = s.hierHide || {};
@@ -35,8 +35,8 @@ EAP.renderHierarchy = function() {
     '<div class="gpanel-hd"><div class="gpanel-hd-left"><span class="gpanel-title">Hierarchy</span>' +
     '<span style="font-size:11px;color:var(--text-tertiary);margin-left:8px;">Goal → Epic → Capability → Feature → Story → Defect</span></div>' +
     '<div style="display:flex;gap:6px;align-items:center;">' +
-    '<button class="add-btn" id="hier-expand" style="height:22px;font-size:10px;">Expand all</button>' +
-    '<button class="add-btn" id="hier-collapse" style="height:22px;font-size:10px;">Collapse all</button>' +
+    '<button class="add-btn" id="hier-expand" style="height:22px;font-size:10px;">' + EAP.icon('expand', 12) + ' Expand all</button>' +
+    '<button class="add-btn" id="hier-collapse" style="height:22px;font-size:10px;">' + EAP.icon('collapse', 12) + ' Collapse all</button>' +
     '</div></div>' +
     '<div class="gpanel-scroll">' +
     '<table class="dtbl hier-tbl"><thead><tr>' +
@@ -50,30 +50,41 @@ EAP.renderHierarchy = function() {
     '<th style="width:11%;">Team</th>' +
     '</tr></thead><tbody>';
 
-  var tc = { goal: '#0e4e69', epic: '#6d28d9', capability: '#0369a1', feature: '#0d9488', story: '#6b7280', defect: '#dc2626' };
+  // Type icon + text (no coloured pill)
+  var typeColors = { goal: '#374151', epic: '#6d28d9', capability: '#0369a1', feature: '#0d9488', story: '#6B7280', defect: '#DC2626' };
 
   rows.forEach(function(r, idx) {
     var n = r.node, d = r.depth, isG = n.type === 'goal', isE = n.type === 'epic';
     var indent = d * 18;
-    var bg = isG ? 'rgba(14,78,105,0.04)' : isE ? 'rgba(14,78,105,0.02)' : 'transparent';
     var display = r.visible ? '' : 'display:none;';
 
-    h += '<tr data-hier-row="' + n.id + '" style="background:' + bg + ';' + display + '">';
+    // Goal rows get distinct treatment
+    var rowStyle = '';
+    if (isG) {
+      rowStyle = 'background:rgba(14,78,105,0.06);border-bottom:2px solid rgba(14,78,105,0.1);';
+    } else if (isE) {
+      rowStyle = 'background:rgba(14,78,105,0.02);';
+    }
+
+    h += '<tr data-hier-row="' + n.id + '" style="' + rowStyle + display + '">';
 
     // #
-    h += '<td style="text-align:center;font-family:var(--font-mono);font-size:10px;color:var(--text-disabled);padding:7px 4px;">' + (idx + 1) + '</td>';
+    h += '<td style="text-align:center;font-family:var(--font-mono);font-size:10px;color:#9CA3AF;padding:8px 4px;">' + (idx + 1) + '</td>';
 
-    // Name — indented, with toggle
-    h += '<td style="padding:7px 10px 7px ' + (10 + indent) + 'px;">';
+    // Name — indented with toggle + icon
+    h += '<td style="padding:8px 12px 8px ' + (12 + indent) + 'px;">';
     if (r.hasK) {
-      h += '<div class="pi-tog' + (r.isOpen ? ' open' : '') + '" id="hier-tog-' + n.id + '" data-hier-toggle="' + n.id + '" style="display:inline-flex;margin-right:6px;vertical-align:middle;cursor:pointer;">' + (r.isOpen ? '−' : '+') + '</div>';
+      h += '<div class="pi-tog' + (r.isOpen ? ' open' : '') + '" id="hier-tog-' + n.id + '" data-hier-toggle="' + n.id + '" style="display:inline-flex;margin-right:8px;vertical-align:middle;cursor:pointer;">' + (r.isOpen ? '−' : '+') + '</div>';
     } else {
-      h += '<span style="display:inline-block;width:18px;margin-right:6px;"></span>';
+      h += '<span style="display:inline-block;width:20px;margin-right:8px;"></span>';
     }
-    h += '<span style="font-size:' + (isG ? '13px' : '12px') + ';font-weight:' + (isG ? '600' : isE ? '500' : '400') + ';color:var(--text-secondary);">' + n.name + '</span></td>';
+    // Level icon before name
+    var iconColor = typeColors[n.type] || '#6B7280';
+    h += '<span style="display:inline-flex;vertical-align:middle;margin-right:6px;color:' + iconColor + ';">' + EAP.icon(n.type, 14) + '</span>';
+    h += '<span style="font-size:' + (isG ? '13px' : '12px') + ';font-weight:' + (isG ? '600' : isE ? '500' : '400') + ';color:' + (isG ? '#111827' : '#374151') + ';vertical-align:middle;">' + n.name + '</span></td>';
 
-    // Type
-    h += '<td><span style="font-size:9px;font-weight:500;padding:1px 6px;border-radius:3px;background:' + (tc[n.type] || '#94a3b8') + ';color:#fff;text-transform:capitalize;">' + n.type + '</span></td>';
+    // Type — plain text with icon color, no pill
+    h += '<td style="color:' + iconColor + ';font-size:11px;font-weight:400;text-transform:capitalize;">' + n.type + '</td>';
 
     // State
     h += '<td>' + (n.state ? EAP.pill(n.state) : '') + '</td>';
@@ -101,13 +112,8 @@ EAP.setAllHier = function(nodes, v) {
   nodes.forEach(function(n) { EAP.state.openHierarchy[n.id] = v; if (n.children) EAP.setAllHier(n.children, v); });
 };
 
-// Toggle: show/hide children rows by walking the flat DOM
 EAP.toggleHierarchy = function(id) {
   EAP.state.openHierarchy[id] = !EAP.state.openHierarchy[id];
-  var tog = document.getElementById('hier-tog-' + id);
-  var isOpen = EAP.state.openHierarchy[id];
-  if (tog) { tog.textContent = isOpen ? '−' : '+'; tog.classList.toggle('open', isOpen); }
-
-  // Re-render to recalculate visibility (simpler than walking DOM)
+  // Re-render to recalculate visibility
   EAP.render();
 };
