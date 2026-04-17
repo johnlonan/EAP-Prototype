@@ -321,17 +321,175 @@ EAP.drawDependencyLines = function() {
   });
 };
 
-// ── CSS for dropdown animation ─────────────────────────
+// ── CSS for animations ─────────────────────────────────
 (function() {
   var style = document.createElement('style');
-  style.textContent = '@keyframes ddFadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } } .dep-svg { pointer-events: none; }';
+  style.textContent =
+    '@keyframes ddFadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }' +
+    '.dep-svg { pointer-events: none; }' +
+    '.search-dim { opacity: 0.15 !important; transition: opacity 200ms ease; }' +
+    '.search-hit { background: rgba(245,158,11,0.08) !important; transition: background 200ms ease; }' +
+    '@keyframes cardDrop { 0% { transform: scale(1.03); box-shadow: 0 0 0 2px rgba(37,99,235,0.2); } 100% { transform: scale(1); box-shadow: none; } }' +
+    '.card-dropped { animation: cardDrop 250ms ease-out; }';
   document.head.appendChild(style);
 })();
+
+// ── Search ─────────────────────────────────────────────
+EAP.initSearch = function() {
+  document.addEventListener('input', function(e) {
+    if (!e.target.classList.contains('chrome-search')) return;
+    var q = e.target.value.trim().toLowerCase();
+    EAP.applySearch(q);
+  });
+};
+
+EAP.applySearch = function(q) {
+  var content = document.getElementById('content-area');
+  if (!content) return;
+
+  // Clear previous
+  content.querySelectorAll('.search-dim, .search-hit').forEach(function(el) {
+    el.classList.remove('search-dim', 'search-hit');
+  });
+
+  if (!q) return;
+
+  var tab = EAP.state.tab;
+  var hits = 0;
+
+  if (tab === 'Backlog' || tab === 'List') {
+    // Search table rows
+    content.querySelectorAll('.dtbl tbody tr').forEach(function(row) {
+      if (row.textContent.toLowerCase().indexOf(q) !== -1) {
+        row.classList.add('search-hit');
+        hits++;
+        // Expand parent accordion if collapsed
+        var body = row.closest('.pi-body');
+        if (body && !body.classList.contains('open')) {
+          body.classList.add('open');
+          body.style.display = '';
+          var id = body.id.replace('pi-body-', '');
+          EAP.state.openAccordions[id] = true;
+          var tog = document.getElementById('pi-tog-' + id);
+          if (tog) { tog.textContent = '−'; tog.classList.add('open'); }
+        }
+      } else {
+        row.classList.add('search-dim');
+      }
+    });
+  }
+
+  if (tab === 'Board') {
+    // Search board cards
+    content.querySelectorAll('.bcard').forEach(function(card) {
+      if (card.textContent.toLowerCase().indexOf(q) !== -1) {
+        card.classList.add('search-hit');
+        hits++;
+      } else {
+        card.classList.add('search-dim');
+      }
+    });
+  }
+
+  if (tab === 'Hierarchy') {
+    // Search hierarchy rows
+    content.querySelectorAll('.hier-tbl tbody tr').forEach(function(row) {
+      if (row.style.display === 'none') return; // already hidden
+      if (row.textContent.toLowerCase().indexOf(q) !== -1) {
+        row.classList.add('search-hit');
+        hits++;
+      } else {
+        row.classList.add('search-dim');
+      }
+    });
+  }
+};
+
+// ── Board Drag & Drop ──────────────────────────────────
+EAP.initBoardDrag = function() {
+  var content = document.getElementById('content-area');
+  if (!content) return;
+
+  var dragging = null;
+  var dragSource = null;
+
+  // Make all board cards draggable
+  content.querySelectorAll('.bcard').forEach(function(card) {
+    card.setAttribute('draggable', 'true');
+
+    card.addEventListener('dragstart', function(e) {
+      dragging = card;
+      dragSource = card.parentElement;
+      card.style.opacity = '0.4';
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', card.id || '');
+    });
+
+    card.addEventListener('dragend', function() {
+      card.style.opacity = '1';
+      dragging = null;
+      dragSource = null;
+      // Remove all drop highlights
+      content.querySelectorAll('.drop-highlight').forEach(function(el) { el.classList.remove('drop-highlight'); });
+    });
+  });
+
+  // Column/cell drop zones
+  content.querySelectorAll('[style*="min-height"]').forEach(function(zone) {
+    zone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drop-highlight');
+    });
+
+    zone.addEventListener('dragleave', function() {
+      zone.classList.remove('drop-highlight');
+    });
+
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      zone.classList.remove('drop-highlight');
+      if (!dragging || zone === dragSource) return;
+
+      // Move the card to the new zone
+      zone.appendChild(dragging);
+      dragging.style.opacity = '1';
+
+      // Drop animation
+      dragging.classList.add('card-dropped');
+      var cardRef = dragging;
+      setTimeout(function() { cardRef.classList.remove('card-dropped'); }, 300);
+    });
+  });
+
+  // Table row drag (within same table)
+  content.querySelectorAll('.dtbl tbody tr').forEach(function(row) {
+    row.setAttribute('draggable', 'true');
+    row.addEventListener('dragstart', function(e) {
+      dragging = row;
+      row.style.opacity = '0.35';
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragend', function() { row.style.opacity = '1'; dragging = null; });
+    row.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      if (!dragging || row === dragging) return;
+      if (row.parentNode !== dragging.parentNode) return;
+      var rect = row.getBoundingClientRect();
+      if (e.clientY < rect.top + rect.height / 2) {
+        row.parentNode.insertBefore(dragging, row);
+      } else {
+        row.parentNode.insertBefore(dragging, row.nextSibling);
+      }
+    });
+  });
+};
 
 // ── Initialize all interactions ────────────────────────
 EAP.initInteractions = function() {
   EAP.initContextSelector();
   EAP.initSplitResize();
+  EAP.initSearch();
 };
 
 // ── Hook into render cycle ─────────────────────────────
@@ -340,7 +498,10 @@ EAP.render = function() {
   _originalRender();
   // Post-render hooks
   setTimeout(function() {
-    EAP.initDragDrop();
+    EAP.initBoardDrag();
     EAP.drawDependencyLines();
+    // Clear search on tab change
+    var si = document.querySelector('.chrome-search');
+    if (si && si.value) EAP.applySearch(si.value.trim().toLowerCase());
   }, 60);
 };

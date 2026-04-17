@@ -160,7 +160,19 @@ EAP.getInsightsKey = function() {
 };
 
 EAP.getInsights = function() {
-  return EAP.insights[EAP.getInsightsKey()] || EAP.insights['art-Feature-List'] || {};
+  var s = EAP.state;
+  var data = EAP.insights[EAP.getInsightsKey()] || EAP.insights['art-Feature-' + s.tab] || {};
+  var result = {};
+  for (var k in data) result[k] = data[k];
+
+  // Gauge + team capacity only at ART context + Feature level + List or Board tab
+  var showCapacity = (s.context === 'art' && s.tab !== 'Backlog' && s.tab !== 'Hierarchy');
+  if (!showCapacity) { delete result.gauge; delete result.teams; }
+
+  // Team bars only at ART context (not team, portfolio, ST)
+  if (s.context !== 'art') { delete result.teams; }
+
+  return result;
 };
 
 // ── Helpers ────────────────────────────────────────────
