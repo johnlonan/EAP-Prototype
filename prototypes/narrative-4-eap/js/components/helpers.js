@@ -22,6 +22,17 @@ EAP.typeCell = function(type) {
   return '<span class="type-cell" style="color:' + color + ';">' + iconHtml + ' ' + type + '</span>';
 };
 
+// Avatar — renders image or initials fallback
+EAP.avatar = function(ownerKey, size) {
+  var sz = size || 24;
+  var p = EAP.people ? EAP.people[ownerKey] : null;
+  if (!p) return '';
+  if (p.avatar) {
+    return '<img src="' + p.avatar + '" alt="' + p.initials + '" title="' + p.name + '" style="width:' + sz + 'px;height:' + sz + 'px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.8);">';
+  }
+  return '<span title="' + p.name + '" style="display:inline-flex;align-items:center;justify-content:center;width:' + sz + 'px;height:' + sz + 'px;border-radius:50%;background:' + p.color + ';color:#fff;font-size:' + Math.round(sz * 0.4) + 'px;font-weight:600;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.8);">' + p.initials + '</span>';
+};
+
 // State pill
 EAP.pill = function(st) { return '<span class="st-pill ' + EAP.stateClass(st) + '">' + st + '</span>'; };
 

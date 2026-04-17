@@ -226,13 +226,54 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ins-row:last-child { margin-bottom: 0; }
 .ins-row:hover { background: rgba(0,0,0,0.02); }
 .ins-row.urgent { border-left-color: #DC2626; }
-.ins-row.watch { border-left-color: #D97706; }
+.ins-row.watch { border-left-color: #F59E0B; }
 .ins-row.ok { border-left-color: rgba(0,0,0,0.06); }
 .ins-t { font-size: 12px; line-height: 1.4; color: #111827; font-weight: 400; }
 .ins-row.urgent .ins-t { font-weight: 500; }
 .ins-s { font-size: 11px; color: #6B7280; line-height: 1.4; margin-top: 4px; font-weight: 400; }
 .ins-a { font-size: 11px; font-weight: 500; color: var(--color-primary); cursor: pointer; margin-top: 4px; display: inline-block; text-decoration: none; }
 .ins-a:hover { text-decoration: underline; }
+
+/* ═══ BOARD CARDS ═══ */
+.bcard {
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  cursor: grab;
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+.bcard:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.bcard-blocked {
+  background: rgba(220,38,38,0.04);
+  border-color: rgba(220,38,38,0.2);
+  border-top: 2px solid #DC2626;
+}
+.bcard-atrisk {
+  background: rgba(245,158,11,0.04);
+  border-color: rgba(245,158,11,0.15);
+  border-top: 2px solid #F59E0B;
+}
+.bcard-done {
+  background: rgba(22,163,74,0.03);
+  border-color: rgba(22,163,74,0.1);
+  opacity: 0.65;
+}
+.bcard-title { font-size: 12px; font-weight: 500; color: #374151; line-height: 1.35; margin-bottom: 6px; }
+.bcard-compact .bcard-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.bcard-banner { font-size: 10px; font-weight: 500; display: flex; align-items: center; gap: 4px; margin-bottom: 4px; padding: 3px 6px; border-radius: 4px; }
+.bcard-banner-red { color: #DC2626; background: rgba(220,38,38,0.06); }
+.bcard-banner-amber { color: #D97706; background: rgba(245,158,11,0.06); }
+.bcard-meta { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.bcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.bcard-compact .bcard-footer { margin-top: 4px; }
+.bcard-id { font-size: 10px; font-family: var(--font-mono); color: #9CA3AF; }
+.bcard-pts { font-size: 10px; font-family: var(--font-mono); color: #6B7280; background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.bcard-owner { font-size: 10px; color: #9CA3AF; }
+.bcard-progress { margin-top: 4px; }
+.bcard-compact .bcard-progress { display: none; }
+.bcard-compact .bcard-meta .st-pill { font-size: 9px; padding: 1px 6px; }
 
 /* ═══ HIERARCHY SHOW/HIDE TOGGLES ═══ */
 .hier-check-pill {

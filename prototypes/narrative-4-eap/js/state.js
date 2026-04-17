@@ -26,6 +26,7 @@ EAP.state = {
 
   // Board sub-views
   boardView: 'grid',                 // grid | track (WorkItem only)
+  boardDensity: 'default',           // default | compact (per tab session)
 
   // Accordion open states
   openAccordions: {},

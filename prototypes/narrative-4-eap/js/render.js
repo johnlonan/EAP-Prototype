@@ -77,6 +77,7 @@ EAP.renderFilterBar = function() {
   if (s.tab === 'List') h += '<span class="fbar-vtog' + (s.splitView ? ' on' : '') + '" id="split-toggle">' + EAP.icon('columns', 14) + ' Split</span>';
   if (s.tab === 'Board' && s.level === 'WorkItem') h += '<span class="fbar-vtog' + (s.boardView === 'track' ? ' on' : '') + '" id="track-toggle">Track</span>';
   if (s.tab === 'Board' && (s.level === 'Feature' || s.level === 'WorkItem')) h += '<span class="fbar-vtog' + (s.showDeps ? ' on' : '') + '" id="deps-toggle">Dependencies</span>';
+  if (s.tab === 'Board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">Compact</span>';
   h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('info', 14) + ' Insights</span>';
 
   el.innerHTML = h;
@@ -93,6 +94,8 @@ EAP.renderFilterBar = function() {
   if (tb) tb.addEventListener('click', function() { EAP.state.boardView = EAP.state.boardView === 'track' ? 'grid' : 'track'; EAP.render(); });
   var db = document.getElementById('deps-toggle');
   if (db) db.addEventListener('click', function() { EAP.state.showDeps = !EAP.state.showDeps; EAP.render(); });
+  var dn = document.getElementById('density-toggle');
+  if (dn) dn.addEventListener('click', function() { EAP.state.boardDensity = EAP.state.boardDensity === 'compact' ? 'default' : 'compact'; EAP.render(); });
 
   // Hierarchy show/hide toggles
   document.querySelectorAll('[data-hier-check]').forEach(function(pill) {

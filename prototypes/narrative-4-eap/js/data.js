@@ -429,6 +429,17 @@ EAP.insights = {
   }
 };
 
+// ── People (avatars + initials) ────────────────────────
+EAP.people = {
+  'Ananya': {name:'Ananya Krishnan', initials:'AK', avatar:'../../assets/images/avatar-ananya.png', color:'#0d9488'},
+  'Kiran':  {name:'Kiran Patel',     initials:'KP', avatar:'../../assets/images/avatar-kiran.png',  color:'#0e4e69'},
+  'Dev2':   {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-dev2.png',   color:'#6d28d9'},
+  'Dev3':   {name:'Marcus Chen',     initials:'MC', avatar:'../../assets/images/avatar-dev3.png',   color:'#D97706'},
+  'Dev4':   {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#DC2626'},
+  'Raj':    {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-dev2.png',   color:'#6d28d9'},
+  'Priya':  {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#DC2626'}
+};
+
 // ── Team capacity ──────────────────────────────────────
 EAP.teamCapacity = {
   'Auth Team':       {sp2:80,sp3:75,sp4:70,ip:40},
