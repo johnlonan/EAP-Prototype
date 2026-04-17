@@ -234,6 +234,21 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ins-a { font-size: 11px; font-weight: 500; color: var(--color-primary); cursor: pointer; margin-top: 4px; display: inline-block; text-decoration: none; }
 .ins-a:hover { text-decoration: underline; }
 
+/* ═══ TRACK FILTER CHIPS ═══ */
+.track-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 16px;
+  font-size: 12px; font-weight: 400; color: #6B7280;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.4);
+  cursor: pointer; transition: all 120ms ease;
+  white-space: nowrap;
+}
+.track-chip:hover { background: rgba(255,255,255,0.7); color: #374151; border-color: rgba(0,0,0,0.12); }
+.track-chip.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+.track-chip.active img { border-color: rgba(255,255,255,0.5); }
+.track-chip svg { flex-shrink: 0; }
+
 /* ═══ BOARD CARDS ═══ */
 .bcard {
   background: rgba(255,255,255,0.7);

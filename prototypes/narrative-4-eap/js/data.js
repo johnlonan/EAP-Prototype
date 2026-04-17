@@ -328,6 +328,13 @@ EAP.featureDeps = [
   {from:'f14', to:'f1',  type:'risk',      reason:'Biometric Auth for Returning Users (PI 28) depends on Fingerprint Login (PI 26) — tight timeline'}
 ];
 
+// Work Item dependencies (cross-sprint)
+EAP.wiDeps = [
+  {from:'ls8', to:'ls6', type:'conflict', reason:'Auth API integration (Sprint 2) blocked by PIN fallback (Sprint 2) — same sprint, not sequenced'},
+  {from:'ls15', to:'ls9', type:'risk', reason:'Retry mechanism (Sprint 3) depends on payment validation (Sprint 2) — adjacent sprints, sp2 item in review'},
+  {from:'ls22', to:'ls15', type:'ok', reason:'Recurring payment (Sprint 4) depends on retry mechanism (Sprint 3) — correctly sequenced'}
+];
+
 // ═══════════════════════════════════════════════════════
 // INSIGHTS — per view/level
 // ═══════════════════════════════════════════════════════
@@ -431,12 +438,12 @@ EAP.insights = {
 
 // ── People (avatars + initials) ────────────────────────
 EAP.people = {
-  'Ananya': {name:'Ananya Krishnan', initials:'AK', avatar:'../../assets/images/avatar-ananya.png', color:'#0d9488'},
-  'Kiran':  {name:'Kiran Patel',     initials:'KP', avatar:'../../assets/images/avatar-kiran.png',  color:'#0e4e69'},
-  'Dev2':   {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-dev2.png',   color:'#6d28d9'},
-  'Dev3':   {name:'Marcus Chen',     initials:'MC', avatar:'../../assets/images/avatar-dev3.png',   color:'#D97706'},
+  'Ananya': {name:'Ananya Krishnan', initials:'AK', avatar:'../../assets/images/avatar-3.png', color:'#0d9488'},
+  'Kiran':  {name:'Kiran Patel',     initials:'KP', avatar:'../../assets/images/avatar-1.png', color:'#0e4e69'},
+  'Dev2':   {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-2.png', color:'#6d28d9'},
+  'Dev3':   {name:'Marcus Chen',     initials:'MC', avatar:'../../assets/images/avatar-4.png', color:'#D97706'},
   'Dev4':   {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#DC2626'},
-  'Raj':    {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-dev2.png',   color:'#6d28d9'},
+  'Raj':    {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-2.png', color:'#6d28d9'},
   'Priya':  {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#DC2626'}
 };
 

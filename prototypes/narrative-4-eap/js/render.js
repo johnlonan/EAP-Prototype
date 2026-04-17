@@ -58,26 +58,31 @@ EAP.renderFilterBar = function() {
       }).join('') +
       '<div class="fbar-spacer"></div>';
   } else {
-    h += '<span class="fbar-label">Level</span><select class="fbar-select" id="level-select">' +
+    // Level icon prefix + select
+    var levelIconKey = s.level === 'WorkItem' ? 'story' : s.level.toLowerCase();
+    var levelColor = EAP._typeColors ? (EAP._typeColors[s.level] || '#6B7280') : '#6B7280';
+    h += '<span class="fbar-label">Level</span>' +
+      '<span style="display:inline-flex;align-items:center;gap:4px;color:' + levelColor + ';">' + EAP.icon(levelIconKey, 14) + '</span>' +
+      '<select class="fbar-select" id="level-select">' +
       levels.map(function(l) { return '<option value="' + l.value + '"' + (s.level === l.value ? ' selected' : '') + '>' + l.label + '</option>'; }).join('') +
       '</select>';
 
     if ((s.tab === 'Board' || s.tab === 'List') && s.level === 'WorkItem') {
-      h += '<div class="fbar-sep"></div><span class="fbar-label">PI</span>' +
+      h += '<div class="fbar-sep"></div><span class="fbar-label">' + EAP.icon('calendar', 12) + '</span>' +
         '<select class="fbar-select" id="pi-select"><option>PI 26 — Current</option><option>PI 25</option><option>PI 24</option></select>';
     }
 
     h += '<div class="fbar-sep"></div>' +
-      '<button class="fbar-filter">' + EAP.icon('filter', 14) + 'Filter</button>' +
-      '<span class="fbar-chip' + (s.mineOnly ? ' on' : '') + '" id="mine-toggle">Mine only' + (s.mineOnly ? ' <span class="cx">' + EAP.icon('x', 12) + '</span>' : '') + '</span>' +
+      '<button class="fbar-filter">' + EAP.icon('filter', 14) + ' Filter</button>' +
+      '<span class="fbar-chip' + (s.mineOnly ? ' on' : '') + '" id="mine-toggle">' + EAP.icon('user', 12) + ' Mine only' + (s.mineOnly ? ' <span class="cx">' + EAP.icon('x', 10) + '</span>' : '') + '</span>' +
       '<div class="fbar-spacer"></div>';
   }
 
-  // Right-side toggles
+  // Right-side toggles — all with icons
   if (s.tab === 'List') h += '<span class="fbar-vtog' + (s.splitView ? ' on' : '') + '" id="split-toggle">' + EAP.icon('columns', 14) + ' Split</span>';
-  if (s.tab === 'Board' && s.level === 'WorkItem') h += '<span class="fbar-vtog' + (s.boardView === 'track' ? ' on' : '') + '" id="track-toggle">Track</span>';
-  if (s.tab === 'Board' && (s.level === 'Feature' || s.level === 'WorkItem')) h += '<span class="fbar-vtog' + (s.showDeps ? ' on' : '') + '" id="deps-toggle">Dependencies</span>';
-  if (s.tab === 'Board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">Compact</span>';
+  if (s.tab === 'Board' && s.level === 'WorkItem') h += '<span class="fbar-vtog' + (s.boardView === 'track' ? ' on' : '') + '" id="track-toggle">' + EAP.icon('layout-list', 14) + ' Track</span>';
+  if (s.tab === 'Board' && (s.level === 'Feature' || s.level === 'WorkItem')) h += '<span class="fbar-vtog' + (s.showDeps ? ' on' : '') + '" id="deps-toggle">' + EAP.icon('link', 14) + ' Dependencies</span>';
+  if (s.tab === 'Board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">' + EAP.icon('rows', 14) + ' Compact</span>';
   h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('info', 14) + ' Insights</span>';
 
   el.innerHTML = h;
@@ -134,6 +139,14 @@ EAP.renderContent = function() {
   // Wire hierarchy toggles
   el.querySelectorAll('[data-hier-toggle]').forEach(function(t) {
     t.addEventListener('click', function(e) { e.stopPropagation(); EAP.toggleHierarchy(t.dataset.hierToggle); });
+  });
+
+  // Wire track member/team chips
+  el.querySelectorAll('[data-track-member]').forEach(function(chip) {
+    chip.addEventListener('click', function() { EAP.state.trackMember = chip.dataset.trackMember; EAP.render(); });
+  });
+  el.querySelectorAll('[data-track-team]').forEach(function(chip) {
+    chip.addEventListener('click', function() { EAP.state.trackTeam = chip.dataset.trackTeam; EAP.render(); });
   });
 
   // Wire hierarchy expand/collapse buttons

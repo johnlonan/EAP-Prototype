@@ -129,9 +129,16 @@ EAP.renderWIGrid = function() {
   var teams = ['Auth Team', 'Payments Team', 'Fraud Team', 'Mobile Exp Team', 'Accounts Team', 'Onboarding Team'];
 
   var h = '<div style="flex:1;overflow:auto;">';
+  var isFirstTeam = true;
   teams.forEach(function(team) {
     var cap = EAP.teamCapacity[team] || {};
-    h += '<div style="margin-bottom:16px;"><div style="padding:8px 12px;background:rgba(14,78,105,0.12);color:#374151;border-radius:8px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">' + team + '</div>';
+    var totalItems = cols.reduce(function(a, sp) { return a + (sp.items || []).filter(function(i) { return i.team === team; }).length; }, 0);
+    h += '<div style="margin-bottom:16px;">' +
+      '<div style="padding:8px 12px;background:rgba(14,78,105,0.15);border-left:3px solid var(--color-primary);color:#374151;border-radius:0 8px 8px 0;font-size:11px;font-weight:500;letter-spacing:0.02em;margin-bottom:6px;display:flex;align-items:center;gap:8px;">' +
+      '<span style="display:inline-flex;color:var(--color-primary);">' + EAP.icon('users', 14) + '</span>' +
+      '<span>' + team + '</span>' +
+      '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;font-weight:400;">' + totalItems + ' items</span>' +
+      '</div>';
     h += '<div style="display:flex;gap:8px;width:100%;">';
     cols.forEach(function(sp) {
       var items = (sp.items || []).filter(function(i) { return i.team === team; });
@@ -143,7 +150,9 @@ EAP.renderWIGrid = function() {
       h += '<div style="' + colHd(isA) + 'border-radius:8px 8px 0 0;padding:6px 10px;flex-direction:column;align-items:stretch;gap:4px;">';
       h += '<div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:10px;font-weight:500;">' + sp.name + '</span><span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;">' + items.length + '</span></div>';
       if (capVal !== null && capVal !== undefined) {
-        h += '<div style="display:flex;align-items:center;gap:4px;"><div style="flex:1;height:3px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;"><div style="height:100%;width:' + Math.min(capVal, 100) + '%;background:' + capColor + ';border-radius:2px;opacity:0.6;"></div></div><span style="font-size:9px;font-family:var(--font-mono);color:' + (isA ? 'rgba(255,255,255,0.7)' : capColor) + ';">' + capVal + '%</span></div>';
+        h += '<div style="display:flex;align-items:center;gap:4px;">';
+        if (isFirstTeam && sp.id !== 'backlog') h += '<span style="font-size:8px;color:' + (isA ? 'rgba(255,255,255,0.5)' : '#9CA3AF') + ';white-space:nowrap;">Cap</span>';
+        h += '<div style="flex:1;height:4px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;"><div style="height:100%;width:' + Math.min(capVal, 100) + '%;background:' + capColor + ';border-radius:2px;opacity:0.7;"></div></div><span style="font-size:9px;font-family:var(--font-mono);color:' + (isA ? 'rgba(255,255,255,0.7)' : capColor) + ';">' + capVal + '%</span></div>';
       }
       h += '</div>';
       h += '<div style="' + CB + 'border-radius:0 0 8px 8px;padding:6px;min-height:50px;">';
@@ -151,22 +160,57 @@ EAP.renderWIGrid = function() {
       h += '</div></div>';
     });
     h += '</div></div>';
+    isFirstTeam = false;
   });
   return h + '</div>';
 };
 
 // ── Track view (9-column workflow) ─────────────────────
 EAP.renderTrackBoard = function() {
+  var s = EAP.state;
+  var isTeamCtx = (s.context === 'team');
+
+  // Member/team filter chips
+  var filterHtml = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;">';
+  if (isTeamCtx) {
+    // Team context: show individual members
+    var members = ['Kiran', 'Dev2', 'Dev3', 'Dev4'];
+    var activeMember = s.trackMember || 'All';
+    filterHtml += '<span class="track-chip' + (activeMember === 'All' ? ' active' : '') + '" data-track-member="All">' + EAP.icon('users', 14) + ' All</span>';
+    members.forEach(function(m) {
+      var p = EAP.people[m];
+      if (!p) return;
+      filterHtml += '<span class="track-chip' + (activeMember === m ? ' active' : '') + '" data-track-member="' + m + '">' + EAP.avatar(m, 20) + ' ' + p.name + '</span>';
+    });
+  } else {
+    // ART context: show teams
+    var teams = ['Auth Team', 'Payments Team', 'Fraud Team', 'Mobile Exp Team', 'Accounts Team', 'Onboarding Team'];
+    var activeTeam = s.trackTeam || 'All';
+    filterHtml += '<span class="track-chip' + (activeTeam === 'All' ? ' active' : '') + '" data-track-team="All">' + EAP.icon('users', 14) + ' All Teams</span>';
+    teams.forEach(function(t) {
+      filterHtml += '<span class="track-chip' + (activeTeam === t ? ' active' : '') + '" data-track-team="' + t + '">' + EAP.icon('user', 14) + ' ' + t + '</span>';
+    });
+  }
+  filterHtml += '</div>';
+
   var all = [];
   EAP.workItems.sprints.forEach(function(sp) { all = all.concat(sp.items || []); });
   all = all.concat(EAP.getBacklogFlat());
+
+  // Apply member/team filter
+  if (isTeamCtx && s.trackMember && s.trackMember !== 'All') {
+    all = all.filter(function(i) { return i.owner === s.trackMember; });
+  }
+  if (!isTeamCtx && s.trackTeam && s.trackTeam !== 'All') {
+    all = all.filter(function(i) { return i.team === s.trackTeam; });
+  }
   var bk = {};
   EAP.trackColumns.forEach(function(c) { bk[c] = []; });
   all.forEach(function(i) { var c = i.state; if (c === 'Planned' || c === 'To Do') c = 'Draft'; if (bk[c]) bk[c].push(i); else bk.Draft.push(i); });
 
   var colBorder = {'Draft':'#9CA3AF','Ready':'#6B7280','In Progress':'#2563EB','In Review':'#D97706','Testing':'#D97706','Ready for Acceptance':'#7c3aed','Accepted':'#16A34A','Complete':'#16A34A','Cancelled':'#9CA3AF'};
 
-  var h = '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:8px;padding:4px 2px 16px;width:100%;">';
+  var h = filterHtml + '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:8px;padding:4px 2px 16px;width:100%;">';
   EAP.trackColumns.forEach(function(col) {
     var items = bk[col] || [];
     var bc = colBorder[col] || '#9CA3AF';

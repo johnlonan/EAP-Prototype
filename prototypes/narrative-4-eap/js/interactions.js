@@ -56,9 +56,15 @@ EAP.buildContextTree = function(query) {
   function row(name, type, id, depth, isActive) {
     var indent = depth * 16;
     var typeLabels = { portfolio: 'Portfolio', 'solution-train': 'Sol. Train', art: 'ART', team: 'Team' };
-    return '<div class="ctx-row' + (isActive ? ' ctx-active' : '') + '" data-ctx-type="' + type + '" data-ctx-name="' + name.replace(/"/g, '&quot;') + '" data-ctx-id="' + id + '" style="padding:7px 12px 7px ' + (12 + indent) + 'px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;transition:background 100ms ease;' + (isActive ? 'background:var(--color-primary);color:#fff;' : '') + '">' +
-      '<span style="font-size:9px;text-transform:uppercase;letter-spacing:0.04em;padding:1px 5px;border-radius:2px;flex-shrink:0;' + (isActive ? 'background:rgba(255,255,255,0.2);color:#fff;' : 'background:rgba(0,0,0,0.05);color:var(--text-tertiary);') + '">' + typeLabels[type] + '</span>' +
-      '<span style="flex:1;font-weight:' + (isActive ? '600' : '400') + ';color:' + (isActive ? '#fff' : 'var(--text-primary)') + ';">' + name + '</span>' +
+    // Tree line stub for depth > 0
+    var treeLine = '';
+    if (depth > 0) {
+      treeLine = '<span style="display:inline-flex;align-items:center;width:12px;flex-shrink:0;color:' + (isActive ? 'rgba(255,255,255,0.3)' : '#E5E7EB') + ';">└</span>';
+    }
+    return '<div class="ctx-row' + (isActive ? ' ctx-active' : '') + '" data-ctx-type="' + type + '" data-ctx-name="' + name.replace(/"/g, '&quot;') + '" data-ctx-id="' + id + '" style="padding:7px 12px 7px ' + (12 + indent) + 'px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;transition:background 100ms ease;' + (isActive ? 'background:var(--color-primary);color:#fff;' : '') + '">' +
+      treeLine +
+      '<span style="font-size:9px;text-transform:uppercase;letter-spacing:0.04em;padding:1px 5px;border-radius:2px;flex-shrink:0;' + (isActive ? 'background:rgba(255,255,255,0.2);color:#fff;' : 'background:rgba(0,0,0,0.05);color:#6B7280;') + '">' + typeLabels[type] + '</span>' +
+      '<span style="flex:1;font-weight:' + (isActive ? '600' : '400') + ';color:' + (isActive ? '#fff' : '#374151') + ';">' + name + '</span>' +
       '</div>';
   }
 
@@ -197,7 +203,7 @@ EAP.initDragDrop = function() {
 // ── Dependency Lines (SVG) ─────────────────────────────
 EAP.drawDependencyLines = function() {
   if (!EAP.state.showDeps || EAP.state.tab !== 'Board') return;
-  if (EAP.state.level !== 'Feature') return;
+  if (EAP.state.level !== 'Feature' && EAP.state.level !== 'WorkItem') return;
 
   // Wait for DOM to settle
   requestAnimationFrame(function() {
@@ -216,7 +222,8 @@ EAP.drawDependencyLines = function() {
 
     var bRect = board.getBoundingClientRect();
 
-    EAP.featureDeps.forEach(function(dep) {
+    var deps = EAP.state.level === 'WorkItem' ? (EAP.wiDeps || []) : (EAP.featureDeps || []);
+    deps.forEach(function(dep) {
       var fromEl = document.getElementById('fcard-' + dep.from);
       var toEl = document.getElementById('fcard-' + dep.to);
       if (!fromEl || !toEl) return;
