@@ -462,7 +462,7 @@ EAP.initBoardDrag = function() {
     });
   });
 
-  // Table row drag (within same table)
+  // Table row drag (within same table) with drop animation
   content.querySelectorAll('.dtbl tbody tr').forEach(function(row) {
     row.setAttribute('draggable', 'true');
     row.addEventListener('dragstart', function(e) {
@@ -470,7 +470,14 @@ EAP.initBoardDrag = function() {
       row.style.opacity = '0.35';
       e.dataTransfer.effectAllowed = 'move';
     });
-    row.addEventListener('dragend', function() { row.style.opacity = '1'; dragging = null; });
+    row.addEventListener('dragend', function() {
+      row.style.opacity = '1';
+      // Drop animation on the row
+      row.classList.add('row-dropped');
+      var ref = row;
+      setTimeout(function() { ref.classList.remove('row-dropped'); }, 350);
+      dragging = null;
+    });
     row.addEventListener('dragover', function(e) {
       e.preventDefault();
       if (!dragging || row === dragging) return;
