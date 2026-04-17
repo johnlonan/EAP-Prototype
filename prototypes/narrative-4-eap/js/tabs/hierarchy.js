@@ -41,13 +41,14 @@ EAP.renderHierarchy = function() {
     '<div class="gpanel-scroll">' +
     '<table class="dtbl hier-tbl"><thead><tr>' +
     '<th style="width:3%;">#</th>' +
-    '<th style="width:30%;">Name</th>' +
-    '<th style="width:9%;">Type</th>' +
-    '<th style="width:11%;">State</th>' +
-    '<th style="width:14%;">% Complete</th>' +
+    '<th style="width:28%;">Name</th>' +
+    '<th style="width:8%;">Type</th>' +
+    '<th style="width:10%;">State</th>' +
+    '<th style="width:12%;">% Complete</th>' +
     '<th style="width:6%;">Pts</th>' +
-    '<th style="width:11%;">Owner</th>' +
-    '<th style="width:11%;">Team</th>' +
+    '<th style="width:10%;">Owner</th>' +
+    '<th style="width:10%;">Team</th>' +
+    '<th style="width:10%;">PI / Sprint</th>' +
     '</tr></thead><tbody>';
 
   // Type icon + text (no coloured pill)
@@ -100,6 +101,22 @@ EAP.renderHierarchy = function() {
 
     // Team
     h += '<td><span class="tm">' + (n.team || '') + '</span></td>';
+
+    // PI / Sprint — show for features and stories/defects
+    var piSprint = '';
+    if (n.type === 'feature') {
+      // Look up which PI this feature is in
+      var matchF = EAP.allFeatures.filter(function(f){ return f.name === n.name && f.pi; })[0];
+      if (matchF) {
+        var piObj = EAP.features.pis.filter(function(p){ return p.id === matchF.pi; })[0];
+        piSprint = piObj ? piObj.name : '';
+      }
+    } else if (n.type === 'story' || n.type === 'defect') {
+      piSprint = 'Sprint 2'; // Current sprint for in-progress items
+      if (n.state === 'To Do' || n.state === 'Planned') piSprint = '';
+      if (n.state === 'Done') piSprint = 'Sprint 1';
+    }
+    h += '<td><span style="font-size:10px;color:#6B7280;">' + piSprint + '</span></td>';
 
     h += '</tr>';
   });

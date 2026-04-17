@@ -97,14 +97,14 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .dg svg { display: block; }
 .item-nm { font-weight: 500; color: #374151; line-height: 1.4; white-space: normal; }
 
-/* WorkItem grouped table */
+/* WorkItem grouped table — # | Number | Name | Type | Epic | Pts */
 .wi-grp-tbl { table-layout: fixed; }
-.wi-grp-tbl th:nth-child(1), .wi-grp-tbl td:nth-child(1) { width: 24px; padding: 8px 4px; }
-.wi-grp-tbl th:nth-child(2), .wi-grp-tbl td:nth-child(2) { width: 120px; }
-.wi-grp-tbl th:nth-child(3), .wi-grp-tbl td:nth-child(3) { }
-.wi-grp-tbl th:nth-child(4), .wi-grp-tbl td:nth-child(4) { width: 80px; }
-.wi-grp-tbl th:nth-child(5), .wi-grp-tbl td:nth-child(5) { width: 48px; }
-.wi-grp-tbl th:nth-child(6), .wi-grp-tbl td:nth-child(6) { width: 80px; }
+.wi-grp-tbl th:nth-child(1), .wi-grp-tbl td:nth-child(1) { width: 3%; padding: 8px 4px; }  /* drag */
+.wi-grp-tbl th:nth-child(2), .wi-grp-tbl td:nth-child(2) { width: 14%; }                   /* Number */
+.wi-grp-tbl th:nth-child(3), .wi-grp-tbl td:nth-child(3) { width: 38%; }                   /* Name */
+.wi-grp-tbl th:nth-child(4), .wi-grp-tbl td:nth-child(4) { width: 12%; }                   /* Type */
+.wi-grp-tbl th:nth-child(5), .wi-grp-tbl td:nth-child(5) { width: 25%; }                   /* Epic */
+.wi-grp-tbl th:nth-child(6), .wi-grp-tbl td:nth-child(6) { width: 8%; }                    /* Pts */
 
 /* PI table column alignment */
 .pi-pad .dtbl { table-layout: fixed; }

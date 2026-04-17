@@ -156,16 +156,33 @@ EAP.renderTrackBoard = function() {
   EAP.trackColumns.forEach(function(c) { bk[c] = []; });
   all.forEach(function(i) { var c = i.state; if (c === 'Planned' || c === 'To Do') c = 'Draft'; if (bk[c]) bk[c].push(i); else bk.Draft.push(i); });
 
+  // Column border colours by workflow stage
+  var colBorder = {'Draft':'#9CA3AF','Ready':'#6B7280','In Progress':'#2563EB','In Review':'#D97706','Testing':'#D97706','Ready for Acceptance':'#7c3aed','Accepted':'#16A34A','Complete':'#16A34A','Cancelled':'#9CA3AF'};
+
   var h = '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:8px;padding:4px 2px 16px;width:100%;">';
   EAP.trackColumns.forEach(function(col) {
     var items = bk[col] || [];
+    var bc = colBorder[col] || '#9CA3AF';
     h += '<div style="flex:1;min-width:140px;display:flex;flex-direction:column;">';
-    h += '<div style="' + colHd(false) + 'border-radius:10px 10px 0 0;padding:8px 10px;"><span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.03em;">' + col + '</span><span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;">' + items.length + '</span></div>';
+    // Column header with bottom accent
+    h += '<div style="padding:8px 10px;border-radius:10px 10px 0 0;background:rgba(14,78,105,0.08);border-bottom:3px solid ' + bc + ';display:flex;align-items:center;justify-content:space-between;">';
+    h += '<span style="font-size:10px;font-weight:500;color:#374151;text-transform:uppercase;letter-spacing:0.03em;">' + col + '</span>';
+    h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;font-variant-numeric:tabular-nums;">' + items.length + '</span></div>';
+    // Column body
     h += '<div style="' + CB + 'border-radius:0 0 10px 10px;min-height:80px;">';
     items.forEach(function(wi) {
-      h += '<div style="' + CS + 'padding:8px;font-size:11px;"><div style="font-weight:500;color:var(--text-secondary);line-height:1.3;margin-bottom:4px;">' + wi.name + '</div>';
-      if (wi.pts) h += '<span class="sz">' + wi.pts + 'pt</span> ';
-      if (wi.owner) h += '<span class="par">' + wi.owner + '</span>';
+      var wiStyle = (wi.blocked || wi.state === 'Blocked') ? CS_BLOCKED : CS;
+      h += '<div style="' + wiStyle + 'padding:8px;">';
+      if (wi.blocked || wi.state === 'Blocked') {
+        h += '<div style="font-size:9px;font-weight:500;color:#DC2626;margin-bottom:3px;">' + (wi.blockReason || 'Blocked') + '</div>';
+      }
+      h += '<div style="font-weight:500;color:#374151;font-size:11px;line-height:1.3;margin-bottom:4px;">' + wi.name + '</div>';
+      h += '<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">';
+      if (wi.pts) h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;background:rgba(0,0,0,0.04);padding:1px 4px;border-radius:3px;">' + wi.pts + 'pt</span>';
+      if (wi.owner) h += '<span style="font-size:10px;color:#9CA3AF;">' + wi.owner + '</span>';
+      if (wi.team) h += '<span style="font-size:9px;color:#9CA3AF;">· ' + wi.team + '</span>';
+      h += '</div>';
+      if (wi.pct > 0) h += '<div style="margin-top:4px;">' + EAP.pbar(wi.pct, wi.state) + '</div>';
       h += '</div>';
     });
     h += '</div></div>';

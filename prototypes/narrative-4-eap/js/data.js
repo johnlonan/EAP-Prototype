@@ -395,11 +395,13 @@ EAP.insights = {
     ]
   },
   'art-Feature-Hierarchy': {
+    // No gauge or team data — strategy signals only
     signals: [
       {level:'urgent', title:'Goal 2 at risk — only 12% progress vs 42% for Goal 1', desc:'Cost reduction goal falling behind. No Features in execution for Customer Self-Service Expansion Epic. Strategic imbalance growing.', action:'Rebalance portfolio'},
       {level:'urgent', title:'Customer Self-Service Expansion has 0 Features defined', desc:'This is the primary Epic for Goal 2. Without scoping, the goal cannot recover this PI.', action:'Start scoping'},
       {level:'watch',  title:'Open Banking API Programme in Review with no breakdown', desc:'PSD3 deadline Q3 2026. Without Capability/Feature breakdown, delivery timeline is unknown.', action:'Break down into Capabilities'},
       {level:'watch',  title:'Next-Gen Mobile Banking has 3 unassigned backlog Features', desc:'Epic at 42% but pipeline thinning. Teams will have nothing to pull in PI 27.', action:'Assign teams'},
+      {level:'watch',  title:'2 Epics with no Features or Capabilities defined', desc:'Customer Self-Service and Open Banking are empty containers. Need breakdown before PI 27 planning.', action:'Schedule scoping'},
       {level:'ok',     title:'Goal 1 on track at 42%', desc:'Digital bank goal progressing. PI 26 commitments aligned. 4 of 7 Features in execution.', action:''}
     ]
   },
