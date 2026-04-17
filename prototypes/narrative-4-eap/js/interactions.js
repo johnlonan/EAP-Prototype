@@ -463,30 +463,45 @@ EAP.initBoardDrag = function() {
   });
 
   // Table row drag (within same table) with drop animation
+  var rowDragging = null;
+  var rowMoved = false;
   content.querySelectorAll('.dtbl tbody tr').forEach(function(row) {
     row.setAttribute('draggable', 'true');
     row.addEventListener('dragstart', function(e) {
-      dragging = row;
+      e.stopPropagation();
+      rowDragging = row;
+      rowMoved = false;
       row.style.opacity = '0.35';
       e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', 'row');
     });
     row.addEventListener('dragend', function() {
       row.style.opacity = '1';
-      // Drop animation on the row
-      row.classList.add('row-dropped');
-      var ref = row;
-      setTimeout(function() { ref.classList.remove('row-dropped'); }, 350);
-      dragging = null;
+      if (rowMoved) {
+        // Flash animation — apply directly to each td
+        var tds = row.querySelectorAll('td');
+        tds.forEach(function(td) {
+          td.style.transition = 'background 350ms ease-out';
+          td.style.background = 'rgba(37,99,235,0.08)';
+        });
+        setTimeout(function() {
+          tds.forEach(function(td) { td.style.background = ''; });
+          setTimeout(function() { tds.forEach(function(td) { td.style.transition = ''; }); }, 100);
+        }, 350);
+      }
+      rowDragging = null;
+      rowMoved = false;
     });
     row.addEventListener('dragover', function(e) {
       e.preventDefault();
-      if (!dragging || row === dragging) return;
-      if (row.parentNode !== dragging.parentNode) return;
+      if (!rowDragging || row === rowDragging) return;
+      if (row.parentNode !== rowDragging.parentNode) return;
+      rowMoved = true;
       var rect = row.getBoundingClientRect();
       if (e.clientY < rect.top + rect.height / 2) {
-        row.parentNode.insertBefore(dragging, row);
+        row.parentNode.insertBefore(rowDragging, row);
       } else {
-        row.parentNode.insertBefore(dragging, row.nextSibling);
+        row.parentNode.insertBefore(rowDragging, row.nextSibling);
       }
     });
   });
