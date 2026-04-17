@@ -59,7 +59,7 @@ EAP.buildContextTree = function(query) {
     // Tree line stub for depth > 0
     var treeLine = '';
     if (depth > 0) {
-      treeLine = '<span style="display:inline-flex;align-items:center;width:12px;flex-shrink:0;color:' + (isActive ? 'rgba(255,255,255,0.3)' : '#E5E7EB') + ';">└</span>';
+      treeLine = '<span style="display:inline-flex;align-items:center;width:12px;flex-shrink:0;color:' + (isActive ? 'rgba(255,255,255,0.4)' : '#9CA3AF') + ';">└</span>';
     }
     return '<div class="ctx-row' + (isActive ? ' ctx-active' : '') + '" data-ctx-type="' + type + '" data-ctx-name="' + name.replace(/"/g, '&quot;') + '" data-ctx-id="' + id + '" style="padding:7px 12px 7px ' + (12 + indent) + 'px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;transition:background 100ms ease;' + (isActive ? 'background:var(--color-primary);color:#fff;' : '') + '">' +
       treeLine +
@@ -218,6 +218,24 @@ EAP.drawDependencyLines = function() {
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'dep-svg');
     svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:20;';
+
+    // Define arrowhead markers
+    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    ['ok','risk','conflict'].forEach(function(t) {
+      var colors = {ok:'rgba(0,0,0,0.3)',risk:'#D97706',conflict:'#dc2626'};
+      var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+      marker.setAttribute('id', 'arrow-' + t);
+      marker.setAttribute('viewBox', '0 0 10 10');
+      marker.setAttribute('refX', '9'); marker.setAttribute('refY', '5');
+      marker.setAttribute('markerWidth', '8'); marker.setAttribute('markerHeight', '8');
+      marker.setAttribute('orient', 'auto-start-reverse');
+      var tri = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      tri.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+      tri.setAttribute('fill', colors[t]);
+      marker.appendChild(tri);
+      defs.appendChild(marker);
+    });
+    svg.appendChild(defs);
     board.appendChild(svg);
 
     var bRect = board.getBoundingClientRect();
@@ -236,7 +254,7 @@ EAP.drawDependencyLines = function() {
       var y2 = tR.top - bRect.top + tR.height / 2;
       var mx = (x1 + x2) / 2;
 
-      var colors = { ok: 'rgba(0,0,0,0.15)', risk: '#D97706', conflict: '#dc2626' };
+      var colors = { ok: 'rgba(0,0,0,0.2)', risk: '#D97706', conflict: '#dc2626' };
       var strokeW = dep.type === 'conflict' ? 2.5 : dep.type === 'risk' ? 2 : 1.5;
       var dashArray = dep.type === 'ok' ? '5 3' : 'none';
 
@@ -246,7 +264,15 @@ EAP.drawDependencyLines = function() {
       path.setAttribute('stroke', colors[dep.type] || colors.ok);
       path.setAttribute('stroke-width', strokeW);
       if (dashArray !== 'none') path.setAttribute('stroke-dasharray', dashArray);
+      path.setAttribute('marker-end', 'url(#arrow-' + dep.type + ')');
       svg.appendChild(path);
+
+      // Source dot (circle at the "from" card)
+      var srcDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      srcDot.setAttribute('cx', x1); srcDot.setAttribute('cy', y1);
+      srcDot.setAttribute('r', '4');
+      srcDot.setAttribute('fill', colors[dep.type] || colors.ok);
+      svg.appendChild(srcDot);
 
       // Diamond midpoint
       var dmx = (x1 + x2) / 2, dmy = (y1 + y2) / 2;

@@ -10,15 +10,17 @@ EAP._ADD = EAP.icon ? EAP.icon('plus', 12) : '';
 EAP._TH0 = '<th style="width:24px;padding:8px 4px"></th>';
 
 // Type icon colours
-EAP._typeColors = { goal:'#374151', epic:'#6d28d9', capability:'#0369a1', feature:'#0d9488', story:'#6B7280', defect:'#DC2626',
-  Goal:'#374151', Epic:'#6d28d9', Capability:'#0369a1', Feature:'#0d9488', Story:'#6B7280', Defect:'#DC2626', 'Case Task':'#6B7280', 'Work Item':'#6B7280' };
+EAP._typeColors = { goal:'#374151', epic:'#6d28d9', capability:'#0369a1', feature:'#2563EB', story:'#8B5CF6', defect:'#DC2626',
+  Goal:'#374151', Epic:'#6d28d9', Capability:'#0369a1', Feature:'#2563EB', Story:'#8B5CF6', Defect:'#DC2626', 'Case Task':'#EC4899', 'Work Item':'#8B5CF6' };
 
 // Type cell — icon + label
 EAP.typeCell = function(type) {
   if (!type) return '';
   var key = type.toLowerCase();
+  // Handle "case task" icon key mapping
+  var iconKey = key === 'case task' ? 'clipboard-check' : key;
   var color = EAP._typeColors[type] || '#6B7280';
-  var iconHtml = EAP.icon ? EAP.icon(key, 14) : '';
+  var iconHtml = EAP.icon ? EAP.icon(iconKey, 14) : '';
   return '<span class="type-cell" style="color:' + color + ';">' + iconHtml + ' ' + type + '</span>';
 };
 

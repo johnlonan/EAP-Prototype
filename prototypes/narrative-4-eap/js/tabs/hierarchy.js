@@ -55,7 +55,7 @@ EAP.renderHierarchy = function() {
     '<th style="width:10%;">PI / Sprint</th>' +
     '</tr></thead><tbody>';
 
-  var typeColors = { goal:'#374151', epic:'#6d28d9', capability:'#0369a1', feature:'#0d9488', story:'#6B7280', defect:'#DC2626' };
+  var typeColors = { goal:'#374151', epic:'#6d28d9', capability:'#0369a1', feature:'#2563EB', story:'#8B5CF6', defect:'#DC2626' };
 
   rows.forEach(function(r, idx) {
     var n = r.node, d = r.depth, isG = n.type === 'goal', isE = n.type === 'epic';

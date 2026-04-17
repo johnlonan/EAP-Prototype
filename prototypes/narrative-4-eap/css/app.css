@@ -95,7 +95,12 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .dg { color: rgba(0,0,0,0.18); cursor: grab; }
 .dg:hover { color: rgba(0,0,0,0.35); }
 .dg svg { display: block; }
-.item-nm { font-weight: 500; color: #374151; line-height: 1.4; white-space: normal; }
+.item-nm { font-weight: 500; color: #374151; line-height: 1.4; white-space: normal; cursor: pointer; transition: color 100ms ease; }
+.item-nm:hover { color: #0e4e69; text-decoration: underline; }
+
+/* Record number — hyperlink style */
+.record-num { font-family: var(--font-mono); font-size: 11px; color: #0e4e69; cursor: pointer; text-decoration: none; font-variant-numeric: tabular-nums; }
+.record-num:hover { text-decoration: underline; }
 
 /* WorkItem grouped table — # | Number | Name | Type | Epic | Pts */
 .wi-grp-tbl { table-layout: fixed; }

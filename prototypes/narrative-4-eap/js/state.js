@@ -68,6 +68,13 @@ EAP.toggleMineOnly = function() {
 
 EAP.toggleSplit = function() {
   EAP.state.splitView = !EAP.state.splitView;
+  // When switching to stacked (non-split), collapse all except active
+  if (!EAP.state.splitView) {
+    var groups = EAP.getListGroups();
+    groups.forEach(function(g) {
+      EAP.state.openAccordions[g.id] = !!g.active;
+    });
+  }
   EAP.render();
 };
 

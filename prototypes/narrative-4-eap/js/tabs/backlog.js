@@ -35,7 +35,7 @@ EAP.renderBacklogGrouped = function() {
     h += '<div class="pi-body' + (isOpen ? ' open' : '') + '" id="pi-body-' + gId + '"><table class="dtbl wi-grp-tbl"><thead><tr>' +
       '<th></th><th>Number</th><th>Name</th><th>Type</th><th>Epic</th><th>Pts</th></tr></thead><tbody>' +
       g.items.map(function(i) {
-        return '<tr>' + EAP._GT + '<td><span style="font-family:var(--font-mono);font-size:11px;color:#9CA3AF;">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || '') + '</td><td><span class="par">' + (i.epic || '—') + '</span></td><td><span class="sz">' + (i.pts || '') + '</span></td></tr>';
+        return '<tr>' + EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || '') + '</td><td><span class="par">' + (i.epic || '—') + '</span></td><td><span class="sz">' + (i.pts || '') + '</span></td></tr>';
       }).join('') +
       '</tbody></table></div></div>';
   });

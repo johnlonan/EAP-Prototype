@@ -133,9 +133,10 @@ EAP.renderWIGrid = function() {
   teams.forEach(function(team) {
     var cap = EAP.teamCapacity[team] || {};
     var totalItems = cols.reduce(function(a, sp) { return a + (sp.items || []).filter(function(i) { return i.team === team; }).length; }, 0);
+    var tc = EAP.teamColors[team] || '#6B7280';
     h += '<div style="margin-bottom:16px;">' +
-      '<div style="padding:8px 12px;background:rgba(14,78,105,0.15);border-left:3px solid var(--color-primary);color:#374151;border-radius:0 8px 8px 0;font-size:11px;font-weight:500;letter-spacing:0.02em;margin-bottom:6px;display:flex;align-items:center;gap:8px;">' +
-      '<span style="display:inline-flex;color:var(--color-primary);">' + EAP.icon('users', 14) + '</span>' +
+      '<div style="padding:8px 12px;background:rgba(14,78,105,0.08);border-left:3px solid ' + tc + ';color:#374151;border-radius:0 8px 8px 0;font-size:11px;font-weight:500;letter-spacing:0.02em;margin-bottom:6px;display:flex;align-items:center;gap:8px;">' +
+      '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span>' +
       '<span>' + team + '</span>' +
       '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;font-weight:400;">' + totalItems + ' items</span>' +
       '</div>';
@@ -188,7 +189,8 @@ EAP.renderTrackBoard = function() {
     var activeTeam = s.trackTeam || 'All';
     filterHtml += '<span class="track-chip' + (activeTeam === 'All' ? ' active' : '') + '" data-track-team="All">' + EAP.icon('users', 14) + ' All Teams</span>';
     teams.forEach(function(t) {
-      filterHtml += '<span class="track-chip' + (activeTeam === t ? ' active' : '') + '" data-track-team="' + t + '">' + EAP.icon('user', 14) + ' ' + t + '</span>';
+      var tc = EAP.teamColors[t] || '#6B7280';
+      filterHtml += '<span class="track-chip' + (activeTeam === t ? ' active' : '') + '" data-track-team="' + t + '"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span> ' + t + '</span>';
     });
   }
   filterHtml += '</div>';
@@ -210,7 +212,7 @@ EAP.renderTrackBoard = function() {
 
   var colBorder = {'Draft':'#9CA3AF','Ready':'#6B7280','In Progress':'#2563EB','In Review':'#D97706','Testing':'#D97706','Ready for Acceptance':'#7c3aed','Accepted':'#16A34A','Complete':'#16A34A','Cancelled':'#9CA3AF'};
 
-  var h = filterHtml + '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:8px;padding:4px 2px 16px;width:100%;">';
+  var h = '<div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">' + filterHtml + '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:8px;padding:4px 2px 16px;width:100%;">';
   EAP.trackColumns.forEach(function(col) {
     var items = bk[col] || [];
     var bc = colBorder[col] || '#9CA3AF';
@@ -222,5 +224,5 @@ EAP.renderTrackBoard = function() {
     items.forEach(function(wi) { h += renderCard(wi, {showTeam: true, ownerField: 'owner'}); });
     h += '</div></div>';
   });
-  return h + '</div></div>';
+  return h + '</div></div></div>';
 };

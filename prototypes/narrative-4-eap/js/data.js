@@ -442,9 +442,21 @@ EAP.people = {
   'Kiran':  {name:'Kiran Patel',     initials:'KP', avatar:'../../assets/images/avatar-1.png', color:'#0e4e69'},
   'Dev2':   {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-2.png', color:'#6d28d9'},
   'Dev3':   {name:'Marcus Chen',     initials:'MC', avatar:'../../assets/images/avatar-4.png', color:'#D97706'},
-  'Dev4':   {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#DC2626'},
+  'Dev4':   {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#6366F1'},
   'Raj':    {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-2.png', color:'#6d28d9'},
-  'Priya':  {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#DC2626'}
+  'Priya':  {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#6366F1'}
+};
+
+// ── Team colours (unique per team for dots, headers, chips) ──
+EAP.teamColors = {
+  'Auth Team':       '#2563EB',
+  'Payments Team':   '#0d9488',
+  'Fraud Team':      '#D97706',
+  'Mobile Exp Team': '#8B5CF6',
+  'Accounts Team':   '#6366F1',
+  'Onboarding Team': '#EC4899',
+  'Auth': '#2563EB', 'Payments': '#0d9488', 'Fraud': '#D97706',
+  'Mobile': '#8B5CF6', 'Accounts': '#6366F1', 'Onboard': '#EC4899'
 };
 
 // ── Team capacity ──────────────────────────────────────
