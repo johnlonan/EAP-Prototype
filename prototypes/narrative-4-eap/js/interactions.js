@@ -157,49 +157,6 @@ EAP.initSplitResize = function() {
   });
 };
 
-// ── Drag and Drop (within tables) ──────────────────────
-EAP.initDragDrop = function() {
-  // Use event delegation on the content area
-  var content = document.getElementById('content-area');
-  if (!content) return;
-
-  var dragging = null;
-
-  content.addEventListener('dragstart', function(e) {
-    var row = e.target.closest('tr[draggable]');
-    if (!row) return;
-    dragging = row;
-    row.style.opacity = '0.4';
-    e.dataTransfer.effectAllowed = 'move';
-  });
-
-  content.addEventListener('dragend', function(e) {
-    var row = e.target.closest('tr');
-    if (row) row.style.opacity = '1';
-    dragging = null;
-  });
-
-  content.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    var row = e.target.closest('tr');
-    if (!row || !dragging || row === dragging) return;
-    // Only reorder within same tbody
-    if (row.parentNode !== dragging.parentNode) return;
-    var rect = row.getBoundingClientRect();
-    var mid = rect.top + rect.height / 2;
-    if (e.clientY < mid) {
-      row.parentNode.insertBefore(dragging, row);
-    } else {
-      row.parentNode.insertBefore(dragging, row.nextSibling);
-    }
-  });
-
-  // Make all table rows draggable
-  content.querySelectorAll('.dtbl tbody tr').forEach(function(row) {
-    row.setAttribute('draggable', 'true');
-  });
-};
-
 // ── Dependency Lines (SVG) ─────────────────────────────
 EAP.drawDependencyLines = function() {
   if (!EAP.state.showDeps || EAP.state.tab !== 'Board') return;

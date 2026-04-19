@@ -96,17 +96,7 @@ EAP.toggleAccordion = function(id) {
   }
 };
 
-EAP.toggleHierarchy = function(id) {
-  EAP.state.openHierarchy[id] = !EAP.state.openHierarchy[id];
-  var kids = document.getElementById('hier-kids-' + id);
-  var tog = document.getElementById('hier-tog-' + id);
-  if (kids && tog) {
-    var isOpen = EAP.state.openHierarchy[id];
-    kids.classList.toggle('open', isOpen);
-    tog.textContent = isOpen ? '−' : '+';
-    tog.classList.toggle('open', isOpen);
-  }
-};
+// toggleHierarchy defined in js/tabs/hierarchy.js (uses re-render)
 
 // ── Data accessors based on current state ──────────────
 
