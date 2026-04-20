@@ -79,6 +79,7 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .add-btn:hover { background: var(--color-primary-hover); color: #ffffff !important; border-color: var(--color-primary-hover); }
 .add-btn:hover svg { color: #ffffff; stroke: #ffffff !important; }
 .gpanel-hd .add-btn { background-color: rgba(255,255,255,0.85); }
+.gpanel-hd .add-btn:hover { background-color: var(--color-primary-hover); color: #ffffff !important; }
 /* add-btn svg size set by EAP.icon() */
 .gpanel-scroll { flex: 1; overflow: auto; }
 .gpanel-scroll .dtbl { min-width: 900px; }
