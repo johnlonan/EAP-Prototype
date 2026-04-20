@@ -143,7 +143,7 @@ function tlMs(range, td, level) {
 
   // Sort by date, then assign stagger rows when milestones are close
   visible.sort(function(a, b) { return tlP(a.date) - tlP(b.date); });
-  var PROXIMITY = 5; // % threshold for overlap (increased for better deconfliction)
+  var PROXIMITY = 8; // % threshold — accounts for icon + short label width
   var rows = []; // track last-used left% per stagger row
   visible.forEach(function(m) {
     m._left = tlPct(range, td, tlP(m.date));
@@ -167,8 +167,10 @@ function tlMs(range, td, level) {
     var dateStr = MN2[md.getMonth()] + ' ' + md.getDate() + ', ' + md.getFullYear();
     var top = m._row * rowH + (rowH / 2);
     var iconHtml = m.icon ? EAP.iconFilled(m.icon, 11) : '<span class="tl-ms-dot"></span>';
+    // Short label: "PI 26 Release" → "PI 26 Rel.", "System Demo 1" → "Demo 1"
+    var shortLabel = m.label.replace('System Demo', 'Demo').replace('Release', 'Rel.').replace('Planning', 'Plan.');
     h += '<span class="tl-ms tl-ms-' + m.type + '" style="left:' + m._left + '%;top:' + top + 'px;" data-ms-tip="' + m.label + ' — ' + dateStr + '">' +
-      '<span class="tl-ms-icon">' + iconHtml + '</span><span class="tl-ms-lbl">' + m.label + '</span></span>';
+      '<span class="tl-ms-icon">' + iconHtml + '</span><span class="tl-ms-lbl">' + shortLabel + '</span></span>';
   });
   return { html: h + '</div>', height: totalH };
 }

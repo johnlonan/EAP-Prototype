@@ -111,7 +111,7 @@ EAP.renderFilterBar = function() {
     }
   }
   if (s.tab === 'board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">' + EAP.icon('rows', 14) + ' Compact</span>';
-  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('info', 14) + ' Insights</span>';
+  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('sparkle', 14) + ' Insights</span>';
 
   el.innerHTML = h;
 
