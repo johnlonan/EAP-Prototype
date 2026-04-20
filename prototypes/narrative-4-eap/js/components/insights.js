@@ -28,7 +28,7 @@ EAP.renderInsights = function() {
   if (d.gauge || d.predict) {
     var heroVal = d.predict ? d.predict.value : d.gauge ? d.gauge.value : 0;
     var heroLabel = d.predict ? d.predict.label : d.gauge ? d.gauge.label : '';
-    var heroColor = heroVal >= 80 ? 'var(--color-success)' : heroVal >= 60 ? 'var(--color-warning)' : 'var(--color-error)';
+    var heroColor = heroVal >= 80 ? 'var(--dv-success)' : heroVal >= 60 ? 'var(--dv-warning)' : 'var(--dv-error)';
     var trendHtml = '';
     if (d.predict && d.predict.trend) {
       var tIcon = d.predict.trend === 'down' ? 'trending-down' : 'trending-up';
@@ -70,15 +70,15 @@ EAP.renderInsights = function() {
   if (d.health && s.context === 'art') {
     var th = EAP.teamHealth;
     var dims = [
-      { key: 'cap', vKey: 'capV', label: 'Capacity', unit: '%' },
-      { key: 'flow', vKey: 'flowV', label: 'Flow', unit: 'd' },
-      { key: 'qual', vKey: 'qualV', label: 'Quality', unit: '' },
-      { key: 'block', vKey: 'blockV', label: 'Blockers', unit: '' }
+      { key: 'cap', vKey: 'capV', label: 'Cap', unit: '%', tip: 'Capacity utilisation' },
+      { key: 'flow', vKey: 'flowV', label: 'Cycle', unit: 'd', tip: 'Avg cycle time (days)' },
+      { key: 'qual', vKey: 'qualV', label: 'Defects', unit: '', tip: 'Open defect count' },
+      { key: 'block', vKey: 'blockV', label: 'Blkd', unit: '', tip: 'Blocked items' }
     ];
-    var hColors = { healthy: 'var(--color-success)', watch: 'var(--color-warning)', over: 'var(--color-error)' };
+    var hColors = { healthy: 'var(--dv-success)', watch: 'var(--dv-warning)', over: 'var(--dv-error)' };
     h += '<div class="ins-health"><div class="ins-sec-lbl">Team Health</div>';
     h += '<table class="ins-health-grid"><thead><tr><th></th>';
-    dims.forEach(function(dim) { h += '<th>' + dim.label + '</th>'; });
+    dims.forEach(function(dim) { h += '<th title="' + dim.tip + '">' + dim.label + '</th>'; });
     h += '</tr></thead><tbody>';
     Object.keys(th).forEach(function(team) {
       var t = th[team];
@@ -102,9 +102,9 @@ EAP.renderInsights = function() {
         '<div class="ins-metric"><div class="ins-metric-val">' + remaining + '</div><div class="ins-metric-lbl">Pts left</div>' +
         '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:' + Math.round(sp.donePts / sp.totalPts * 100) + '%;background:var(--color-primary);"></div></div></div>' +
         '<div class="ins-metric"><div class="ins-metric-val">3.2<span class="ins-metric-pct">d</span></div><div class="ins-metric-lbl">Avg cycle</div>' +
-        '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:65%;background:var(--color-warning);"></div></div></div>' +
+        '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:65%;background:var(--dv-warning);"></div></div></div>' +
         '<div class="ins-metric"><div class="ins-metric-val">4</div><div class="ins-metric-lbl">In review</div>' +
-        '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:80%;background:var(--color-error);"></div></div></div>' +
+        '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:80%;background:var(--dv-error);"></div></div></div>' +
         '</div>';
     }
   }
@@ -116,7 +116,7 @@ EAP.renderInsights = function() {
       var p = EAP.people[s.trackMember];
       var pName = p ? p.name : s.trackMember;
       var pFinish = mw.predictFinish;
-      var pColor = pFinish >= 80 ? 'var(--color-success)' : pFinish >= 60 ? 'var(--color-warning)' : 'var(--color-error)';
+      var pColor = pFinish >= 80 ? 'var(--dv-success)' : pFinish >= 60 ? 'var(--dv-warning)' : 'var(--dv-error)';
       var wipOver = mw.inProgress > mw.wipLimit;
 
       h += '<div class="ins-member">' +
@@ -142,7 +142,7 @@ EAP.renderInsights = function() {
     var feats = EAP.allFeatures.filter(function(f) { return f.pi === 'pi26'; });
     h += '<div class="ins-feat-progress"><div class="ins-sec-lbl">Feature Progress</div>';
     feats.forEach(function(f) {
-      var col = f.state === 'Done' ? 'var(--color-success)' : (f.blocked || f.state === 'Blocked') ? 'var(--color-error)' : f.pct >= 40 ? 'var(--color-primary)' : 'rgba(14,78,105,0.3)';
+      var col = f.state === 'Done' ? 'var(--dv-success)' : (f.blocked || f.state === 'Blocked') ? 'var(--dv-error)' : f.pct >= 40 ? 'var(--dv-primary)' : 'rgba(14,78,105,0.3)';
       var name = f.name.length > 22 ? f.name.substring(0, 20) + '…' : f.name;
       // Ghost bar: where it should be based on time elapsed (40% through PI)
       var planned = Math.min(100, Math.round(40 + Math.random() * 20));
@@ -208,7 +208,7 @@ EAP.drawGauge = function(tv) {
   var x = c.getContext('2d');
   x.scale(dpr, dpr);
   var cx = W / 2, cy = H - 8, iR = 72, sA = Math.PI;
-  function gc(v) { return v <= 60 ? '#e2161c' : v <= 80 ? '#8d6e00' : '#00834f'; }
+  function gc(v) { return v <= 60 ? '#ef4444' : v <= 80 ? '#f59e0b' : '#22c55e'; }
   function draw(v) {
     x.clearRect(0, 0, W, H);
     var va = sA + (v / 100) * Math.PI, fc = gc(v);

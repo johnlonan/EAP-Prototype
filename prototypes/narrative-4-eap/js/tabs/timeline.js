@@ -67,11 +67,11 @@ function tlGroup(items, level) {
 
 // ── Bar colour — using design tokens ─────────────────
 function tlCol(st) {
-  var m = { Done:'var(--color-success)', Complete:'var(--color-success)',
-    'In Progress':'var(--color-info)', Implementation:'var(--color-info)',
-    Blocked:'var(--color-error)',
-    'In Review':'#6d28d9', Analysis:'#6d28d9', Review:'#6d28d9',
-    Funnel:'var(--text-disabled)', Backlog:'var(--color-warning)',
+  var m = { Done:'var(--dv-success)', Complete:'var(--dv-success)',
+    'In Progress':'var(--dv-info)', Implementation:'var(--dv-info)',
+    Blocked:'var(--dv-error)',
+    'In Review':'#8b5cf6', Analysis:'#8b5cf6', Review:'#8b5cf6',
+    Funnel:'var(--text-disabled)', Backlog:'var(--dv-warning)',
     Draft:'var(--text-disabled)', Planned:'var(--text-disabled)' };
   return m[st] || 'var(--text-disabled)';
 }
