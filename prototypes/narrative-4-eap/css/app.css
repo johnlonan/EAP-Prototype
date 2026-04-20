@@ -252,13 +252,38 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ins-sec-lbl { font-size: 10px; font-weight: 500; letter-spacing: 0.04em; color: var(--text-disabled); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
 .ins-sig-count { font-family: var(--font-mono); background: rgba(226,22,28,0.08); color: var(--color-error); padding: 0 5px; border-radius: var(--radius-full); font-size: 10px; }
 
-/* ── Team health heat strip ── */
-.ins-heat { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
-.ins-heat-strip { display: flex; gap: 3px; }
-.ins-heat-cell { flex: 1; height: 28px; border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: default; transition: transform var(--transition-fast); position: relative; }
-.ins-heat-cell:hover { transform: scale(1.08); z-index: 1; }
-.ins-heat-name { font-size: 8px; font-weight: 500; color: #fff; opacity: 0.85; line-height: 1; }
-.ins-heat-val { font-size: 9px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; line-height: 1; margin-top: 1px; }
+/* ── Flow distribution (Backlog) ── */
+.ins-flow-dist { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.ins-flow-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 1px; }
+.ins-flow-seg { transition: width 0.4s ease; }
+.ins-flow-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ins-flow-item { font-size: 9px; color: var(--text-tertiary); display: flex; align-items: center; gap: 3px; }
+.ins-flow-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Team health heatmap grid ── */
+.ins-health { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.ins-health-grid { width: 100%; border-collapse: collapse; }
+.ins-health-grid th { font-size: 9px; font-weight: 500; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.03em; padding: 0 0 6px; text-align: center; }
+.ins-health-grid th:first-child { text-align: left; }
+.ins-health-grid td { padding: 3px 0; text-align: center; }
+.ins-health-team { font-size: 10px; color: var(--text-tertiary); text-align: left !important; }
+.ins-health-dot { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
+
+/* ── Individual workload card (Task Board member) ── */
+.ins-member { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.ins-member-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ins-member-info { flex: 1; }
+.ins-member-name { font-size: 12px; font-weight: 500; color: var(--text-primary); display: block; }
+.ins-member-role { font-size: 10px; color: var(--text-disabled); }
+.ins-member-stats { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px; margin-bottom: 10px; }
+.ins-member-stat { text-align: center; padding: 6px 4px; background: var(--bg-secondary); border-radius: var(--radius-sm); }
+.ins-member-num { font-size: 16px; font-weight: 600; color: var(--text-primary); display: block; font-variant-numeric: tabular-nums; }
+.ins-member-num.ins-wip-over { color: var(--color-error); }
+.ins-member-lbl { font-size: 8px; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.03em; display: flex; align-items: center; justify-content: center; gap: 2px; }
+.ins-member-predict { margin-top: 8px; }
+.ins-member-pbar { height: 6px; background: rgba(0,0,0,0.04); border-radius: 3px; overflow: hidden; margin: 6px 0 4px; }
+.ins-member-pfill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.ins-member-ppct { font-size: 10px; font-weight: 500; }
 
 /* ── Inline metrics (sprint-level) ── */
 .ins-metrics { display: flex; border-bottom: 1px solid rgba(0,0,0,0.06); }
@@ -275,8 +300,9 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ins-feat-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
 .ins-feat-row:last-child { margin-bottom: 0; }
 .ins-feat-name { font-size: 9px; color: var(--text-tertiary); width: 90px; flex-shrink: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ins-feat-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.04); border-radius: 3px; overflow: hidden; }
-.ins-feat-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.ins-feat-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.04); border-radius: 3px; overflow: hidden; position: relative; }
+.ins-feat-ghost { position: absolute; height: 100%; border-radius: 3px; background: rgba(0,0,0,0.06); }
+.ins-feat-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; position: relative; z-index: 1; }
 .ins-feat-val { font-size: 9px; font-family: var(--font-mono); color: var(--text-tertiary); width: 28px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 
 /* ── Signal groups ── */

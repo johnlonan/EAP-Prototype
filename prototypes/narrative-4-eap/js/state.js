@@ -176,16 +176,21 @@ EAP.getInsightsKey = function() {
 
 EAP.getInsights = function() {
   var s = EAP.state;
-  var data = EAP.insights[EAP.getInsightsKey()] || EAP.insights['art-Feature-' + s.tab] || {};
+  var key = EAP.getInsightsKey();
+  var data = EAP.insights[key] || EAP.insights['art-Feature-' + s.tab] || EAP.insights['art-Feature-backlog'] || {};
   var result = {};
   for (var k in data) result[k] = data[k];
 
-  // Gauge + team capacity only at ART context + Feature level + List or Board tab
-  var showCapacity = (s.context === 'art' && s.tab !== 'backlog' && s.tab !== 'hierarchy');
-  if (!showCapacity) { delete result.gauge; delete result.teams; }
+  // Gauge/predict only on views that have them (Planning, Board)
+  var showGauge = (s.context === 'art' && (s.tab === 'planning' || s.tab === 'board'));
+  if (!showGauge) { delete result.gauge; delete result.predict; }
 
-  // Team bars only at ART context (not team, portfolio, ST)
-  if (s.context !== 'art') { delete result.teams; }
+  // Health heatmap only on views that need it (Planning, Board, Task Board at ART)
+  var showHealth = (s.context === 'art' && (s.tab === 'planning' || s.tab === 'board' || s.tab === 'taskboard'));
+  if (!showHealth) delete result.health;
+
+  // Flow distribution only on Backlog views
+  if (s.tab !== 'backlog') delete result.flowDist;
 
   return result;
 };
