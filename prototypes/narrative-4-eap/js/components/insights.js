@@ -30,7 +30,7 @@ EAP.renderInsights = function() {
     h += '<div class="ins-sec"><div class="ins-sec-lbl">Signals</div>';
     d.signals.forEach(function(s) {
       h += '<div class="ins-row ' + s.level + '"><div class="ins-t">' + s.title + '</div><div class="ins-s">' + s.desc + '</div>';
-      if (s.action) h += '<a class="ins-a" href="#">' + s.action + '</a>';
+      if (s.action) h += '<a class="ins-a" data-ins-action="' + s.action + '">' + s.action + ' →</a>';
       h += '</div>';
     });
     h += '</div>';
@@ -91,4 +91,49 @@ EAP.drawGauge = function(tv) {
     av = Math.min(av + st, tv); draw(av);
     if (av >= tv) clearInterval(anim);
   }, 16);
+};
+
+// ── Toast notification ────────────────────────────────
+EAP.showToast = function(msg, type) {
+  var existing = document.querySelector('.eap-toast');
+  if (existing) existing.remove();
+  var t = document.createElement('div');
+  t.className = 'eap-toast eap-toast-' + (type || 'info');
+  t.innerHTML = EAP.icon(type === 'success' ? 'check-square' : 'info', 14) + ' ' + msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(function() { t.classList.add('show'); });
+  setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 300); }, 3000);
+};
+
+// ── Insight action handler ────────────────────────────
+EAP.wireInsightActions = function() {
+  document.querySelectorAll('[data-ins-action]').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var action = link.getAttribute('data-ins-action');
+
+      // Map actions to behaviours
+      if (action === 'Escalate now') {
+        EAP.openDetail('f3'); // Payment Confirmation Flow is blocked
+        EAP.showToast('Escalation initiated for Payment Confirmation Flow', 'success');
+      } else if (action === 'Plan into PI 26') {
+        EAP.openDetail('f7'); // Enhanced Biometric Auth Flow
+        EAP.showToast('Enhanced Biometric Auth Flow opened for planning', 'info');
+      } else if (action === 'Create Feature') {
+        EAP.showToast('Feature creation flow would open here', 'info');
+      } else if (action === 'Assign team') {
+        EAP.openDetail('f6'); // Streamlined Onboarding
+        EAP.showToast('Assign a team to Streamlined Onboarding Flow', 'info');
+      } else if (action === 'View all blockers') {
+        EAP.showToast('Showing 14 blocked stories across 4 teams', 'info');
+      } else if (action === 'Rebalance Sprint 4') {
+        EAP.showToast('Sprint 4 capacity rebalancing view would open here', 'info');
+      } else if (action === 'Schedule defect sprint') {
+        EAP.showToast('Defect sprint scheduling initiated for Fraud Team', 'success');
+      } else {
+        // Generic — show toast with the action text
+        EAP.showToast(action + ' — action initiated', 'info');
+      }
+    });
+  });
 };

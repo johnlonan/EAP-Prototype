@@ -243,4 +243,7 @@ EAP.renderContent = function() {
 
   // Wire WSJF rank buttons
   EAP.wsjfWire();
+
+  // Wire insight action links
+  if (EAP.wireInsightActions) EAP.wireInsightActions();
 };

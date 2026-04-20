@@ -57,7 +57,7 @@ EAP.renderList = function() {
         pageItems.map(function(i) { return '<tr>' + cols.r(i) + '</tr>'; }).join('') + '</tbody></table>' +
         EAP.pgFooter(g.items.length, pgId);
     } else {
-      acc += '<div style="padding:20px;text-align:center;font-size:12px;color:var(--text-disabled);font-style:italic;">No items assigned</div>';
+      acc += '<div class="empty-state"><div class="empty-state-icon">' + EAP.icon('plus', 24) + '</div><div class="empty-state-text">No items assigned to this increment</div><div class="empty-state-cta">Drag items from the backlog or click <strong>New</strong> to create one</div></div>';
     }
     acc += '</div></div></div>';
   });

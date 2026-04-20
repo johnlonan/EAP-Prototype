@@ -451,6 +451,18 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 /* Row drop animation applied via inline styles in interactions.js */
 
 /* ═══ DEPENDENCY SVG ═══ */
+/* ═══ TOAST NOTIFICATION ═══ */
+.eap-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 10px 20px; border-radius: var(--radius-field); font-size: 12px; font-weight: 500; font-family: var(--font-sans); color: var(--text-inverted); background: var(--bg-inverted); box-shadow: var(--shadow-xl); z-index: 100; display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity var(--transition-base), transform var(--transition-base); white-space: nowrap; }
+.eap-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.eap-toast-success { background: var(--color-success); }
+.eap-toast-info { background: var(--bg-inverted); }
+
+/* ═══ EMPTY STATE ═══ */
+.empty-state { padding: 32px 20px; text-align: center; }
+.empty-state-icon { display: inline-flex; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-secondary); color: var(--text-disabled); align-items: center; justify-content: center; margin-bottom: 10px; }
+.empty-state-text { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
+.empty-state-cta { font-size: 11px; color: var(--text-tertiary); }
+
 .dep-svg { pointer-events: none; }
 
 /* ═══ DETAIL PANEL ═══ */
