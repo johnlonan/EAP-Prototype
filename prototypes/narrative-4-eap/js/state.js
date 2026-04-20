@@ -117,15 +117,8 @@ EAP.toggleInsights = function() {
 
 EAP.toggleAccordion = function(id) {
   EAP.state.openAccordions[id] = !EAP.state.openAccordions[id];
-  // Don't full re-render — just toggle the body
-  var body = document.getElementById('pi-body-' + id);
-  var tog = document.getElementById('pi-tog-' + id);
-  if (body && tog) {
-    var isOpen = EAP.state.openAccordions[id];
-    body.classList.toggle('open', isOpen);
-    tog.textContent = isOpen ? '−' : '+';
-    tog.classList.toggle('open', isOpen);
-  }
+  // Full re-render to ensure pagination and layout are correct
+  EAP.render();
 };
 
 // toggleHierarchy defined in js/tabs/hierarchy.js (uses re-render)

@@ -28,7 +28,7 @@ EAP.renderList = function() {
   }
 
   // Accordions
-  var acc = '<div class="' + (s.splitView ? 'split-right' : '') + '" style="' + (s.splitView ? '' : 'flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 4px 24px;') + '">';
+  var acc = '<div class="' + (s.splitView ? 'split-right' : '') + '" style="' + (s.splitView ? '' : 'flex:1;min-width:0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 4px 24px;') + '">';
 
   groups.forEach(function(g) {
     var isA = !!g.active, isO = !!EAP.state.openAccordions[g.id];
