@@ -28,7 +28,7 @@ EAP.renderList = function() {
   }
 
   // Accordions
-  var acc = '<div class="' + (s.splitView ? 'split-right' : '') + '" style="' + (s.splitView ? '' : 'flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:2px;') + '">';
+  var acc = '<div class="' + (s.splitView ? 'split-right' : '') + '" style="' + (s.splitView ? '' : 'flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 4px 24px;') + '">';
 
   groups.forEach(function(g) {
     var isA = !!g.active, isO = !!EAP.state.openAccordions[g.id];
@@ -54,12 +54,13 @@ EAP.renderList = function() {
     if (g.items && g.items.length) {
       var pageItems = EAP.pgSlice(EAP.wsjfSorted(g.items), pgId);
       acc += '<table class="dtbl"><thead><tr>' + cols.h + '</tr></thead><tbody>' +
-        pageItems.map(function(i) { return '<tr>' + cols.r(i) + '</tr>'; }).join('') + '</tbody></table>' +
-        EAP.pgFooter(g.items.length, pgId);
+        pageItems.map(function(i) { return '<tr>' + cols.r(i) + '</tr>'; }).join('') + '</tbody></table>';
     } else {
       acc += '<div class="empty-state"><div class="empty-state-icon">' + EAP.icon('plus', 24) + '</div><div class="empty-state-text">No items assigned to this increment</div><div class="empty-state-cta">Drag items from the backlog or click <strong>New</strong> to create one</div></div>';
     }
-    acc += '</div></div></div>';
+    acc += '</div>';
+    if (g.items && g.items.length) acc += EAP.pgFooter(g.items.length, pgId);
+    acc += '</div></div>';
   });
 
   // Non-split: backlog section below accordions
