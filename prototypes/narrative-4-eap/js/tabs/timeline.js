@@ -166,7 +166,7 @@ function tlMs(range, td, level) {
     var md = tlP(m.date);
     var dateStr = MN2[md.getMonth()] + ' ' + md.getDate() + ', ' + md.getFullYear();
     var top = m._row * rowH + (rowH / 2);
-    var iconHtml = m.icon ? EAP.iconFilled(m.icon, 11) : '<span class="tl-ms-dot"></span>';
+    var iconHtml = m.icon ? EAP.icon(m.icon, 11) : '<span class="tl-ms-dot"></span>';
     // Short label: "PI 26 Release" → "PI 26 Rel.", "System Demo 1" → "Demo 1"
     var shortLabel = m.label.replace('System Demo', 'Demo').replace('Release', 'Rel.').replace('Planning', 'Plan.');
     h += '<span class="tl-ms tl-ms-' + m.type + '" style="left:' + m._left + '%;top:' + top + 'px;" data-ms-tip="' + m.label + ' — ' + dateStr + '">' +
@@ -225,8 +225,15 @@ EAP.renderTimeline = function() {
       var tc = (EAP._typeColors[(item.type||level)] || 'var(--text-tertiary)');
       leftHtml += '<div class="tl-row-lbl" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm" title="'+item.name+'">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
       rightHtml += '<div class="tl-row-bg" style="top:'+y+'px;height:'+rowH+'px;"></div>';
-      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;background:'+col+';" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'">';
-      if (pct > 0 && pct < 100) rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;"></div>';
+      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'" data-bar-color="'+col+'">';
+      if (pct > 0 && pct < 100) {
+        rightHtml += '<div class="tl-bar-track" style="background:'+col+';opacity:0.2;"></div>';
+        rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;background:'+col+';"></div>';
+      } else if (pct >= 100) {
+        rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';"></div>';
+      } else {
+        rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';opacity:0.25;"></div>';
+      }
       rightHtml += '<span class="tl-bar-lbl">'+item.name+'</span></div>';
       y += rowH;
     });
