@@ -102,10 +102,12 @@ EAP.renderFilterBar = function() {
     h += '<span class="fbar-vtog' + (s.showDeps ? ' on' : '') + '" id="deps-toggle">' + EAP.icon('link', 14) + ' Dependencies</span>';
     if (s.showDeps) {
       var df = s.depFilter || 'all';
-      h += '<span class="fbar-chip dep-chip' + (df === 'all' ? ' on' : '') + '" data-dep-filter="all">All</span>';
-      h += '<span class="fbar-chip dep-chip dep-chip-conflict' + (df === 'conflict' ? ' on' : '') + '" data-dep-filter="conflict">Conflicts</span>';
-      h += '<span class="fbar-chip dep-chip dep-chip-risk' + (df === 'risk' ? ' on' : '') + '" data-dep-filter="risk">Risks</span>';
-      h += '<span class="fbar-chip dep-chip dep-chip-ok' + (df === 'ok' ? ' on' : '') + '" data-dep-filter="ok">Resolved</span>';
+      h += '<select class="fbar-select dep-filter-select" id="dep-filter-select">' +
+        '<option value="all"' + (df === 'all' ? ' selected' : '') + '>All types</option>' +
+        '<option value="conflict"' + (df === 'conflict' ? ' selected' : '') + '>Conflicts only</option>' +
+        '<option value="risk"' + (df === 'risk' ? ' selected' : '') + '>Risks only</option>' +
+        '<option value="ok"' + (df === 'ok' ? ' selected' : '') + '>Resolved only</option>' +
+        '</select>';
     }
   }
   if (s.tab === 'board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">' + EAP.icon('rows', 14) + ' Compact</span>';
@@ -123,9 +125,8 @@ EAP.renderFilterBar = function() {
   document.getElementById('insights-toggle').addEventListener('click', function() { EAP.toggleInsights(); });
   var db = document.getElementById('deps-toggle');
   if (db) db.addEventListener('click', function() { EAP.state.showDeps = !EAP.state.showDeps; if (!EAP.state.showDeps) EAP.state.depFilter = 'all'; EAP.render(); });
-  document.querySelectorAll('[data-dep-filter]').forEach(function(chip) {
-    chip.addEventListener('click', function() { EAP.state.depFilter = chip.dataset.depFilter; EAP.render(); });
-  });
+  var dfs = document.getElementById('dep-filter-select');
+  if (dfs) dfs.addEventListener('change', function() { EAP.state.depFilter = dfs.value; EAP.render(); });
   var dn = document.getElementById('density-toggle');
   if (dn) dn.addEventListener('click', function() { EAP.state.boardDensity = EAP.state.boardDensity === 'compact' ? 'default' : 'compact'; EAP.render(); });
 
