@@ -70,22 +70,23 @@ EAP.renderInsights = function() {
   if (d.health && s.context === 'art') {
     var th = EAP.teamHealth;
     var dims = [
-      { key: 'cap', label: 'Cap', tip: 'Capacity' },
-      { key: 'flow', label: 'Flow', tip: 'Cycle Time' },
-      { key: 'qual', label: 'Qual', tip: 'Defects' },
-      { key: 'block', label: 'Block', tip: 'Blockers' }
+      { key: 'cap', vKey: 'capV', label: 'Capacity', unit: '%' },
+      { key: 'flow', vKey: 'flowV', label: 'Flow', unit: 'd' },
+      { key: 'qual', vKey: 'qualV', label: 'Quality', unit: '' },
+      { key: 'block', vKey: 'blockV', label: 'Blockers', unit: '' }
     ];
     var hColors = { healthy: 'var(--color-success)', watch: 'var(--color-warning)', over: 'var(--color-error)' };
     h += '<div class="ins-health"><div class="ins-sec-lbl">Team Health</div>';
     h += '<table class="ins-health-grid"><thead><tr><th></th>';
-    dims.forEach(function(dim) { h += '<th title="' + dim.tip + '">' + dim.label + '</th>'; });
+    dims.forEach(function(dim) { h += '<th>' + dim.label + '</th>'; });
     h += '</tr></thead><tbody>';
     Object.keys(th).forEach(function(team) {
       var t = th[team];
       h += '<tr><td class="ins-health-team">' + team + '</td>';
       dims.forEach(function(dim) {
-        var status = t[dim.key];
-        h += '<td><span class="ins-health-dot" style="background:' + hColors[status] + ';" title="' + dim.tip + ': ' + status + '"></span></td>';
+        var status = t[dim.key], val = t[dim.vKey];
+        var col = hColors[status];
+        h += '<td><span class="ins-health-val" style="color:' + col + ';">' + val + (dim.unit ? '<span class="ins-health-unit">' + dim.unit + '</span>' : '') + '</span></td>';
       });
       h += '</tr>';
     });
