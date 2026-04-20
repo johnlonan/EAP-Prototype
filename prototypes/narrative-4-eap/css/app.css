@@ -451,6 +451,12 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 /* Row drop animation applied via inline styles in interactions.js */
 
 /* ═══ DEPENDENCY SVG ═══ */
+/* ═══ INSIGHT CHARTS ═══ */
+.ins-charts { padding: 0 12px 8px; }
+.ins-chart-wrap { margin-bottom: 12px; }
+.ins-chart-title { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-disabled); margin-bottom: 6px; padding: 0 4px; }
+.ins-chart-wrap canvas { max-height: 140px; }
+
 /* ═══ TOAST NOTIFICATION ═══ */
 .eap-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 10px 20px; border-radius: var(--radius-field); font-size: 12px; font-weight: 500; font-family: var(--font-sans); color: var(--text-inverted); background: var(--bg-inverted); box-shadow: var(--shadow-xl); z-index: 100; display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity var(--transition-base), transform var(--transition-base); white-space: nowrap; }
 .eap-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }

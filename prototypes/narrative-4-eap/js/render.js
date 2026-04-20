@@ -15,6 +15,7 @@ EAP.render = function() {
   EAP.renderFilterBar();
   EAP.renderContent();
   EAP.renderInsights();
+  if (EAP.renderCharts) EAP.renderCharts();
 };
 
 // ── Chrome ─────────────────────────────────────────────
