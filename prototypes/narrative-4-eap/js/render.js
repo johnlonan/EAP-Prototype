@@ -200,6 +200,44 @@ EAP.renderContent = function() {
     });
   });
 
+  // Wire detail panel — delegated click on item names, record numbers, and cards
+  el.addEventListener('click', function(e) {
+    // Board/Track cards — id is on the card element (fcard-{id} or tcard-{id})
+    var card = e.target.closest('.bcard');
+    if (card && card.id) {
+      var cardId = card.id.replace(/^[ft]card-/, '');
+      if (cardId) { EAP.openDetail(cardId); return; }
+    }
+    // Table item name or record number with data-item-id
+    var nm = e.target.closest('[data-item-id]');
+    if (nm) { EAP.openDetail(nm.getAttribute('data-item-id')); return; }
+    // Fallback: item-nm or record-num without data-item-id — find by name match
+    var clickable = e.target.closest('.item-nm') || e.target.closest('.record-num');
+    if (clickable) {
+      var row = clickable.closest('tr');
+      if (row) {
+        var numEl = row.querySelector('.record-num');
+        var nameEl = row.querySelector('.item-nm');
+        var name = nameEl ? nameEl.textContent.trim() : '';
+        var num = numEl ? numEl.textContent.trim() : '';
+        // Search all data for matching item
+        var found = null;
+        function searchByNameOrNum(items) {
+          items.forEach(function(item) {
+            if (found) return;
+            if ((num && item.num === num) || (name && item.name === name)) found = item;
+          });
+        }
+        searchByNameOrNum(EAP.epics.all);
+        searchByNameOrNum(EAP.capabilities.all);
+        searchByNameOrNum(EAP.allFeatures);
+        EAP.workItems.sprints.forEach(function(sp) { searchByNameOrNum(sp.items || []); });
+        ['Story','Defect','CaseTask'].forEach(function(k) { searchByNameOrNum(EAP.workItems.backlog[k] || []); });
+        if (found) EAP.openDetail(found.id);
+      }
+    }
+  });
+
   // Wire pagination controls
   EAP.pgWire();
 

@@ -9,6 +9,9 @@ EAP._GT = '<td style="width:24px;padding:8px 4px">' + EAP._G + '</td>';
 EAP._ADD = EAP.icon ? EAP.icon('plus', 12) : '';
 EAP._TH0 = '<th style="width:24px;padding:8px 4px"></th>';
 
+// Detail panel opens via delegated click on .item-nm / .record-num / .bcard
+// See render.js renderContent() for the event delegation logic.
+
 // Type icon colours
 // Type identity colours — intentionally distinct from status tokens.
 // Defect uses --color-error (#e2161c), feature uses --color-info (#2a6edc).
