@@ -143,7 +143,7 @@ function tlMs(range, td, level) {
 
   // Sort by date, then assign stagger rows when milestones are close
   visible.sort(function(a, b) { return tlP(a.date) - tlP(b.date); });
-  var PROXIMITY = 2.5; // % threshold for overlap
+  var PROXIMITY = 5; // % threshold for overlap (increased for better deconfliction)
   var rows = []; // track last-used left% per stagger row
   visible.forEach(function(m) {
     m._left = tlPct(range, td, tlP(m.date));
@@ -247,6 +247,9 @@ EAP.renderTimeline = function() {
   // Body
   h += '<div class="tl-body"><div class="tl-body-left" style="width:'+leftW+'px;height:'+totalH+'px;">'+leftHtml+'</div>';
   h += '<div class="tl-body-rscroll"><div class="tl-body-right" style="height:'+totalH+'px;">'+tlGrid(range,td,showSp)+tlToday(range,td)+rightHtml+'</div></div></div>';
+
+  // Scroll-to-today button
+  h += '<button class="tl-scroll-today" id="tl-scroll-today" title="Scroll to today">' + EAP.icon('calendar', 12) + ' Today</button>';
 
   h += '</div>';
   return h;

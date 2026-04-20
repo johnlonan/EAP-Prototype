@@ -247,4 +247,15 @@ EAP.renderContent = function() {
 
   // Wire insight action links
   if (EAP.wireInsightActions) EAP.wireInsightActions();
+
+  // Wire scroll-to-today on Timeline
+  var stt = document.getElementById('tl-scroll-today');
+  if (stt) stt.addEventListener('click', function() {
+    var todayEl = document.querySelector('.tl-today');
+    var scroller = document.querySelector('.tl-body-rscroll');
+    if (todayEl && scroller) {
+      var left = todayEl.offsetLeft - scroller.clientWidth / 2;
+      scroller.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+    }
+  });
 };

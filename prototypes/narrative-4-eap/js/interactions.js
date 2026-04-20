@@ -313,6 +313,10 @@ EAP.applySearch = function(q) {
     el.classList.remove('search-dim', 'search-hit');
   });
 
+  // Remove old count badge
+  var oldBadge = document.querySelector('.search-count');
+  if (oldBadge) oldBadge.remove();
+
   if (!q) return;
 
   var tab = EAP.state.tab;
@@ -355,7 +359,7 @@ EAP.applySearch = function(q) {
   if (tab === 'hierarchy') {
     // Search hierarchy rows
     content.querySelectorAll('.hier-tbl tbody tr').forEach(function(row) {
-      if (row.style.display === 'none') return; // already hidden
+      if (row.style.display === 'none') return;
       if (row.textContent.toLowerCase().indexOf(q) !== -1) {
         row.classList.add('search-hit');
         hits++;
@@ -363,6 +367,15 @@ EAP.applySearch = function(q) {
         row.classList.add('search-dim');
       }
     });
+  }
+
+  // Show result count badge
+  var wrap = document.querySelector('.search-wrap');
+  if (wrap && hits >= 0) {
+    var badge = document.createElement('span');
+    badge.className = 'search-count';
+    badge.textContent = hits + (hits === 1 ? ' match' : ' matches');
+    wrap.appendChild(badge);
   }
 };
 
@@ -476,6 +489,17 @@ EAP.initBoardDrag = function() {
     });
   });
 };
+
+// ── Keyboard shortcut: / focuses search ───────────────
+document.addEventListener('keydown', function(e) {
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+    var active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) return;
+    e.preventDefault();
+    var si = document.querySelector('.chrome-search');
+    if (si) si.focus();
+  }
+});
 
 // ── Initialize all interactions ────────────────────────
 EAP.initInteractions = function() {
