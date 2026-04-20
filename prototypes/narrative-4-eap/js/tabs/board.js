@@ -73,7 +73,7 @@ EAP.renderBoard = function() {
   var s = EAP.state;
   if (s.level === 'Epic' || s.level === 'Capability') return EAP.renderWorkflowBoard();
   if (s.level === 'Feature') return EAP.renderFeatureBoard();
-  if (s.level === 'WorkItem') return s.boardView === 'track' ? EAP.renderTrackBoard() : EAP.renderWIGrid();
+  if (s.level === 'WorkItem') return EAP.renderWIGrid();
   return '';
 };
 
@@ -166,63 +166,4 @@ EAP.renderWIGrid = function() {
   return h + '</div>';
 };
 
-// ── Track view (9-column workflow) ─────────────────────
-EAP.renderTrackBoard = function() {
-  var s = EAP.state;
-  var isTeamCtx = (s.context === 'team');
-
-  // Member/team filter chips
-  var filterHtml = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;">';
-  if (isTeamCtx) {
-    // Team context: show individual members
-    var members = ['Kiran', 'Dev2', 'Dev3', 'Dev4'];
-    var activeMember = s.trackMember || 'All';
-    filterHtml += '<span class="track-chip' + (activeMember === 'All' ? ' active' : '') + '" data-track-member="All">' + EAP.icon('users', 14) + ' All</span>';
-    members.forEach(function(m) {
-      var p = EAP.people[m];
-      if (!p) return;
-      filterHtml += '<span class="track-chip' + (activeMember === m ? ' active' : '') + '" data-track-member="' + m + '">' + EAP.avatar(m, 20) + ' ' + p.name + '</span>';
-    });
-  } else {
-    // ART context: show teams
-    var teams = ['Auth Team', 'Payments Team', 'Fraud Team', 'Mobile Exp Team', 'Accounts Team', 'Onboarding Team'];
-    var activeTeam = s.trackTeam || 'All';
-    filterHtml += '<span class="track-chip' + (activeTeam === 'All' ? ' active' : '') + '" data-track-team="All">' + EAP.icon('users', 14) + ' All Teams</span>';
-    teams.forEach(function(t) {
-      var tc = EAP.teamColors[t] || '#6B7280';
-      filterHtml += '<span class="track-chip' + (activeTeam === t ? ' active' : '') + '" data-track-team="' + t + '"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span> ' + t + '</span>';
-    });
-  }
-  filterHtml += '</div>';
-
-  var all = [];
-  EAP.workItems.sprints.forEach(function(sp) { all = all.concat(sp.items || []); });
-  all = all.concat(EAP.getBacklogFlat());
-
-  // Apply member/team filter
-  if (isTeamCtx && s.trackMember && s.trackMember !== 'All') {
-    all = all.filter(function(i) { return i.owner === s.trackMember; });
-  }
-  if (!isTeamCtx && s.trackTeam && s.trackTeam !== 'All') {
-    all = all.filter(function(i) { return i.team === s.trackTeam; });
-  }
-  var bk = {};
-  EAP.trackColumns.forEach(function(c) { bk[c] = []; });
-  all.forEach(function(i) { var c = i.state; if (c === 'Planned' || c === 'To Do') c = 'Draft'; if (bk[c]) bk[c].push(i); else bk.Draft.push(i); });
-
-  var colBorder = {'Draft':'#9CA3AF','Ready':'#6B7280','In Progress':'#2563EB','In Review':'#D97706','Testing':'#D97706','Ready for Acceptance':'#7c3aed','Accepted':'#16A34A','Complete':'#16A34A','Cancelled':'#9CA3AF'};
-
-  var h = '<div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">' + filterHtml + '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:8px;padding:4px 2px 16px;width:100%;">';
-  EAP.trackColumns.forEach(function(col) {
-    var items = bk[col] || [];
-    var bc = colBorder[col] || '#9CA3AF';
-    h += '<div style="flex:1;min-width:140px;display:flex;flex-direction:column;">';
-    h += '<div style="padding:8px 10px;border-radius:10px 10px 0 0;background:rgba(14,78,105,0.08);border-bottom:3px solid ' + bc + ';display:flex;align-items:center;justify-content:space-between;">';
-    h += '<span style="font-size:10px;font-weight:500;color:#374151;text-transform:uppercase;letter-spacing:0.03em;">' + col + '</span>';
-    h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;">' + items.length + '</span></div>';
-    h += '<div style="' + CB + 'border-radius:0 0 10px 10px;min-height:80px;">';
-    items.forEach(function(wi) { h += renderCard(wi, {showTeam: true, ownerField: 'owner'}); });
-    h += '</div></div>';
-  });
-  return h + '</div></div></div>';
-};
+// Track view moved to js/tabs/track.js

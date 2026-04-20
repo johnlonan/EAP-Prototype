@@ -90,7 +90,7 @@ EAP.renderHierarchy = function() {
     if (r.hasK) {
       nameCell += '<div class="pi-tog' + (r.isOpen ? ' open' : '') + '" id="hier-tog-' + n.id + '" data-hier-toggle="' + n.id + '" style="display:inline-flex;margin-right:6px;vertical-align:middle;cursor:pointer;position:relative;z-index:1;">' + (r.isOpen ? '−' : '+') + '</div>';
     } else {
-      nameCell += '<div class="pi-tog" style="display:inline-flex;margin-right:6px;vertical-align:middle;opacity:0.15;cursor:default;position:relative;z-index:1;">·</div>';
+      nameCell += '<div class="pi-tog" style="display:inline-flex;margin-right:6px;vertical-align:middle;cursor:default;position:relative;z-index:1;background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.12);color:#9CA3AF;">·</div>';
     }
 
     // Level icon + name

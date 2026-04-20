@@ -69,13 +69,14 @@ EAP.buildContextTree = function(query) {
   }
 
   var root = EAP.structure;
+  var taskboardOnly = (s.tab === 'taskboard'); // Task Board: only ART + Team
 
   // Portfolio
-  if (matches(root.name)) {
+  if (!taskboardOnly && matches(root.name)) {
     html += row(root.name, 'portfolio', root.id, 0, s.context === 'portfolio');
   }
 
-  // Solution Trains
+  // Solution Trains → ARTs → Teams
   (root.children || []).forEach(function(st) {
     var stMatch = matches(st.name);
     var anyBelow = (st.children || []).some(function(art) {
@@ -83,18 +84,21 @@ EAP.buildContextTree = function(query) {
     });
     if (!stMatch && !anyBelow) return;
 
-    if (!ql) html += row(st.name, 'solution-train', st.id, 1, s.context === 'solution-train' && s.contextId === st.id);
+    if (!taskboardOnly && !ql) html += row(st.name, 'solution-train', st.id, 1, s.context === 'solution-train' && s.contextId === st.id);
+
+    var artDepth = taskboardOnly ? 0 : (ql ? 1 : 2);
+    var teamDepth = taskboardOnly ? 1 : (ql ? 2 : 3);
 
     (st.children || []).forEach(function(art) {
       var artMatch = matches(art.name);
       var teamMatches = (art.children || []).some(function(t) { return matches(t.name); });
       if (!artMatch && !teamMatches) return;
 
-      html += row(art.name, 'art', art.id, ql ? 1 : 2, s.context === 'art' && s.contextId === art.id);
+      html += row(art.name, 'art', art.id, artDepth, s.context === 'art' && s.contextId === art.id);
 
       (art.children || []).forEach(function(team) {
         if (!matches(team.name)) return;
-        html += row(team.name, 'team', team.id, ql ? 2 : 3, s.context === 'team' && s.contextId === team.id);
+        html += row(team.name, 'team', team.id, teamDepth, s.context === 'team' && s.contextId === team.id);
       });
     });
   });
@@ -159,7 +163,7 @@ EAP.initSplitResize = function() {
 
 // ── Dependency Lines (SVG) ─────────────────────────────
 EAP.drawDependencyLines = function() {
-  if (!EAP.state.showDeps || EAP.state.tab !== 'Board') return;
+  if (!EAP.state.showDeps || (EAP.state.tab !== 'board' && EAP.state.tab !== 'taskboard')) return;
   if (EAP.state.level !== 'Feature' && EAP.state.level !== 'WorkItem') return;
 
   // Wait for DOM to settle
@@ -314,7 +318,7 @@ EAP.applySearch = function(q) {
   var tab = EAP.state.tab;
   var hits = 0;
 
-  if (tab === 'Backlog' || tab === 'List') {
+  if (tab === 'backlog' || tab === 'planning') {
     // Search table rows
     content.querySelectorAll('.dtbl tbody tr').forEach(function(row) {
       if (row.textContent.toLowerCase().indexOf(q) !== -1) {
@@ -336,8 +340,8 @@ EAP.applySearch = function(q) {
     });
   }
 
-  if (tab === 'Board') {
-    // Search board cards
+  if (tab === 'board' || tab === 'taskboard') {
+    // Search board/task board cards
     content.querySelectorAll('.bcard').forEach(function(card) {
       if (card.textContent.toLowerCase().indexOf(q) !== -1) {
         card.classList.add('search-hit');
@@ -348,7 +352,7 @@ EAP.applySearch = function(q) {
     });
   }
 
-  if (tab === 'Hierarchy') {
+  if (tab === 'hierarchy') {
     // Search hierarchy rows
     content.querySelectorAll('.hier-tbl tbody tr').forEach(function(row) {
       if (row.style.display === 'none') return; // already hidden
@@ -479,6 +483,7 @@ EAP.render = function() {
   setTimeout(function() {
     EAP.initBoardDrag();
     EAP.drawDependencyLines();
+    if (EAP.state.tab === 'timeline' && EAP.tlDrawDeps) EAP.tlDrawDeps();
     // Clear search on tab change
     var si = document.querySelector('.chrome-search');
     if (si && si.value) EAP.applySearch(si.value.trim().toLowerCase());

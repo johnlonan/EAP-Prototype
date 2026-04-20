@@ -4,6 +4,17 @@
 
 var EAP = EAP || {};
 
+// ── Tab config — change display labels here, IDs are stable ──
+// To rename a tab: edit the label only. IDs never change.
+EAP.tabConfig = [
+  { id: 'backlog',   label: 'Backlog' },
+  { id: 'planning',  label: 'Planning' },
+  { id: 'timeline',  label: 'Timeline' },
+  { id: 'board',     label: 'Board' },
+  { id: 'taskboard', label: 'Task Board' },
+  { id: 'hierarchy', label: 'Hierarchy' }
+];
+
 EAP.state = {
   // Context — what scope the user is viewing
   context: 'art',                    // portfolio | solution-train | art | team
@@ -13,8 +24,8 @@ EAP.state = {
   // Level — what entity type is shown (driven by context)
   level: 'Feature',                  // Epic | Capability | Feature | WorkItem
 
-  // Tab — which view is active
-  tab: 'Backlog',                    // Backlog | List | Board | Hierarchy
+  // Tab — which view is active (uses stable IDs from tabConfig)
+  tab: 'backlog',
 
   // Filters
   mineOnly: true,
@@ -24,15 +35,20 @@ EAP.state = {
   insightsOpen: true,
   showDeps: false,
 
-  // Board sub-views
-  boardView: 'grid',                 // grid | track (WorkItem only)
+  // Board options
   boardDensity: 'default',           // default | compact (per tab session)
 
   // Accordion open states
   openAccordions: {},
 
   // Hierarchy expand states
-  openHierarchy: {}
+  openHierarchy: {},
+
+  // Pagination state per group
+  pagination: {},
+
+  // WSJF sort state (null = default order, 'desc' = sorted)
+  wsjfSort: null
 };
 
 // ── State transitions ──────────────────────────────────
@@ -53,11 +69,29 @@ EAP.setContext = function(type, name, id) {
 EAP.setLevel = function(level) {
   EAP.state.level = level;
   EAP.state.openAccordions = {};
+  EAP.state.wsjfSort = null;
+  EAP.state.pagination = {};
   EAP.render();
 };
 
 EAP.setTab = function(tab) {
-  EAP.state.tab = tab;
+  var s = EAP.state;
+  s.tab = tab;
+  s.wsjfSort = null;
+  s.pagination = {};
+
+  // Track tab requires ART or Team context + WorkItem level.
+  // Auto-configure if needed (Ananya is ART PM → default to her ART).
+  if (tab === 'taskboard') {
+    if (s.context !== 'art' && s.context !== 'team') {
+      s.context = 'art';
+      s.contextName = 'Digital Banking ART';
+      s.contextId = 'art1';
+    }
+    s.level = 'WorkItem';
+    s.openAccordions = {};
+  }
+
   EAP.render();
 };
 
@@ -68,13 +102,11 @@ EAP.toggleMineOnly = function() {
 
 EAP.toggleSplit = function() {
   EAP.state.splitView = !EAP.state.splitView;
-  // When switching to stacked (non-split), collapse all except active
-  if (!EAP.state.splitView) {
-    var groups = EAP.getListGroups();
-    groups.forEach(function(g) {
-      EAP.state.openAccordions[g.id] = !!g.active;
-    });
-  }
+  // Reset accordions: only active group open in both modes
+  var groups = EAP.getListGroups();
+  groups.forEach(function(g) {
+    EAP.state.openAccordions[g.id] = !!g.active;
+  });
   EAP.render();
 };
 
@@ -156,7 +188,7 @@ EAP.getInsights = function() {
   for (var k in data) result[k] = data[k];
 
   // Gauge + team capacity only at ART context + Feature level + List or Board tab
-  var showCapacity = (s.context === 'art' && s.tab !== 'Backlog' && s.tab !== 'Hierarchy');
+  var showCapacity = (s.context === 'art' && s.tab !== 'backlog' && s.tab !== 'hierarchy');
   if (!showCapacity) { delete result.gauge; delete result.teams; }
 
   // Team bars only at ART context (not team, portfolio, ST)

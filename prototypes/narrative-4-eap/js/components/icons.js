@@ -36,7 +36,12 @@ EAP._icons = {
   'gauge':        '<path d="M12 20V10"/><path d="m4.93 17.07 2.83-2.83"/><path d="m19.07 17.07-2.83-2.83"/><circle cx="12" cy="20" r="2"/>',
   'calendar':     '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
   'clipboard-check': '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>',
-  'case task':    '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>'
+  'case task':    '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>',
+  // Milestone icons (outline)
+  'rocket':       '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+  'monitor':      '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  'compass':      '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+  'lock':         '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
 };
 
 // Render an icon SVG string
@@ -46,6 +51,24 @@ EAP.icon = function(name, size, extra) {
   var paths = EAP._icons[name];
   if (!paths) return '';
   return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"' + (extra ? ' ' + extra : '') + '>' + paths + '</svg>';
+};
+
+// Filled milestone icons — solid shapes, better at small sizes
+EAP._filledIcons = {
+  'rocket':  '<path d="M13.13 2.02a1 1 0 0 0-1.26.5L8.5 10.5 5 14l1 1 3-1.5 2.5-1L19.48 9.13a1 1 0 0 0 .5-1.26l-1.5-3a1 1 0 0 0-.35-.35l-3-1.5a1 1 0 0 0-2 0z M3 21l3.5-3.5M6 18l-3 3"/>',
+  'monitor': '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  'compass': '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/>',
+  'lock':    '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  // Simple geometric filled shapes (fallback for clarity at 10-12px)
+  'diamond':   '<path d="M12 2L22 12L12 22L2 12Z"/>',
+  'flag':      '<path d="M4 2v20"/><path d="M4 2h12l-3 5 3 5H4"/>',
+  'triangle':  '<path d="M12 3L22 21H2Z"/>'
+};
+EAP.iconFilled = function(name, size) {
+  var s = size || 14;
+  var paths = EAP._filledIcons[name] || EAP._icons[name];
+  if (!paths) return '';
+  return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
 };
 
 // Drag grip — special: uses fill not stroke, smaller viewBox
