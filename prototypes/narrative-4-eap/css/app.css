@@ -445,7 +445,9 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ctx-active { font-weight: 600; }
 
 /* ═══ DRAG & DROP ═══ */
-.drop-highlight { outline: 2px dashed rgba(37,99,235,0.3); outline-offset: -2px; background: rgba(37,99,235,0.03) !important; }
+.bcard-dragging { opacity: 0.4; transform: rotate(1deg); box-shadow: var(--shadow-lg); }
+.drop-highlight { outline: 2px dashed var(--color-info); outline-offset: -2px; background: rgba(42,110,220,0.03) !important; border-radius: var(--radius-lg); }
+.dtbl tbody tr[draggable]:active { cursor: grabbing; }
 /* Row drop animation applied via inline styles in interactions.js */
 
 /* ═══ DEPENDENCY SVG ═══ */

@@ -381,16 +381,15 @@ EAP.initBoardDrag = function() {
     card.addEventListener('dragstart', function(e) {
       dragging = card;
       dragSource = card.parentElement;
-      card.style.opacity = '0.4';
+      card.classList.add('bcard-dragging');
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', card.id || '');
     });
 
     card.addEventListener('dragend', function() {
-      card.style.opacity = '1';
+      card.classList.remove('bcard-dragging');
       dragging = null;
       dragSource = null;
-      // Remove all drop highlights
       content.querySelectorAll('.drop-highlight').forEach(function(el) { el.classList.remove('drop-highlight'); });
     });
   });
@@ -420,6 +419,16 @@ EAP.initBoardDrag = function() {
       dragging.classList.add('card-dropped');
       var cardRef = dragging;
       setTimeout(function() { cardRef.classList.remove('card-dropped'); }, 300);
+
+      // Update column counts (find count badges in column headers)
+      function updateColCount(colZone) {
+        var col = colZone.closest('[style*="flex-direction:column"]') || colZone.parentElement;
+        if (!col) return;
+        var countEl = col.querySelector('[style*="font-mono"]');
+        if (countEl) countEl.textContent = colZone.querySelectorAll('.bcard').length;
+      }
+      updateColCount(zone);
+      if (dragSource) updateColCount(dragSource);
     });
   });
 
@@ -456,13 +465,13 @@ EAP.initBoardDrag = function() {
     row.addEventListener('dragover', function(e) {
       e.preventDefault();
       if (!rowDragging || row === rowDragging) return;
-      if (row.parentNode !== rowDragging.parentNode) return;
       rowMoved = true;
       var rect = row.getBoundingClientRect();
+      var tbody = row.parentNode;
       if (e.clientY < rect.top + rect.height / 2) {
-        row.parentNode.insertBefore(rowDragging, row);
+        tbody.insertBefore(rowDragging, row);
       } else {
-        row.parentNode.insertBefore(rowDragging, row.nextSibling);
+        tbody.insertBefore(rowDragging, row.nextSibling);
       }
     });
   });
