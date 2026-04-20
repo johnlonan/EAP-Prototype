@@ -405,27 +405,30 @@ EAP.wiDeps = [
 // ═══════════════════════════════════════════════════════
 // INSIGHTS — per view/level
 // ═══════════════════════════════════════════════════════
+// Signal types: ai=true means AI-inferred (sparkle + teal + confidence + source).
+// ai=false or absent means rule-based (system fact, no sparkle, no confidence).
 EAP.insights = {
   'art-Feature-backlog': {
     signals: [
-      {level:'urgent', title:'47 customers flagged biometric issues this week', desc:'Up 3× from last month. Enhanced Biometric Auth Flow is ranked #1 by WSJF with no PI commitment.', action:'Plan into PI 26'},
-      {level:'urgent', title:'New customer theme: payment confirmation too slow', desc:'31 mentions in 7 days. No Feature in backlog matches this pattern.', action:'Create Feature'},
-      {level:'urgent', title:'2 Features backlogged for 3+ PIs', desc:'Loan Application Wizard and Investment Portfolio View have never been pulled. Backlog noise increasing.', action:'Prioritise or remove'},
-      {level:'watch',  title:'3 competitor banks launched biometric login this quarter', desc:'Accelerating Enhanced Biometric Auth Flow over lower-ranked items makes strategic sense.', action:'Reprioritise'},
-      {level:'watch',  title:'PSD3 regulatory update published', desc:'Transaction Dispute Resolution may need scope change to comply by Q3 2026.', action:'Review scope'},
-      {level:'ok',     title:'Mobile Exp has unallocated capacity in Sprint 3', desc:'No Features currently assigned. Opportunity to pull from backlog.', action:''}
+      {level:'urgent', ai:true, confidence:'High', title:'47 customers flagged biometric issues this week', desc:'Up 3× from last month. Enhanced Biometric Auth Flow is ranked #1 by WSJF with no PI commitment.', action:'Plan into PI 26', meta:'Based on 47 support tickets, 12 NPS comments'},
+      {level:'urgent', ai:true, confidence:'High', title:'New customer theme: payment confirmation too slow', desc:'31 mentions in 7 days. No Feature in backlog matches this pattern.', action:'Create Feature', meta:'Analysing 31 support tickets across 3 channels'},
+      {level:'urgent', title:'2 Features backlogged for 3+ PIs', desc:'Loan Application Wizard and Investment Portfolio View have never been pulled. Backlog noise increasing.', action:'Prioritise or remove', meta:'Comparing backlog age across 18 items'},
+      {level:'watch', ai:true, confidence:'Moderate', title:'3 competitor banks launched biometric login this quarter', desc:'Accelerating Enhanced Biometric Auth Flow over lower-ranked items makes strategic sense.', action:'Reprioritise', meta:'Monitoring 12 competitor product releases'},
+      {level:'watch', ai:true, confidence:'Moderate', title:'PSD3 regulatory update published', desc:'Transaction Dispute Resolution may need scope change to comply by Q3 2026.', action:'Review scope', meta:'Regulatory feed — published 3 days ago'},
+      {level:'ok', title:'Mobile Exp has unallocated capacity in Sprint 3', desc:'No Features currently assigned. Opportunity to pull from backlog.', action:'', meta:'Capacity data from 6 teams'}
     ]
   },
   'art-WorkItem-backlog': {
     signals: [
-      {level:'urgent', title:'22 Stories across all teams have no acceptance criteria', desc:'Cannot be reliably estimated or tested before Sprint 3 planning.', action:'Prioritise AC definition'},
-      {level:'urgent', title:'Fraud Team has 12 open defects in backlog', desc:'Up from 4 last PI. Defect rate accelerating.', action:'Schedule defect sprint'},
-      {level:'watch',  title:'5 Stories in backlog for 3+ sprints with no assignment', desc:'Stale items reducing backlog signal quality.', action:'Review and assign or descope'},
-      {level:'ok',     title:'Story estimation consistency within normal range', desc:'Auth and Payments teams estimation is stable this PI.', action:''}
+      {level:'urgent', title:'22 Stories across all teams have no acceptance criteria', desc:'Cannot be reliably estimated or tested before Sprint 3 planning.', action:'Prioritise AC definition', meta:'Scanning 26 backlog stories'},
+      {level:'urgent', title:'Fraud Team has 12 open defects in backlog', desc:'Up from 4 last PI. Defect rate accelerating.', action:'Schedule defect sprint', meta:'Defect trend over last 3 PIs'},
+      {level:'watch', title:'5 Stories in backlog for 3+ sprints with no assignment', desc:'Stale items reducing backlog signal quality.', action:'Review and assign or descope'},
+      {level:'ok', title:'Story estimation consistency within normal range', desc:'Auth and Payments teams estimation is stable this PI.', action:''}
     ]
   },
   'art-Feature-planning': {
-    gauge: {value:68, label:'PI 26 Capacity'},
+    gauge: {value:68, label:'PI Predictability'},
+    predict: {value:72, label:'Completion probability', trend:'down'},
     teams: [
       {name:'Auth',     pct:80,  status:'healthy'},
       {name:'Payments', pct:92,  status:'watch'},
@@ -435,70 +438,67 @@ EAP.insights = {
       {name:'Onboard',  pct:60,  status:'healthy'}
     ],
     signals: [
-      {level:'urgent', title:'Payment Confirmation Flow blocked Day 2', desc:'Auth Team dependency unresolved. 8 days left in Sprint 2. Escalation path not assigned.', action:'Escalate now'},
-      {level:'urgent', title:'Fraud Team Sprint 4 at 110% capacity', desc:'3 items need moving or descoping before PI closes.', action:'Rebalance Sprint 4'},
-      {level:'urgent', title:'Streamlined Onboarding has no team assigned Sprint 3', desc:'Will not make PI 26 without assignment this sprint.', action:'Assign team'},
-      {level:'watch',  title:'Auth Team is critical path for 2 downstream items', desc:'Auth at 80% capacity — any slip cascades to Payments and Fraud.', action:'Monitor closely'},
-      {level:'watch',  title:'Mobile Exp has no items in Sprint 3', desc:'Capacity available, nothing planned. Planning gap.', action:'Pull from backlog'},
-      {level:'ok',     title:'Auth and Mobile Exp on track Sprints 1–3', desc:'No capacity or dependency issues detected.', action:''}
+      {level:'urgent', title:'Payment Confirmation Flow blocked Day 2', desc:'Auth Team dependency unresolved. 8 days left in Sprint 2. Escalation path not assigned.', action:'Escalate now', meta:'Blocked since sprint start — 2 downstream items at risk'},
+      {level:'urgent', title:'Fraud Team Sprint 4 at 110% capacity', desc:'3 items need moving or descoping before PI closes.', action:'Rebalance Sprint 4', meta:'Capacity calculated across 4 sprints'},
+      {level:'urgent', ai:true, confidence:'High', title:'Streamlined Onboarding will miss PI 26', desc:'No team assigned for Sprint 3. At current trajectory, 0% chance of completion this PI.', action:'Assign team', meta:'Analysing velocity of 6 teams over 3 sprints'},
+      {level:'watch', ai:true, confidence:'Moderate', title:'Auth Team is critical path for 2 downstream items', desc:'Auth at 80% capacity — any slip cascades to Payments and Fraud.', action:'Monitor closely', meta:'Dependency chain analysis across 4 Features'},
+      {level:'watch', title:'Mobile Exp has no items in Sprint 3', desc:'Capacity available, nothing planned. Planning gap.', action:'Pull from backlog', meta:'Capacity data from team allocation'},
+      {level:'ok', title:'Auth and Mobile Exp on track Sprints 1–3', desc:'No capacity or dependency issues detected.', action:''}
     ]
   },
   'art-WorkItem-planning': {
     signals: [
-      {level:'urgent', title:'14 Stories blocked across 4 teams', desc:'Auth API, Payments gateway and 2 Fraud dependencies unresolved.', action:'View all blockers'},
-      {level:'urgent', title:'Sprint 2 burn rate 18% below target on Day 3', desc:'At current pace ART will complete 71% of Sprint 2 commitments.', action:'Review with teams'},
-      {level:'watch',  title:'Unplanned work is 18% of Sprint 2 scope', desc:'ART target is under 10%. Planning quality risk.', action:'Review sprint planning'},
-      {level:'ok',     title:'Story defect rate within normal range for Sprint 2', desc:'Despite new Feature work, quality holding.', action:''}
+      {level:'urgent', title:'14 Stories blocked across 4 teams', desc:'Auth API, Payments gateway and 2 Fraud dependencies unresolved.', action:'View all blockers', meta:'Scanning 32 sprint items across 6 teams'},
+      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2 will complete 71% of commitments', desc:'At current burn rate with 8 days remaining. Auth and Payments teams below target.', action:'Review with teams', meta:'Predicting from velocity of last 3 sprints'},
+      {level:'watch', title:'Unplanned work is 18% of Sprint 2 scope', desc:'ART target is under 10%. Planning quality risk.', action:'Review sprint planning', meta:'Comparing committed vs actual scope'},
+      {level:'ok', title:'Story defect rate within normal range for Sprint 2', desc:'Despite new Feature work, quality holding.', action:''}
     ]
   },
   'art-Feature-board': {
     signals: [
-      {level:'urgent', title:'Real-time Fraud Alerts at 0% after 2 of 4 sprints', desc:'At current pace will not complete this PI. 3 open defects blocking progress.', action:'Escalate to Fraud Team'},
-      {level:'urgent', title:'3 Features below 30% with 6 weeks remaining', desc:'Payment Confirmation (20%), Fraud Alerts (25%), Onboarding (0%). Slip probability high.', action:'Descope or add capacity'},
-      {level:'watch',  title:'Account Statement Export at 40% — on the edge', desc:'Accounts Team below velocity target this sprint. Watch closely.', action:'Check with Accounts Team'},
-      {level:'ok',     title:'Balance on Home Screen complete at 100%', desc:'3 weeks remaining in PI 26. Opportunity to pull additional scope.', action:''}
+      {level:'urgent', ai:true, confidence:'High', title:'Real-time Fraud Alerts will not complete this PI', desc:'At 25% after 2 of 5 sprints. 3 open defects blocking progress. Completion probability: 18%.', action:'Escalate to Fraud Team', meta:'Predicting from team velocity and defect trend'},
+      {level:'urgent', ai:true, confidence:'High', title:'3 Features below 30% with 6 weeks remaining', desc:'Payment Confirmation (20%), Fraud Alerts (25%), Onboarding (0%). Combined slip probability: 84%.', action:'Descope or add capacity', meta:'Analysing progress vs remaining PI capacity'},
+      {level:'watch', title:'Account Statement Export at 40% — on the edge', desc:'Accounts Team below velocity target this sprint. Watch closely.', action:'Check with Accounts Team'},
+      {level:'ok', title:'Balance on Home Screen complete at 100%', desc:'Opportunity to pull additional scope.', action:''}
     ]
   },
   'art-WorkItem-board': {
     signals: [
-      {level:'urgent', title:'Payment Confirmation blocked Day 2', desc:'Dependency on Auth API. This Story blocks 2 others in the same sprint. Cascade risk.', action:'Escalate now'},
+      {level:'urgent', title:'Payment Confirmation blocked Day 2', desc:'Dependency on Auth API. This Story blocks 2 others in the same sprint. Cascade risk.', action:'Escalate now', meta:'Blocked since sprint start'},
       {level:'urgent', title:'Fraud Team Sprint 4 at 110% capacity', desc:'Cards visually overflowing. Items need moving before sprint start.', action:'Rebalance'},
-      {level:'watch',  title:'Accounts Team 20% below Sprint 2 velocity', desc:'3 Stories not yet started on Day 3.', action:'Flag in standup'},
-      {level:'watch',  title:'14 Stories In Progress, only 3 Done', desc:'Stories not flowing to completion — likely review bottleneck.', action:'Check review process'},
-      {level:'ok',     title:'Auth Team velocity consistent with last 3 sprints', desc:'On track.', action:''}
+      {level:'watch', ai:true, confidence:'Moderate', title:'Flow bottleneck: 14 In Progress, only 3 Done', desc:'Stories not completing — likely review process bottleneck. Avg cycle time up 40%.', action:'Check review process', meta:'Comparing flow metrics to last 3 sprints'},
+      {level:'watch', title:'Accounts Team 20% below Sprint 2 velocity', desc:'3 Stories not yet started on Day 3.', action:'Flag in standup'},
+      {level:'ok', title:'Auth Team velocity consistent with last 3 sprints', desc:'On track.', action:''}
     ]
   },
   'art-Feature-hierarchy': {
-    // No gauge or team data — strategy signals only
     signals: [
-      {level:'urgent', title:'Goal 2 at risk — only 12% progress vs 42% for Goal 1', desc:'Cost reduction goal falling behind. No Features in execution for Customer Self-Service Expansion Epic. Strategic imbalance growing.', action:'Rebalance portfolio'},
-      {level:'urgent', title:'Customer Self-Service Expansion has 0 Features defined', desc:'This is the primary Epic for Goal 2. Without scoping, the goal cannot recover this PI.', action:'Start scoping'},
-      {level:'watch',  title:'Open Banking API Programme in Review with no breakdown', desc:'PSD3 deadline Q3 2026. Without Capability/Feature breakdown, delivery timeline is unknown.', action:'Break down into Capabilities'},
-      {level:'watch',  title:'Next-Gen Mobile Banking has 3 unassigned backlog Features', desc:'Epic at 42% but pipeline thinning. Teams will have nothing to pull in PI 27.', action:'Assign teams'},
-      {level:'watch',  title:'2 Epics with no Features or Capabilities defined', desc:'Customer Self-Service and Open Banking are empty containers. Need breakdown before PI 27 planning.', action:'Schedule scoping'},
-      {level:'ok',     title:'Goal 1 on track at 42%', desc:'Digital bank goal progressing. PI 26 commitments aligned. 4 of 7 Features in execution.', action:''}
+      {level:'urgent', ai:true, confidence:'High', title:'Goal 2 at risk — strategic imbalance growing', desc:'Cost reduction goal at 12% vs 42% for Goal 1. No Features in execution for Customer Self-Service Epic.', action:'Rebalance portfolio', meta:'Comparing goal progress across 6 Epics'},
+      {level:'urgent', title:'Customer Self-Service Expansion has 0 Features defined', desc:'Primary Epic for Goal 2. Cannot recover this PI without scoping.', action:'Start scoping'},
+      {level:'watch', title:'Open Banking API Programme in Review with no breakdown', desc:'PSD3 deadline Q3 2026. Delivery timeline unknown without Capability breakdown.', action:'Break down into Capabilities'},
+      {level:'watch', ai:true, confidence:'Moderate', title:'Pipeline thinning for Next-Gen Mobile Banking', desc:'Epic at 42% but 3 backlog Features unassigned. Teams will have nothing to pull in PI 27.', action:'Assign teams', meta:'Forecasting team demand for PI 27'},
+      {level:'ok', title:'Goal 1 on track at 42%', desc:'4 of 7 Features in execution. PI 26 commitments aligned.', action:''}
     ]
   },
-  // Team-level insights — no gauge or team capacity (that's ART-level)
   'team-WorkItem-backlog': {
     signals: [
       {level:'urgent', title:'3 Stories have no acceptance criteria', desc:'Cannot be estimated or tested before Sprint 3.', action:'Define AC'},
-      {level:'watch',  title:'2 Defects older than 14 days in backlog', desc:'Ageing defects reduce backlog quality.', action:'Prioritise or close'},
-      {level:'ok',     title:'Story estimation consistent with team average', desc:'No anomalies detected.', action:''}
+      {level:'watch', title:'2 Defects older than 14 days in backlog', desc:'Ageing defects reduce backlog quality.', action:'Prioritise or close'},
+      {level:'ok', title:'Story estimation consistent with team average', desc:'No anomalies detected.', action:''}
     ]
   },
   'team-WorkItem-planning': {
     signals: [
       {level:'urgent', title:'Auth API integration blocked Day 2', desc:'Past team average resolution: 1.4 days. Escalation window closing.', action:'Escalate'},
-      {level:'watch',  title:'At current pace 3 Stories may not complete Sprint 2', desc:'7 days left, 4 Stories not started or blocked.', action:'Flag standup'},
-      {level:'ok',     title:'Defect count within normal range', desc:'Consistent with last 3 sprints.', action:''}
+      {level:'watch', ai:true, confidence:'Moderate', title:'3 Stories may not complete Sprint 2', desc:'7 days left, 4 Stories not started or blocked.', action:'Flag standup', meta:'Predicting from team burn rate'},
+      {level:'ok', title:'Defect count within normal range', desc:'Consistent with last 3 sprints.', action:''}
     ]
   },
   'team-WorkItem-board': {
     signals: [
       {level:'urgent', title:'1 Story blocked in Sprint 2', desc:'Auth API dependency unresolved. Blocks 2 downstream items.', action:'Escalate'},
-      {level:'watch',  title:'In Progress column has 3 items, Done has 1', desc:'Flow bottleneck — items not completing.', action:'Review WIP limits'},
-      {level:'ok',     title:'Sprint velocity on track', desc:'Burn rate consistent with commitment.', action:''}
+      {level:'watch', title:'In Progress column has 3 items, Done has 1', desc:'Flow bottleneck — items not completing.', action:'Review WIP limits'},
+      {level:'ok', title:'Sprint velocity on track', desc:'Burn rate consistent with commitment.', action:''}
     ]
   }
 };

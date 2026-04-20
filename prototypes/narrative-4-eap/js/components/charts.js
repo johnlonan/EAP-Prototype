@@ -1,158 +1,143 @@
 /* ═══════════════════════════════════════════════════════
-   CHARTS.JS — Sprint burndown + PI velocity charts
-   Uses Chart.js (bundled). Renders into the insights panel.
-   Only shown at ART context, Feature or WorkItem level.
+   CHARTS.JS — Compact sparkline charts for insights panel
+   Uses Chart.js (bundled). No axes, no grid, no legend.
+   Pure data shape — the number tells the value, the shape
+   tells the trend.
    ═══════════════════════════════════════════════════════ */
 var EAP = EAP || {};
 
 EAP.renderCharts = function() {
   var s = EAP.state;
-  // Only show at ART context on Feature or WorkItem level, non-hierarchy tabs
   if (s.context !== 'art' || s.tab === 'hierarchy') return;
   if (s.level !== 'Feature' && s.level !== 'WorkItem') return;
 
   var panel = document.getElementById('insights-panel');
   if (!panel) return;
 
-  // Insert chart section before the signals section
   var chartHtml = '<div class="ins-charts">';
 
   if (s.level === 'WorkItem') {
-    chartHtml += '<div class="ins-chart-wrap"><div class="ins-chart-title">Sprint Burndown</div><canvas id="burndownChart" height="140"></canvas></div>';
+    // Burn rate sparkline + bold metric
+    chartHtml += '<div class="ins-spark-row">' +
+      '<div class="ins-spark-info"><div class="ins-spark-label">Sprint Burn Rate</div><div class="ins-spark-val">24 <span class="ins-spark-unit">pts remaining</span></div></div>' +
+      '<div class="ins-spark-chart"><canvas id="burnSpark" height="40"></canvas></div></div>';
+
+    // Velocity sparkline + bold metric
+    chartHtml += '<div class="ins-spark-row">' +
+      '<div class="ins-spark-info"><div class="ins-spark-label">Velocity Trend</div><div class="ins-spark-val">28 <span class="ins-spark-unit">pts / sprint</span></div></div>' +
+      '<div class="ins-spark-chart"><canvas id="velSpark" height="40"></canvas></div></div>';
   }
 
-  chartHtml += '<div class="ins-chart-wrap"><div class="ins-chart-title">' +
-    (s.level === 'WorkItem' ? 'Sprint Velocity' : 'PI Feature Progress') +
-    '</div><canvas id="velocityChart" height="140"></canvas></div>';
+  if (s.level === 'Feature') {
+    // Feature progress compact bars
+    chartHtml += '<div class="ins-chart-wrap"><div class="ins-chart-title">PI Feature Progress</div><canvas id="featureProgress" height="120"></canvas></div>';
+  }
 
   chartHtml += '</div>';
 
-  // Insert after teams section or after gauge
   var scroll = panel.querySelector('.ins-scroll');
   if (scroll) {
     var sigSec = scroll.querySelector('.ins-sec');
-    if (sigSec) {
-      sigSec.insertAdjacentHTML('beforebegin', chartHtml);
-    } else {
-      scroll.insertAdjacentHTML('beforeend', chartHtml);
-    }
+    if (sigSec) sigSec.insertAdjacentHTML('beforebegin', chartHtml);
+    else scroll.insertAdjacentHTML('beforeend', chartHtml);
   }
 
-  // Draw charts after DOM insert
   setTimeout(function() {
-    if (s.level === 'WorkItem') EAP.drawBurndown();
-    EAP.drawVelocity(s.level);
+    if (s.level === 'WorkItem') { EAP.drawBurnSpark(); EAP.drawVelSpark(); }
+    if (s.level === 'Feature') EAP.drawFeatureProgress();
   }, 80);
 };
 
-// ── Sprint Burndown (WorkItem level) ──────────────────
-EAP.drawBurndown = function() {
-  var el = document.getElementById('burndownChart');
+// ── Sparkline base config ─────────────────────────────
+function sparkBase() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: { x: { display: false }, y: { display: false } },
+    elements: { point: { radius: 0 } }
+  };
+}
+
+// ── Sprint Burndown Sparkline ─────────────────────────
+EAP.drawBurnSpark = function() {
+  var el = document.getElementById('burnSpark');
   if (!el || typeof Chart === 'undefined') return;
 
-  var totalPts = 32; // Sprint 2 total
+  var actual = [32, 32, 30, 28, 27, 25, 24];
   var days = EAP._sprintDays;
-  var dayLabels = [];
-  for (var i = 1; i <= days; i++) dayLabels.push('D' + i);
-
-  // Ideal burndown (straight line)
-  var ideal = dayLabels.map(function(_, idx) { return Math.round(totalPts * (1 - idx / (days - 1))); });
-
-  // Actual burndown (simulated — slower than ideal, realistic)
-  var actual = [32, 32, 30, 28, 27, 25, 24, 24, 22, 20, 18, 16, 14, 12];
-  // Trim to current day
-  var currentDay = Math.min(EAP._dayInSprint, days);
-  actual = actual.slice(0, currentDay);
+  var ideal = [];
+  for (var i = 0; i < days; i++) ideal.push(Math.round(32 * (1 - i / (days - 1))));
 
   new Chart(el, {
     type: 'line',
     data: {
-      labels: dayLabels,
+      labels: ideal.map(function(_, i) { return i; }),
       datasets: [
-        { label: 'Ideal', data: ideal, borderColor: 'rgba(0,0,0,0.12)', borderWidth: 1.5, borderDash: [4, 3], pointRadius: 0, fill: false, tension: 0 },
-        { label: 'Actual', data: actual, borderColor: '#0e4e69', borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, fill: false, tension: 0.2 }
+        { data: ideal, borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1, borderDash: [3,2], fill: false, tension: 0 },
+        { data: actual, borderColor: '#0e4e69', borderWidth: 2, fill: true, backgroundColor: 'rgba(14,78,105,0.06)', tension: 0.3 }
       ]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 9, family: 'var(--font-sans)' }, color: '#c2c1be', maxRotation: 0 } },
-        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 9 }, color: '#c2c1be', stepSize: 8 } }
-      }
-    }
+    options: sparkBase()
   });
 };
 
-// ── Velocity / Feature Progress ───────────────────────
-EAP.drawVelocity = function(level) {
-  var el = document.getElementById('velocityChart');
+// ── Velocity Sparkline ────────────────────────────────
+EAP.drawVelSpark = function() {
+  var el = document.getElementById('velSpark');
   if (!el || typeof Chart === 'undefined') return;
 
-  if (level === 'WorkItem') {
-    // Sprint velocity — points completed per sprint
-    new Chart(el, {
-      type: 'bar',
-      data: {
-        labels: ['Sprint 1', 'Sprint 2', 'Sprint 3', 'Sprint 4'],
-        datasets: [{
-          label: 'Completed',
-          data: [28, 8, 0, 0],
-          backgroundColor: ['#0e4e69', 'rgba(14,78,105,0.5)', 'rgba(14,78,105,0.15)', 'rgba(14,78,105,0.15)'],
-          borderRadius: 4,
-          barThickness: 24,
-          borderSkipped: false
-        }, {
-          label: 'Committed',
-          data: [30, 32, 29, 24],
-          backgroundColor: 'rgba(0,0,0,0.06)',
-          borderRadius: 4,
-          barThickness: 24,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#c2c1be' } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 9 }, color: '#c2c1be', stepSize: 10 } }
-        }
+  new Chart(el, {
+    type: 'bar',
+    data: {
+      labels: ['S1', 'S2', 'S3', 'S4'],
+      datasets: [{
+        data: [28, 8, 0, 0],
+        backgroundColor: ['#0e4e69', 'rgba(14,78,105,0.5)', 'rgba(14,78,105,0.12)', 'rgba(14,78,105,0.12)'],
+        borderRadius: 3,
+        barThickness: 16,
+        borderSkipped: false
+      }]
+    },
+    options: Object.assign({}, sparkBase(), {
+      scales: { x: { display: false }, y: { display: false, beginAtZero: true } }
+    })
+  });
+};
+
+// ── Feature Progress (horizontal bars) ────────────────
+EAP.drawFeatureProgress = function() {
+  var el = document.getElementById('featureProgress');
+  if (!el || typeof Chart === 'undefined') return;
+
+  var features = EAP.allFeatures.filter(function(f) { return f.pi === 'pi26'; });
+
+  new Chart(el, {
+    type: 'bar',
+    data: {
+      labels: features.map(function(f) { return f.name.length > 18 ? f.name.substring(0, 16) + '…' : f.name; }),
+      datasets: [{
+        data: features.map(function(f) { return f.pct || 0; }),
+        backgroundColor: features.map(function(f) {
+          if (f.state === 'Done') return '#00834f';
+          if (f.state === 'Blocked' || f.blocked) return '#e2161c';
+          if (f.pct >= 40) return '#0e4e69';
+          return 'rgba(14,78,105,0.3)';
+        }),
+        borderRadius: 3,
+        barThickness: 12,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: function(ctx) { return ctx.raw + '% complete'; } } } },
+      scales: {
+        x: { display: false, beginAtZero: true, max: 100 },
+        y: { display: true, grid: { display: false }, ticks: { font: { size: 9, family: 'var(--font-sans)' }, color: '#656462', padding: 0 } }
       }
-    });
-  } else {
-    // Feature level — progress per feature (horizontal bar)
-    var features = EAP.allFeatures.filter(function(f) { return f.pi === 'pi26'; });
-    new Chart(el, {
-      type: 'bar',
-      data: {
-        labels: features.map(function(f) { return f.name.length > 20 ? f.name.substring(0, 18) + '…' : f.name; }),
-        datasets: [{
-          label: '% Complete',
-          data: features.map(function(f) { return f.pct || 0; }),
-          backgroundColor: features.map(function(f) {
-            if (f.state === 'Done') return '#00834f';
-            if (f.state === 'Blocked') return '#e2161c';
-            if (f.pct >= 40) return '#0e4e69';
-            return 'rgba(14,78,105,0.4)';
-          }),
-          borderRadius: 4,
-          barThickness: 14,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 9 }, color: '#c2c1be', callback: function(v) { return v + '%'; } } },
-          y: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#656462' } }
-        }
-      }
-    });
-  }
+    }
+  });
 };
