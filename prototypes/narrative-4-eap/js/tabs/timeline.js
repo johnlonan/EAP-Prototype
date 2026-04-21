@@ -254,8 +254,25 @@ EAP.renderTimeline = function() {
   h += '<div class="tl-body"><div class="tl-body-left" style="width:'+leftW+'px;height:'+totalH+'px;">'+leftHtml+'</div>';
   h += '<div class="tl-body-rscroll"><div class="tl-body-right" style="height:'+totalH+'px;">'+tlGrid(range,td,showSp)+tlToday(range,td)+rightHtml+'</div></div></div>';
 
-  // Scroll-to-today button
-  h += '<button class="tl-scroll-today" id="tl-scroll-today" title="Scroll to today">' + EAP.icon('calendar', 12) + ' Today</button>';
+  // Scroll-to-today + legend
+  h += '<div class="tl-fab-wrap">';
+  h += '<button class="tl-fab" id="tl-legend-btn" title="Colour legend" aria-label="Colour legend">' + EAP.icon('info', 14) + '</button>';
+  h += '<button class="tl-fab" id="tl-scroll-today" title="Scroll to today">' + EAP.icon('calendar', 12) + ' Today</button>';
+  h += '</div>';
+
+  // Legend popover (hidden by default)
+  h += '<div class="tl-legend" id="tl-legend" hidden>' +
+    '<div class="tl-legend-title">Bar colour = work item state</div>' +
+    '<ul class="tl-legend-list">' +
+    '<li><span class="tl-legend-sw" style="background:var(--dv-info);"></span>In Progress</li>' +
+    '<li><span class="tl-legend-sw" style="background:var(--dv-success);"></span>Done</li>' +
+    '<li><span class="tl-legend-sw" style="background:var(--dv-error);"></span>Blocked</li>' +
+    '<li><span class="tl-legend-sw" style="background:#8b5cf6;"></span>In Review / Analysis</li>' +
+    '<li><span class="tl-legend-sw" style="background:var(--dv-warning);"></span>Backlog (committed, not started)</li>' +
+    '<li><span class="tl-legend-sw" style="background:var(--text-disabled);"></span>Funnel / Draft / Planned</li>' +
+    '</ul>' +
+    '<div class="tl-legend-note">White strip on a bar = completion progress</div>' +
+    '</div>';
 
   h += '</div>';
   return h;

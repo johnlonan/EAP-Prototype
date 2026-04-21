@@ -259,4 +259,17 @@ EAP.renderContent = function() {
       scroller.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
     }
   });
+
+  // Wire legend popover on Timeline
+  var legBtn = document.getElementById('tl-legend-btn');
+  var leg = document.getElementById('tl-legend');
+  if (legBtn && leg) {
+    legBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      leg.hidden = !leg.hidden;
+    });
+    document.addEventListener('click', function(e) {
+      if (!leg.hidden && !leg.contains(e.target) && e.target !== legBtn && !legBtn.contains(e.target)) leg.hidden = true;
+    });
+  }
 };
