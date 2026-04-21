@@ -225,16 +225,11 @@ EAP.renderTimeline = function() {
       var tc = (EAP._typeColors[(item.type||level)] || 'var(--text-tertiary)');
       leftHtml += '<div class="tl-row-lbl" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm" title="'+item.name+'">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
       rightHtml += '<div class="tl-row-bg" style="top:'+y+'px;height:'+rowH+'px;"></div>';
-      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'">';
+      // Bar is solid full-colour (white text readable). Progress shown as
+      // a lighter strip on top of the filled portion.
+      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;background:'+col+';" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'">';
       if (pct > 0 && pct < 100) {
-        // Two-tone: track is lighter shade of fill, both dark enough for white text
-        rightHtml += '<div class="tl-bar-track" style="background:'+col+';opacity:0.65;"></div>';
-        rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;background:'+col+';"></div>';
-      } else if (pct >= 100) {
-        rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';"></div>';
-      } else {
-        // Unstarted: use track tone (lighter but still dark enough for white text)
-        rightHtml += '<div class="tl-bar-track" style="width:100%;background:'+col+';opacity:0.55;"></div>';
+        rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;background:rgba(255,255,255,0.28);"></div>';
       }
       rightHtml += '<span class="tl-bar-lbl">'+item.name+'</span></div>';
       y += rowH;
