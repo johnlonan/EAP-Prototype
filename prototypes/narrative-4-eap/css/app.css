@@ -200,10 +200,10 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 /* ═══ PI ACCORDION ═══ */
 .pi-acc { border-radius: 16px; background: rgba(255,255,255,0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.65); box-shadow: 0 1px 4px rgba(0,0,0,0.04); transition: box-shadow 0.2s ease; }
 .pi-acc:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
-.pi-acc > .pi-hd { border-radius: 16px 16px 0 0; }
-.pi-acc > .pi-hd:last-child { border-radius: 16px; }
-.pi-acc > :last-child { border-radius: 0 0 16px 16px; }
-.pi-acc > .pi-hd:last-child { border-radius: 16px; }
+/* Header: full radius when accordion collapsed (body not open), top radius when open */
+.pi-acc > .pi-hd { border-radius: 16px; }
+.pi-acc > .pi-hd:has(+ .pi-body.open) { border-radius: 16px 16px 0 0; }
+.pi-acc > .pi-body.open { border-radius: 0 0 16px 16px; }
 .pi-hd { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; user-select: none; transition: background 120ms ease; }
 .pi-hd:hover { background: rgba(255,255,255,0.35); }
 .pi-hd:not(.active) { background: rgba(14,78,105,0.12); }
@@ -254,7 +254,7 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 /* ── Hero metric (gauge + value overlay) ── */
 .ins-hero { position: relative; padding: 16px 16px 12px; border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, rgba(0,199,177,0.03), transparent); }
 .ins-hero canvas { display: block; }
-.ins-hero-overlay { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
+.ins-hero-overlay { position: absolute; top: 72px; left: 0; right: 0; text-align: center; pointer-events: none; }
 .ins-hero-val { font-size: 32px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
 .ins-hero-pct { font-size: 18px; font-weight: 500; }
 .ins-hero-trend { font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 3px; margin-top: 2px; }
@@ -325,7 +325,7 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ins-sig-ok { opacity: 0.7; }
 
 /* ── Signal cards ── */
-.ins-sig { padding: 8px 10px; margin-bottom: 6px; border-radius: var(--radius-md); position: relative; transition: background 120ms ease, max-height 300ms, opacity 300ms; }
+.ins-sig { padding: 8px 10px; margin-bottom: 6px; border-radius: 0 var(--radius-md) var(--radius-md) 0; position: relative; transition: background 120ms ease, max-height 300ms, opacity 300ms; }
 .ins-sig:last-child { margin-bottom: 0; }
 .ins-sig:hover { background: rgba(0,0,0,0.02); }
 
