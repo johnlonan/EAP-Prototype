@@ -225,18 +225,18 @@ EAP.renderTimeline = function() {
       var tc = (EAP._typeColors[(item.type||level)] || 'var(--text-tertiary)');
       leftHtml += '<div class="tl-row-lbl" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm" title="'+item.name+'">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
       rightHtml += '<div class="tl-row-bg" style="top:'+y+'px;height:'+rowH+'px;"></div>';
-      // Label colour: dark if bar is light (unstarted or low fill), white if solid
-      var lblDark = (pct < 40);
-      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;border:1px solid '+col+';" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'">';
+      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'">';
       if (pct > 0 && pct < 100) {
-        rightHtml += '<div class="tl-bar-track" style="background:'+col+';opacity:0.18;"></div>';
+        // Two-tone: track is lighter shade of fill, both dark enough for white text
+        rightHtml += '<div class="tl-bar-track" style="background:'+col+';opacity:0.65;"></div>';
         rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;background:'+col+';"></div>';
       } else if (pct >= 100) {
         rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';"></div>';
       } else {
-        rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';opacity:0.18;"></div>';
+        // Unstarted: use track tone (lighter but still dark enough for white text)
+        rightHtml += '<div class="tl-bar-track" style="width:100%;background:'+col+';opacity:0.55;"></div>';
       }
-      rightHtml += '<span class="tl-bar-lbl' + (lblDark ? ' tl-bar-lbl-dark' : '') + '" style="' + (lblDark ? 'color:'+col+';' : '') + '">'+item.name+'</span></div>';
+      rightHtml += '<span class="tl-bar-lbl">'+item.name+'</span></div>';
       y += rowH;
     });
   });
