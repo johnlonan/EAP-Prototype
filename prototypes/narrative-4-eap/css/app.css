@@ -447,10 +447,10 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .tl-row-bg { position: absolute; left: 0; right: 0; border-bottom: 1px solid rgba(0,0,0,0.03); }
 
 /* Gantt bars */
-.tl-bar { position: absolute; border-radius: var(--radius-sm); cursor: pointer; overflow: hidden; display: flex; align-items: center; min-width: 4px; z-index: 2; transition: opacity var(--transition-fast); background: transparent; }
-.tl-bar:hover { opacity: 0.85; box-shadow: var(--shadow-sm); }
-.tl-bar-track { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: var(--radius-sm); }
-.tl-bar-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: var(--radius-sm); }
+.tl-bar { position: absolute; border-radius: var(--radius-sm); cursor: pointer; overflow: hidden; display: flex; align-items: center; min-width: 4px; z-index: 2; transition: all var(--transition-fast); background: transparent; box-sizing: border-box; }
+.tl-bar:hover { box-shadow: var(--shadow-sm); transform: translateY(-0.5px); }
+.tl-bar-track { position: absolute; inset: 0; }
+.tl-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; }
 .tl-bar-lbl { position: relative; z-index: 1; font-size: 9px; font-weight: 500; color: var(--text-inverted); padding: 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Today marker */

@@ -225,14 +225,14 @@ EAP.renderTimeline = function() {
       var tc = (EAP._typeColors[(item.type||level)] || 'var(--text-tertiary)');
       leftHtml += '<div class="tl-row-lbl" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm" title="'+item.name+'">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
       rightHtml += '<div class="tl-row-bg" style="top:'+y+'px;height:'+rowH+'px;"></div>';
-      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'" data-bar-color="'+col+'">';
+      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;border:1px solid '+col+';" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'">';
       if (pct > 0 && pct < 100) {
-        rightHtml += '<div class="tl-bar-track" style="background:'+col+';opacity:0.2;"></div>';
+        rightHtml += '<div class="tl-bar-track" style="background:'+col+';opacity:0.18;"></div>';
         rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;background:'+col+';"></div>';
       } else if (pct >= 100) {
         rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';"></div>';
       } else {
-        rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';opacity:0.25;"></div>';
+        rightHtml += '<div class="tl-bar-fill" style="width:100%;background:'+col+';opacity:0.18;"></div>';
       }
       rightHtml += '<span class="tl-bar-lbl">'+item.name+'</span></div>';
       y += rowH;
