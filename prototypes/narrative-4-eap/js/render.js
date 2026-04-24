@@ -276,28 +276,23 @@ EAP.renderContent = function() {
     });
   }
 
-  // Timeline focus: click a bar to focus its dependency chain; click empty canvas to clear
-  if (s.tab === 'timeline' && EAP.tlFocusChain) {
-    document.querySelectorAll('.tl-bar').forEach(function(bar) {
-      bar.addEventListener('click', function(e) {
-        e.stopPropagation();
-        var id = bar.id.replace('tl-bar-', '');
-        // Collect ids in chain: this item + anything it links to or is linked from
-        var deps = (s.level === 'WorkItem') ? (EAP.wiDeps || []) : (EAP.featureDeps || []);
-        var chain = { __id: true };
-        chain[id] = true;
-        deps.forEach(function(d) {
-          if (d.from === id || d.to === id) { chain[d.from] = true; chain[d.to] = true; }
-        });
-        delete chain.__id;
-        EAP.tlFocusChain(Object.keys(chain));
-      });
-    });
-    // Click on timeline background (not on bar, icon, popover) clears focus
+  // Focus mode is driven by clicking dependency icons only (Timeline + Board).
+  // Clicking a bar/card continues to open the detail panel as before.
+  // Click on empty canvas clears focus.
+  if (s.tab === 'timeline' && EAP.tlClearFocus) {
     var tlBody = document.querySelector('.tl-body-right');
     if (tlBody) tlBody.addEventListener('click', function(e) {
       if (e.target === tlBody || e.target.classList.contains('tl-row-bg') || e.target.classList.contains('tl-grp-band')) {
-        if (EAP.tlClearFocus) EAP.tlClearFocus();
+        EAP.tlClearFocus();
+      }
+    });
+  }
+  if ((s.tab === 'board' || s.tab === 'taskboard') && EAP.boardClearFocus) {
+    var board = document.querySelector('.content-area > div:first-child');
+    if (board) board.addEventListener('click', function(e) {
+      // Click on empty board area (not a card, not a dep icon, not popover) clears focus
+      if (!e.target.closest('.bcard') && !e.target.closest('.dep-svg') && !e.target.closest('.dep-popover')) {
+        EAP.boardClearFocus();
       }
     });
   }

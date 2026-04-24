@@ -439,36 +439,118 @@ EAP.showDepPopover = function(x, y, dep) {
   var existing = document.getElementById('dep-popover');
   if (existing) existing.remove();
 
-  var typeLabels = { conflict:'Conflict', risk:'Risk', satisfied:'Satisfied' };
-  var typeColors = { conflict:'var(--dv-error)', risk:'var(--dv-warning)', satisfied:'var(--dv-success)' };
+  var TYPE = {
+    conflict:  { label:'Conflict',  icon:'alert-triangle', verb:'blocks',       action:'Escalate',       actionId:'escalate' },
+    risk:      { label:'Risk',      icon:'clock',           verb:'feeds into',   action:'Monitor',        actionId:'monitor' },
+    satisfied: { label:'Satisfied', icon:'check-square',   verb:'feeds into',   action:'Mark resolved',  actionId:'resolve' }
+  };
+  var t = TYPE[dep.type] || TYPE.satisfied;
 
-  // Look up item names
-  function nameFor(id) {
+  // Look up full item record
+  function findItem(id) {
     var all = [].concat(EAP.allFeatures || [], EAP.epics.all || [], EAP.capabilities.all || []);
     EAP.workItems.sprints.forEach(function(sp) { all = all.concat(sp.items || []); });
-    var m = all.filter(function(i) { return i.id === id; })[0];
-    return m ? m.name : id;
+    var bl = (EAP.workItems.backlog) || {};
+    ['Story','Defect','CaseTask'].forEach(function(k) { all = all.concat(bl[k] || []); });
+    return all.filter(function(i) { return i.id === id; })[0];
+  }
+  function ownerLabel(item) {
+    if (!item) return '';
+    var ownerKey = item.owner;
+    if (!ownerKey) return '';
+    var p = EAP.people && EAP.people[ownerKey];
+    return p ? p.name : ownerKey;
+  }
+  function whenLabel(item) {
+    if (!item) return '';
+    if (item.pi) return 'PI ' + item.pi.replace('pi','');
+    return '';
+  }
+  function stateColor(state) {
+    if (!state) return 'var(--text-disabled)';
+    if (state === 'Done' || state === 'Complete') return 'var(--dv-success)';
+    if (state === 'Blocked') return 'var(--dv-error)';
+    if (state === 'In Progress' || state === 'Implementation') return 'var(--dv-info)';
+    if (state === 'In Review' || state === 'Analysis') return '#8b5cf6';
+    if (state === 'Backlog') return 'var(--dv-warning)';
+    return 'var(--text-disabled)';
+  }
+
+  var from = findItem(dep.from);
+  var to = findItem(dep.to);
+
+  function itemCard(label, item, isBlocker) {
+    if (!item) return '';
+    var meta = [];
+    if (item.state) meta.push(item.state);
+    if (ownerLabel(item)) meta.push(ownerLabel(item));
+    if (whenLabel(item)) meta.push(whenLabel(item));
+    return '<div class="dep-pop-item' + (isBlocker ? ' is-blocker' : '') + '" data-dep-item="' + item.id + '">' +
+      '<div class="dep-pop-item-label">' + label + '</div>' +
+      '<div class="dep-pop-item-name">' +
+        '<span class="dep-pop-dot" style="background:' + stateColor(item.state) + ';"></span>' +
+        item.name +
+      '</div>' +
+      '<div class="dep-pop-item-meta">' + meta.join(' · ') + '</div>' +
+      '</div>';
   }
 
   var pop = document.createElement('div');
   pop.id = 'dep-popover';
-  pop.className = 'dep-popover';
+  pop.className = 'dep-popover dep-popover-' + dep.type;
   pop.innerHTML =
-    '<div class="dep-pop-hd" style="color:' + typeColors[dep.type] + ';">' +
-      EAP.icon(dep.type === 'conflict' ? 'alert-triangle' : dep.type === 'risk' ? 'clock' : 'check-square', 14) +
-      ' ' + typeLabels[dep.type] +
+    '<div class="dep-pop-bar"></div>' +
+    '<div class="dep-pop-hd">' + EAP.icon(t.icon, 14) + '<span>' + t.label + '</span></div>' +
+    '<div class="dep-pop-body">' +
+      itemCard('Prerequisite', from, dep.type === 'conflict') +
+      '<div class="dep-pop-verb">' + EAP.icon('chevron-down', 12) + ' ' + t.verb + '</div>' +
+      itemCard('Dependent', to, false) +
     '</div>' +
-    '<div class="dep-pop-link"><strong>' + nameFor(dep.from) + '</strong> <span class="dep-pop-arrow">→</span> <strong>' + nameFor(dep.to) + '</strong></div>' +
-    '<div class="dep-pop-reason">' + dep.reason + '</div>';
+    '<div class="dep-pop-reason">' + dep.reason + '</div>' +
+    '<div class="dep-pop-actions">' +
+      '<button class="dep-pop-btn dep-pop-btn-secondary" data-dep-view="' + dep.from + '">View prerequisite</button>' +
+      '<button class="dep-pop-btn dep-pop-btn-primary" data-dep-act="' + t.actionId + '" data-dep-from="' + dep.from + '">' + t.action + '</button>' +
+    '</div>';
 
   document.body.appendChild(pop);
   var w = pop.offsetWidth, h = pop.offsetHeight;
   var vw = window.innerWidth, vh = window.innerHeight;
   var left = Math.min(Math.max(8, x - w / 2), vw - w - 8);
-  var top = y - h - 12;
-  if (top < 8) top = y + 16;
+  var top = y - h - 14;
+  if (top < 8) top = Math.min(y + 16, vh - h - 8);
   pop.style.left = left + 'px';
   pop.style.top = top + 'px';
+
+  // Wire item cards to open detail panel
+  pop.querySelectorAll('[data-dep-item]').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var id = el.getAttribute('data-dep-item');
+      pop.remove();
+      if (EAP.openDetail) EAP.openDetail(id);
+    });
+  });
+  pop.querySelectorAll('[data-dep-view]').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var id = el.getAttribute('data-dep-view');
+      pop.remove();
+      if (EAP.openDetail) EAP.openDetail(id);
+    });
+  });
+  pop.querySelectorAll('[data-dep-act]').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var act = el.getAttribute('data-dep-act');
+      var fromId = el.getAttribute('data-dep-from');
+      pop.remove();
+      var item = findItem(fromId);
+      var msg = act === 'escalate' ? 'Escalation initiated for ' + (item ? item.name : 'item') :
+                act === 'monitor' ? 'Added ' + (item ? item.name : 'item') + ' to watch list' :
+                'Dependency marked as resolved';
+      if (EAP.showToast) EAP.showToast(msg, act === 'resolve' ? 'success' : 'info');
+    });
+  });
 
   // Click outside to close
   setTimeout(function() {

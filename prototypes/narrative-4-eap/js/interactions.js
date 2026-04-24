@@ -211,18 +211,51 @@ EAP.drawDependencyLines = function() {
 
       var fR = fromEl.getBoundingClientRect();
       var tR = toEl.getBoundingClientRect();
-      // Prerequisite right edge → dependent left edge (forward in time)
-      var x1 = fR.right - bRect.left;
-      var y1 = fR.top - bRect.top + fR.height / 2;
-      var x2 = tR.left - bRect.left;
-      var y2 = tR.top - bRect.top + tR.height / 2;
-      var dx = Math.max(20, Math.abs(x2 - x1) * 0.35);
-
+      // Direction-aware edge selection: connect the edges closest to each other.
+      // Horizontal gap > vertical gap → connect horizontal edges; else vertical.
+      var fCx = fR.left + fR.width / 2, fCy = fR.top + fR.height / 2;
+      var tCx = tR.left + tR.width / 2, tCy = tR.top + tR.height / 2;
+      var dxCenters = tCx - fCx, dyCenters = tCy - fCy;
+      var x1, y1, x2, y2, isHorizontal = Math.abs(dxCenters) >= Math.abs(dyCenters) * 0.8;
+      if (isHorizontal) {
+        if (dxCenters >= 0) {
+          // dependent is to the right → from.right → to.left
+          x1 = fR.right - bRect.left; y1 = fCy - bRect.top;
+          x2 = tR.left - bRect.left;  y2 = tCy - bRect.top;
+        } else {
+          // dependent is to the left → from.left → to.right
+          x1 = fR.left - bRect.left;  y1 = fCy - bRect.top;
+          x2 = tR.right - bRect.left; y2 = tCy - bRect.top;
+        }
+      } else {
+        if (dyCenters >= 0) {
+          // dependent is below → from.bottom → to.top
+          x1 = fCx - bRect.left; y1 = fR.bottom - bRect.top;
+          x2 = tCx - bRect.left; y2 = tR.top - bRect.top;
+        } else {
+          // dependent is above → from.top → to.bottom
+          x1 = fCx - bRect.left; y1 = fR.top - bRect.top;
+          x2 = tCx - bRect.left; y2 = tR.bottom - bRect.top;
+        }
+      }
       var col = hex[dep.type] || hex.satisfied;
       var strokeW = dep.type === 'conflict' ? 2.5 : dep.type === 'risk' ? 2 : 1.5;
 
+      // Bezier control points follow the connection axis
       var path = document.createElementNS(SVG_NS, 'path');
-      path.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + (x1 + dx) + ',' + y1 + ' ' + (x2 - dx) + ',' + y2 + ' ' + x2 + ',' + y2);
+      var d;
+      if (isHorizontal) {
+        var cx = Math.max(20, Math.abs(x2 - x1) * 0.35);
+        var cx1 = dxCenters >= 0 ? x1 + cx : x1 - cx;
+        var cx2 = dxCenters >= 0 ? x2 - cx : x2 + cx;
+        d = 'M' + x1 + ',' + y1 + ' C' + cx1 + ',' + y1 + ' ' + cx2 + ',' + y2 + ' ' + x2 + ',' + y2;
+      } else {
+        var cy = Math.max(20, Math.abs(y2 - y1) * 0.35);
+        var cy1 = dyCenters >= 0 ? y1 + cy : y1 - cy;
+        var cy2 = dyCenters >= 0 ? y2 - cy : y2 + cy;
+        d = 'M' + x1 + ',' + y1 + ' C' + x1 + ',' + cy1 + ' ' + x2 + ',' + cy2 + ' ' + x2 + ',' + y2;
+      }
+      path.setAttribute('d', d);
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke', col);
       path.setAttribute('stroke-width', strokeW);
@@ -246,7 +279,11 @@ EAP.drawDependencyLines = function() {
       iconBg.setAttribute('stroke-width', '1.5');
       iconBg.style.cursor = 'pointer';
       iconBg.style.pointerEvents = 'all';
-      iconBg.addEventListener('click', function(e) { e.stopPropagation(); EAP.showDepPopover(e.clientX, e.clientY, dep); });
+      iconBg.addEventListener('click', function(e) {
+        e.stopPropagation();
+        EAP.boardFocusChain([dep.from, dep.to]);
+        EAP.showDepPopover(e.clientX, e.clientY, dep);
+      });
       svg.appendChild(iconBg);
 
       var glyph = document.createElementNS(SVG_NS, 'g');
@@ -267,6 +304,25 @@ EAP.drawDependencyLines = function() {
       svg.appendChild(glyph);
     });
   });
+};
+
+// ── Board focus mode: dim unrelated cards + labels ──
+EAP.boardFocusChain = function(ids) {
+  var board = document.querySelector('.content-area > div:first-child');
+  if (!board) return;
+  board.classList.add('board-has-focus');
+  var idSet = {}; ids.forEach(function(id) { idSet[id] = true; });
+  document.querySelectorAll('.bcard').forEach(function(card) {
+    var cardId = card.id ? card.id.replace(/^[ft]card-/, '') : '';
+    card.classList.toggle('board-dimmed', !idSet[cardId]);
+  });
+};
+
+EAP.boardClearFocus = function() {
+  var board = document.querySelector('.content-area > div:first-child');
+  if (!board) return;
+  board.classList.remove('board-has-focus');
+  document.querySelectorAll('.board-dimmed').forEach(function(el) { el.classList.remove('board-dimmed'); });
 };
 
 // ── CSS for animations ─────────────────────────────────
