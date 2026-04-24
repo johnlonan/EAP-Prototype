@@ -162,37 +162,38 @@ EAP.initSplitResize = function() {
 };
 
 // ── Dependency Lines (SVG) ─────────────────────────────
+// Convention: dep.from = prerequisite, dep.to = dependent. Arrow: prerequisite → dependent.
 EAP.drawDependencyLines = function() {
   if (!EAP.state.showDeps || (EAP.state.tab !== 'board' && EAP.state.tab !== 'taskboard')) return;
   if (EAP.state.level !== 'Feature' && EAP.state.level !== 'WorkItem') return;
+  var filter = EAP.state.depFilter || 'all';
 
-  // Wait for DOM to settle
   requestAnimationFrame(function() {
     var board = document.querySelector('.content-area > div:first-child');
     if (!board) return;
 
-    // Remove old SVG
     var old = board.querySelector('.dep-svg');
     if (old) old.remove();
 
     board.style.position = 'relative';
-    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('class', 'dep-svg');
     svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:20;';
 
-    // Define arrowhead markers
-    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    ['ok','risk','conflict'].forEach(function(t) {
-      var colors = {ok:'rgba(0,0,0,0.3)',risk:'#D97706',conflict:'#dc2626'};
-      var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    var hex = { conflict:'#ef4444', risk:'#f59e0b', satisfied:'#22c55e' };
+
+    var defs = document.createElementNS(SVG_NS, 'defs');
+    ['conflict','risk','satisfied'].forEach(function(t) {
+      var marker = document.createElementNS(SVG_NS, 'marker');
       marker.setAttribute('id', 'arrow-' + t);
       marker.setAttribute('viewBox', '0 0 10 10');
       marker.setAttribute('refX', '9'); marker.setAttribute('refY', '5');
-      marker.setAttribute('markerWidth', '8'); marker.setAttribute('markerHeight', '8');
-      marker.setAttribute('orient', 'auto-start-reverse');
-      var tri = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      marker.setAttribute('markerWidth', '7'); marker.setAttribute('markerHeight', '7');
+      marker.setAttribute('orient', 'auto');
+      var tri = document.createElementNS(SVG_NS, 'path');
       tri.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
-      tri.setAttribute('fill', colors[t]);
+      tri.setAttribute('fill', hex[t]);
       marker.appendChild(tri);
       defs.appendChild(marker);
     });
@@ -200,84 +201,70 @@ EAP.drawDependencyLines = function() {
     board.appendChild(svg);
 
     var bRect = board.getBoundingClientRect();
-
     var deps = EAP.state.level === 'WorkItem' ? (EAP.wiDeps || []) : (EAP.featureDeps || []);
-    deps.forEach(function(dep) {
+    if (filter !== 'all') deps = deps.filter(function(d) { return d.type === filter; });
+
+    deps.forEach(function(dep, idx) {
       var fromEl = document.getElementById('fcard-' + dep.from);
       var toEl = document.getElementById('fcard-' + dep.to);
       if (!fromEl || !toEl) return;
 
       var fR = fromEl.getBoundingClientRect();
       var tR = toEl.getBoundingClientRect();
-      var x1 = fR.left - bRect.left;
+      // Prerequisite right edge → dependent left edge (forward in time)
+      var x1 = fR.right - bRect.left;
       var y1 = fR.top - bRect.top + fR.height / 2;
-      var x2 = tR.right - bRect.left;
+      var x2 = tR.left - bRect.left;
       var y2 = tR.top - bRect.top + tR.height / 2;
-      var mx = (x1 + x2) / 2;
+      var dx = Math.max(20, Math.abs(x2 - x1) * 0.35);
 
-      var colors = { ok: 'rgba(0,0,0,0.2)', risk: '#D97706', conflict: '#dc2626' };
+      var col = hex[dep.type] || hex.satisfied;
       var strokeW = dep.type === 'conflict' ? 2.5 : dep.type === 'risk' ? 2 : 1.5;
-      var dashArray = dep.type === 'ok' ? '5 3' : 'none';
 
-      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + mx + ',' + y1 + ' ' + mx + ',' + y2 + ' ' + x2 + ',' + y2);
+      var path = document.createElementNS(SVG_NS, 'path');
+      path.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + (x1 + dx) + ',' + y1 + ' ' + (x2 - dx) + ',' + y2 + ' ' + x2 + ',' + y2);
       path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', colors[dep.type] || colors.ok);
+      path.setAttribute('stroke', col);
       path.setAttribute('stroke-width', strokeW);
-      if (dashArray !== 'none') path.setAttribute('stroke-dasharray', dashArray);
+      if (dep.type === 'risk') path.setAttribute('stroke-dasharray', '5 3');
       path.setAttribute('marker-end', 'url(#arrow-' + dep.type + ')');
+      path.setAttribute('opacity', '0.9');
       svg.appendChild(path);
 
-      // Source dot (circle at the "from" card)
-      var srcDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      srcDot.setAttribute('cx', x1); srcDot.setAttribute('cy', y1);
-      srcDot.setAttribute('r', '4');
-      srcDot.setAttribute('fill', colors[dep.type] || colors.ok);
+      // Source dot at prerequisite edge
+      var srcDot = document.createElementNS(SVG_NS, 'circle');
+      srcDot.setAttribute('cx', x1); srcDot.setAttribute('cy', y1); srcDot.setAttribute('r', '4');
+      srcDot.setAttribute('fill', col);
       svg.appendChild(srcDot);
 
-      // Diamond midpoint
-      var dmx = (x1 + x2) / 2, dmy = (y1 + y2) / 2;
-      var diamond = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      diamond.setAttribute('points', dmx + ',' + (dmy - 5) + ' ' + (dmx + 5) + ',' + dmy + ' ' + dmx + ',' + (dmy + 5) + ' ' + (dmx - 5) + ',' + dmy);
-      diamond.setAttribute('fill', 'rgba(255,255,255,0.9)');
-      diamond.setAttribute('stroke', colors[dep.type] || colors.ok);
-      diamond.setAttribute('stroke-width', '1.5');
-      diamond.style.pointerEvents = 'all';
-      diamond.style.cursor = 'pointer';
-      diamond.addEventListener('click', function(evt) {
-        evt.stopPropagation();
-        // Remove existing popover
-        var old = document.getElementById('dep-popover');
-        if (old) old.remove();
+      // Midpoint icon — clickable
+      var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      var iconBg = document.createElementNS(SVG_NS, 'circle');
+      iconBg.setAttribute('cx', mx); iconBg.setAttribute('cy', my); iconBg.setAttribute('r', '10');
+      iconBg.setAttribute('fill', '#fff');
+      iconBg.setAttribute('stroke', col);
+      iconBg.setAttribute('stroke-width', '1.5');
+      iconBg.style.cursor = 'pointer';
+      iconBg.style.pointerEvents = 'all';
+      iconBg.addEventListener('click', function(e) { e.stopPropagation(); EAP.showDepPopover(e.clientX, e.clientY, dep); });
+      svg.appendChild(iconBg);
 
-        var typeLabel = {ok:'Normal',risk:'At Risk',conflict:'Conflict'}[dep.type] || dep.type;
-        var typeColor = colors[dep.type] || colors.ok;
-        var popover = document.createElement('div');
-        popover.id = 'dep-popover';
-        popover.style.cssText = 'position:fixed;z-index:700;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(0,0,0,0.12);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.14);padding:16px;width:280px;animation:ddFadeIn 150ms ease;';
-        popover.style.left = (evt.clientX + 12) + 'px';
-        popover.style.top = (evt.clientY - 20) + 'px';
-
-        popover.innerHTML =
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
-            '<span style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:' + typeColor + ';color:#fff;text-transform:uppercase;letter-spacing:0.03em;">' + typeLabel + '</span>' +
-            '<button onclick="this.parentElement.parentElement.remove()" style="border:none;background:rgba(0,0,0,0.04);width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:13px;color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;">×</button>' +
-          '</div>' +
-          '<div style="font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">' + dep.from + ' → ' + dep.to + '</div>' +
-          '<div style="font-size:11px;color:var(--text-secondary);line-height:1.5;margin-bottom:12px;">' + dep.reason + '</div>' +
-          (dep.type === 'conflict' ? '<div style="padding:8px 10px;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.12);border-radius:8px;font-size:11px;color:#8c1d1d;line-height:1.4;"><strong>Suggested fix:</strong> Resolve Auth API blocker before continuing Payment Confirmation flow. Escalate to Auth Team lead.</div>' : '') +
-          (dep.type === 'risk' ? '<div style="padding:8px 10px;background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.12);border-radius:8px;font-size:11px;color:#92400e;line-height:1.4;"><strong>Watch:</strong> Monitor Auth progress closely. If below 80% by Sprint 3, trigger contingency plan.</div>' : '');
-
-        document.body.appendChild(popover);
-
-        // Close on outside click
-        setTimeout(function() {
-          document.addEventListener('click', function closer(e) {
-            if (!popover.contains(e.target)) { popover.remove(); document.removeEventListener('click', closer); }
-          });
-        }, 10);
-      });
-      svg.appendChild(diamond);
+      var glyph = document.createElementNS(SVG_NS, 'g');
+      glyph.style.pointerEvents = 'none';
+      glyph.setAttribute('transform', 'translate(' + (mx - 5.5) + ',' + (my - 5.5) + ')');
+      glyph.setAttribute('stroke', col);
+      glyph.setAttribute('stroke-width', '1.5');
+      glyph.setAttribute('stroke-linecap', 'round');
+      glyph.setAttribute('stroke-linejoin', 'round');
+      glyph.setAttribute('fill', 'none');
+      if (dep.type === 'conflict') {
+        glyph.innerHTML = '<path d="M5.5 0.8 L10.2 9.8 L0.8 9.8 Z"/><line x1="5.5" y1="4" x2="5.5" y2="7"/><circle cx="5.5" cy="8.6" r="0.3" fill="' + col + '" stroke="none"/>';
+      } else if (dep.type === 'risk') {
+        glyph.innerHTML = '<circle cx="5.5" cy="5.5" r="4.2"/><polyline points="5.5 3 5.5 5.5 7.3 6.5"/>';
+      } else {
+        glyph.innerHTML = '<polyline points="1.8 5.8 4.5 8.5 9 3"/>';
+      }
+      svg.appendChild(glyph);
     });
   });
 };

@@ -99,16 +99,16 @@ EAP.renderFilterBar = function() {
   // Right-side toggles — all with icons
   if (s.tab === 'planning') h += '<span class="fbar-vtog' + (s.splitView ? ' on' : '') + '" id="split-toggle">' + EAP.icon('columns', 14) + ' Split</span>';
   if ((s.tab === 'board' || s.tab === 'taskboard' || s.tab === 'timeline') && (s.level === 'Feature' || s.level === 'WorkItem')) {
-    h += '<span class="fbar-vtog' + (s.showDeps ? ' on' : '') + '" id="deps-toggle">' + EAP.icon('link', 14) + ' Dependencies</span>';
-    if (s.showDeps) {
-      var df = s.depFilter || 'all';
-      h += '<select class="fbar-select dep-filter-select" id="dep-filter-select">' +
-        '<option value="all"' + (df === 'all' ? ' selected' : '') + '>All types</option>' +
-        '<option value="conflict"' + (df === 'conflict' ? ' selected' : '') + '>Conflicts only</option>' +
-        '<option value="risk"' + (df === 'risk' ? ' selected' : '') + '>Risks only</option>' +
-        '<option value="ok"' + (df === 'ok' ? ' selected' : '') + '>Resolved only</option>' +
-        '</select>';
-    }
+    // Single dropdown: Hide / All / Conflicts / Risks / Satisfied. Selection determines both on/off and filter.
+    var dv = s.showDeps ? (s.depFilter || 'all') : 'hide';
+    var activeClass = s.showDeps ? ' fbar-select-on' : '';
+    h += '<select class="fbar-select dep-select' + activeClass + '" id="dep-select" data-prefix="' + EAP.icon('link', 12) + '">' +
+      '<option value="hide"' + (dv === 'hide' ? ' selected' : '') + '>Dependencies: Hide</option>' +
+      '<option value="all"' + (dv === 'all' ? ' selected' : '') + '>Dependencies: All</option>' +
+      '<option value="conflict"' + (dv === 'conflict' ? ' selected' : '') + '>Dependencies: Conflicts</option>' +
+      '<option value="risk"' + (dv === 'risk' ? ' selected' : '') + '>Dependencies: Risks</option>' +
+      '<option value="satisfied"' + (dv === 'satisfied' ? ' selected' : '') + '>Dependencies: Satisfied</option>' +
+      '</select>';
   }
   if (s.tab === 'board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">' + EAP.icon('rows', 14) + ' Compact</span>';
   h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('sparkle', 14) + ' Insights</span>';
@@ -123,10 +123,13 @@ EAP.renderFilterBar = function() {
   var sb = document.getElementById('split-toggle');
   if (sb) sb.addEventListener('click', function() { EAP.toggleSplit(); });
   document.getElementById('insights-toggle').addEventListener('click', function() { EAP.toggleInsights(); });
-  var db = document.getElementById('deps-toggle');
-  if (db) db.addEventListener('click', function() { EAP.state.showDeps = !EAP.state.showDeps; if (!EAP.state.showDeps) EAP.state.depFilter = 'all'; EAP.render(); });
-  var dfs = document.getElementById('dep-filter-select');
-  if (dfs) dfs.addEventListener('change', function() { EAP.state.depFilter = dfs.value; EAP.render(); });
+  var dsel = document.getElementById('dep-select');
+  if (dsel) dsel.addEventListener('change', function() {
+    var v = dsel.value;
+    if (v === 'hide') { EAP.state.showDeps = false; EAP.state.depFilter = 'all'; }
+    else { EAP.state.showDeps = true; EAP.state.depFilter = v; }
+    EAP.render();
+  });
   var dn = document.getElementById('density-toggle');
   if (dn) dn.addEventListener('click', function() { EAP.state.boardDensity = EAP.state.boardDensity === 'compact' ? 'default' : 'compact'; EAP.render(); });
 
@@ -270,6 +273,32 @@ EAP.renderContent = function() {
     });
     document.addEventListener('click', function(e) {
       if (!leg.hidden && !leg.contains(e.target) && e.target !== legBtn && !legBtn.contains(e.target)) leg.hidden = true;
+    });
+  }
+
+  // Timeline focus: click a bar to focus its dependency chain; click empty canvas to clear
+  if (s.tab === 'timeline' && EAP.tlFocusChain) {
+    document.querySelectorAll('.tl-bar').forEach(function(bar) {
+      bar.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = bar.id.replace('tl-bar-', '');
+        // Collect ids in chain: this item + anything it links to or is linked from
+        var deps = (s.level === 'WorkItem') ? (EAP.wiDeps || []) : (EAP.featureDeps || []);
+        var chain = { __id: true };
+        chain[id] = true;
+        deps.forEach(function(d) {
+          if (d.from === id || d.to === id) { chain[d.from] = true; chain[d.to] = true; }
+        });
+        delete chain.__id;
+        EAP.tlFocusChain(Object.keys(chain));
+      });
+    });
+    // Click on timeline background (not on bar, icon, popover) clears focus
+    var tlBody = document.querySelector('.tl-body-right');
+    if (tlBody) tlBody.addEventListener('click', function(e) {
+      if (e.target === tlBody || e.target.classList.contains('tl-row-bg') || e.target.classList.contains('tl-grp-band')) {
+        if (EAP.tlClearFocus) EAP.tlClearFocus();
+      }
     });
   }
 };

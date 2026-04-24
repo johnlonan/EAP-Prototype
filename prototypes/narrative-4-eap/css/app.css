@@ -72,6 +72,17 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .fbar-chip.on { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 .fbar-chip.on .cx { opacity: 0.5; font-size: 12px; line-height: 1; }
 .dep-filter-select { min-width: 100px; }
+.dep-select { min-width: 170px; }
+.dep-select.fbar-select-on { border-color: var(--color-primary); background-color: rgba(14,78,105,0.08); color: var(--color-primary); font-weight: 500; }
+
+/* Dependency popover (shared across Timeline & Board) */
+.dep-popover { position: fixed; z-index: 700; background: rgba(255,255,255,0.98); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); padding: 12px 14px; width: 280px; font-family: var(--font-sans); animation: depPopIn 150ms ease; }
+@keyframes depPopIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.dep-pop-hd { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+.dep-pop-link { font-size: 12px; color: var(--text-primary); margin-bottom: 6px; line-height: 1.4; }
+.dep-pop-link strong { font-weight: 500; }
+.dep-pop-arrow { color: var(--text-tertiary); margin: 0 4px; }
+.dep-pop-reason { font-size: 11px; color: var(--text-tertiary); line-height: 1.5; }
 .fbar-spacer { flex: 1; }
 .fbar-vtog { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.35); font-size: 12px; font-weight: 400; color: var(--text-tertiary); cursor: pointer; font-family: var(--font-sans); transition: all 120ms ease; }
 .fbar-vtog:hover { background: rgba(255,255,255,0.6); color: var(--text-secondary); }
@@ -452,6 +463,11 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .tl-bar-track { position: absolute; inset: 0; }
 .tl-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; }
 .tl-bar-lbl { position: relative; z-index: 1; font-size: 9px; font-weight: 500; color: var(--text-inverted); padding: 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Timeline focus mode: dim unrelated items */
+.tl-has-focus .tl-dimmed { opacity: 0.18; transition: opacity 150ms ease; }
+.tl-has-focus .tl-bar:not(.tl-dimmed) { box-shadow: 0 0 0 2px rgba(14,78,105,0.4); }
+.tl-has-focus .tl-dep-svg { opacity: 0.9; }
 
 /* Today marker */
 .tl-today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--color-error); z-index: 5; pointer-events: none; }

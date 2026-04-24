@@ -388,18 +388,25 @@ EAP.workflowColumns = ['Funnel','Review','Analysis','Backlog','Implementation','
 EAP.trackColumns = ['Draft','Ready','In Progress','In Review','Testing','Ready for Acceptance','Accepted','Complete','Cancelled'];
 
 // Dependencies — cross-PI
+// Convention: `from` = prerequisite (must finish first), `to` = dependent (waits for from).
+// Arrow is drawn: prerequisite → dependent (forward in time).
+// Types: conflict = prerequisite blocked/late; risk = tight timeline; satisfied = prerequisite done/on-track.
 EAP.featureDeps = [
-  {from:'f9',  to:'f1',  type:'risk',     reason:'Transaction Dispute Resolution (PI 27) depends on Fingerprint Login (PI 26) — Auth must complete before dispute identity verification'},
-  {from:'f11', to:'f3',  type:'conflict',  reason:'Cross-Border Payment Support (PI 27) depends on Payment Confirmation Flow (PI 26) — but Payment Confirmation is Blocked'},
-  {from:'f8',  to:'f4',  type:'ok',        reason:'Dark Mode Support (PI 27) depends on Balance Widget (PI 26) — Balance is Done, dependency satisfied'},
-  {from:'f14', to:'f1',  type:'risk',      reason:'Biometric Auth for Returning Users (PI 28) depends on Fingerprint Login (PI 26) — tight timeline'}
+  {from:'f1',  to:'f9',  type:'risk',      reason:'Fingerprint Login (PI 26) must complete before Transaction Dispute (PI 27) — Auth needed for dispute identity verification'},
+  {from:'f3',  to:'f11', type:'conflict',  reason:'Payment Confirmation (PI 26) is Blocked — Cross-Border Payment Support (PI 27) cannot proceed'},
+  {from:'f4',  to:'f8',  type:'satisfied', reason:'Balance on Home Screen (PI 26) is Done — Dark Mode (PI 27) has its dependency met'},
+  {from:'f1',  to:'f14', type:'risk',      reason:'Fingerprint Login (PI 26) must complete for Biometric Auth Returning Users (PI 28) — tight sequence'},
+  {from:'f3',  to:'f15', type:'conflict',  reason:'Payment Confirmation blocker cascades to PSD3 Compliance (PI 28) — regulatory deadline at risk'},
+  {from:'f12', to:'f15', type:'risk',      reason:'Account Aggregation API (PI 27) prerequisite for PSD3 Compliance (PI 28) — open banking APIs required'},
+  {from:'f2',  to:'f9',  type:'satisfied', reason:'Real-time Fraud Alerts (PI 26) on track — Transaction Dispute (PI 27) dependency will be met'}
 ];
 
 // Work Item dependencies (cross-sprint)
+// Same convention: from = prerequisite, to = dependent.
 EAP.wiDeps = [
-  {from:'ls8', to:'ls6', type:'conflict', reason:'Auth API integration (Sprint 2) blocked by PIN fallback (Sprint 2) — same sprint, not sequenced'},
-  {from:'ls15', to:'ls9', type:'risk', reason:'Retry mechanism (Sprint 3) depends on payment validation (Sprint 2) — adjacent sprints, sp2 item in review'},
-  {from:'ls22', to:'ls15', type:'ok', reason:'Recurring payment (Sprint 4) depends on retry mechanism (Sprint 3) — correctly sequenced'}
+  {from:'ls9',  to:'ls15', type:'risk',      reason:'Payment validation (Sprint 2, In Review) must complete before Retry mechanism (Sprint 3) can start'},
+  {from:'ls15', to:'ls22', type:'satisfied', reason:'Retry mechanism (Sprint 3) correctly sequenced before Recurring payment (Sprint 4)'},
+  {from:'ls12', to:'ls18', type:'satisfied', reason:'Auth session handler (Sprint 2) will complete before regression tests (Sprint 3)'}
 ];
 
 // ═══════════════════════════════════════════════════════

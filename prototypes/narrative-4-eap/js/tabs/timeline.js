@@ -223,7 +223,7 @@ EAP.renderTimeline = function() {
       var left = tlPct(range,td,is), width = Math.max(0.5, tlPct(range,td,ie) - left);
       var col = tlCol(item.state), pct = item.pct || 0;
       var tc = (EAP._typeColors[(item.type||level)] || 'var(--text-tertiary)');
-      leftHtml += '<div class="tl-row-lbl" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm" title="'+item.name+'">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
+      leftHtml += '<div class="tl-row-lbl" data-item-row="'+item.id+'" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm" title="'+item.name+'">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
       rightHtml += '<div class="tl-row-bg" style="top:'+y+'px;height:'+rowH+'px;"></div>';
       // Bar is solid full-colour (white text readable). Progress shown as
       // a lighter strip on top of the filled portion.
@@ -298,63 +298,182 @@ EAP.tlDrawDeps = function() {
   if (old) old.remove();
 
   var cRect = container.getBoundingClientRect();
-  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('class', 'tl-dep-svg');
-  svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;';
+  // Allow pointer events on child elements but not the SVG background
+  svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible;';
 
-  // Arrowhead markers
-  var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-  ['ok','risk','conflict'].forEach(function(t) {
-    var cols = { ok: 'var(--color-success)', risk: 'var(--color-warning)', conflict: 'var(--color-error)' };
-    var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+  var colors = { conflict:'var(--dv-error)', risk:'var(--dv-warning)', satisfied:'var(--dv-success)' };
+  var hex =    { conflict:'#ef4444',          risk:'#f59e0b',           satisfied:'#22c55e' };
+
+  // Arrowhead markers (one per type)
+  var defs = document.createElementNS(SVG_NS, 'defs');
+  ['conflict','risk','satisfied'].forEach(function(t) {
+    var marker = document.createElementNS(SVG_NS, 'marker');
     marker.setAttribute('id', 'tl-arrow-' + t);
     marker.setAttribute('viewBox', '0 0 10 7');
     marker.setAttribute('refX', '10'); marker.setAttribute('refY', '3.5');
-    marker.setAttribute('markerWidth', '8'); marker.setAttribute('markerHeight', '6');
-    marker.setAttribute('orient', 'auto-start-reverse');
-    var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    marker.setAttribute('markerWidth', '7'); marker.setAttribute('markerHeight', '5');
+    marker.setAttribute('orient', 'auto');
+    var poly = document.createElementNS(SVG_NS, 'polygon');
     poly.setAttribute('points', '0 0, 10 3.5, 0 7');
-    poly.setAttribute('fill', cols[t]);
+    poly.setAttribute('fill', hex[t]);
     marker.appendChild(poly);
     defs.appendChild(marker);
   });
   svg.appendChild(defs);
 
-  deps.forEach(function(dep) {
+  deps.forEach(function(dep, idx) {
+    // Convention: from = prerequisite, to = dependent. Arrow draws from → to.
     var fromBar = document.getElementById('tl-bar-' + dep.from);
-    var toBar = document.getElementById('tl-bar-' + dep.to);
+    var toBar   = document.getElementById('tl-bar-' + dep.to);
     if (!fromBar || !toBar) return;
 
     var fR = fromBar.getBoundingClientRect();
     var tR = toBar.getBoundingClientRect();
 
-    // Source: right edge center. Target: left edge center.
+    // Source: right edge of prerequisite. Target: left edge of dependent.
     var x1 = fR.right - cRect.left;
     var y1 = fR.top + fR.height / 2 - cRect.top;
-    var x2 = tR.left - cRect.left;
-    var y2 = tR.top + tR.height / 2 - cRect.top;
+    var x2 = tR.left  - cRect.left;
+    var y2 = tR.top   + tR.height / 2 - cRect.top;
 
-    var cols = { ok: 'var(--color-success)', risk: 'var(--color-warning)', conflict: 'var(--color-error)' };
-    var col = cols[dep.type] || cols.ok;
+    var col = hex[dep.type] || hex.satisfied;
 
-    // Draw curved path
-    var midX = (x1 + x2) / 2;
-    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + midX + ',' + y1 + ' ' + midX + ',' + y2 + ' ' + x2 + ',' + y2);
+    // Bezier curve: horizontal out from source, horizontal into target
+    var dx = Math.max(20, Math.abs(x2 - x1) * 0.35);
+    var path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', 'M' + x1 + ',' + y1 + ' C' + (x1 + dx) + ',' + y1 + ' ' + (x2 - dx) + ',' + y2 + ' ' + x2 + ',' + y2);
     path.setAttribute('fill', 'none');
     path.setAttribute('stroke', col);
-    path.setAttribute('stroke-width', '1.5');
-    path.setAttribute('stroke-dasharray', dep.type === 'risk' ? '4,3' : 'none');
+    path.setAttribute('stroke-width', dep.type === 'conflict' ? '2' : '1.5');
+    path.setAttribute('stroke-dasharray', dep.type === 'risk' ? '5,3' : 'none');
     path.setAttribute('marker-end', 'url(#tl-arrow-' + dep.type + ')');
-    path.setAttribute('opacity', '0.7');
+    path.setAttribute('opacity', '0.85');
     svg.appendChild(path);
 
-    // Source dot
-    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    // Source dot (at prerequisite edge)
+    var dot = document.createElementNS(SVG_NS, 'circle');
     dot.setAttribute('cx', x1); dot.setAttribute('cy', y1); dot.setAttribute('r', '3');
-    dot.setAttribute('fill', col); dot.setAttribute('opacity', '0.7');
+    dot.setAttribute('fill', col);
     svg.appendChild(dot);
+
+    // Midpoint icon — clickable
+    var midX = (x1 + x2) / 2;
+    var midY = (y1 + y2) / 2;
+    var iconBg = document.createElementNS(SVG_NS, 'circle');
+    iconBg.setAttribute('cx', midX); iconBg.setAttribute('cy', midY); iconBg.setAttribute('r', '9');
+    iconBg.setAttribute('fill', '#fff');
+    iconBg.setAttribute('stroke', col);
+    iconBg.setAttribute('stroke-width', '1.5');
+    iconBg.setAttribute('class', 'tl-dep-icon-bg');
+    iconBg.setAttribute('data-dep-idx', idx);
+    iconBg.setAttribute('data-dep-src', 'feature');
+    iconBg.style.cursor = 'pointer';
+    iconBg.style.pointerEvents = 'all';
+    svg.appendChild(iconBg);
+
+    // Icon glyph (simple geometry, scales with SVG)
+    var glyph = document.createElementNS(SVG_NS, 'g');
+    glyph.style.pointerEvents = 'none';
+    glyph.setAttribute('transform', 'translate(' + (midX - 5) + ',' + (midY - 5) + ')');
+    glyph.setAttribute('stroke', col);
+    glyph.setAttribute('stroke-width', '1.5');
+    glyph.setAttribute('stroke-linecap', 'round');
+    glyph.setAttribute('stroke-linejoin', 'round');
+    glyph.setAttribute('fill', 'none');
+    if (dep.type === 'conflict') {
+      // alert-triangle
+      glyph.innerHTML = '<path d="M5 0.5 L9.5 9 L0.5 9 Z"/><line x1="5" y1="4" x2="5" y2="6.5"/><circle cx="5" cy="8" r="0.3" fill="' + col + '" stroke="none"/>';
+    } else if (dep.type === 'risk') {
+      // clock
+      glyph.innerHTML = '<circle cx="5" cy="5" r="4"/><polyline points="5 2.5 5 5 6.8 6"/>';
+    } else {
+      // check
+      glyph.innerHTML = '<polyline points="1.5 5.5 4 8 8.5 2.5"/>';
+    }
+    svg.appendChild(glyph);
   });
 
   container.appendChild(svg);
+
+  // Wire click-to-popover on midpoint icons + focus the chain
+  svg.querySelectorAll('.tl-dep-icon-bg').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var idx = parseInt(el.getAttribute('data-dep-idx'), 10);
+      var dep = deps[idx];
+      if (!dep) return;
+      EAP.tlFocusChain([dep.from, dep.to]);
+      EAP.showDepPopover(e.clientX, e.clientY, dep);
+    });
+  });
+};
+
+// ── Focus mode: dim all items except those in the chain ─────
+EAP.tlFocusChain = function(ids) {
+  var wrap = document.querySelector('.tl-wrap');
+  if (!wrap) return;
+  wrap.classList.add('tl-has-focus');
+  var idSet = {}; ids.forEach(function(id) { idSet[id] = true; });
+  document.querySelectorAll('.tl-bar').forEach(function(el) {
+    var id = el.id.replace('tl-bar-', '');
+    el.classList.toggle('tl-dimmed', !idSet[id]);
+  });
+  document.querySelectorAll('[data-item-row]').forEach(function(el) {
+    var id = el.getAttribute('data-item-row');
+    el.classList.toggle('tl-dimmed', !idSet[id]);
+  });
+};
+
+EAP.tlClearFocus = function() {
+  var wrap = document.querySelector('.tl-wrap');
+  if (!wrap) return;
+  wrap.classList.remove('tl-has-focus');
+  document.querySelectorAll('.tl-dimmed').forEach(function(el) { el.classList.remove('tl-dimmed'); });
+};
+
+// ── Dependency popover (shared across Timeline & Board) ─────
+EAP.showDepPopover = function(x, y, dep) {
+  var existing = document.getElementById('dep-popover');
+  if (existing) existing.remove();
+
+  var typeLabels = { conflict:'Conflict', risk:'Risk', satisfied:'Satisfied' };
+  var typeColors = { conflict:'var(--dv-error)', risk:'var(--dv-warning)', satisfied:'var(--dv-success)' };
+
+  // Look up item names
+  function nameFor(id) {
+    var all = [].concat(EAP.allFeatures || [], EAP.epics.all || [], EAP.capabilities.all || []);
+    EAP.workItems.sprints.forEach(function(sp) { all = all.concat(sp.items || []); });
+    var m = all.filter(function(i) { return i.id === id; })[0];
+    return m ? m.name : id;
+  }
+
+  var pop = document.createElement('div');
+  pop.id = 'dep-popover';
+  pop.className = 'dep-popover';
+  pop.innerHTML =
+    '<div class="dep-pop-hd" style="color:' + typeColors[dep.type] + ';">' +
+      EAP.icon(dep.type === 'conflict' ? 'alert-triangle' : dep.type === 'risk' ? 'clock' : 'check-square', 14) +
+      ' ' + typeLabels[dep.type] +
+    '</div>' +
+    '<div class="dep-pop-link"><strong>' + nameFor(dep.from) + '</strong> <span class="dep-pop-arrow">→</span> <strong>' + nameFor(dep.to) + '</strong></div>' +
+    '<div class="dep-pop-reason">' + dep.reason + '</div>';
+
+  document.body.appendChild(pop);
+  var w = pop.offsetWidth, h = pop.offsetHeight;
+  var vw = window.innerWidth, vh = window.innerHeight;
+  var left = Math.min(Math.max(8, x - w / 2), vw - w - 8);
+  var top = y - h - 12;
+  if (top < 8) top = y + 16;
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+
+  // Click outside to close
+  setTimeout(function() {
+    document.addEventListener('click', function close(e) {
+      if (!pop.contains(e.target)) { pop.remove(); document.removeEventListener('click', close); }
+    });
+  }, 0);
 };
