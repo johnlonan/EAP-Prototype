@@ -123,33 +123,14 @@ EAP.toggleAccordion = function(id) {
 
 // toggleHierarchy defined in js/tabs/hierarchy.js (uses re-render)
 
-// ── "Owned by me" filter ───────────────────────────────
-// Persona = Ananya Krishnan (ART PM). At Epic/Capability/Feature levels she
-// is a literal owner. At WorkItem level she does NOT own individual stories
-// (that's a team-member responsibility) — the filter scopes instead to
-// "items inside features I own", which is the realistic ART-PM view.
+// ── "Owned by me" / "Assigned to me" filter ────────────
+// Persona = Ananya Krishnan (ART PM). Strict ownership: item.owner === ME.
+// At WorkItem level this will return zero rows (a PM isn't an assignee)
+// — which is the honest answer for the persona; user can toggle off.
 EAP.ME = 'Ananya';
 
-EAP._myFeatureNames = function() {
-  if (EAP._myFeatureNamesCache) return EAP._myFeatureNamesCache;
-  var names = (EAP.allFeatures || []).filter(function(f) { return f.owner === EAP.ME; }).map(function(f) { return f.name.toLowerCase(); });
-  EAP._myFeatureNamesCache = names;
-  return names;
-};
-
 EAP.isMine = function(item) {
-  if (!item) return false;
-  if (item.owner === EAP.ME) return true;
-  // WorkItem fallback: parent feature is mine
-  var t = item.type;
-  if (t === 'Story' || t === 'Defect' || t === 'Case Task' || t === 'CaseTask') {
-    var p = (item.parent || '').toLowerCase();
-    if (!p) return false;
-    return EAP._myFeatureNames().some(function(fn) {
-      return fn.indexOf(p) >= 0 || p.indexOf(fn) >= 0;
-    });
-  }
-  return false;
+  return !!item && item.owner === EAP.ME;
 };
 
 EAP.applyMineFilter = function(items) {
