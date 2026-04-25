@@ -249,6 +249,9 @@ EAP.renderContent = function() {
   // Wire WSJF rank buttons
   EAP.wsjfWire();
 
+  // Wire WSJF breakdown popover (delegated; idempotent)
+  if (EAP.wsjfPopoverWire) EAP.wsjfPopoverWire();
+
   // Wire insight action links
   if (EAP.wireInsightActions) EAP.wireInsightActions();
 
