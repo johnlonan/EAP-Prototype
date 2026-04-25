@@ -230,52 +230,55 @@ EAP.features = {
 // WORK ITEMS — Stories, Defects, Case Tasks
 // ═══════════════════════════════════════════════════════
 EAP.workItems = {
+  // Backlog ranking: lower rank = higher priority. Realistic PM-ranked
+  // interleave across Story / Defect / CaseTask, not bucket-by-type.
   backlog: {
     Story: [
-      {id:'blw1', num:'STRY61094301', name:'Report fraudulent transaction and recover funds',  state:'Draft', pts:3, owner:'Vikram', team:'Payments Team', type:'Story', parent:'', goal:'g1'},
-      {id:'blw2', num:'STRY61094302', name:'Change password regularly for account security',    state:'Draft', pts:2, owner:'Sana',   team:'Auth Team',     type:'Story', parent:'', goal:'g1'},
-      {id:'blw3', num:'STRY61094303', name:'Log out remotely to prevent unauthorised access',   state:'Draft', pts:2, owner:'Tomás',  team:'Mobile Exp Team',type:'Story', parent:'', goal:'g1'},
-      {id:'blw4', num:'STRY61094304', name:'Set up PIN as additional protection layer',         state:'Draft', pts:3, owner:'Kiran',  team:'Auth Team',     type:'Story', parent:'', goal:'g1'},
-      {id:'blw5', num:'STRY61094305', name:'View devices currently logged into account',        state:'Draft', pts:2, owner:'Yuki',   team:'Mobile Exp Team',type:'Story', parent:'', goal:'g1'},
-      {id:'blw6', num:'STRY61094306', name:'Report security vulnerabilities discovered',        state:'Draft', pts:3, owner:'Marcus', team:'Fraud Team',    type:'Story', parent:'', goal:'g1'},
-      {id:'blw7', num:'STRY61094307', name:'Export transaction history as CSV',                  state:'Draft', pts:2, owner:'Lena',   team:'Accounts Team', type:'Story', parent:'', goal:'g2'},
-      {id:'blw8', num:'STRY61094308', name:'Enable face recognition for login',                 state:'Draft', pts:5, owner:'Kiran',  team:'Auth Team',     type:'Story', parent:'', goal:'g1'}
+      {id:'blw1', num:'STRY61094301', name:'Report fraudulent transaction and recover funds',  state:'Draft', pts:3, owner:'Vikram', team:'Payments Team',  type:'Story', parent:'Real-time Fraud Alerts',         goal:'g1', rank:6},
+      {id:'blw2', num:'STRY61094302', name:'Change password regularly for account security',    state:'Draft', pts:2, owner:'Sana',   team:'Auth Team',      type:'Story', parent:'Fingerprint Login Redesign',     goal:'g1', rank:11},
+      {id:'blw3', num:'STRY61094303', name:'Log out remotely to prevent unauthorised access',   state:'Draft', pts:2, owner:'Tomás',  team:'Mobile Exp Team',type:'Story', parent:'Enhanced Biometric Auth Flow',   goal:'g1', rank:13},
+      {id:'blw4', num:'STRY61094304', name:'Set up PIN as additional protection layer',         state:'Draft', pts:3, owner:'Kiran',  team:'Auth Team',      type:'Story', parent:'Fingerprint Login Redesign',     goal:'g1', rank:8},
+      {id:'blw5', num:'STRY61094305', name:'View devices currently logged into account',        state:'Draft', pts:2, owner:'Yuki',   team:'Mobile Exp Team',type:'Story', parent:'Enhanced Biometric Auth Flow',   goal:'g1', rank:15},
+      {id:'blw6', num:'STRY61094306', name:'Report security vulnerabilities discovered',        state:'Draft', pts:3, owner:'Marcus', team:'Fraud Team',     type:'Story', parent:'Real-time Fraud Alerts',         goal:'g1', rank:2},
+      {id:'blw7', num:'STRY61094307', name:'Export transaction history as CSV',                  state:'Draft', pts:2, owner:'Lena',   team:'Accounts Team',  type:'Story', parent:'Account Statement Export PDF',   goal:'g2', rank:17},
+      {id:'blw8', num:'STRY61094308', name:'Enable face recognition for login',                 state:'Draft', pts:5, owner:'Kiran',  team:'Auth Team',      type:'Story', parent:'Biometric Auth for Returning Users', goal:'g1', rank:19}
     ],
     Defect: [
-      {id:'bld1', num:'DEF0192954', name:'Resource Report forecast utilisation not calculated with days off', state:'Backlog', pts:0, owner:'Mei',    team:'Payments Team',  type:'Defect', parent:'', goal:''},
-      {id:'bld2', num:'DEF0366785', name:'Mobile timesheets single-select should auto-close modal',          state:'Backlog', pts:0, owner:'Yuki',   team:'Mobile Exp Team',type:'Defect', parent:'', goal:''},
-      {id:'bld3', num:'DEF0500640', name:'Push notification delayed on Android 14 devices',                  state:'Backlog', pts:0, owner:'Tomás',  team:'Mobile Exp Team',type:'Defect', parent:'', goal:''},
-      {id:'bld4', num:'DEF0500641', name:'Statement PDF missing page numbers on multi-page exports',         state:'Backlog', pts:0, owner:'Omar',   team:'Accounts Team',  type:'Defect', parent:'Statement Export', goal:'g2'},
-      {id:'bld5', num:'DEF0500642', name:'Fraud alert duplicate firing on card-not-present transactions',    state:'Backlog', pts:2, owner:'Aisha',  team:'Fraud Team',     type:'Defect', parent:'Fraud Alerts', goal:'g1'},
-      {id:'bld6', num:'DEF0500643', name:'Auth token refresh fails silently after 24h session',              state:'Backlog', pts:3, owner:'Sana',   team:'Auth Team',      type:'Defect', parent:'Seamless Auth', goal:'g1'},
-      {id:'bld7', num:'DEF0500644', name:'Balance widget shows stale data after background app resume',      state:'Backlog', pts:2, owner:'Yuki',   team:'Mobile Exp Team',type:'Defect', parent:'Account Vis.', goal:'g1'},
-      {id:'bld8', num:'DEF0500645', name:'Fraud webhook retry logic creates duplicate entries',              state:'Backlog', pts:3, owner:'Marcus', team:'Fraud Team',     type:'Defect', parent:'Fraud Alerts', goal:'g1'},
-      {id:'bld9', num:'DEF0500646', name:'Payment confirmation timeout not handled gracefully',              state:'Backlog', pts:2, owner:'Vikram', team:'Payments Team',  type:'Defect', parent:'Payments', goal:'g1'},
-      {id:'bld10',num:'DEF0500647', name:'Onboarding KYC upload crashes on large file',                     state:'Backlog', pts:0, owner:'Devi',   team:'Onboarding Team',type:'Defect', parent:'Onboarding', goal:'g2'},
-      {id:'bld11',num:'DEF0500648', name:'Fraud detection model false positive rate above threshold',       state:'Backlog', pts:5, owner:'Aisha',  team:'Fraud Team',     type:'Defect', parent:'Fraud Alerts', goal:'g1'},
-      {id:'bld12',num:'DEF0500649', name:'Account statement date filter off-by-one error',                  state:'Backlog', pts:1, owner:'Lena',   team:'Accounts Team',  type:'Defect', parent:'Statement Export', goal:'g2'}
+      {id:'bld1', num:'DEF0192954', name:'Resource Report forecast utilisation not calculated with days off', state:'Backlog', pts:0, owner:'Mei',    team:'Payments Team',  type:'Defect', parent:'',                              goal:'',   rank:14},
+      {id:'bld2', num:'DEF0366785', name:'Mobile timesheets single-select should auto-close modal',          state:'Backlog', pts:0, owner:'Yuki',   team:'Mobile Exp Team',type:'Defect', parent:'',                              goal:'',   rank:18},
+      {id:'bld3', num:'DEF0500640', name:'Push notification delayed on Android 14 devices',                  state:'Backlog', pts:0, owner:'Tomás',  team:'Mobile Exp Team',type:'Defect', parent:'Real-time Fraud Alerts',        goal:'',   rank:21},
+      {id:'bld4', num:'DEF0500641', name:'Statement PDF missing page numbers on multi-page exports',         state:'Backlog', pts:0, owner:'Omar',   team:'Accounts Team',  type:'Defect', parent:'Account Statement Export PDF',  goal:'g2', rank:9},
+      {id:'bld7', num:'DEF0500644', name:'Balance widget shows stale data after background app resume',      state:'Backlog', pts:2, owner:'Yuki',   team:'Mobile Exp Team',type:'Defect', parent:'Balance on Home Screen',        goal:'g1', rank:7},
+      {id:'bld8', num:'DEF0500645', name:'Fraud webhook retry logic creates duplicate entries',              state:'Backlog', pts:3, owner:'Marcus', team:'Fraud Team',     type:'Defect', parent:'Real-time Fraud Alerts',        goal:'g1', rank:5},
+      {id:'bld10',num:'DEF0500647', name:'Onboarding KYC upload crashes on large file',                     state:'Backlog', pts:0, owner:'Devi',   team:'Onboarding Team',type:'Defect', parent:'Streamlined Onboarding Flow',   goal:'g2', rank:3},
+      {id:'bld11',num:'DEF0500648', name:'Fraud detection model false positive rate above threshold',       state:'Backlog', pts:5, owner:'Ananya', team:'Fraud Team',     type:'Defect', parent:'Real-time Fraud Alerts',        goal:'g1', rank:1},
+      {id:'bld12',num:'DEF0500649', name:'Account statement date filter off-by-one error',                  state:'Backlog', pts:1, owner:'Lena',   team:'Accounts Team',  type:'Defect', parent:'Account Statement Export PDF',  goal:'g2', rank:12}
     ],
     CaseTask: [
-      {id:'blc1', num:'CSTASK1070158', name:'Write acceptance criteria for biometric fallback flow', state:'Draft', pts:1, owner:'Ananya', team:'Auth Team',     type:'Case Task', parent:'Seamless Auth', goal:'g1'},
-      {id:'blc2', num:'CSTASK1215264', name:'Update test plan for fraud alert deduplication',        state:'Draft', pts:1, owner:'Aisha',  team:'Fraud Team',    type:'Case Task', parent:'Fraud Alerts', goal:'g1'},
-      {id:'blc3', num:'CSTASK1222242', name:'Document API contract for payment confirmation',        state:'Draft', pts:2, owner:'Mei',    team:'Payments Team', type:'Case Task', parent:'Payments', goal:'g1'},
-      {id:'blc4', num:'CSTASK1222243', name:'Review KYC compliance checklist sign-off',              state:'Draft', pts:1, owner:'Ananya', team:'Onboarding Team',type:'Case Task', parent:'Onboarding', goal:'g2'},
-      {id:'blc5', num:'CSTASK1222244', name:'Create runbook for biometric service deployment',       state:'Draft', pts:2, owner:'Kiran',  team:'Auth Team',     type:'Case Task', parent:'Seamless Auth', goal:'g1'},
-      {id:'blc6', num:'CSTASK1222245', name:'Coordinate UAT session for statement export',           state:'Draft', pts:1, owner:'Omar',   team:'Accounts Team', type:'Case Task', parent:'Statement Export', goal:'g2'}
+      {id:'blc1', num:'CSTASK1070158', name:'Write acceptance criteria for biometric fallback flow', state:'Draft', pts:1, owner:'Ananya', team:'Auth Team',     type:'Case Task', parent:'Fingerprint Login Redesign',    goal:'g1', rank:4},
+      {id:'blc2', num:'CSTASK1215264', name:'Update test plan for fraud alert deduplication',        state:'Draft', pts:1, owner:'Aisha',  team:'Fraud Team',    type:'Case Task', parent:'Real-time Fraud Alerts',        goal:'g1', rank:10},
+      {id:'blc4', num:'CSTASK1222243', name:'Review KYC compliance checklist sign-off',              state:'Draft', pts:1, owner:'Ananya', team:'Onboarding Team',type:'Case Task', parent:'Streamlined Onboarding Flow',  goal:'g2', rank:16},
+      {id:'blc5', num:'CSTASK1222244', name:'Create runbook for biometric service deployment',       state:'Draft', pts:2, owner:'Kiran',  team:'Auth Team',     type:'Case Task', parent:'Fingerprint Login Redesign',    goal:'g1', rank:20},
+      {id:'blc6', num:'CSTASK1222245', name:'Coordinate UAT session for statement export',           state:'Draft', pts:1, owner:'Omar',   team:'Accounts Team', type:'Case Task', parent:'Account Statement Export PDF',  goal:'g2', rank:22}
     ]
   },
   sprints: [
-    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:60, totalPts:32, donePts:8,
+    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:60, totalPts:41, donePts:8,
       items: [
-        {id:'ls6',  num:'STRY61094201', name:'Handle fallback to PIN on failed biometric scan',     type:'Story', state:'In Progress', pct:50, pts:3, owner:'Kiran',  team:'Auth Team', parent:'Fingerprint Login Redesign', goal:'g1'},
-        {id:'ls7',  num:'STRY61094202', name:'Build payment confirmation screen layout',            type:'Story', state:'In Progress', pct:40, pts:5, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
-        {id:'ls8',  num:'STRY61094203', name:'Integrate Auth API for payment confirmation flow',    type:'Story', state:'In Progress', pct:10, pts:8, owner:'Mei',    team:'Payments Team', blocked:true, blockReason:'Auth API dependency Day 2', parent:'Payment Confirmation Flow', goal:'g1'},
-        {id:'ls9',  num:'STRY61094204', name:'Payment amount validation rules and error states',    type:'Story', state:'In Review',   pct:80, pts:3, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
-        {id:'ls10', num:'STRY61094205', name:'Fraud detection webhook integration and retry logic', type:'Story', state:'In Progress', pct:30, pts:8, owner:'Marcus', team:'Fraud Team', parent:'Real-time Fraud Alerts', goal:'g1'},
-        {id:'ls11', num:'STRY61094206', name:'Balance refresh on app resume and foreground event',  type:'Story', state:'To Do',       pct:0,  pts:5, owner:'Tomás',  team:'Mobile Exp Team', parent:'Balance on Home Screen', goal:'g1'},
-        {id:'ls12', num:'STRY61094207', name:'Auth session expiry handler and token refresh',       type:'Story', state:'In Progress', pct:45, pts:3, owner:'Sana',   team:'Auth Team', parent:'Fingerprint Login Redesign', goal:'g1'},
-        {id:'ls13', num:'STRY61094208', name:'Account statement data fetch from backend API',       type:'Story', state:'To Do',       pct:0,  pts:3, owner:'Lena',   team:'Accounts Team', parent:'Statement Export PDF', goal:'g2'},
-        {id:'ls14', num:'STRY61094209', name:'KYC document upload step in onboarding flow',         type:'Story', state:'To Do',       pct:0,  pts:4, owner:'Nina',   team:'Onboarding Team', parent:'Streamlined Onboarding', goal:'g2'}
+        {id:'ls6',  num:'STRY61094201', name:'Handle fallback to PIN on failed biometric scan',     type:'Story',     state:'In Progress', pct:50, pts:3, owner:'Kiran',  team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1'},
+        {id:'ls7',  num:'STRY61094202', name:'Build payment confirmation screen layout',            type:'Story',     state:'In Progress', pct:40, pts:5, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
+        {id:'ls8',  num:'STRY61094203', name:'Integrate Auth API for payment confirmation flow',    type:'Story',     state:'In Progress', pct:10, pts:8, owner:'Mei',    team:'Payments Team', blocked:true, blockReason:'Auth API dependency Day 2', parent:'Payment Confirmation Flow', goal:'g1'},
+        {id:'ls9',  num:'STRY61094204', name:'Payment amount validation rules and error states',    type:'Story',     state:'In Review',   pct:80, pts:3, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
+        {id:'ls10', num:'STRY61094205', name:'Fraud detection webhook integration and retry logic', type:'Story',     state:'In Progress', pct:30, pts:8, owner:'Marcus', team:'Fraud Team',    parent:'Real-time Fraud Alerts', goal:'g1'},
+        {id:'ls11', num:'STRY61094206', name:'Balance refresh on app resume and foreground event',  type:'Story',     state:'To Do',       pct:0,  pts:5, owner:'Tomás',  team:'Mobile Exp Team', parent:'Balance on Home Screen', goal:'g1'},
+        {id:'ls12', num:'STRY61094207', name:'Auth session expiry handler and token refresh',       type:'Story',     state:'In Progress', pct:45, pts:3, owner:'Sana',   team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1'},
+        {id:'ls13', num:'STRY61094208', name:'Account statement data fetch from backend API',       type:'Story',     state:'To Do',       pct:0,  pts:3, owner:'Lena',   team:'Accounts Team', parent:'Account Statement Export PDF', goal:'g2'},
+        {id:'ls14', num:'STRY61094209', name:'KYC document upload step in onboarding flow',         type:'Story',     state:'To Do',       pct:0,  pts:4, owner:'Nina',   team:'Onboarding Team', parent:'Streamlined Onboarding Flow', goal:'g2'},
+        // Defects + Case Task in flight this sprint (realistic mix, not 100% Stories)
+        {id:'bld5', num:'DEF0500642',   name:'Fraud alert duplicate firing on card-not-present transactions', type:'Defect',    state:'In Progress', pct:30, pts:2, owner:'Aisha',  team:'Fraud Team',     parent:'Real-time Fraud Alerts',     goal:'g1'},
+        {id:'bld6', num:'DEF0500643',   name:'Auth token refresh fails silently after 24h session',           type:'Defect',    state:'In Progress', pct:60, pts:3, owner:'Sana',   team:'Auth Team',      parent:'Fingerprint Login Redesign', goal:'g1'},
+        {id:'bld9', num:'DEF0500646',   name:'Payment confirmation timeout not handled gracefully',           type:'Defect',    state:'To Do',       pct:0,  pts:2, owner:'Vikram', team:'Payments Team',  parent:'Payment Confirmation Flow',  goal:'g1'},
+        {id:'blc3', num:'CSTASK1222242',name:'Document API contract for payment confirmation',                type:'Case Task', state:'In Progress', pct:50, pts:2, owner:'Mei',    team:'Payments Team',  parent:'Payment Confirmation Flow',  goal:'g1'}
       ]
     },
     {id:'sp3', name:'Sprint 3', dates:EAP._sprintDisplay[2].dates, active:false, capPct:0, totalPts:29, donePts:0,

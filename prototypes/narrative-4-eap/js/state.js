@@ -164,8 +164,11 @@ EAP.getBacklogFlat = function() {
   if (s.level !== 'WorkItem') return EAP.getBacklogData();
   // getBacklogData() returns the keyed object {Story, Defect, CaseTask},
   // already mine-filtered when state.mineOnly is on.
+  // Sort by manual PM rank — interleaves Story/Defect/CaseTask by priority,
+  // not by type bucket.
   var bl = EAP.getBacklogData();
-  return (bl.Story || []).concat(bl.Defect || []).concat(bl.CaseTask || []);
+  var all = (bl.Story || []).concat(bl.Defect || []).concat(bl.CaseTask || []);
+  return all.slice().sort(function(a, b) { return (a.rank || 999) - (b.rank || 999); });
 };
 
 EAP.getListGroups = function() {
