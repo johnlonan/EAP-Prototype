@@ -58,6 +58,40 @@ var DP_ACTIVITY = [
   { who: 'Priya', when: '1 week ago', text: 'Created from PI Planning session. Initial sizing complete.' }
 ];
 
+// ── Dependencies section ──────────────────────────────
+var DP_DEP_META = {
+  conflict:  { icon:'alert-triangle', label:'Conflict',  blocksVerb:'Blocks',      dependsVerb:'Blocked by' },
+  risk:      { icon:'clock',          label:'Risk',      blocksVerb:'Feeds into',  dependsVerb:'Waiting on' },
+  satisfied: { icon:'check-square',   label:'Satisfied', blocksVerb:'Feeds into',  dependsVerb:'Depends on' }
+};
+
+function dpRenderDeps(item) {
+  var deps = [].concat(EAP.featureDeps || [], EAP.wiDeps || []);
+  var outbound = deps.filter(function(d) { return d.from === item.id; }); // item is prerequisite
+  var inbound  = deps.filter(function(d) { return d.to === item.id; });   // item is dependent
+  if (!outbound.length && !inbound.length) return '';
+
+  function row(dep, direction) {
+    var meta = DP_DEP_META[dep.type] || DP_DEP_META.satisfied;
+    var otherId = direction === 'outbound' ? dep.to : dep.from;
+    var other = dpFind(otherId);
+    if (!other) return '';
+    var verb = direction === 'outbound' ? meta.blocksVerb : meta.dependsVerb;
+    return '<div class="dp-dep-row dp-dep-' + dep.type + '" data-dep-target="' + otherId + '">' +
+      '<span class="dp-dep-icon">' + EAP.icon(meta.icon, 14) + '</span>' +
+      '<div class="dp-dep-body">' +
+        '<span class="dp-dep-verb">' + verb + '</span>' +
+        '<span class="dp-dep-name">' + other.name + '</span>' +
+        '<span class="dp-dep-meta">' + (other.num ? other.num + ' · ' : '') + (other.state || '') + '</span>' +
+      '</div>' +
+      '</div>';
+  }
+
+  var rows = outbound.map(function(d) { return row(d, 'outbound'); }).join('') +
+             inbound.map(function(d) { return row(d, 'inbound'); }).join('');
+  return '<div class="dp-section"><span class="dp-section-label">Dependencies</span><div class="dp-dep-list">' + rows + '</div></div>';
+}
+
 // ── Render panel HTML ─────────────────────────────────
 function dpRender(item) {
   if (!item) return '';
@@ -100,6 +134,10 @@ function dpRender(item) {
   if (item.pct !== undefined && item.pct !== null) {
     h += '<div class="dp-section"><span class="dp-section-label">Progress</span>' + EAP.pbar(item.pct, item.state) + '</div>';
   }
+
+  // Dependencies (if any)
+  var depsHtml = dpRenderDeps(item);
+  if (depsHtml) h += depsHtml;
 
   // Description
   h += '<div class="dp-section"><span class="dp-section-label">Description</span><p class="dp-desc">' + (DP_DESC[type] || DP_DESC.Story) + '</p></div>';
@@ -145,6 +183,14 @@ EAP.openDetail = function(id) {
   // Wire close
   document.getElementById('dp-close').addEventListener('click', function() { EAP.closeDetail(); });
   document.getElementById('dp-overlay').addEventListener('click', function() { EAP.closeDetail(); });
+
+  // Wire dep rows to re-open detail for the linked item
+  document.querySelectorAll('#dp-panel [data-dep-target]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var tid = el.getAttribute('data-dep-target');
+      if (tid) EAP.openDetail(tid);
+    });
+  });
 };
 
 EAP.closeDetail = function() {

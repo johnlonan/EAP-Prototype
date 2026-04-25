@@ -241,6 +241,11 @@ EAP.drawDependencyLines = function() {
       var col = hex[dep.type] || hex.satisfied;
       var strokeW = dep.type === 'conflict' ? 2.5 : dep.type === 'risk' ? 2 : 1.5;
 
+      // Group all shapes for this dep so focus mode can dim non-matching deps
+      var depG = document.createElementNS(SVG_NS, 'g');
+      depG.setAttribute('class', 'board-dep-g');
+      depG.setAttribute('data-dep-idx', idx);
+
       // Bezier control points follow the connection axis
       var path = document.createElementNS(SVG_NS, 'path');
       var d;
@@ -262,13 +267,13 @@ EAP.drawDependencyLines = function() {
       if (dep.type === 'risk') path.setAttribute('stroke-dasharray', '5 3');
       path.setAttribute('marker-end', 'url(#arrow-' + dep.type + ')');
       path.setAttribute('opacity', '0.9');
-      svg.appendChild(path);
+      depG.appendChild(path);
 
       // Source dot at prerequisite edge
       var srcDot = document.createElementNS(SVG_NS, 'circle');
       srcDot.setAttribute('cx', x1); srcDot.setAttribute('cy', y1); srcDot.setAttribute('r', '4');
       srcDot.setAttribute('fill', col);
-      svg.appendChild(srcDot);
+      depG.appendChild(srcDot);
 
       // Midpoint icon — clickable
       var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
@@ -281,10 +286,10 @@ EAP.drawDependencyLines = function() {
       iconBg.style.pointerEvents = 'all';
       iconBg.addEventListener('click', function(e) {
         e.stopPropagation();
-        EAP.boardFocusChain([dep.from, dep.to]);
+        EAP.boardFocusChain([dep.from, dep.to], idx);
         EAP.showDepPopover(e.clientX, e.clientY, dep);
       });
-      svg.appendChild(iconBg);
+      depG.appendChild(iconBg);
 
       var glyph = document.createElementNS(SVG_NS, 'g');
       glyph.style.pointerEvents = 'none';
@@ -301,13 +306,15 @@ EAP.drawDependencyLines = function() {
       } else {
         glyph.innerHTML = '<polyline points="1.8 5.8 4.5 8.5 9 3"/>';
       }
-      svg.appendChild(glyph);
+      depG.appendChild(glyph);
+
+      svg.appendChild(depG);
     });
   });
 };
 
 // ── Board focus mode: dim unrelated cards + labels ──
-EAP.boardFocusChain = function(ids) {
+EAP.boardFocusChain = function(ids, activeDepIdx) {
   var board = document.querySelector('.content-area > div:first-child');
   if (!board) return;
   board.classList.add('board-has-focus');
@@ -315,6 +322,11 @@ EAP.boardFocusChain = function(ids) {
   document.querySelectorAll('.bcard').forEach(function(card) {
     var cardId = card.id ? card.id.replace(/^[ft]card-/, '') : '';
     card.classList.toggle('board-dimmed', !idSet[cardId]);
+  });
+  // Dim other dep groups (paths, dots, midpoint icons)
+  document.querySelectorAll('.board-dep-g').forEach(function(g) {
+    var idx = parseInt(g.getAttribute('data-dep-idx'), 10);
+    g.classList.toggle('board-dimmed', idx !== activeDepIdx);
   });
 };
 

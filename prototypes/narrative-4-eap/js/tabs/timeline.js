@@ -341,6 +341,11 @@ EAP.tlDrawDeps = function() {
 
     var col = hex[dep.type] || hex.satisfied;
 
+    // Group all shapes for this dep so focus mode can dim non-matching deps
+    var depG = document.createElementNS(SVG_NS, 'g');
+    depG.setAttribute('class', 'tl-dep-g');
+    depG.setAttribute('data-dep-idx', idx);
+
     // Bezier curve: horizontal out from source, horizontal into target
     var dx = Math.max(20, Math.abs(x2 - x1) * 0.35);
     var path = document.createElementNS(SVG_NS, 'path');
@@ -351,13 +356,13 @@ EAP.tlDrawDeps = function() {
     path.setAttribute('stroke-dasharray', dep.type === 'risk' ? '5,3' : 'none');
     path.setAttribute('marker-end', 'url(#tl-arrow-' + dep.type + ')');
     path.setAttribute('opacity', '0.85');
-    svg.appendChild(path);
+    depG.appendChild(path);
 
     // Source dot (at prerequisite edge)
     var dot = document.createElementNS(SVG_NS, 'circle');
     dot.setAttribute('cx', x1); dot.setAttribute('cy', y1); dot.setAttribute('r', '3');
     dot.setAttribute('fill', col);
-    svg.appendChild(dot);
+    depG.appendChild(dot);
 
     // Midpoint icon — clickable
     var midX = (x1 + x2) / 2;
@@ -372,7 +377,7 @@ EAP.tlDrawDeps = function() {
     iconBg.setAttribute('data-dep-src', 'feature');
     iconBg.style.cursor = 'pointer';
     iconBg.style.pointerEvents = 'all';
-    svg.appendChild(iconBg);
+    depG.appendChild(iconBg);
 
     // Icon glyph (simple geometry, scales with SVG)
     var glyph = document.createElementNS(SVG_NS, 'g');
@@ -393,7 +398,9 @@ EAP.tlDrawDeps = function() {
       // check
       glyph.innerHTML = '<polyline points="1.5 5.5 4 8 8.5 2.5"/>';
     }
-    svg.appendChild(glyph);
+    depG.appendChild(glyph);
+
+    svg.appendChild(depG);
   });
 
   container.appendChild(svg);
@@ -405,14 +412,14 @@ EAP.tlDrawDeps = function() {
       var idx = parseInt(el.getAttribute('data-dep-idx'), 10);
       var dep = deps[idx];
       if (!dep) return;
-      EAP.tlFocusChain([dep.from, dep.to]);
+      EAP.tlFocusChain([dep.from, dep.to], idx);
       EAP.showDepPopover(e.clientX, e.clientY, dep);
     });
   });
 };
 
 // ── Focus mode: dim all items except those in the chain ─────
-EAP.tlFocusChain = function(ids) {
+EAP.tlFocusChain = function(ids, activeDepIdx) {
   var wrap = document.querySelector('.tl-wrap');
   if (!wrap) return;
   wrap.classList.add('tl-has-focus');
@@ -424,6 +431,11 @@ EAP.tlFocusChain = function(ids) {
   document.querySelectorAll('[data-item-row]').forEach(function(el) {
     var id = el.getAttribute('data-item-row');
     el.classList.toggle('tl-dimmed', !idSet[id]);
+  });
+  // Dim other dep groups (paths, dots, midpoint icons)
+  document.querySelectorAll('.tl-dep-g').forEach(function(g) {
+    var idx = parseInt(g.getAttribute('data-dep-idx'), 10);
+    g.classList.toggle('tl-dimmed', idx !== activeDepIdx);
   });
 };
 
@@ -506,7 +518,7 @@ EAP.showDepPopover = function(x, y, dep) {
       '<div class="dep-pop-verb">' + EAP.icon('chevron-down', 12) + ' ' + t.verb + '</div>' +
       itemCard('Dependent', to, false) +
     '</div>' +
-    '<div class="dep-pop-reason">' + dep.reason + '</div>' +
+    '<div class="dep-pop-reason"><span class="dep-pop-reason-label">Reason</span><p class="dep-pop-reason-text">' + dep.reason + '</p></div>' +
     '<div class="dep-pop-actions">' +
       '<button class="dep-pop-btn dep-pop-btn-secondary" data-dep-view="' + dep.from + '">View prerequisite</button>' +
       '<button class="dep-pop-btn dep-pop-btn-primary" data-dep-act="' + t.actionId + '" data-dep-from="' + dep.from + '">' + t.action + '</button>' +
