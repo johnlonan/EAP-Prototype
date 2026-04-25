@@ -28,7 +28,7 @@ EAP.state = {
   tab: 'backlog',
 
   // Filters
-  mineOnly: true,
+  mineOnly: false,
 
   // View options
   splitView: true,
