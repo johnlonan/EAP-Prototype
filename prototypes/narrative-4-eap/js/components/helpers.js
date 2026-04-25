@@ -18,15 +18,15 @@ EAP._TH0 = '<th style="width:24px;padding:8px 4px"></th>';
 EAP._typeColors = { goal:'#4d4c4a', epic:'#6d28d9', capability:'#0369a1', feature:'#2a6edc', story:'#8B5CF6', defect:'#e2161c',
   Goal:'#4d4c4a', Epic:'#6d28d9', Capability:'#0369a1', Feature:'#2a6edc', Story:'#8B5CF6', Defect:'#e2161c', 'Case Task':'#db2777', 'Work Item':'#8B5CF6' };
 
-// Type cell — icon + label
+// Type pill — filled tinted pill with type icon + label.
+// Differentiates from state pill (no icon) by containing an icon glyph.
 EAP.typeCell = function(type) {
   if (!type) return '';
   var key = type.toLowerCase();
-  // Handle "case task" icon key mapping
   var iconKey = key === 'case task' ? 'clipboard-check' : key;
-  var color = EAP._typeColors[type] || '#6B7280';
-  var iconHtml = EAP.icon ? EAP.icon(iconKey, 14) : '';
-  return '<span class="type-cell" style="color:' + color + ';">' + iconHtml + ' ' + type + '</span>';
+  var slug = key.replace(/\s+/g, '-');
+  var iconHtml = EAP.icon ? EAP.icon(iconKey, 11) : '';
+  return '<span class="type-pill type-pill-' + slug + '">' + iconHtml + ' ' + type + '</span>';
 };
 
 // Avatar — renders image or initials fallback

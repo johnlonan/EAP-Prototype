@@ -266,9 +266,18 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .st-done     { background: var(--color-success-content); color: var(--color-success); }
 .st-analysis { background: #ede9fe; color: #6d28d9; }
 
-/* Type cell — icon + label */
-.type-cell { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 400; white-space: nowrap; text-transform: capitalize; }
-.type-cell svg { flex-shrink: 0; }
+/* Type pill — filled tinted, icon + label. State pill has no icon, so the
+   visual split is icon-vs-no-icon + colour family. */
+.type-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-full); white-space: nowrap; line-height: 1.4; }
+.type-pill svg { flex-shrink: 0; }
+.type-pill-epic        { background: rgba(109,40,217,0.10);  color: #6d28d9; }
+.type-pill-capability  { background: rgba(3,105,161,0.10);   color: #0369a1; }
+.type-pill-feature     { background: rgba(42,110,220,0.10);  color: #2a6edc; }
+.type-pill-story       { background: rgba(139,92,246,0.10);  color: #8B5CF6; }
+.type-pill-defect      { background: rgba(226,22,28,0.08);   color: #b91c1c; }
+.type-pill-case-task   { background: rgba(219,39,119,0.10);  color: #db2777; }
+.type-pill-goal        { background: rgba(0,0,0,0.04);       color: var(--text-secondary); }
+.type-pill-work-item   { background: rgba(139,92,246,0.10);  color: #8B5CF6; }
 
 /* Data values */
 .sz  { font-family: var(--font-mono); font-weight: 400; font-size: 11px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
