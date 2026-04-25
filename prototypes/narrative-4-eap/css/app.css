@@ -22,6 +22,35 @@
      WCAG AA contrast on white.
    • For faint-but-readable content use text-tertiary (#656462).
    • Teal (--ai-accent) is reserved for AI-generated content only.
+
+   BUTTON TIERS — see .btn-primary / .btn-secondary / .btn-tertiary
+   ─────────────────────────────────────────────────────
+   TIER         USE                                            SIZE
+   primary      The single main action (panel/dialog/popover)  32px
+   secondary    Sibling alternatives, top-bar, table actions   28px
+   tertiary     In-context micro-actions inside cards/rows     11px text
+                (bare inline link, primary colour, chevron)
+
+   • Don't introduce new button variants ad-hoc. If you need
+     a new affordance, check whether it's primary, secondary,
+     or tertiary first.
+   • Tertiary links use a chevron-right glyph; never use
+     decorative icons on buttons.
+   • The icon-only hover-revealed micro-buttons (e.g. snooze,
+     dismiss on signal cards) are NOT a tier — they're 22px
+     icon affordances and may use --text-disabled at rest
+     because they only become readable on container hover.
+
+   INSIGHTS SECTION HEADERS — every section gets a header
+   ─────────────────────────────────────────────────────
+   • Use .ins-sec-lbl (10px / 500 / uppercase / text-tertiary).
+   • Icon ONLY when (a) sparkle ✦ for AI-derived sections,
+     or (b) count badge for actionable counts. No decorative
+     icons.
+   • Right-side affordances allowed: count pill, "Fresh Xm
+     ago" timestamp. Nothing else.
+   • Don't let the first row of content masquerade as a header
+     (e.g. an avatar+name where you forgot the section label).
    ═══════════════════════════════════════════════════════ */
 
 body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%, #ddedf4 76%, #e6eef4 100%) !important; }
