@@ -170,6 +170,21 @@ EAP.wsjfWire = function() {
   });
 };
 
+// WSJF tier — colour the value by priority band.
+// Range across N4 data is ~4–18; hard cutoffs read more legibly than
+// runtime quartile against a shifting visible set.
+EAP.wsjfTier = function(v) {
+  if (v == null) return '';
+  if (v >= 12) return 'wsjf-high';
+  if (v >= 7)  return 'wsjf-mid';
+  return 'wsjf-low';
+};
+
+EAP.wsjfCell = function(item) {
+  if (!item || item.wsjf == null) return '<span class="wsjf">—</span>';
+  return '<span class="wsjf ' + EAP.wsjfTier(item.wsjf) + '" data-wsjf-id="' + item.id + '" tabindex="0">' + item.wsjf + '</span>';
+};
+
 // ── WSJF breakdown — deterministic from item id ───────
 // SAFe WSJF = CoD / Size where CoD = BV + TC + RR.
 // We don't store sub-scores; we derive plausible 0–10 values from
@@ -325,11 +340,11 @@ EAP.bkCols = function() {
   var s = EAP.state;
   if (s.level === 'Epic') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ST</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.st || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.st || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
   if (s.level === 'Capability') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ART</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.art || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.art || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
   if (s.level === 'WorkItem') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>Team</th><th>Primary Goal</th>',
@@ -338,7 +353,7 @@ EAP.bkCols = function() {
   // Feature
   return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.team || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
 };
 
@@ -347,11 +362,11 @@ EAP.lsCols = function() {
   var s = EAP.state;
   if (s.level === 'Epic') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ST</th><th>% Complete</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.st || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.st || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
   if (s.level === 'Capability') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ART</th><th>% Complete</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.art || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.art || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
   if (s.level === 'WorkItem') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>% Complete</th><th>Team</th><th>Primary Goal</th>',
@@ -360,7 +375,7 @@ EAP.lsCols = function() {
   // Feature
   return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>% Complete</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
 };
 
@@ -369,11 +384,11 @@ EAP.lsBlCols = function() {
   var s = EAP.state;
   if (s.level === 'Epic') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ST</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.st || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.st || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
   if (s.level === 'Capability') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ART</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.art || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.art || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
   if (s.level === 'WorkItem') return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>Team</th><th>Primary Goal</th>',
@@ -382,6 +397,6 @@ EAP.lsBlCols = function() {
   // Feature
   return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="wsjf" data-wsjf-id="' + i.id + '" tabindex="0">' + i.wsjf + '</span></td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
 };

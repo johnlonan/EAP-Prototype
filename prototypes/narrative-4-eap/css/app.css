@@ -283,6 +283,9 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .sz  { font-family: var(--font-mono); font-weight: 400; font-size: 11px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
 .wsjf { font-family: var(--font-mono); font-weight: 400; font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; cursor: pointer; padding: 2px 4px; margin: -2px -4px; border-radius: var(--radius-sm); transition: background var(--transition-fast); }
 .wsjf:hover { background: rgba(14,78,105,0.06); }
+.wsjf-high { color: var(--color-primary); font-weight: 500; }
+.wsjf-mid  { color: var(--text-primary); }
+.wsjf-low  { color: var(--text-tertiary); }
 
 /* WSJF breakdown popover */
 .wsjf-popover { position: fixed; z-index: 1000; width: 280px; background: #fff; border-radius: var(--radius-lg); box-shadow: 0 8px 28px rgba(0,0,0,0.18), 0 1px 0 rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06); overflow: hidden; animation: depPopIn 140ms ease-out; }
