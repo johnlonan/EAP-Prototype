@@ -26,8 +26,20 @@ function trackCard(item, opts) {
     h += '<div class="bcard-banner bcard-banner-amber">' + (item.openDefects ? item.openDefects + ' open defects' : 'At risk') + '</div>';
   }
 
+  // Type pill (WorkItem cards)
+  var t = item.type;
+  var isWI = t === 'Story' || t === 'Defect' || t === 'Case Task' || t === 'CaseTask';
+  if (isWI) {
+    h += '<div class="bcard-tags">' + EAP.typeCell(t) + '</div>';
+  }
+
   // Title
   h += '<div class="bcard-title">' + item.name + '</div>';
+
+  // Parent feature caption (WorkItem only)
+  if (isWI && item.parent) {
+    h += '<div class="bcard-parent" title="Parent feature">' + EAP.icon('chevron-up', 10) + ' ' + item.parent + '</div>';
+  }
 
   // Meta row
   h += '<div class="bcard-meta">';

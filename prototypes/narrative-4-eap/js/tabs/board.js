@@ -18,6 +18,8 @@ function renderCard(item, opts) {
   var isBlocked = item.blocked || item.state === 'Blocked';
   var isAtRisk = item.atRisk && !isBlocked;
   var isDone = item.state === 'Done' || item.state === 'Complete';
+  var t = item.type;
+  var isWI = t === 'Story' || t === 'Defect' || t === 'Case Task' || t === 'CaseTask';
   var cls = 'bcard' + (compact ? ' bcard-compact' : '') + (isBlocked ? ' bcard-blocked' : '') + (isAtRisk ? ' bcard-atrisk' : '') + (isDone ? ' bcard-done' : '');
 
   var h = '<div class="' + cls + '"' + (item.id ? ' id="fcard-' + item.id + '"' : '') + '>';
@@ -31,8 +33,23 @@ function renderCard(item, opts) {
     }
   }
 
+  // Type pill (WorkItem cards only — Feature/Epic/Cap are obvious from context)
+  if (isWI && !compact) {
+    h += '<div class="bcard-tags">' + EAP.typeCell(t) + '</div>';
+  }
+
   // Title
   h += '<div class="bcard-title">' + item.name + '</div>';
+
+  // Parent feature caption (WorkItem only)
+  if (isWI && item.parent && !compact) {
+    h += '<div class="bcard-parent" title="Parent feature">' + EAP.icon('chevron-up', 10) + ' ' + item.parent + '</div>';
+  }
+
+  // Block reason in compact mode (non-compact already has banner)
+  if (compact && isBlocked && item.blockReason) {
+    h += '<div class="bcard-block-compact">' + item.blockReason + '</div>';
+  }
 
   // Meta row — state + team/owner + points
   h += '<div class="bcard-meta">';
