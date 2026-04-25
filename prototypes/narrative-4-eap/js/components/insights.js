@@ -98,6 +98,7 @@ EAP.renderInsights = function() {
     var sp = EAP.workItems.sprints.filter(function(sp) { return sp.active; })[0];
     if (sp) {
       var remaining = sp.totalPts - sp.donePts;
+      h += '<div class="ins-metrics-section"><div class="ins-sec-lbl">At a glance</div>';
       h += '<div class="ins-metrics">' +
         '<div class="ins-metric"><div class="ins-metric-val">' + remaining + '</div><div class="ins-metric-lbl">Pts left</div>' +
         '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:' + Math.round(sp.donePts / sp.totalPts * 100) + '%;background:var(--color-primary);"></div></div></div>' +
@@ -105,7 +106,7 @@ EAP.renderInsights = function() {
         '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:65%;background:var(--dv-warning);"></div></div></div>' +
         '<div class="ins-metric"><div class="ins-metric-val">4</div><div class="ins-metric-lbl">In review</div>' +
         '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:80%;background:var(--dv-error);"></div></div></div>' +
-        '</div>';
+        '</div></div>';
     }
   }
 
@@ -120,6 +121,7 @@ EAP.renderInsights = function() {
       var wipOver = mw.inProgress > mw.wipLimit;
 
       h += '<div class="ins-member">' +
+        '<div class="ins-sec-lbl">Member focus</div>' +
         '<div class="ins-member-hd">' + EAP.avatar(s.trackMember, 24) + '<div class="ins-member-info"><span class="ins-member-name">' + pName + '</span><span class="ins-member-role">Sprint workload</span></div></div>';
 
       h += '<div class="ins-member-stats">' +
@@ -158,7 +160,7 @@ EAP.renderInsights = function() {
     var ok = d.signals.filter(function(s) { return s.level === 'ok'; });
 
     if (urgent.length) {
-      h += '<div class="ins-sig-group"><div class="ins-sec-lbl">' + EAP.icon('zap', 10) + ' Needs Attention <span class="ins-sig-count">' + urgent.length + '</span></div>';
+      h += '<div class="ins-sig-group"><div class="ins-sec-lbl">Needs Attention <span class="ins-sig-count">' + urgent.length + '</span></div>';
       urgent.forEach(function(s, i) { h += renderSignal(s, 'u' + i); });
       h += '</div>';
     }
