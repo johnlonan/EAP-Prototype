@@ -123,14 +123,58 @@ EAP.toggleAccordion = function(id) {
 
 // toggleHierarchy defined in js/tabs/hierarchy.js (uses re-render)
 
+// ── "Owned by me" filter ───────────────────────────────
+// Persona = Ananya Krishnan (ART PM). At Epic/Capability/Feature levels she
+// is a literal owner. At WorkItem level she does NOT own individual stories
+// (that's a team-member responsibility) — the filter scopes instead to
+// "items inside features I own", which is the realistic ART-PM view.
+EAP.ME = 'Ananya';
+
+EAP._myFeatureNames = function() {
+  if (EAP._myFeatureNamesCache) return EAP._myFeatureNamesCache;
+  var names = (EAP.allFeatures || []).filter(function(f) { return f.owner === EAP.ME; }).map(function(f) { return f.name.toLowerCase(); });
+  EAP._myFeatureNamesCache = names;
+  return names;
+};
+
+EAP.isMine = function(item) {
+  if (!item) return false;
+  if (item.owner === EAP.ME) return true;
+  // WorkItem fallback: parent feature is mine
+  var t = item.type;
+  if (t === 'Story' || t === 'Defect' || t === 'Case Task' || t === 'CaseTask') {
+    var p = (item.parent || '').toLowerCase();
+    if (!p) return false;
+    return EAP._myFeatureNames().some(function(fn) {
+      return fn.indexOf(p) >= 0 || p.indexOf(fn) >= 0;
+    });
+  }
+  return false;
+};
+
+EAP.applyMineFilter = function(items) {
+  if (!EAP.state.mineOnly) return items;
+  if (!Array.isArray(items)) return items;
+  return items.filter(EAP.isMine);
+};
+
 // ── Data accessors based on current state ──────────────
 
 EAP.getBacklogData = function() {
   var s = EAP.state;
-  if (s.level === 'Epic')       return typeof EAP.epics.backlog === 'function' ? EAP.epics.backlog() : EAP.epics.backlog;
-  if (s.level === 'Capability') return typeof EAP.capabilities.backlog === 'function' ? EAP.capabilities.backlog() : EAP.capabilities.backlog;
-  if (s.level === 'Feature')    return typeof EAP.features.backlog === 'function' ? EAP.features.backlog() : EAP.features.backlog;
-  if (s.level === 'WorkItem')   return EAP.workItems.backlog;
+  if (s.level === 'Epic')       return EAP.applyMineFilter(typeof EAP.epics.backlog === 'function' ? EAP.epics.backlog() : EAP.epics.backlog);
+  if (s.level === 'Capability') return EAP.applyMineFilter(typeof EAP.capabilities.backlog === 'function' ? EAP.capabilities.backlog() : EAP.capabilities.backlog);
+  if (s.level === 'Feature')    return EAP.applyMineFilter(typeof EAP.features.backlog === 'function' ? EAP.features.backlog() : EAP.features.backlog);
+  if (s.level === 'WorkItem') {
+    // Workitem backlog is keyed object {Story, Defect, CaseTask}; filter each bucket.
+    var bl = EAP.workItems.backlog;
+    if (!EAP.state.mineOnly) return bl;
+    return {
+      Story: EAP.applyMineFilter(bl.Story || []),
+      Defect: EAP.applyMineFilter(bl.Defect || []),
+      CaseTask: EAP.applyMineFilter(bl.CaseTask || [])
+    };
+  }
   return [];
 };
 
@@ -143,30 +187,40 @@ EAP.getBacklogFlat = function() {
 
 EAP.getListGroups = function() {
   var s = EAP.state;
+  var groups;
   if (s.level === 'Epic') {
     // Resolve epicIds to actual epic objects
-    return EAP.epics.groups.map(function(g) {
+    groups = EAP.epics.groups.map(function(g) {
       return {id:g.id, name:g.name, type:g.type, items: g.epicIds.map(function(eid) {
         return EAP.epics.all.filter(function(e){return e.id===eid;})[0];
       }).filter(Boolean)};
     });
-  }
-  if (s.level === 'Capability') {
-    return EAP.capabilities.groups.map(function(g) {
+  } else if (s.level === 'Capability') {
+    groups = EAP.capabilities.groups.map(function(g) {
       return {id:g.id, name:g.name, type:g.type, items: g.capIds.map(function(cid) {
         return EAP.capabilities.all.filter(function(c){return c.id===cid;})[0];
       }).filter(Boolean)};
     });
-  }
-  if (s.level === 'Feature') {
+  } else if (s.level === 'Feature') {
     // Build PI groups from consolidated feature array
-    return EAP.features.pis.map(function(pi) {
+    groups = EAP.features.pis.map(function(pi) {
       var items = EAP.features.byPI(pi.id);
       return {id:pi.id, name:pi.name, dates:pi.dates, active:pi.active, capPct:pi.capPct, totalPts:pi.totalPts, donePts:pi.donePts, items:items};
     });
+  } else if (s.level === 'WorkItem') {
+    groups = EAP.workItems.sprints;
+  } else {
+    return [];
   }
-  if (s.level === 'WorkItem') return EAP.workItems.sprints;
-  return [];
+  // Apply mineOnly filter to items inside each group
+  if (s.mineOnly) {
+    groups = groups.map(function(g) {
+      var copy = {}; for (var k in g) copy[k] = g[k];
+      copy.items = EAP.applyMineFilter(g.items || []);
+      return copy;
+    });
+  }
+  return groups;
 };
 
 EAP.getInsightsKey = function() {
