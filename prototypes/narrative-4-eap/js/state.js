@@ -181,7 +181,9 @@ EAP.getBacklogData = function() {
 EAP.getBacklogFlat = function() {
   var s = EAP.state;
   if (s.level !== 'WorkItem') return EAP.getBacklogData();
-  var bl = EAP.workItems.backlog;
+  // getBacklogData() returns the keyed object {Story, Defect, CaseTask},
+  // already mine-filtered when state.mineOnly is on.
+  var bl = EAP.getBacklogData();
   return (bl.Story || []).concat(bl.Defect || []).concat(bl.CaseTask || []);
 };
 
