@@ -189,7 +189,7 @@ function renderSignal(s, id) {
   if (isAi) h += '<span class="ins-sig-sparkle">' + EAP.icon('sparkle', 11) + '</span>';
   h += s.title + '</div>';
   h += '<div class="ins-sig-desc">' + s.desc + '</div>';
-  if (s.action) h += '<a class="ins-sig-action" data-ins-action="' + s.action + '">' + s.action + '</a>';
+  if (s.action) h += '<a class="ins-sig-action" data-ins-action="' + s.action + '">' + s.action + EAP.icon('chevron-right', 11) + '</a>';
   var meta = [];
   if (isAi && s.confidence) meta.push('<span class="ins-conf ins-conf-' + s.confidence.toLowerCase() + '">' + s.confidence + '</span>');
   if (s.meta) meta.push(s.meta);

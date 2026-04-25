@@ -151,6 +151,21 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .gpanel-hd .gpanel-title { color: var(--text-primary); font-size: 12px; font-weight: 500; }
 .gpanel-hd .gpanel-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 8px; border-radius: var(--radius-full); background: rgba(14,78,105,0.12); color: var(--color-primary); font-size: 12px; font-weight: 500; }
 .gpanel-hd-left { display: flex; align-items: center; gap: 8px; }
+/* ═══ BUTTON TIERS — three-tier system ═══
+   .btn-primary    — solid primary fill. The single main action of a panel/dialog/popover.
+   .btn-secondary  — outline + primary hover-fill. Sibling alternatives, top-bar/table affordances.
+   .btn-tertiary   — bare inline link with chevron. In-context micro-actions inside cards/rows.
+   Sizes: 32 / 28 / 22 (icon-only). Don't introduce new variants ad-hoc. */
+.btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-weight: 500; cursor: pointer; border: 0; transition: all var(--transition-fast); white-space: nowrap; }
+.btn-primary { height: 32px; padding: 0 14px; border-radius: var(--radius-md); background: var(--color-primary); color: #fff; font-size: 12px; }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-secondary { height: 28px; padding: 0 12px; border-radius: var(--radius-md); border: 1px solid rgba(0,0,0,0.12); background: rgba(255,255,255,0.6); color: var(--text-secondary); font-size: 12px; }
+.btn-secondary:hover { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.btn-tertiary { height: auto; padding: 0; background: transparent; color: var(--color-primary); font-size: 11px; gap: 3px; }
+.btn-tertiary:hover { text-decoration: underline; text-underline-offset: 2px; }
+.btn-tertiary svg { transition: transform 120ms ease; }
+.btn-tertiary:hover svg { transform: translateX(2px); }
+
 .add-btn { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--color-primary); background: rgba(255,255,255,0.5); cursor: pointer; color: var(--color-primary); transition: all 120ms ease; font-size: 10px; font-weight: 500; font-family: var(--font-sans); }
 .add-btn:hover { background: var(--color-primary-hover); color: #ffffff !important; border-color: var(--color-primary-hover); }
 .add-btn:hover svg { color: #ffffff; stroke: #ffffff !important; }
@@ -411,8 +426,11 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 .ins-sig-title { font-size: 12px; line-height: 1.35; color: var(--text-primary); font-weight: 400; padding-right: 40px; }
 .ins-sig.urgent .ins-sig-title { font-weight: 500; }
 .ins-sig-desc { font-size: 11px; color: var(--text-tertiary); line-height: 1.4; margin-top: 3px; }
-.ins-sig-action { display: inline-flex; align-items: center; gap: 2px; margin-top: 5px; font-size: 10px; font-weight: 500; color: var(--color-primary); background: rgba(14,78,105,0.06); padding: 3px 8px; border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; transition: all var(--transition-fast); }
-.ins-sig-action:hover { background: var(--color-primary); color: #fff; }
+/* Tertiary inline-link button (see .btn-tertiary block) */
+.ins-sig-action { display: inline-flex; align-items: center; gap: 3px; margin-top: 6px; font-size: 11px; font-weight: 500; color: var(--color-primary); background: transparent; padding: 0; border: 0; cursor: pointer; text-decoration: none; font-family: var(--font-sans); transition: color var(--transition-fast); }
+.ins-sig-action:hover { color: var(--color-primary-hover); text-decoration: underline; text-underline-offset: 2px; }
+.ins-sig-action svg { transition: transform 120ms ease; }
+.ins-sig-action:hover svg { transform: translateX(2px); }
 
 /* Signal meta line */
 .ins-sig-meta { font-size: 9px; color: var(--text-tertiary); margin-top: 5px; line-height: 1.4; }
