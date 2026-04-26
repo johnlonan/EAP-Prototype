@@ -41,7 +41,8 @@
 <script src="js/render.js"></script>
 <script src="js/interactions.js"></script>
 <script>
-  // Initialize
+  // Apply selected persona (URL ?p=, then localStorage, fallback ananya)
+  if (EAP.bootPersona) EAP.bootPersona();
   EAP.state.openAccordions['pi26'] = true;
   EAP.initInteractions();
   EAP.render();

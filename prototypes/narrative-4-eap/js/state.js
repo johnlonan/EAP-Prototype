@@ -123,11 +123,65 @@ EAP.toggleAccordion = function(id) {
 
 // toggleHierarchy defined in js/tabs/hierarchy.js (uses re-render)
 
-// ── "Owned by me" / "Assigned to me" filter ────────────
-// Persona = Ananya Krishnan (ART PM). Strict ownership: item.owner === ME.
-// At WorkItem level this will return zero rows (a PM isn't an assignee)
-// — which is the honest answer for the persona; user can toggle off.
-EAP.ME = 'Ananya';
+// ── Personas (entry-slide + persona switcher) ──────────
+// EAP.ME is the active persona's owner-key, set by EAP.applyPersona().
+// "Owned by me" / "Assigned to me" filter does strict ownership against ME.
+EAP.personas = {
+  ananya: {
+    key: 'ananya',
+    me: 'Ananya',
+    name: 'Ananya Krishnan',
+    role: 'Product Manager',
+    avatar: '../../assets/images/avatar-3.png',
+    defaults: {
+      tab: 'backlog',
+      context: 'art', contextName: 'Digital Banking ART', contextId: 'art1',
+      level: 'Feature'
+    }
+  },
+  james: {
+    key: 'james',
+    me: 'James',
+    name: 'James Carter',
+    role: 'Senior Developer · Auth Team',
+    avatar: '../../assets/images/avatar-james.png',
+    defaults: {
+      tab: 'taskboard',
+      context: 'team', contextName: 'Auth Team', contextId: 'team-auth',
+      level: 'WorkItem'
+    }
+  }
+};
+
+EAP.ME = 'Ananya';                  // updated by applyPersona() at boot
+
+EAP.applyPersona = function(key) {
+  var p = EAP.personas[key];
+  if (!p) return false;
+  EAP.ME = p.me;
+  EAP.state.persona = key;
+  EAP.state.tab         = p.defaults.tab;
+  EAP.state.context     = p.defaults.context;
+  EAP.state.contextName = p.defaults.contextName;
+  EAP.state.contextId   = p.defaults.contextId;
+  EAP.state.level       = p.defaults.level;
+  EAP.state.mineOnly    = true;     // personalised demo — filter on by default
+  try { localStorage.setItem('eap.persona', key); } catch (e) {}
+  return true;
+};
+
+EAP.bootPersona = function() {
+  var key = null;
+  try {
+    var qs = new URLSearchParams(window.location.search);
+    if (qs.get('p')) key = qs.get('p');
+  } catch (e) {}
+  if (!key) {
+    try { key = localStorage.getItem('eap.persona'); } catch (e) {}
+  }
+  if (!key || !EAP.personas[key]) key = 'ananya';
+  EAP.applyPersona(key);
+};
 
 EAP.isMine = function(item) {
   return !!item && item.owner === EAP.ME;
