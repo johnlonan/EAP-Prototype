@@ -166,6 +166,8 @@ EAP.applyPersona = function(key) {
   EAP.state.contextId   = p.defaults.contextId;
   EAP.state.level       = p.defaults.level;
   EAP.state.mineOnly    = true;     // personalised demo — filter on by default
+  // Task Board: when persona is a team member, preselect them in the member chip
+  EAP.state.trackMember = (key === 'james') ? 'James' : 'All';
   try { localStorage.setItem('eap.persona', key); } catch (e) {}
   return true;
 };
