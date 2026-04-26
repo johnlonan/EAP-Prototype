@@ -132,7 +132,7 @@ EAP.personas = {
     me: 'Ananya',
     name: 'Ananya Krishnan',
     role: 'Product Manager',
-    avatar: '../../assets/images/avatar-3.png',
+    avatar: '../../assets/images/avatar-miley-simmons.png',
     defaults: {
       tab: 'backlog',
       context: 'art', contextName: 'Digital Banking ART', contextId: 'art1',

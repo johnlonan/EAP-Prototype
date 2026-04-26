@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Enterprise Agile Planning | Digital Banking ART</title>
+  <script>
+    // Show the persona slide on a fresh visit (no URL param, no stored persona).
+    // Once a persona is chosen, this redirect is skipped.
+    (function() {
+      try {
+        var qs = new URLSearchParams(window.location.search);
+        if (qs.get('p')) return;
+        if (localStorage.getItem('eap.persona')) return;
+        window.location.replace('start.html');
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="../shared/shell.css">
   <link rel="stylesheet" href="../../assets/css/tokens.css">
   <link rel="stylesheet" href="../../assets/css/base.css">
@@ -46,7 +58,7 @@
   // Render nav with the active persona's avatar + name
   var __p = (EAP.personas && EAP.personas[EAP.state.persona]) || (EAP.personas && EAP.personas.ananya) || {};
   renderNav('board', {
-    avatar: __p.avatar || '../../assets/images/avatar-3.png',
+    avatar: __p.avatar || '../../assets/images/avatar-miley-simmons.png',
     name:   __p.name   || 'Ananya Krishnan',
     links:  { 0: 'index.html', 3: 'index.html', 4: 'index.html' }
   });

@@ -694,7 +694,7 @@ EAP.goalName = function(gid) {
 // Developers: unique per team (no sharing between teams)
 EAP.people = {
   // Product / PM layer
-  'Ananya': {name:'Ananya Krishnan', initials:'AK', avatar:'../../assets/images/avatar-3.png', color:'#0d9488'},
+  'Ananya': {name:'Ananya Krishnan', initials:'AK', avatar:'../../assets/images/avatar-miley-simmons.png', color:'#0d9488'},
   'Raj':    {name:'Raj Mehta',       initials:'RM', avatar:'../../assets/images/avatar-2.png', color:'#6d28d9'},
   'Priya':  {name:'Priya Kumar',     initials:'PK', avatar:null, color:'#6366F1'},
   // Auth Team
