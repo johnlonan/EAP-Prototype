@@ -554,6 +554,9 @@ EAP.insights = {
   },
   'team-WorkItem-taskboard': {
     signals: [
+      // Cross-persona — only James sees these (Ananya's actions affecting his work)
+      {level:'ok', ai:true, confidence:'High', title:'Ananya signed off on blc1 — your blocked path is clear', desc:'Acceptance criteria for biometric fallback flow approved. ls6 unblocked for Sprint 2 close.', action:'Open story', meta:'Sign-off received 2h ago', forPersonas:['james']},
+      {level:'urgent', title:'Ananya assigned bld11 to your team', desc:'Fraud detection false-positive triage — needs disposition before Sprint 3 commit.', action:'Review with Ananya', meta:'Assigned today', forPersonas:['james']},
       {level:'urgent', title:'1 Story blocked since sprint start', desc:'Auth API dependency unresolved. Past team avg resolution: 1.4 days.', action:'Escalate', meta:'Blocked duration vs team norm'},
       {level:'urgent', ai:true, confidence:'High', title:'Sprint completion at risk: 55%', desc:'At current pace, 3 of 5 committed items will not finish.', action:'Flag standup', meta:'Predicting from team burn rate'},
       {level:'watch', title:'WIP imbalance: 2 members at 0 items', desc:'Tomás and Yuki have capacity. 2 items aging in queue.', action:'Redistribute'},
@@ -575,6 +578,9 @@ EAP.insights = {
   'art-Feature-backlog': {
     flowDist: { features:55, defects:20, enablers:15, maintenance:10 },
     signals: [
+      // Cross-persona — only Ananya sees these (James activity rolling up)
+      {level:'urgent', ai:true, confidence:'High', title:'James raised bld13 — affects Fingerprint Login Redesign', desc:'Biometric library throws on iOS 17.5 lock-screen entry. Needs PM disposition before Sprint 3 commit.', action:'Review impact', meta:'Defect raised today by Auth Team', forPersonas:['ananya']},
+      {level:'watch',  ai:true, confidence:'High', title:'James advanced ls6 to 50% — f1 on track', desc:'PIN fallback handler in In Progress. Fingerprint Login Redesign burn rate matches plan for Sprint 2 close.', action:'Open feature', meta:'Auth Team velocity', forPersonas:['ananya']},
       {level:'urgent', ai:true, confidence:'High', title:'47 customers flagged biometric issues', desc:'Up 3× from last month. Enhanced Biometric Auth ranked #1 by WSJF.', action:'Plan into PI 26', meta:'47 support tickets, 12 NPS comments'},
       {level:'urgent', ai:true, confidence:'High', title:'New theme: payment confirmation too slow', desc:'31 mentions in 7 days. No Feature in backlog matches.', action:'Create Feature', meta:'31 tickets across 3 channels'},
       {level:'urgent', title:'2 Features backlogged for 3+ PIs', desc:'Loan Application Wizard and Investment Portfolio View never pulled.', action:'Prioritise or remove'},

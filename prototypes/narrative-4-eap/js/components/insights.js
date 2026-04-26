@@ -155,9 +155,16 @@ EAP.renderInsights = function() {
 
   // ── Signals ──
   if (d.signals) {
-    var urgent = d.signals.filter(function(s) { return s.level === 'urgent'; });
-    var watch = d.signals.filter(function(s) { return s.level === 'watch'; });
-    var ok = d.signals.filter(function(s) { return s.level === 'ok'; });
+    // Persona-aware filter: signals with forPersonas only show for matching persona;
+    // signals without forPersonas show for all personas.
+    var activePersona = EAP.state.persona;
+    var visibleSignals = d.signals.filter(function(s) {
+      if (!s.forPersonas) return true;
+      return s.forPersonas.indexOf(activePersona) >= 0;
+    });
+    var urgent = visibleSignals.filter(function(s) { return s.level === 'urgent'; });
+    var watch = visibleSignals.filter(function(s) { return s.level === 'watch'; });
+    var ok = visibleSignals.filter(function(s) { return s.level === 'ok'; });
 
     if (urgent.length) {
       h += '<div class="ins-sig-group"><div class="ins-sec-lbl">Needs Attention <span class="ins-sig-count">' + urgent.length + '</span></div>';
