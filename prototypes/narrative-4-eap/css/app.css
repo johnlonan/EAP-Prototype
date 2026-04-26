@@ -289,6 +289,20 @@ body { background: linear-gradient(160deg, #dff0e6 0%, #d6ede9 28%, #d4eaee 52%,
 
 /* WSJF breakdown popover */
 .wsjf-popover { position: fixed; z-index: 1000; width: 280px; background: #fff; border-radius: var(--radius-lg); box-shadow: 0 8px 28px rgba(0,0,0,0.18), 0 1px 0 rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06); overflow: hidden; animation: depPopIn 140ms ease-out; }
+
+/* Persona switcher popover (anchored to nav avatar) */
+.persona-pop { z-index: 1100; width: 280px; background: #fff; border-radius: var(--radius-lg); box-shadow: 0 16px 40px -10px rgba(0,0,0,0.22), 0 1px 0 rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06); overflow: hidden; animation: depPopIn 140ms ease-out; }
+.persona-pop-hd { padding: 12px 16px 8px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); border-bottom: 1px solid rgba(0,0,0,0.04); }
+.persona-pop-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-decoration: none; color: var(--text-primary); transition: background 120ms ease; }
+.persona-pop-row:hover { background: rgba(14,78,105,0.05); }
+.persona-pop-row.is-active { background: rgba(0,199,177,0.05); }
+.persona-pop-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.8); }
+.persona-pop-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.persona-pop-name { font-size: 13px; font-weight: 500; color: var(--text-primary); line-height: 1.25; }
+.persona-pop-role { font-size: 11px; color: var(--text-tertiary); line-height: 1.3; margin-top: 1px; }
+.persona-pop-active { color: #00C7B1; font-size: 12px; flex-shrink: 0; }
+.persona-pop-back { display: block; padding: 10px 16px; border-top: 1px solid rgba(0,0,0,0.04); background: rgba(0,0,0,0.015); font-size: 11px; color: var(--text-tertiary); text-decoration: none; transition: color 120ms ease; }
+.persona-pop-back:hover { color: var(--text-secondary); }
 .wsjf-pop-hd { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 16px 8px; border-bottom: 1px solid rgba(0,0,0,0.05); }
 .wsjf-pop-hd-lbl { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
 .wsjf-pop-hd-val { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
