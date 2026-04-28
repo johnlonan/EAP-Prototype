@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Card
+       Variants: with-media · with-widget-header
+       Direction: vertical (default) · side (horizontal)
+       Padding sizes: default (24px) · sm (16px) · xs (8px)
+    -------------------------------------------------------- */
+
+    .card {
+      background: var(--surface-primary, #ffffff);
+      border: 1px solid var(--border-subtle, #edece9);
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      width: 361px;
+    }
+
+    /* ---- Directions ---- */
+    .card--side {
+      flex-direction: row;
+      width: 631px;
+      height: 446px;
+    }
+
+    /* ---- Media figure ---- */
+    .card__figure {
+      flex-shrink: 0;
+      padding: 8px 8px 0;
+    }
+    .card--side .card__figure {
+      flex: 1;
+      padding: 8px 0 8px 8px;
+    }
+    .card__figure--end {
+      padding: 0 8px 8px;
+    }
+    .card--side .card__figure--end {
+      padding: 8px 8px 8px 0;
+    }
+
+    .card__media {
+      width: 100%;
+      aspect-ratio: 347 / 195;
+      border-radius: 24px;
+      background: var(--bg-tertiary);
+      overflow: hidden;
+      position: relative;
+    }
+    .card__media--sm { border-radius: 16px; }
+    .card--side .card__media {
+      height: 100%;
+      aspect-ratio: unset;
+    }
+    .card__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ---- Body ---- */
+    .card__body {
+      padding: 24px;
+      flex: 1;
+    }
+    .card__body--sm { padding: 16px; }
+    .card__body--xs { padding: 8px; }
+
+    /* ---- Widget header ---- */
+    .card__widget-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 16px 24px;
+      border-bottom: 1px solid var(--border-subtle, #edece9);
+    }
+    .card__widget-title {
+      flex: 1;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 24px;
+    }
+
+    /* ---- Slot placeholder ---- */
+    .card__slot {
+      height: 40px;
+      border-radius: 8px;
+      background: var(--bg-tertiary);
+    }
+    .card__slot-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-2);
+    }
+
+    /* ---- Showcase ---- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+
+    .card-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-6);
+      align-items: flex-start;
+    }
+
+    .showcase-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Vertical — With Media (24px default) -->
+    <div class="showcase-card">
+      <p class="section-title">Vertical · With Media · Padding sizes</p>
+      <div class="card-row">
+
+        <!-- 24px default -->
+        <div>
+          <p class="section-title">24px default</p>
+          <div class="card">
+            <div class="card__figure">
+              <div class="card__media">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80" alt="Office">
+              </div>
+            </div>
+            <div class="card__body">
+              <p class="card__slot-label">Content slot</p>
+              <div class="card__slot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 16px sm -->
+        <div>
+          <p class="section-title">16px sm</p>
+          <div class="card">
+            <div class="card__figure">
+              <div class="card__media card__media--sm">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80" alt="Office">
+              </div>
+            </div>
+            <div class="card__body card__body--sm">
+              <p class="card__slot-label">Content slot</p>
+              <div class="card__slot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8px xs -->
+        <div>
+          <p class="section-title">8px xs</p>
+          <div class="card">
+            <div class="card__figure">
+              <div class="card__media card__media--sm">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80" alt="Office">
+              </div>
+            </div>
+            <div class="card__body card__body--xs">
+              <p class="card__slot-label">Content slot</p>
+              <div class="card__slot"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Side — With Media -->
+    <div class="showcase-card">
+      <p class="section-title">Side (horizontal) · With Media</p>
+      <div class="card card--side">
+        <div class="card__figure" style="flex:1; padding: 8px 0 8px 8px;">
+          <div class="card__media" style="height:100%; aspect-ratio:unset; border-radius:24px;">
+            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80" alt="Office">
+          </div>
+        </div>
+        <div class="card__body" style="flex:1;">
+          <p class="card__slot-label">Content slot</p>
+          <div class="card__slot"></div>
+        </div>
+        <div class="card__figure card__figure--end" style="flex:1; padding: 8px 8px 8px 0;">
+          <div class="card__media" style="height:100%; aspect-ratio:unset; border-radius:24px;">
+            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80" alt="Office">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Widget Header variants -->
+    <div class="showcase-card">
+      <p class="section-title">With Widget Header · Padding sizes</p>
+      <div class="card-row">
+
+        <!-- 24px default -->
+        <div>
+          <p class="section-title">24px default</p>
+          <div class="card">
+            <div class="card__widget-header">
+              <p class="card__widget-title">Header title</p>
+            </div>
+            <div class="card__body">
+              <div class="card__slot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 16px sm -->
+        <div>
+          <p class="section-title">16px sm</p>
+          <div class="card">
+            <div class="card__widget-header">
+              <p class="card__widget-title">Header title</p>
+            </div>
+            <div class="card__body card__body--sm">
+              <div class="card__slot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8px xs -->
+        <div>
+          <p class="section-title">8px xs</p>
+          <div class="card">
+            <div class="card__widget-header">
+              <p class="card__widget-title">Header title</p>
+            </div>
+            <div class="card__body card__body--xs">
+              <div class="card__slot"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Realistic content -->
+    <div class="showcase-card">
+      <p class="section-title">Example — Real Content</p>
+      <div class="card-row">
+
+        <div class="card">
+          <div class="card__figure">
+            <div class="card__media">
+              <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=700&q=80" alt="">
+            </div>
+          </div>
+          <div class="card__body">
+            <p style="font-size:var(--font-size-sm); font-weight:var(--font-weight-semibold); color:var(--text-primary); margin-bottom:4px;">ServiceNow Now Platform</p>
+            <p style="font-size:var(--font-size-xs); color:var(--text-tertiary); line-height:1.5;">A unified platform for enterprise service management, automation, and AI-powered operations.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__widget-header">
+            <p class="card__widget-title">Incident Overview</p>
+            <span class="badge badge--sm badge--error-tertiary" style="display:inline-flex;align-items:center;gap:4px;border-radius:9999px;font-size:11px;font-weight:400;white-space:nowrap;height:20px;padding:0 6px;background:#fde8e6;color:#c0392b;border:1px solid transparent;">3 Critical</span>
+          </div>
+          <div class="card__body" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:var(--font-size-xs);color:var(--text-secondary);">INC0045621</span>
+              <span style="font-size:var(--font-size-xs);color:var(--color-error);">P1 — Critical</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:var(--font-size-xs);color:var(--text-secondary);">INC0045618</span>
+              <span style="font-size:var(--font-size-xs);color:var(--color-warning);">P2 — High</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:var(--font-size-xs);color:var(--text-secondary);">INC0045610</span>
+              <span style="font-size:var(--font-size-xs);color:var(--color-info);">P3 — Medium</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerts — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Alert
+       Types: info · success · warning · error · primary · accent
+       Variants: default · auto-dismiss (with progress bar)
+       Style: soft (tinted bg, coloured border-left, icon)
+    -------------------------------------------------------- */
+
+    .alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid transparent;
+      box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1), 0 10px 15px -3px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Icon */
+    .alert__icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+    }
+
+    /* Text group */
+    .alert__content { flex: 1; min-width: 0; }
+    .alert__title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 24px;
+    }
+    .alert__message {
+      font-size: var(--font-size-base);
+      font-weight: 300;
+      color: inherit;
+      line-height: 24px;
+      opacity: 0.85;
+    }
+
+    /* Actions */
+    .alert__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .alert__btn {
+      height: 28px;
+      padding: 0 10px;
+      border-radius: var(--radius-field);
+      border: none;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+      cursor: pointer;
+      background: rgba(0,0,0,0.12);
+      color: inherit;
+      transition: background var(--transition-fast);
+    }
+    .alert__btn:hover { background: rgba(0,0,0,0.2); }
+    .alert__close {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+      opacity: 0.7;
+      transition: opacity var(--transition-fast), background var(--transition-fast);
+    }
+    .alert__close:hover { opacity: 1; background: rgba(0,0,0,0.08); }
+    .alert__close [data-icon] { width: 12px; height: 12px; }
+
+    /* Progress bar */
+    .alert__progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      border-radius: 0 2px 2px 0;
+      background: currentColor;
+      opacity: 0.5;
+      width: 100%;
+      transform-origin: left;
+    }
+    .alert--dismissing .alert__progress {
+      animation: alert-dismiss 5s linear forwards;
+    }
+    @keyframes alert-dismiss {
+      from { transform: scaleX(1); }
+      to   { transform: scaleX(0); }
+    }
+
+    /* ---- Colours ---- */
+    .alert--info {
+      background: #EFF6FF;
+      border-color: rgba(42, 110, 220, 0.25);
+      color: #1e4d9e;
+    }
+    .alert--success {
+      background: #F0FDF4;
+      border-color: rgba(0, 131, 79, 0.25);
+      color: #166534;
+    }
+    .alert--warning {
+      background: #FFFBEB;
+      border-color: rgba(141, 110, 0, 0.25);
+      color: #7a5000;
+    }
+    .alert--error {
+      background: #FEF2F2;
+      border-color: rgba(226, 22, 28, 0.25);
+      color: #9b1c1c;
+    }
+    .alert--primary {
+      background: #EFF6FF;
+      border-color: rgba(14, 78, 105, 0.25);
+      color: var(--color-primary);
+    }
+    .alert--accent {
+      background: #F0FDF4;
+      border-color: rgba(104, 227, 83, 0.4);
+      color: #166534;
+    }
+
+    /* ---- Dismiss state ---- */
+    .alert.is-dismissed {
+      display: none;
+    }
+
+    /* ---- Showcase ---- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+    .showcase-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Default (with action button + close) -->
+    <div class="showcase-card">
+      <p class="section-title">Default — With Action &amp; Close</p>
+
+      <div class="alert alert--info">
+        <span class="alert__icon" data-icon="circle-info"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__btn">Button</button>
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert--success">
+        <span class="alert__icon" data-icon="check-circle"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__btn">Button</button>
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert--warning">
+        <span class="alert__icon" data-icon="triangle-exclamation"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__btn">Button</button>
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert--error">
+        <span class="alert__icon" data-icon="alert-circle"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__btn">Button</button>
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert--primary">
+        <span class="alert__icon" data-icon="circle-info"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__btn">Button</button>
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert--accent">
+        <span class="alert__icon" data-icon="check-circle"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__btn">Button</button>
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auto-dismiss (close only, with progress bar) -->
+    <div class="showcase-card">
+      <p class="section-title">Auto-Dismiss — With Progress Bar</p>
+
+      <div class="alert alert--info alert--dismissing">
+        <span class="alert__icon" data-icon="circle-info"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <div class="alert__progress"></div>
+      </div>
+
+      <div class="alert alert--success alert--dismissing">
+        <span class="alert__icon" data-icon="check-circle"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <div class="alert__progress"></div>
+      </div>
+
+      <div class="alert alert--warning alert--dismissing">
+        <span class="alert__icon" data-icon="triangle-exclamation"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <div class="alert__progress"></div>
+      </div>
+
+      <div class="alert alert--error alert--dismissing">
+        <span class="alert__icon" data-icon="alert-circle"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <div class="alert__progress"></div>
+      </div>
+    </div>
+
+    <!-- Close-only (no action button) -->
+    <div class="showcase-card">
+      <p class="section-title">Close Only</p>
+
+      <div class="alert alert--info">
+        <span class="alert__icon" data-icon="circle-info"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert--success">
+        <span class="alert__icon" data-icon="check-circle"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="alert alert--error">
+        <span class="alert__icon" data-icon="alert-circle"></span>
+        <div class="alert__content">
+          <p class="alert__title">New message!</p>
+          <p class="alert__message">You have 1 unread message</p>
+        </div>
+        <div class="alert__actions">
+          <button class="alert__close" onclick="this.closest('.alert').classList.add('is-dismissed')">
+            <span data-icon="close"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

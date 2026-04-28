@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sortable List — No Drag Feedback</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 p-8">
+    <h1 class="text-xl font-semibold mb-4">Priority Queue</h1>
+
+    <!--
+    PROBLEM: Dragging an item has zero visual feedback — no lift effect on
+    pickup, no scale, no shadow change. Displaced items teleport when
+    reordering instead of smoothly reflowing. There is no settle animation.
+    Task: add proper Nexus drag-and-drop motion:
+    - Pickup: item should visually lift (scale up + optional opacity/shadow)
+    - Displaced items: should transition-transform so they slide into new positions
+    - Settle: item animates back to resting state on drop
+    - All with correct motion-reduce: variants
+  -->
+    <ul id="sortable-list" class="space-y-2 max-w-md">
+      <li
+        draggable="true"
+        class="bg-white rounded-lg px-4 py-3 border border-gray-200 shadow-sm flex items-center gap-3 cursor-grab"
+      >
+        <span class="text-gray-400 select-none">⠿</span>
+        <span class="text-sm font-medium">Fix login bug</span>
+      </li>
+      <li
+        draggable="true"
+        class="bg-white rounded-lg px-4 py-3 border border-gray-200 shadow-sm flex items-center gap-3 cursor-grab"
+      >
+        <span class="text-gray-400 select-none">⠿</span>
+        <span class="text-sm font-medium">Update API docs</span>
+      </li>
+      <li
+        draggable="true"
+        class="bg-white rounded-lg px-4 py-3 border border-gray-200 shadow-sm flex items-center gap-3 cursor-grab"
+      >
+        <span class="text-gray-400 select-none">⠿</span>
+        <span class="text-sm font-medium">Add dark mode</span>
+      </li>
+      <li
+        draggable="true"
+        class="bg-white rounded-lg px-4 py-3 border border-gray-200 shadow-sm flex items-center gap-3 cursor-grab"
+      >
+        <span class="text-gray-400 select-none">⠿</span>
+        <span class="text-sm font-medium">Performance audit</span>
+      </li>
+    </ul>
+
+    <script>
+      const list = document.getElementById('sortable-list');
+      let draggedItem = null;
+
+      list.querySelectorAll('li').forEach(item => {
+        item.addEventListener('dragstart', () => {
+          draggedItem = item;
+          // No visual feedback on pickup — item looks identical to resting state
+        });
+
+        item.addEventListener('dragend', () => {
+          draggedItem = null;
+          // No settle animation — just stops
+        });
+
+        item.addEventListener('dragover', e => {
+          e.preventDefault();
+          const afterElement = getDragAfterElement(list, e.clientY);
+          if (afterElement === null) {
+            list.appendChild(draggedItem);
+          } else {
+            list.insertBefore(draggedItem, afterElement);
+          }
+          // Displaced items teleport — no transition-transform reflow
+        });
+      });
+
+      function getDragAfterElement(container, y) {
+        const items = [...container.querySelectorAll('li:not(.dragging)')];
+        return items.reduce(
+          (closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+              return {offset, element: child};
+            }
+            return closest;
+          },
+          {offset: Number.NEGATIVE_INFINITY}
+        ).element;
+      }
+    </script>
+  </body>
+</html>

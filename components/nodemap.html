@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nodemap — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/cytoscape.min.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Nodemap — Cytoscape.js rebuild
+       Two-hub topology: AI Assets · CMDB Apps
+       Features: pan/zoom · node popover · filter · legend ·
+                 minimap · list view · dot-grid background
+    -------------------------------------------------------- */
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-secondary);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .nm-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ---- Top bar ---- */
+    .nm-topbar {
+      flex-shrink: 0;
+      height: 56px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 12px;
+      z-index: 10;
+    }
+    .nm-topbar__title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .nm-topbar__sep { width: 1px; height: 20px; background: var(--border-subtle); flex-shrink: 0; }
+
+    .nm-search {
+      position: relative;
+      max-width: 260px;
+      flex: 1;
+    }
+    .nm-search [data-icon] {
+      position: absolute; left: 9px; top: 50%;
+      transform: translateY(-50%);
+      width: 13px; height: 13px;
+      color: var(--text-tertiary); pointer-events: none;
+    }
+    .nm-search__input {
+      width: 100%; height: 30px;
+      padding: 0 10px 0 30px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-field);
+      background: var(--bg-secondary);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      color: var(--text-primary); outline: none;
+    }
+    .nm-search__input:focus { border-color: var(--border-default); }
+    .nm-search__input::placeholder { color: var(--text-tertiary); }
+
+    .nm-filters { display: flex; align-items: center; gap: 5px; flex: 1; }
+    .nm-filter-pill {
+      height: 26px; padding: 0 10px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+      font-family: var(--font-sans); font-size: 11px;
+      color: var(--text-secondary); cursor: pointer;
+      transition: all var(--transition-fast); white-space: nowrap;
+    }
+    .nm-filter-pill:hover { border-color: var(--border-default); background: var(--bg-tertiary); }
+    .nm-filter-pill.is-active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+    .nm-nodetype-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 30px; padding: 0 10px;
+      border-radius: var(--radius-field);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-primary);
+      font-family: var(--font-sans); font-size: var(--font-size-xs);
+      color: var(--text-secondary); cursor: pointer; white-space: nowrap;
+    }
+    .nm-nodetype-btn [data-icon] { width: 12px; height: 12px; }
+
+    /* ---- Canvas area ---- */
+    .nm-canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background-color: #F0F5F7;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.13) 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+
+    #cy {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* ---- Node popover ---- */
+    .nm-popover {
+      position: absolute;
+      z-index: 30;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.08);
+      width: 258px;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .nm-popover.is-visible {
+      opacity: 1; transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+    .nm-popover__header {
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .nm-popover__name {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+    .nm-popover__sub { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+    .nm-popover__body { padding: 8px 14px; }
+    .nm-popover__row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 0;
+    }
+    .nm-popover__row + .nm-popover__row {
+      border-top: 1px solid rgba(0,0,0,0.04);
+    }
+    .nm-popover__key { font-size: 11px; color: var(--text-tertiary); }
+    .nm-popover__val { font-size: 11px; color: var(--text-primary); font-weight: 500; }
+    .nm-popover__footer {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .nm-popover__section-label {
+      font-size: 10px; font-weight: var(--font-weight-semibold);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--text-tertiary); margin-bottom: 7px;
+    }
+    .nm-conn-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .nm-conn-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 20px; padding: 0 7px;
+      border-radius: 9999px; font-size: 11px;
+      background: var(--bg-secondary); color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    .nm-conn-pill__dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .nm-popover__cta {
+      width: 100%; height: 32px; margin-top: 10px;
+      background: var(--color-primary); color: white;
+      border: none; border-radius: var(--radius-field);
+      font-family: var(--font-sans); font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer; transition: opacity var(--transition-fast);
+    }
+    .nm-popover__cta:hover { opacity: 0.87; }
+
+    /* ---- Legend ---- */
+    .nm-legend {
+      position: absolute; bottom: 68px; left: 20px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+      z-index: 20; overflow: hidden; min-width: 170px;
+    }
+    .nm-legend__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; cursor: pointer; user-select: none;
+    }
+    .nm-legend__title {
+      font-size: 11px; font-weight: var(--font-weight-semibold);
+      color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .nm-legend__chevron { width: 12px; height: 12px; color: var(--text-tertiary); }
+    .nm-legend__body { padding: 4px 12px 10px; border-top: 1px solid var(--border-subtle); }
+    .nm-legend__row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+    .nm-legend__dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .nm-legend__label { font-size: 11px; color: var(--text-secondary); }
+
+    /* ---- Minimap ---- */
+    .nm-minimap {
+      position: absolute; bottom: 68px; right: 20px;
+      width: 160px; height: 100px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+      overflow: hidden; z-index: 20;
+    }
+    #minimapCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .nm-minimap__vp {
+      position: absolute;
+      border: 1.5px solid var(--color-primary);
+      border-radius: 2px;
+      background: rgba(14,78,105,0.07);
+      pointer-events: none;
+    }
+
+    /* ---- Action bar ---- */
+    .nm-actionbar {
+      position: absolute; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      height: 36px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9999px; box-shadow: var(--shadow-md);
+      display: flex; align-items: center; gap: 2px;
+      padding: 0 6px; z-index: 20;
+    }
+    .nm-ab-btn {
+      width: 28px; height: 28px;
+      border-radius: 9999px; border: none; background: transparent;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary); font-family: var(--font-sans); font-size: 11px;
+      transition: background var(--transition-fast), color var(--transition-fast);
+      position: relative; white-space: nowrap;
+    }
+    .nm-ab-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .nm-ab-btn.is-active { background: var(--color-primary); color: white; }
+    .nm-ab-btn [data-icon] { width: 14px; height: 14px; }
+    .nm-ab-sep { width: 1px; height: 16px; background: var(--border-subtle); margin: 0 4px; flex-shrink: 0; }
+    .nm-zoom-label {
+      font-size: 11px; color: var(--text-tertiary);
+      padding: 0 4px; min-width: 38px; text-align: center;
+    }
+    .nm-ab-btn::after {
+      content: attr(data-tip);
+      position: absolute; bottom: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%);
+      background: #343331; color: white;
+      font-size: 11px; padding: 3px 8px; border-radius: 4px;
+      white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity 150ms ease;
+    }
+    .nm-ab-btn:hover::after { opacity: 1; }
+
+    /* ---- List view ---- */
+    .nm-listview {
+      display: none; flex-direction: column;
+      overflow-y: auto; flex: 1;
+    }
+    .nm-listview.is-visible { display: flex; }
+    .nm-list-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0; position: sticky; top: 0; z-index: 5;
+    }
+    .nm-list-header {
+      display: flex; align-items: center;
+      padding: 8px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 12px; flex-shrink: 0;
+    }
+    .nm-list-col {
+      font-size: 10px; font-weight: var(--font-weight-semibold);
+      color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .nm-list-row {
+      display: flex; align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      background: var(--bg-primary); gap: 12px; cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .nm-list-row:hover { background: var(--bg-secondary); }
+    .nm-list-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .nm-list-name { font-size: var(--font-size-xs); color: var(--color-link); text-decoration: none; flex: 1; }
+    .nm-list-name:hover { text-decoration: underline; }
+    .nm-list-type { font-size: var(--font-size-xs); color: var(--text-tertiary); width: 140px; flex-shrink: 0; }
+    .nm-list-conns { font-size: var(--font-size-xs); color: var(--text-tertiary); width: 90px; text-align: center; flex-shrink: 0; }
+    .nm-list-badge {
+      font-size: 11px; height: 18px; padding: 0 7px;
+      border-radius: 9999px; display: inline-flex; align-items: center;
+    }
+    .nm-mapback-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 28px; padding: 0 10px;
+      border-radius: var(--radius-field);
+      border: 1px solid var(--border-subtle);
+      background: transparent; font-family: var(--font-sans);
+      font-size: var(--font-size-xs); color: var(--text-secondary);
+      cursor: pointer; transition: background var(--transition-fast);
+    }
+    .nm-mapback-btn:hover { background: var(--bg-tertiary); }
+    .nm-mapback-btn [data-icon] { width: 12px; height: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="nm-shell">
+
+  <!-- Top bar -->
+  <div class="nm-topbar">
+    <span class="nm-topbar__title">AI Knowledge Map</span>
+    <div class="nm-topbar__sep"></div>
+    <div class="nm-search">
+      <span data-icon="search"></span>
+      <input class="nm-search__input" type="text" placeholder="Search nodes…" id="searchInput">
+    </div>
+    <div class="nm-filters">
+      <button class="nm-filter-pill is-active" data-filter="all">All types</button>
+      <button class="nm-filter-pill" data-filter="generative">Generative AI</button>
+      <button class="nm-filter-pill" data-filter="model">Model</button>
+      <button class="nm-filter-pill" data-filter="data">Data</button>
+    </div>
+    <button class="nm-nodetype-btn">
+      <span>Node type</span>
+      <span data-icon="chevron-down"></span>
+    </button>
+  </div>
+
+  <!-- Canvas -->
+  <div class="nm-canvas-wrap" id="canvasWrap">
+    <div id="cy"></div>
+
+    <!-- Node popover -->
+    <div class="nm-popover" id="nmPopover">
+      <div class="nm-popover__header">
+        <div class="nm-popover__name" id="popName">—</div>
+        <div class="nm-popover__sub" id="popSub">—</div>
+      </div>
+      <div class="nm-popover__body">
+        <div class="nm-popover__row">
+          <span class="nm-popover__key">Type</span>
+          <span class="nm-popover__val" id="popType">—</span>
+        </div>
+        <div class="nm-popover__row">
+          <span class="nm-popover__key">Department</span>
+          <span class="nm-popover__val" id="popDept">—</span>
+        </div>
+        <div class="nm-popover__row">
+          <span class="nm-popover__key">Connections</span>
+          <span class="nm-popover__val" id="popConns">—</span>
+        </div>
+        <div class="nm-popover__row">
+          <span class="nm-popover__key">Status</span>
+          <span class="nm-popover__val" id="popStatus">Active</span>
+        </div>
+      </div>
+      <div class="nm-popover__footer">
+        <div class="nm-popover__section-label">Connected to</div>
+        <div class="nm-conn-pills" id="popPills"></div>
+        <button class="nm-popover__cta">Create incident</button>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="nm-legend">
+      <div class="nm-legend__header" id="legendToggleBtn">
+        <span class="nm-legend__title">Legend</span>
+        <span data-icon="chevron-up" class="nm-legend__chevron"></span>
+      </div>
+      <div class="nm-legend__body" id="legendBody">
+        <div class="nm-legend__row"><div class="nm-legend__dot" style="background:#0e4e69;"></div><span class="nm-legend__label">AI Hub / CMDB Hub</span></div>
+        <div class="nm-legend__row"><div class="nm-legend__dot" style="background:#ea580c;"></div><span class="nm-legend__label">Generative AI</span></div>
+        <div class="nm-legend__row"><div class="nm-legend__dot" style="background:#ca8a04;"></div><span class="nm-legend__label">Model</span></div>
+        <div class="nm-legend__row"><div class="nm-legend__dot" style="background:#0d9488;"></div><span class="nm-legend__label">Classic AI</span></div>
+        <div class="nm-legend__row"><div class="nm-legend__dot" style="background:#2563eb;"></div><span class="nm-legend__label">CMDB / Business App</span></div>
+        <div class="nm-legend__row"><div class="nm-legend__dot" style="background:#7c3aed;"></div><span class="nm-legend__label">Prompt / Dataset</span></div>
+      </div>
+    </div>
+
+    <!-- Minimap -->
+    <div class="nm-minimap">
+      <canvas id="minimapCanvas"></canvas>
+      <div class="nm-minimap__vp" id="minimapVp"></div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="nm-actionbar">
+      <button class="nm-ab-btn is-active" id="btnMap" data-tip="Map view" onclick="setView('map')">
+        <span data-icon="org-chart"></span>
+      </button>
+      <button class="nm-ab-btn" id="btnList" data-tip="List view" onclick="setView('list')">
+        <span data-icon="layout-list"></span>
+      </button>
+      <div class="nm-ab-sep"></div>
+      <button class="nm-ab-btn" data-tip="Zoom out" onclick="zoomBy(-0.2)">
+        <span data-icon="arrow-down"></span>
+      </button>
+      <span class="nm-zoom-label" id="zoomLabel">100%</span>
+      <button class="nm-ab-btn" data-tip="Zoom in" onclick="zoomBy(0.2)">
+        <span data-icon="arrow-up"></span>
+      </button>
+      <div class="nm-ab-sep"></div>
+      <button class="nm-ab-btn" data-tip="Reset view" onclick="resetView()">
+        <span data-icon="arrow-counterclockwise"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- List view -->
+  <div class="nm-listview" id="nmListView">
+    <div class="nm-list-topbar">
+      <span style="font-size:var(--font-size-xs);color:var(--text-tertiary);" id="listCountLabel">— nodes</span>
+      <button class="nm-mapback-btn" onclick="setView('map')">
+        <span data-icon="org-chart"></span>
+        Map view
+      </button>
+    </div>
+    <div class="nm-list-header">
+      <div class="nm-list-dot"></div>
+      <div class="nm-list-col" style="flex:1;">Name</div>
+      <div class="nm-list-col nm-list-type">Type</div>
+      <div class="nm-list-col nm-list-conns">Connections</div>
+      <div class="nm-list-col" style="width:70px;">Status</div>
+    </div>
+    <div id="nmListBody"></div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+/* ── Data ─────────────────────────────────────────────────────────── */
+const TYPE_COLORS = {
+  'hub':          '#0e4e69',
+  'Generative AI':'#ea580c',
+  'Model':        '#ca8a04',
+  'Classic AI':   '#0d9488',
+  'CMDB CI':      '#2563eb',
+  'Business App': '#2563eb',
+  'Prompt':       '#7c3aed',
+  'Dataset':      '#7c3aed',
+};
+
+const NODES = [
+  { id:'hub1', label:'AI Assets',       type:'hub',          dept:'Platform', provider:'ServiceNow', status:'Active' },
+  { id:'hub2', label:'CMDB Apps',       type:'hub',          dept:'IT Ops',   provider:'ServiceNow', status:'Active' },
+  { id:'n1',  label:'NowAssist',        type:'Generative AI',dept:'CX',       provider:'ServiceNow', status:'Active' },
+  { id:'n2',  label:'Text Summariser',  type:'Generative AI',dept:'AI Dev',   provider:'OpenAI',     status:'Active' },
+  { id:'n3',  label:'Code Generator',   type:'Generative AI',dept:'Dev',      provider:'Anthropic',  status:'Active' },
+  { id:'n4',  label:'GPT-4o',           type:'Model',        dept:'AI Ops',   provider:'OpenAI',     status:'Active' },
+  { id:'n5',  label:'Claude Sonnet',    type:'Model',        dept:'AI Ops',   provider:'Anthropic',  status:'Active' },
+  { id:'n6',  label:'Predictive ML',    type:'Classic AI',   dept:'Ops',      provider:'ServiceNow', status:'Active' },
+  { id:'n7',  label:'Prompt Library',   type:'Prompt',       dept:'AI Dev',   provider:'Internal',   status:'Active' },
+  { id:'n8',  label:'Training Data',    type:'Dataset',      dept:'Data',     provider:'Internal',   status:'Active' },
+  { id:'n9',  label:'CMDB CI Store',    type:'CMDB CI',      dept:'IT Ops',   provider:'ServiceNow', status:'Active' },
+  { id:'n10', label:'ServicePortal',    type:'Business App', dept:'CX',       provider:'ServiceNow', status:'Active' },
+  { id:'n11', label:'Asset Mgmt',       type:'Business App', dept:'Finance',  provider:'ServiceNow', status:'Active' },
+];
+
+const EDGES = [
+  { source:'hub1', target:'n1',   style:'solid'  },
+  { source:'hub1', target:'n2',   style:'solid'  },
+  { source:'hub1', target:'n3',   style:'solid'  },
+  { source:'hub1', target:'n4',   style:'solid'  },
+  { source:'hub1', target:'n5',   style:'solid'  },
+  { source:'hub1', target:'n6',   style:'solid'  },
+  { source:'hub1', target:'n7',   style:'solid'  },
+  { source:'hub1', target:'n8',   style:'solid'  },
+  { source:'hub2', target:'n9',   style:'solid'  },
+  { source:'hub2', target:'n10',  style:'solid'  },
+  { source:'hub2', target:'n11',  style:'solid'  },
+  { source:'hub1', target:'hub2', style:'dashed' },
+];
+
+const POSITIONS = {
+  hub1: { x: 340, y: 360 },
+  hub2: { x: 800, y: 360 },
+  n1:   { x: 120, y: 140 },
+  n2:   { x: 340, y:  90 },
+  n3:   { x: 560, y: 140 },
+  n4:   { x:  90, y: 360 },
+  n5:   { x: 590, y: 360 },
+  n6:   { x: 120, y: 570 },
+  n7:   { x: 340, y: 610 },
+  n8:   { x: 560, y: 570 },
+  n9:   { x: 800, y: 130 },
+  n10:  { x: 1010,y: 280 },
+  n11:  { x: 1010,y: 460 },
+};
+
+/* ── Cytoscape init ───────────────────────────────────────────────── */
+const cy = cytoscape({
+  container: document.getElementById('cy'),
+  elements: [
+    ...NODES.map(n => ({
+      data: { id: n.id, label: n.label, type: n.type, dept: n.dept, provider: n.provider, status: n.status },
+      position: { ...POSITIONS[n.id] }
+    })),
+    ...EDGES.map((e, i) => ({
+      data: { id: `e${i}`, source: e.source, target: e.target, edgeStyle: e.style }
+    }))
+  ],
+  style: [
+    {
+      selector: 'node',
+      style: {
+        'width': 42, 'height': 42,
+        'background-color': ele => TYPE_COLORS[ele.data('type')] || '#888',
+        'border-width': 3,
+        'border-color': 'white',
+        'label': 'data(label)',
+        'text-valign': 'bottom',
+        'text-halign': 'center',
+        'font-family': 'ServiceNow Sans, -apple-system, sans-serif',
+        'font-size': 10,
+        'color': '#374151',
+        'text-margin-y': 5,
+        'text-max-width': 80,
+        'text-wrap': 'wrap',
+        'overlay-opacity': 0,
+      }
+    },
+    {
+      selector: 'node[type = "hub"]',
+      style: {
+        'width': 78, 'height': 78,
+        'border-width': 5,
+        'border-color': 'rgba(255,255,255,0.55)',
+        'font-size': 11,
+        'font-weight': 600,
+        'color': 'white',
+        'text-valign': 'center',
+        'text-margin-y': 0,
+        'shadow-blur': 28,
+        'shadow-color': '#0e4e69',
+        'shadow-opacity': 0.20,
+        'shadow-offset-x': 0,
+        'shadow-offset-y': 0,
+      }
+    },
+    {
+      selector: 'node.dimmed',
+      style: { 'opacity': 0.18 }
+    },
+    {
+      selector: 'node.selected',
+      style: {
+        'border-color': 'white',
+        'border-width': 3,
+        'shadow-blur': 18,
+        'shadow-color': ele => TYPE_COLORS[ele.data('type')] || '#888',
+        'shadow-opacity': 0.45,
+        'shadow-offset-x': 0,
+        'shadow-offset-y': 0,
+      }
+    },
+    {
+      selector: 'edge',
+      style: {
+        'width': 1.5,
+        'line-color': '#dbd8d3',
+        'curve-style': 'bezier',
+        'overlay-opacity': 0,
+      }
+    },
+    {
+      selector: 'edge[edgeStyle = "dashed"]',
+      style: {
+        'line-style': 'dashed',
+        'line-dash-pattern': [6, 4],
+        'line-color': '#bbb8b3',
+        'width': 1.5,
+      }
+    },
+    {
+      selector: 'edge.dimmed',
+      style: { 'opacity': 0.08 }
+    },
+    {
+      selector: 'edge.highlighted',
+      style: {
+        'line-color': ele => TYPE_COLORS[cy.$(`#${ele.data('source')}`).data('type')] || '#888',
+        'opacity': 0.7,
+        'width': 2,
+      }
+    },
+  ],
+  layout: { name: 'preset' },
+  minZoom: 0.2,
+  maxZoom: 3,
+  wheelSensitivity: 0.25,
+  userZoomingEnabled: true,
+  userPanningEnabled: true,
+  boxSelectionEnabled: false,
+  autounselectify: true,
+});
+
+/* ── Zoom controls ───────────────────────────────────────────────── */
+const zoomLabel = document.getElementById('zoomLabel');
+
+function updateZoomLabel() {
+  zoomLabel.textContent = Math.round(cy.zoom() * 100) + '%';
+}
+
+cy.on('zoom pan', () => {
+  updateZoomLabel();
+  updateMinimap();
+});
+
+function zoomBy(delta) {
+  cy.zoom({
+    level: cy.zoom() + delta,
+    renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 }
+  });
+}
+function resetView() { cy.fit(undefined, 80); }
+window.zoomBy    = zoomBy;
+window.resetView = resetView;
+
+/* ── Node hover glow ────────────────────────────────────────────── */
+cy.on('mouseover', 'node', evt => {
+  const n = evt.target;
+  n.addClass('selected');
+  n.connectedEdges().addClass('highlighted').connectedNodes().addClass('selected');
+});
+cy.on('mouseout', 'node', evt => {
+  cy.elements().removeClass('selected highlighted');
+});
+
+/* ── Node popover ────────────────────────────────────────────────── */
+const popover = document.getElementById('nmPopover');
+
+cy.on('tap', 'node', function(evt) {
+  const node = evt.target;
+  const d    = node.data();
+  const pos  = node.renderedPosition();
+
+  document.getElementById('popName').textContent  = d.label;
+  document.getElementById('popSub').textContent   = `${d.type} · ${d.provider}`;
+  document.getElementById('popType').textContent  = d.type;
+  document.getElementById('popDept').textContent  = d.dept;
+  document.getElementById('popStatus').textContent = d.status;
+
+  const neighbors = node.neighborhood('node');
+  document.getElementById('popConns').textContent = neighbors.length;
+
+  const pills = document.getElementById('popPills');
+  pills.innerHTML = '';
+  neighbors.forEach(nb => {
+    const color = TYPE_COLORS[nb.data('type')] || '#888';
+    const pill = document.createElement('span');
+    pill.className = 'nm-conn-pill';
+    pill.innerHTML = `<span class="nm-conn-pill__dot" style="background:${color};"></span>${nb.data('label')}`;
+    pills.appendChild(pill);
+  });
+
+  const wrap   = document.getElementById('canvasWrap');
+  const nodeW  = node.width() * cy.zoom();
+  let left = pos.x + nodeW / 2 + 14;
+  let top  = pos.y - 60;
+  if (left + 264 > wrap.clientWidth - 12) left = pos.x - nodeW / 2 - 274;
+  top = Math.max(10, Math.min(top, wrap.clientHeight - 320));
+
+  popover.style.left = left + 'px';
+  popover.style.top  = top  + 'px';
+  popover.classList.add('is-visible');
+});
+
+cy.on('tap', function(evt) {
+  if (evt.target === cy) popover.classList.remove('is-visible');
+});
+
+/* ── Filter pills ────────────────────────────────────────────────── */
+const FILTER_TYPES = {
+  all:        null,
+  generative: ['Generative AI', 'hub'],
+  model:      ['Model', 'hub'],
+  data:       ['CMDB CI', 'Business App', 'Dataset', 'hub'],
+};
+
+document.querySelectorAll('.nm-filter-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nm-filter-pill').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    popover.classList.remove('is-visible');
+    const allowed = FILTER_TYPES[btn.dataset.filter];
+    if (!allowed) {
+      cy.elements().removeClass('dimmed');
+    } else {
+      cy.nodes().forEach(n => n.toggleClass('dimmed', !allowed.includes(n.data('type'))));
+      cy.edges().forEach(e => {
+        const srcType = cy.$(`#${e.data('source')}`).data('type');
+        const tgtType = cy.$(`#${e.data('target')}`).data('type');
+        e.toggleClass('dimmed', !allowed.includes(srcType) || !allowed.includes(tgtType));
+      });
+    }
+  });
+});
+
+/* ── Search ──────────────────────────────────────────────────────── */
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  popover.classList.remove('is-visible');
+  if (!q) { cy.elements().removeClass('dimmed'); return; }
+  cy.nodes().forEach(n => n.toggleClass('dimmed', !n.data('label').toLowerCase().includes(q)));
+  cy.edges().forEach(e => e.addClass('dimmed'));
+});
+
+/* ── View toggle ─────────────────────────────────────────────────── */
+function setView(v) {
+  const canvasWrap = document.getElementById('canvasWrap');
+  const listView   = document.getElementById('nmListView');
+  if (v === 'list') {
+    canvasWrap.style.display = 'none';
+    listView.classList.add('is-visible');
+    buildListView();
+  } else {
+    canvasWrap.style.display = '';
+    listView.classList.remove('is-visible');
+  }
+}
+window.setView = setView;
+
+function buildListView() {
+  const body = document.getElementById('nmListBody');
+  if (body.children.length) return;
+  document.getElementById('listCountLabel').textContent = `${NODES.length} nodes`;
+  NODES.forEach(n => {
+    const connCount = EDGES.filter(e => e.source === n.id || e.target === n.id).length;
+    const color = TYPE_COLORS[n.type] || '#888';
+    const row = document.createElement('div');
+    row.className = 'nm-list-row';
+    row.innerHTML = `
+      <div class="nm-list-dot" style="background:${color};"></div>
+      <a class="nm-list-name" href="#">${n.label}</a>
+      <div class="nm-list-type">${n.type}</div>
+      <div class="nm-list-conns">${connCount}</div>
+      <span class="nm-list-badge" style="background:#d1f0df;color:#166534;">${n.status}</span>
+    `;
+    body.appendChild(row);
+  });
+}
+
+/* ── Legend toggle ───────────────────────────────────────────────── */
+document.getElementById('legendToggleBtn').addEventListener('click', () => {
+  const body = document.getElementById('legendBody');
+  body.style.display = body.style.display === 'none' ? '' : 'none';
+});
+
+/* ── Minimap ─────────────────────────────────────────────────────── */
+function updateMinimap() {
+  const canvas = document.getElementById('minimapCanvas');
+  const ctx    = canvas.getContext('2d');
+  const W = 160, H = 100;
+  canvas.width = W; canvas.height = H;
+
+  const posArr = Object.values(POSITIONS);
+  const pad = 60;
+  const minX = Math.min(...posArr.map(p => p.x)) - pad;
+  const minY = Math.min(...posArr.map(p => p.y)) - pad;
+  const maxX = Math.max(...posArr.map(p => p.x)) + pad;
+  const maxY = Math.max(...posArr.map(p => p.y)) + pad;
+  const gW = maxX - minX, gH = maxY - minY;
+  const sx = W / gW, sy = H / gH;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#EEF4F6';
+  ctx.fillRect(0, 0, W, H);
+
+  EDGES.forEach(e => {
+    const sp = POSITIONS[e.source], tp = POSITIONS[e.target];
+    if (!sp || !tp) return;
+    ctx.beginPath();
+    ctx.setLineDash(e.style === 'dashed' ? [2, 2] : []);
+    ctx.strokeStyle = '#ccc8c2';
+    ctx.lineWidth = 0.5;
+    ctx.moveTo((sp.x - minX) * sx, (sp.y - minY) * sy);
+    ctx.lineTo((tp.x - minX) * sx, (tp.y - minY) * sy);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  NODES.forEach(n => {
+    const p = POSITIONS[n.id];
+    if (!p) return;
+    const r = n.type === 'hub' ? 5 : 3;
+    ctx.beginPath();
+    ctx.arc((p.x - minX) * sx, (p.y - minY) * sy, r, 0, Math.PI * 2);
+    ctx.fillStyle = TYPE_COLORS[n.type] || '#888';
+    ctx.fill();
+  });
+
+  const pan  = cy.pan();
+  const zoom = cy.zoom();
+  const vW   = cy.width()  / zoom;
+  const vH   = cy.height() / zoom;
+  const vX   = -pan.x / zoom;
+  const vY   = -pan.y / zoom;
+  const vp   = document.getElementById('minimapVp');
+  vp.style.left   = ((vX - minX) * sx) + 'px';
+  vp.style.top    = ((vY - minY) * sy) + 'px';
+  vp.style.width  = (vW * sx) + 'px';
+  vp.style.height = (vH * sy) + 'px';
+}
+
+/* ── Init ────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  Horizon.initIcons();
+  cy.fit(undefined, 80);
+  updateZoomLabel();
+  updateMinimap();
+});
+</script>
+
+</body>
+</html>

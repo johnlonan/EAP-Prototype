@@ -1,0 +1,36 @@
+<div class="search-container">
+  <input type="text" id="search" placeholder="Search..." oninput="filter()" />
+  <ul class="results" id="results" style="display: none">
+    <!-- Options populated dynamically -->
+  </ul>
+</div>
+
+<script>
+  const options = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
+
+  function filter() {
+    const value = document.getElementById('search').value.toLowerCase();
+    const results = document.getElementById('results');
+    results.innerHTML = '';
+
+    const matches = options.filter(o => o.toLowerCase().includes(value));
+    if (matches.length > 0 && value.length > 0) {
+      results.style.display = 'block';
+      matches.forEach(m => {
+        const li = document.createElement('li');
+        li.textContent = m;
+        li.onclick = function () {
+          selectOption(m);
+        };
+        results.appendChild(li);
+      });
+    } else {
+      results.style.display = 'none';
+    }
+  }
+
+  function selectOption(value) {
+    document.getElementById('search').value = value;
+    document.getElementById('results').style.display = 'none';
+  }
+</script>

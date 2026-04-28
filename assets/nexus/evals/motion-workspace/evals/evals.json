@@ -1,0 +1,142 @@
+{
+  "skill_name": "motion",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "modal-fade-apply",
+      "prompt": "I have a modal component that currently uses `display:none` to show/hide with no animation. Can you add a proper fade-in/fade-out animation to it? The backdrop and the modal panel should animate. Here's the current code: eval-1-modal.html",
+      "expected_output": "Updated modal HTML using the Nexus fade pattern: opacity-0 → opacity-100, split transition with linear easing for opacity, transition-discrete for display:none, motion-reduce: variants, correct duration tokens.",
+      "files": ["evals/fixtures/eval-1-modal.html"],
+      "assertions": [
+        "Output does NOT use `transition-all` — uses `transition-opacity` or a split `[transition:...]` value instead",
+        "Opacity easing uses `linear` only — no named curve like `ease-in`, `ease-out`, or `var(--ease-*)` on the opacity property",
+        "Duration values reference a `--duration-*` token via `var()` — no raw `ms` values or plain numeric classes like `duration-200`",
+        "Output includes `transition-discrete` or `transition-behavior: allow-discrete` to handle animating from `display:none`",
+        "At least one `motion-reduce:` variant is present on each animated element (backdrop and modal panel)",
+        "Both backdrop and modal panel are animated (not just one of them)"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "nav-audit-violations",
+      "prompt": "Can you review the transition classes in my nav component and tell me if there are any motion violations? Provide a summary of each issue and the correct fix. Here's the file: eval-2-nav-violations.html",
+      "expected_output": "Identifies all 5 violations: (1) transition-all banned, (2) duration-200 plain numeric class, (3) named easing on opacity must be linear, (4) hardcoded 250ms in arbitrary value, (5) missing motion-reduce: on chevron. Provides concrete corrected class strings for each.",
+      "files": ["evals/fixtures/eval-2-nav-violations.html"],
+      "assertions": [
+        "Identifies `transition-all` on the `<nav>` element as a violation and explains it must be replaced with specific property transitions",
+        "Identifies `duration-200` (plain numeric Tailwind class) as a violation and explains the correct form is `duration-[var(--duration-sm)]`",
+        "Identifies `var(--ease-enter)` applied to an opacity-only transition as a violation — states opacity must use `linear`",
+        "Identifies `duration-[250ms]` (hardcoded ms in arbitrary value) as a violation and provides the correct token equivalent",
+        "Identifies missing `motion-reduce:` on the chevron `<button>` as a violation",
+        "Provides a corrected class string (not just a description) for at least 3 of the 5 violations",
+        "All corrected class strings reference valid Nexus token names — e.g., uses `--ease-medium-accel` not the non-existent `--ease-medium`; uses `--ease-enter`/`--ease-exit`/`--ease-medium-accel`/`--ease-low-accel`/`--ease-high-accel` only (no invented variants)"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "accordion-expand-apply",
+      "prompt": "I have an accordion that just shows/hides content with `hidden` class — no animation at all. Can you add a smooth expand/collapse animation to it? The chevron should rotate when a section opens too. Here's the code: eval-3-accordion.html",
+      "expected_output": "Uses grid-rows 0fr→1fr pattern for expand/collapse with duration-lg enter / duration-md exit asymmetry and ease-medium-accel. Chevron uses transition-transform with ease-medium-accel and rotate-180. Both have motion-reduce: variants classified as essential (grid-rows) and expressive (chevron). Removes hidden class toggle in favor of CSS-driven state.",
+      "files": ["evals/fixtures/eval-3-accordion.html"],
+      "assertions": [
+        "Uses `grid-rows-[0fr]` → `grid-rows-[1fr]` (or `transition-[grid-rows]`) pattern — NOT `transition-[height]` or `max-height` animation",
+        "Enter and exit durations are asymmetric: enter uses a longer token (e.g., `--duration-lg`) and exit uses a shorter one (e.g., `--duration-md`)",
+        "Uses `--ease-medium-accel` for the grid-rows expand/collapse transition",
+        "Chevron uses `transition-transform` with `rotate-180` (or equivalent) on the open state",
+        "Grid-rows animated element has a `motion-reduce:` variant that preserves the motion but with gentler easing (essential motion classification)",
+        "Chevron has a `motion-reduce:` variant that strips to an opacity fade (expressive motion classification)",
+        "The JavaScript no longer relies solely on toggling `hidden` — state is driven by a CSS-selectable attribute or class that the transition styles key off of"
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "stagger-cards-apply",
+      "prompt": "I have a card grid that loads all 6 cards simultaneously with no animation — they all just appear at once. Can you add a stagger entrance animation so the cards cascade in one by one? Each card should fade in and slide up slightly. Here's the current code: eval-4-stagger-cards.html",
+      "expected_output": "Cards get opacity-0 → opacity-100 fade + translate-y slide with incrementally increasing delays using --stagger-tight or --stagger-loose tokens. Each card has a distinct delay value that increments per card. Opacity uses linear easing. Duration tokens used (no raw ms). motion-reduce: variants strip the slide but preserve the stagger delays.",
+      "files": ["evals/fixtures/eval-4-stagger-cards.html"],
+      "assertions": [
+        "Stagger delays use `delay-[var(--stagger-tight)]` or `delay-[var(--stagger-loose)]` tokens — NOT raw ms values like `delay-[50ms]` or `delay-[100ms]`",
+        "Cards have incrementally increasing delays — each card has a strictly larger delay than the previous (actual cascade, not all the same)",
+        "At least 4 of the 6 cards have distinct delay values (stagger covers most of the grid, not just first 2)",
+        "Each card is animated with opacity fade — opacity easing uses `linear` only (no named curve like `ease-in` on opacity)",
+        "Duration values reference a `--duration-*` token via `var()` — no raw `ms` values or plain numeric Tailwind classes like `duration-200`",
+        "Each card has a `motion-reduce:` variant that strips the slide/scale but preserves the stagger delay (fade-only fallback per expressive motion classification)"
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "page-nav-apply",
+      "prompt": "I have a simple SPA with 3 pages that currently swap instantly with no transition — clicking a nav button teleports you to the new page. Can you add a forward/backward slide transition? Navigating forward should slide old content out to the left while new content slides in from the right. Going backward should reverse. Here's the current code: eval-5-page-nav.html",
+      "expected_output": "Forward navigation slides old page to -translateX (exits left) and new page enters from +translateX (enters right). Backward is reversed. Uses --ease-high-accel for both directions. Duration is --duration-lg (300ms). Split transition for transform + opacity. motion-reduce: strips the directional slide to a 150ms linear fade (Page Open/Close is expressive). JS tracks navigation direction.",
+      "files": ["evals/fixtures/eval-5-page-nav.html"],
+      "assertions": [
+        "Uses `--ease-high-accel` for the page slide transition — not `--ease-enter`, `--ease-exit`, or any other curve",
+        "Forward navigation exits old page to negative X (slides left) and enters new page from positive X (slides in from right)",
+        "Uses `--duration-lg` (300ms) duration token for the page transition — not a shorter token like `--duration-sm`",
+        "Uses split transition syntax: `transform` gets `--ease-high-accel`, `opacity` gets `linear` — they are NOT on the same timing function",
+        "`motion-reduce:` strips the directional slide and reduces to a 150ms linear fade (Page Open/Close classified as expressive motion)",
+        "JavaScript tracks navigation direction (forward vs backward) to determine which way pages slide — the `isForward` variable or equivalent is used to set classes or CSS"
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "drag-drop-apply",
+      "prompt": "I have a drag-and-drop sortable list with zero visual feedback — no lift effect when picking up items, displaced items teleport when reordering. Can you add proper drag-and-drop motion? The dragged item should visually lift on pickup, displaced items should smoothly reflow, and there should be a settle animation on drop. Here's the code: eval-6-drag-drop.html",
+      "expected_output": "Pickup adds scale-[var(--scale-up-sm)] with --duration-sm. Displaced sibling items get transition-transform for smooth reflow. Settle on drop uses --ease-medium-accel. motion-reduce: on dragged item uses shadow only (no scale) — pickup is expressive. motion-reduce: on displaced items preserves transition-transform but uses --ease-low-accel — reflow is essential motion.",
+      "files": ["evals/fixtures/eval-6-drag-drop.html"],
+      "assertions": [
+        "Dragged item pickup uses `scale-[var(--scale-up-sm)]` (or references `--scale-up-sm` token) — NOT a hardcoded scale value like `scale-105`",
+        "Pickup transition uses `--duration-sm` (200ms) duration token",
+        "Displaced/sibling list items have `transition-transform` so they animate smoothly into new positions during reorder",
+        "`motion-reduce:` on the dragged item removes the scale lift — pickup visual feedback is shadow or opacity only (per Drag Pickup expressive classification)",
+        "Displaced items have a `motion-reduce:` variant that still keeps `transition-transform` but uses `--ease-low-accel` (Drag Settle + Reflow is essential motion — keeps position animation)",
+        "Dragged item has a visual active-drag state: opacity change, shadow elevation, or z-index to distinguish it from resting items"
+      ]
+    },
+    {
+      "id": 7,
+      "eval_name": "toast-notify-apply",
+      "prompt": "I have a notification system that currently shows toast messages by just making them visible instantly — no entrance or exit animation. Clicking a button triggers a toast that should appear from the bottom-right, then auto-dismiss after 3 seconds. Can you add the proper appear/dismiss animation using Nexus motion tokens? Here's the code: eval-7-toast-notify.html",
+      "expected_output": "Updated toast HTML using the Nexus appear/dismiss pattern: --appear-duration, --appear-scale, --dismiss-duration, --ease-medium-accel, slide up from bottom, expressive motion-reduce fallback.",
+      "files": ["evals/fixtures/eval-7-toast-notify.html"],
+      "assertions": [
+        "Appear animation uses `--appear-duration` (300ms) token for duration — NOT a hardcoded `300ms` or `var(--duration-lg)`",
+        "Appear animation uses `--ease-medium-accel` easing — NOT `--ease-enter`, `--ease-exit`, or any other curve",
+        "Dismiss/exit animation uses `--dismiss-duration` (250ms) token — shorter than appear (asymmetric enter/exit)",
+        "Toast enters by sliding UP (translate-y positive offset → 0) — correct direction for a bottom-anchored notification",
+        "Opacity uses `linear` easing only — NOT `--ease-medium-accel` or any named curve on opacity",
+        "`motion-reduce:` strips the slide and scale — 150ms linear fade only (Appear/Dismiss is expressive motion)"
+      ]
+    },
+    {
+      "id": 8,
+      "eval_name": "button-swap-apply",
+      "prompt": "I have a submit button that instantly flips between idle, loading, and success states with no animation — the icon and label just snap to the new values. Can you add a swap animation so the outgoing content shrinks out while the incoming content grows in, using the Nexus swap pattern? Here's the code: eval-8-button-swap.html",
+      "expected_output": "Updated button HTML using the Nexus swap pattern: --scale-down-lg for outgoing content, --ease-low-accel, 50ms opacity delay on enter, expressive motion-reduce fallback.",
+      "files": ["evals/fixtures/eval-8-button-swap.html"],
+      "assertions": [
+        "Outgoing (swap-out) content uses `scale-[var(--scale-down-lg)]` (0.5) — NOT a hardcoded scale like `scale-50` or `scale-[0.5]`",
+        "Swap transition uses `--ease-low-accel` easing — NOT `--ease-enter`, `--ease-exit`, or `--ease-medium-accel`",
+        "Opacity on both swap-in and swap-out uses `linear` easing only — NOT a named curve",
+        "Incoming (swap-in) content has an opacity delay of ~50ms so old content fades before new content appears — prevents simultaneous visibility",
+        "Duration uses `--duration-sm` (200ms) token — NOT a hardcoded ms value",
+        "`motion-reduce:` strips the scale — opacity-only fade, no scale change (Swap is expressive motion)"
+      ]
+    },
+    {
+      "id": 9,
+      "eval_name": "hover-card-apply",
+      "prompt": "I have a product card grid with no hover animations — no elevation change, no image zoom, no overlay reveal. Can you add hover micro-interactions using Nexus motion tokens? On hover: the card should lift with a shadow change, the image should subtly zoom in, and a 'Quick View' overlay should slide up from the bottom of the image area. Here's the code: eval-9-hover-card.html",
+      "expected_output": "Updated card HTML: transition-shadow for elevation, scale-up token on image, group-hover: for overlay slide-up, --ease-enter for overlay motion, --duration-sm for hover speed, motion-reduce: variants.",
+      "files": ["evals/fixtures/eval-9-hover-card.html"],
+      "assertions": [
+        "Shadow elevation uses `transition-shadow` (NOT `transition-all`) — correct narrow property for box-shadow changes",
+        "Image zoom uses a `--scale-up-*` token via `var()` — NOT a hardcoded value like `scale-105` or `scale-[1.05]`",
+        "Overlay reveal uses `group-hover:` pattern — parent card has `group` class, overlay reacts to parent hover",
+        "Overlay slide uses `--ease-enter` easing for the enter direction — correct curve for content entering the view",
+        "Hover transition duration uses `--duration-sm` (200ms) token — fast enough for responsive hover feedback",
+        "`motion-reduce:` removes the image zoom (`motion-reduce:scale-100`) — scale lift is expressive motion"
+      ]
+    }
+  ]
+}

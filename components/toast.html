@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toast — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Toast
+       Floating notification at bottom-right.
+       Types: info · success · warning · error
+       Triggered via Horizon.toast('message', 'type')
+       Auto-dismisses after 4s; close button for manual dismiss.
+    -------------------------------------------------------- */
+
+    /* Stack container — fixed position */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 360px;
+      pointer-events: none;
+    }
+
+    /* Individual toast */
+    .toast-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid transparent;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      pointer-events: all;
+      animation: toast-in 200ms ease forwards;
+      overflow: hidden;
+      position: relative;
+    }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .toast-item.is-exiting {
+      animation: toast-out 200ms ease forwards;
+    }
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateY(0) scale(1); max-height: 200px; margin-bottom: 0; }
+      to   { opacity: 0; transform: translateY(-8px) scale(0.97); max-height: 0; margin-bottom: -10px; padding-top: 0; padding-bottom: 0; }
+    }
+
+    .toast-item__icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+    }
+    .toast-item__body { flex: 1; min-width: 0; }
+    .toast-item__title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+      line-height: 20px;
+    }
+    .toast-item__message {
+      font-size: var(--font-size-xs);
+      line-height: 18px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+    .toast-item__close {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+      opacity: 0.6;
+      transition: opacity var(--transition-fast);
+      padding: 0;
+    }
+    .toast-item__close:hover { opacity: 1; }
+    .toast-item__close [data-icon] { width: 10px; height: 10px; }
+
+    /* Progress bar */
+    .toast-item__progress {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 3px;
+      background: currentColor;
+      opacity: 0.35;
+      animation: toast-progress 4s linear forwards;
+      transform-origin: left;
+    }
+    @keyframes toast-progress {
+      from { transform: scaleX(1); }
+      to   { transform: scaleX(0); }
+    }
+
+    /* Type colours */
+    .toast-item--info    { background: #EFF6FF; border-color: rgba(42,110,220,0.2); color: #1e4d9e; }
+    .toast-item--success { background: #F0FDF4; border-color: rgba(0,131,79,0.2);   color: #166534; }
+    .toast-item--warning { background: #FFFBEB; border-color: rgba(141,110,0,0.2);  color: #7a5000; }
+    .toast-item--error   { background: #FEF2F2; border-color: rgba(226,22,28,0.2);  color: #9b1c1c; }
+
+    /* ---- Showcase ---- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-8); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+    .showcase-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-row { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 36px; padding: 0 16px; border-radius: var(--radius-field);
+      font-family: var(--font-sans); font-size: var(--font-size-sm);
+      cursor: pointer; border: 1px solid var(--border-default);
+      background: transparent; color: var(--text-primary);
+      transition: background var(--transition-fast); white-space: nowrap;
+    }
+    .btn:hover { background: var(--bg-tertiary); }
+    .btn--info    { background: #EFF6FF; color: #1e4d9e; border-color: rgba(42,110,220,0.3); }
+    .btn--success { background: #F0FDF4; color: #166534; border-color: rgba(0,131,79,0.3); }
+    .btn--warning { background: #FFFBEB; color: #7a5000; border-color: rgba(141,110,0,0.3); }
+    .btn--error   { background: #FEF2F2; color: #9b1c1c; border-color: rgba(226,22,28,0.3); }
+
+    /* Static preview section */
+    .toast-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 360px;
+    }
+    .toast-item--static { position: relative; animation: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Live toast container -->
+  <div id="toast-container"></div>
+
+  <div class="showcase">
+
+    <!-- Trigger -->
+    <div class="showcase-card">
+      <p class="section-title">Interactive — Click to Trigger</p>
+      <div class="btn-row">
+        <button class="btn btn--info"    onclick="showToast('info',    'Information', 'This is an informational message.')">Info</button>
+        <button class="btn btn--success" onclick="showToast('success', 'Success!', 'Your changes have been saved.')">Success</button>
+        <button class="btn btn--warning" onclick="showToast('warning', 'Warning', 'Review the highlighted fields before continuing.')">Warning</button>
+        <button class="btn btn--error"   onclick="showToast('error',   'Error', 'Something went wrong. Please try again.')">Error</button>
+        <button class="btn" onclick="showMultiple()">Show all 4</button>
+      </div>
+    </div>
+
+    <!-- Static preview -->
+    <div class="showcase-card">
+      <p class="section-title">Static Preview — All Types</p>
+      <div class="toast-preview">
+
+        <div class="toast-item toast-item--info toast-item--static">
+          <span class="toast-item__icon" data-icon="circle-info"></span>
+          <div class="toast-item__body">
+            <p class="toast-item__title">Information</p>
+            <p class="toast-item__message">This is an informational message.</p>
+          </div>
+          <button class="toast-item__close"><span data-icon="close"></span></button>
+          <div class="toast-item__progress"></div>
+        </div>
+
+        <div class="toast-item toast-item--success toast-item--static">
+          <span class="toast-item__icon" data-icon="check-circle"></span>
+          <div class="toast-item__body">
+            <p class="toast-item__title">Success!</p>
+            <p class="toast-item__message">Your changes have been saved.</p>
+          </div>
+          <button class="toast-item__close"><span data-icon="close"></span></button>
+          <div class="toast-item__progress"></div>
+        </div>
+
+        <div class="toast-item toast-item--warning toast-item--static">
+          <span class="toast-item__icon" data-icon="triangle-exclamation"></span>
+          <div class="toast-item__body">
+            <p class="toast-item__title">Warning</p>
+            <p class="toast-item__message">Review the highlighted fields before continuing.</p>
+          </div>
+          <button class="toast-item__close"><span data-icon="close"></span></button>
+          <div class="toast-item__progress"></div>
+        </div>
+
+        <div class="toast-item toast-item--error toast-item--static">
+          <span class="toast-item__icon" data-icon="alert-circle"></span>
+          <div class="toast-item__body">
+            <p class="toast-item__title">Error</p>
+            <p class="toast-item__message">Something went wrong. Please try again.</p>
+          </div>
+          <button class="toast-item__close"><span data-icon="close"></span></button>
+          <div class="toast-item__progress"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const ICONS = { info: 'circle-info', success: 'check-circle', warning: 'triangle-exclamation', error: 'alert-circle' };
+    const TITLES = { info: 'Information', success: 'Success!', warning: 'Warning', error: 'Error' };
+
+    function showToast(type, title, message) {
+      const container = document.getElementById('toast-container');
+      const item = document.createElement('div');
+      item.className = `toast-item toast-item--${type}`;
+      item.innerHTML = `
+        <span class="toast-item__icon" data-icon="${ICONS[type]}"></span>
+        <div class="toast-item__body">
+          <p class="toast-item__title">${title}</p>
+          <p class="toast-item__message">${message}</p>
+        </div>
+        <button class="toast-item__close"><span data-icon="close"></span></button>
+        <div class="toast-item__progress"></div>
+      `;
+      Horizon.initIcons(item);
+      container.appendChild(item);
+
+      const closeBtn = item.querySelector('.toast-item__close');
+      closeBtn.addEventListener('click', () => dismiss(item));
+
+      setTimeout(() => dismiss(item), 4000);
+    }
+
+    function dismiss(item) {
+      if (item.classList.contains('is-exiting')) return;
+      item.classList.add('is-exiting');
+      item.addEventListener('animationend', () => item.remove(), { once: true });
+    }
+
+    function showMultiple() {
+      showToast('info',    'Information', 'This is an informational message.');
+      setTimeout(() => showToast('success', 'Success!',    'Your changes have been saved.'), 150);
+      setTimeout(() => showToast('warning', 'Warning',     'Review highlighted fields.'), 300);
+      setTimeout(() => showToast('error',   'Error',       'Something went wrong.'), 450);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

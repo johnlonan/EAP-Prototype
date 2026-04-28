@@ -1,0 +1,23 @@
+<div class="dialog" style="position: absolute; top: 100px; left: 200px">
+  <div class="dialog-header" onmousedown="startDrag(event)">
+    <span class="title">Settings</span>
+    <span class="close" onclick="closeDialog()">×</span>
+  </div>
+  <div class="dialog-body">
+    <p>Dialog content here</p>
+  </div>
+  <div class="resize-handle" onmousedown="startResize(event)"></div>
+</div>
+
+<script>
+  function startDrag(e) {
+    // Mouse-only drag implementation
+    document.onmousemove = function (e) {
+      dialog.style.left = e.clientX + 'px';
+      dialog.style.top = e.clientY + 'px';
+    };
+    document.onmouseup = function () {
+      document.onmousemove = null;
+    };
+  }
+</script>

@@ -1,0 +1,26 @@
+<div class="listview">
+  <div class="list-header">
+    <input type="checkbox" onclick="selectAll()" />
+    <span>Name</span>
+    <span>Date</span>
+    <span>Actions</span>
+  </div>
+  <div class="list-row" onclick="toggleSelect(this)">
+    <input type="checkbox" />
+    <span>Document 1</span>
+    <span>2024-01-15</span>
+    <span class="actions">
+      <span onclick="edit(1)">&#x270F;&#xFE0F;</span>
+      <span onclick="del(1)">&#x1F5D1;&#xFE0F;</span>
+    </span>
+  </div>
+  <div class="list-row" onclick="toggleSelect(this)">
+    <input type="checkbox" />
+    <span>Document 2</span>
+    <span>2024-01-16</span>
+    <span class="actions">
+      <span onclick="edit(2)">&#x270F;&#xFE0F;</span>
+      <span onclick="del(2)">&#x1F5D1;&#xFE0F;</span>
+    </span>
+  </div>
+</div>

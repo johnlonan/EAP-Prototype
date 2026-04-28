@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popover — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Popover
+       Arrow positions: top · bottom · left · right
+       Variants: without title · with title (grey header)
+       Width: 263–276px, wraps at threshold
+    -------------------------------------------------------- */
+
+    .popover {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* Container */
+    .popover__box {
+      background: var(--bg-primary, #ffffff);
+      border: 1px solid var(--bg-secondary, #f4f3f0);
+      border-radius: var(--radius-lg);      /* 8px */
+      box-shadow: 0 10px 15px 0 rgba(0,0,0,0.1), 0 4px 6px 0 rgba(0,0,0,0.1);
+      width: 263px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Title strip */
+    .popover__title {
+      background: var(--bg-secondary, #f4f3f0);
+      border-bottom: 1px solid var(--bg-secondary, #f4f3f0);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 8px 16px;
+      font-size: var(--font-size-lg);      /* 18px */
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: 20px;
+    }
+
+    /* Body */
+    .popover__content {
+      padding: 8px 16px;
+      font-size: var(--font-size-base);    /* 16px */
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+
+    /* Arrow — CSS triangle approach */
+    .popover__arrow {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .popover__arrow::before,
+    .popover__arrow::after {
+      content: '';
+      position: absolute;
+      border: 6px solid transparent;
+    }
+
+    /* ---- Bottom arrow (points down) ---- */
+    .popover--arrow-bottom {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .popover--arrow-bottom .popover__tail {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid var(--bg-secondary, #f4f3f0);
+      position: relative;
+    }
+    .popover--arrow-bottom .popover__tail::before {
+      content: '';
+      position: absolute;
+      top: -11px;
+      left: -8px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid var(--bg-primary, #ffffff);
+    }
+
+    /* ---- Top arrow (points up) ---- */
+    .popover--arrow-top {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .popover--arrow-top .popover__tail {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 10px solid var(--bg-secondary, #f4f3f0);
+      position: relative;
+    }
+    .popover--arrow-top .popover__tail::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: -8px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 10px solid var(--bg-primary, #ffffff);
+    }
+
+    /* ---- Right arrow (points right) ---- */
+    .popover--arrow-right {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    .popover--arrow-right .popover__tail {
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 10px solid var(--bg-secondary, #f4f3f0);
+      position: relative;
+    }
+    .popover--arrow-right .popover__tail::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -11px;
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 10px solid var(--bg-primary, #ffffff);
+    }
+
+    /* ---- Left arrow (points left) ---- */
+    .popover--arrow-left {
+      display: inline-flex;
+      flex-direction: row-reverse;
+      align-items: center;
+    }
+    .popover--arrow-left .popover__tail {
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 10px solid var(--bg-secondary, #f4f3f0);
+      position: relative;
+    }
+    .popover--arrow-left .popover__tail::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 2px;
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 10px solid var(--bg-primary, #ffffff);
+    }
+
+    /* ---- Interactive trigger ---- */
+    .popover-trigger {
+      position: relative;
+      display: inline-block;
+    }
+    .popover-trigger .popover-float {
+      position: absolute;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-fast);
+    }
+    .popover-trigger:hover .popover-float,
+    .popover-trigger.is-open .popover-float {
+      opacity: 1;
+      pointer-events: all;
+    }
+    /* Position helpers */
+    .popover-float--bottom { top: calc(100% + 8px); left: 50%; transform: translateX(-50%); }
+    .popover-float--top    { bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); }
+    .popover-float--right  { left: calc(100% + 8px); top: 50%; transform: translateY(-50%); }
+    .popover-float--left   { right: calc(100% + 8px); top: 50%; transform: translateY(-50%); }
+
+    /* ---- Showcase ---- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+    .showcase-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+    .popover-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .popover-demo { display: flex; flex-direction: column; gap: var(--space-2); }
+    .popover-demo-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-2);
+    }
+
+    /* Interactive row */
+    .trigger-row {
+      display: flex;
+      gap: var(--space-12);
+      justify-content: center;
+      padding: var(--space-12) 0;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 36px; padding: 0 16px; border-radius: var(--radius-field);
+      font-family: var(--font-sans); font-size: var(--font-size-sm);
+      cursor: pointer; border: 1px solid var(--border-default);
+      background: transparent; color: var(--text-primary);
+      transition: background var(--transition-fast);
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--bg-tertiary); }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Arrow positions — without title -->
+    <div class="showcase-card">
+      <p class="section-title">Arrow Positions — Without Title</p>
+      <div class="popover-grid">
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Bottom (default)</p>
+          <div class="popover--arrow-bottom" style="width:max-content;">
+            <div class="popover__box">
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+            <div class="popover__tail"></div>
+          </div>
+        </div>
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Top</p>
+          <div class="popover--arrow-top" style="width:max-content;">
+            <div class="popover__tail"></div>
+            <div class="popover__box">
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Right</p>
+          <div class="popover--arrow-right" style="width:max-content;">
+            <div class="popover__box">
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+            <div class="popover__tail"></div>
+          </div>
+        </div>
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Left</p>
+          <div class="popover--arrow-left" style="width:max-content;">
+            <div class="popover__box">
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+            <div class="popover__tail"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Arrow positions — with title -->
+    <div class="showcase-card">
+      <p class="section-title">Arrow Positions — With Title</p>
+      <div class="popover-grid">
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Bottom + Title</p>
+          <div class="popover--arrow-bottom" style="width:max-content;">
+            <div class="popover__box">
+              <div class="popover__title">Popover title</div>
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+            <div class="popover__tail"></div>
+          </div>
+        </div>
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Top + Title</p>
+          <div class="popover--arrow-top" style="width:max-content;">
+            <div class="popover__tail"></div>
+            <div class="popover__box">
+              <div class="popover__title">Popover title</div>
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Right + Title</p>
+          <div class="popover--arrow-right" style="width:max-content;">
+            <div class="popover__box">
+              <div class="popover__title">Popover title</div>
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+            <div class="popover__tail"></div>
+          </div>
+        </div>
+
+        <div class="popover-demo">
+          <p class="popover-demo-label">Left + Title</p>
+          <div class="popover--arrow-left" style="width:max-content;">
+            <div class="popover__box">
+              <div class="popover__title">Popover title</div>
+              <div class="popover__content">Popover content will wrap to the next line when content hits a threshold at 276px.</div>
+            </div>
+            <div class="popover__tail"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Interactive hover demo -->
+    <div class="showcase-card">
+      <p class="section-title">Interactive — Hover to Show</p>
+      <div class="trigger-row">
+
+        <div class="popover-trigger" style="position:relative;">
+          <button class="btn">Hover (bottom)</button>
+          <div class="popover-float popover-float--bottom">
+            <div class="popover--arrow-top" style="width:max-content;">
+              <div class="popover__tail"></div>
+              <div class="popover__box">
+                <div class="popover__content">Appears below the trigger element.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="popover-trigger" style="position:relative;">
+          <button class="btn">Hover (top)</button>
+          <div class="popover-float popover-float--top">
+            <div class="popover--arrow-bottom" style="width:max-content;">
+              <div class="popover__box">
+                <div class="popover__content">Appears above the trigger element.</div>
+              </div>
+              <div class="popover__tail"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="popover-trigger" style="position:relative;">
+          <button class="btn">Hover (right)</button>
+          <div class="popover-float popover-float--right">
+            <div class="popover--arrow-left" style="width:max-content;">
+              <div class="popover__box">
+                <div class="popover__title">Info</div>
+                <div class="popover__content">Appears to the right of the trigger.</div>
+              </div>
+              <div class="popover__tail"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Button Swap States — No Animation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 p-8 min-h-screen">
+    <h1 class="text-xl font-semibold mb-2">Submit Form</h1>
+    <p class="text-sm text-gray-500 mb-6">
+      Click Submit. The button cycles: idle → loading (1.5s) → success (2s) →
+      back to idle.
+    </p>
+
+    <!--
+    PROBLEM: The button snaps between states instantly — the icon and label
+    just teleport to the new values. No animation whatsoever.
+    Task: add a swap animation so the outgoing content shrinks out while
+    the incoming content grows in, using the Nexus swap pattern.
+    Each state change (idle→loading, loading→success, success→idle) should
+    animate with a scale + fade swap.
+  -->
+
+    <form onsubmit="handleSubmit(event)" class="max-w-sm space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input
+          type="text"
+          value="Alice Johnson"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Email</label
+        >
+        <input
+          type="email"
+          value="alice@example.com"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <button
+        id="submit-btn"
+        type="submit"
+        class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg"
+      >
+        <!-- State: idle -->
+        <span id="state-idle" class="flex items-center gap-2">
+          <span>↑</span>
+          <span>Save Changes</span>
+        </span>
+
+        <!-- State: loading (hidden by default) -->
+        <span id="state-loading" class="hidden flex items-center gap-2">
+          <span class="animate-spin">⟳</span>
+          <span>Saving…</span>
+        </span>
+
+        <!-- State: success (hidden by default) -->
+        <span id="state-success" class="hidden flex items-center gap-2">
+          <span>✓</span>
+          <span>Saved!</span>
+        </span>
+      </button>
+    </form>
+
+    <script>
+      let isSubmitting = false;
+
+      function handleSubmit(e) {
+        e.preventDefault();
+        if (isSubmitting) return;
+        isSubmitting = true;
+
+        setState('loading');
+
+        setTimeout(() => {
+          setState('success');
+          setTimeout(() => {
+            setState('idle');
+            isSubmitting = false;
+          }, 2000);
+        }, 1500);
+      }
+
+      function setState(state) {
+        const idle = document.getElementById('state-idle');
+        const loading = document.getElementById('state-loading');
+        const success = document.getElementById('state-success');
+
+        // Just snap — no animation yet
+        idle.classList.toggle('hidden', state !== 'idle');
+        loading.classList.toggle('hidden', state !== 'loading');
+        success.classList.toggle('hidden', state !== 'success');
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Card — Composition Reference</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      /* ============================================================================
+       THEME VARIABLES — resolved values from the running app
+       ============================================================================ */
+
+      [data-theme='light'] {
+        color-scheme: light;
+        --color-primary: #017c9c;
+        --color-primary-content: #fff;
+        --color-primary-hover: #006583;
+        --color-primary-active: #004f69;
+        --matched-primary: #017c9c;
+        --matched-hover: #006583;
+        --matched-active: #004f69;
+        --matched-content: #fff;
+        --color-secondary: #e2e8f0;
+        --color-secondary-content: #1e293b;
+        --color-neutral: #1e293b;
+        --color-neutral-content: white;
+        --color-base-100: white;
+        --color-base-200: #f1f5f9;
+        --color-base-300: #e2e8f0;
+        --color-base-content: black;
+        --color-success: #006b3f;
+        --color-success-content: #a1f1c5;
+        --color-error: #be0003;
+        --color-error-content: #ffd8d0;
+        --color-warning: #8d6e00;
+        --color-warning-content: #fffbc9;
+        --color-info: #1b59bb;
+        --color-info-content: #cbe4ff;
+        --radius-selector: 0.75rem;
+        --radius-field: 0.5rem;
+        --radius-box: 1rem;
+        --border: 1px;
+        --neutral-50: #f8fafc;
+        --neutral-100: #f1f5f9;
+        --neutral-200: #e2e8f0;
+        --neutral-300: #cbd5e1;
+        --neutral-400: #94a3b8;
+        --neutral-500: #64748b;
+        --neutral-600: #475569;
+        --neutral-700: #334155;
+        --neutral-800: #1e293b;
+        --neutral-900: #0f172a;
+        --neutral-950: #020617;
+        --color-background-primary: white;
+        --color-background-secondary: #f1f5f9;
+        --color-background-tertiary: #e2e8f0;
+        --color-background-inverted: #1e293b;
+        --color-text-primary: black;
+        --color-text-secondary: #1e293b;
+        --color-text-tertiary: #475569;
+        --color-text-inverted: white;
+      }
+
+      /* ============================================================================
+       RECIPE-SPECIFIC STYLES — pseudo-elements and complex states only
+       ============================================================================ */
+
+      /* Demo card shells */
+      .demo-card-a {
+        background: var(--color-base-100);
+        border: 1px solid var(--color-base-300);
+        border-radius: 24px;
+        padding: 20px;
+      }
+      .demo-card-b {
+        background: var(--color-base-100);
+        border: 1px solid var(--color-base-300);
+        border-radius: 24px;
+        padding: 20px;
+      }
+      .demo-card-c-primary {
+        background: var(--color-base-100);
+        border: 1.5px solid rgba(15, 194, 127, 0.3);
+        border-radius: 16px;
+        padding: 16px;
+      }
+      .demo-card-c-secondary {
+        background: var(--color-base-200);
+        border: 1px solid var(--color-base-300);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .slot-indicator {
+        border: 2px dashed #c4b5fd;
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        color: #7c3aed;
+        font-size: 11px;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        background: #faf5ff;
+      }
+
+      /* Comparison divider (pseudo-elements) */
+      .vs-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 1.25rem 0;
+        color: var(--neutral-400);
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .vs-divider::before,
+      .vs-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--color-base-300);
+      }
+
+      /* Spacer indicator (pseudo-element) */
+      .spacer-indicator {
+        flex: 1;
+        border-top: 2px dashed #c4b5fd;
+        margin: 0 8px;
+        position: relative;
+      }
+      .spacer-indicator::after {
+        content: 'flex-grow spacer';
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 9px;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        color: #7c3aed;
+        white-space: nowrap;
+      }
+
+      /* Token table */
+      .token-table {
+        width: 100%;
+        font-size: 0.8125rem;
+        border-collapse: collapse;
+      }
+      .token-table th {
+        padding: 8px 12px;
+        color: var(--color-text-tertiary);
+        font-weight: 600;
+        text-align: left;
+        border-bottom: 2px solid var(--color-base-300);
+      }
+      .token-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--color-base-200);
+      }
+      .token-table code {
+        font-size: 11px;
+        background: var(--color-base-200);
+        padding: 1px 4px;
+        border-radius: 3px;
+      }
+      .token-table .wrong {
+        color: var(--color-error);
+        text-decoration: line-through;
+      }
+      .token-table .right {
+        color: var(--color-success);
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body class="bg-base-200 text-base-content font-sans">
+    <div class="max-w-4xl mx-auto px-6 py-8">
+      <h1 class="text-2xl font-bold text-neutral mb-1">
+        Card — Composition Reference
+      </h1>
+      <p class="text-sm text-slate-500 mb-8">
+        Visual ground truth for card assembly across three types. Each example
+        shows correct token usage with annotations.
+        <br />Recipe: <code>compositions/card/references/card.md</code>
+      </p>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <h2
+        class="text-lg font-semibold text-base-content mt-10 mb-4 pb-2 border-b border-base-300"
+      >
+        1. Type A — Container Card (Correct)
+      </h2>
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        aict-card base · with header, body slot, footer slot, arrow button
+      </p>
+      <!-- ═══════════════════════════════════════════════ -->
+
+      <div class="bg-base-100 border border-base-300 rounded-2xl p-5 mb-6">
+        <div class="demo-card-a">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h3 class="text-base font-normal text-base-content">
+                AI Governance
+              </h3>
+              <p class="text-xs font-medium text-base-content/60">
+                Compliance and risk overview
+              </p>
+            </div>
+            <button
+              class="btn btn-circle btn-outline btn-sm border-base-300 text-base-content/40"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Body slot -->
+          <div class="slot-indicator mb-3">
+            &lt;slot&gt; — body content (chart, list, etc.)
+          </div>
+
+          <!-- Footer slot -->
+          <div class="slot-indicator border-success/30 bg-success/5">
+            &lt;slot name="footer"&gt; — action-set or AI insight row
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-4">
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >bg-base-100</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >border: var(--hz-color-border-default)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >border-radius: var(--hz-radius-parent) = 24px</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >title: text-base-content</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >subtitle: text-base-content/60</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >arrow btn: border-base-300</span
+          >
+        </div>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          The radius is NOT a prop — it comes from the token applied in CSS. No
+          consumer should pass <code>radius="..."</code>. The footer slot is a
+          named slot that accepts action-sets or AI insight rows.
+        </p>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <h2
+        class="text-lg font-semibold text-base-content mt-10 mb-4 pb-2 border-b border-base-300"
+      >
+        2. Type A — AI Insight Row Sub-Pattern (Correct)
+      </h2>
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        Consistent across all cards that use it · Lives in footer slot
+      </p>
+      <!-- ═══════════════════════════════════════════════ -->
+
+      <div class="bg-base-100 border border-base-300 rounded-2xl p-5 mb-6">
+        <div class="demo-card-a">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="text-base font-normal text-base-content">Inventory</h3>
+            <button
+              class="btn btn-circle btn-outline btn-sm border-base-300 text-base-content/40"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="slot-indicator mb-3">&lt;slot&gt; — chart content</div>
+
+          <!-- AI Insight Row — correct version -->
+          <div
+            class="flex items-center gap-1.5 py-3 cursor-pointer text-xs font-medium"
+            style="color: var(--color-info, #0369a1)"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="oklch(var(--color-success))"
+            >
+              <path
+                d="M12 2L13.09 8.26L19 7L14.74 11.27L21 14L14.74 12.73L13.09 19L12 12.73L5 14L11.26 11.27L5 7L11.26 8.26L12 2Z"
+              />
+            </svg>
+            <span>Manage 5 high risk, high usage, unmanaged assets</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="text-base-content/40"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-4">
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >sparkle fill: var(--hz-color-ai-sparkle)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >text: var(--hz-color-text-link)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >chevron: var(--hz-color-text-muted)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >gap-1.5 · py-3 · text-xs</span
+          >
+        </div>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Consistent across all instances. Must have an
+          <code>@click</code> handler if <code>cursor-pointer</code> is applied.
+          No <code>border-top</code> — the footer slot handles visual separation
+          from body.
+        </p>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <h2
+        class="text-lg font-semibold text-base-content mt-10 mb-4 pb-2 border-b border-base-300"
+      >
+        3. Type B — Data Display Card (Correct)
+      </h2>
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        aict-metric-card · Owns its rendering · Same shell tokens as Type A
+      </p>
+      <!-- ═══════════════════════════════════════════════ -->
+
+      <div class="bg-base-100 border border-base-300 rounded-2xl p-5 mb-6">
+        <div class="demo-card-b">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <h3 class="text-sm font-normal text-base-content">
+                Total AI Assets
+              </h3>
+              <p class="text-xs font-medium text-base-content/40">
+                Across all departments
+              </p>
+            </div>
+            <button
+              class="btn btn-circle btn-outline btn-sm border-base-300 text-base-content/40"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-3 mb-1">
+            <span class="text-4xl font-medium text-base-content leading-10"
+              >1,247</span
+            >
+            <span
+              class="inline-flex items-center gap-1 text-xs font-semibold px-1.5 py-0.5 rounded"
+              style="
+                color: var(--color-success);
+                background: oklch(var(--color-success) / 0.1);
+              "
+            >
+              <span style="font-size: 8px">&#9650;</span>12%
+            </span>
+          </div>
+
+          <p class="text-xs text-base-content/40">vs. previous month</p>
+
+          <!-- Sparkline placeholder -->
+          <div
+            class="mt-2 h-12 rounded bg-base-200/50 flex items-center justify-center text-xs text-base-content/30"
+          >
+            sparkline chart
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-4">
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >bg-base-100 (not bg-white)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >border-radius: var(--hz-radius-parent)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >border: var(--hz-color-border-default)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >value: text-base-content</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >&#9650; positive: status-success-subtle + status-success-text</span
+          >
+        </div>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Type B builds its own shell — same token rules apply. No
+          <code>rounded-[32px]</code> or <code>bg-white</code>. Change indicator
+          colors come from the status 4-variant model, not hardcoded hex.
+        </p>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <h2
+        class="text-lg font-semibold text-base-content mt-10 mb-4 pb-2 border-b border-base-300"
+      >
+        4. Type C — Status/Priority Card (Correct)
+      </h2>
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        aict-priority-card · Primary variant · Badge system with status tokens
+      </p>
+      <!-- ═══════════════════════════════════════════════ -->
+
+      <div class="bg-base-100 border border-base-300 rounded-2xl p-5 mb-6">
+        <!-- Primary variant -->
+        <p
+          class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"
+        >
+          Primary variant (active/urgent)
+        </p>
+        <div class="demo-card-c-primary mb-4">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span
+              class="badge badge-sm"
+              style="
+                background: oklch(var(--color-info) / 0.15);
+                color: oklch(var(--color-info));
+              "
+              >Review task</span
+            >
+            <span
+              class="badge badge-sm"
+              style="
+                background: oklch(var(--color-error) / 0.1);
+                color: oklch(var(--color-error));
+              "
+              >Expired</span
+            >
+            <span class="text-xs font-medium text-error">Due 2 days ago</span>
+          </div>
+          <h4 class="text-sm font-semibold text-base-content mb-1">
+            Review risk assessment for Moveworks integration
+          </h4>
+          <div
+            class="flex items-center gap-2 text-xs text-base-content/60 mb-2"
+          >
+            <span>AI Risk Agent</span>
+            <span class="flex items-center gap-1">
+              <span class="w-1 h-1 rounded-full bg-base-content/30"></span>
+              Sarah Chen
+            </span>
+          </div>
+          <div
+            class="flex items-start gap-2 mt-2 text-xs text-base-content/60 leading-relaxed"
+          >
+            <svg
+              class="shrink-0 mt-0.5"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="oklch(var(--color-success))"
+            >
+              <path
+                d="M12 2L13.09 8.26L19 7L14.74 11.27L21 14L14.74 12.73L13.09 19L12 12.73L5 14L11.26 11.27L5 7L11.26 8.26L12 2Z"
+              />
+            </svg>
+            <span
+              >This asset has 3 unresolved policy violations and high usage
+              across 12 departments.</span
+            >
+          </div>
+        </div>
+
+        <!-- Secondary variant -->
+        <p
+          class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"
+        >
+          Secondary variant (lower priority)
+        </p>
+        <div class="demo-card-c-secondary">
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="badge badge-sm"
+              style="
+                background: oklch(var(--color-info) / 0.15);
+                color: oklch(var(--color-info));
+              "
+              >Review task</span
+            >
+            <span class="text-xs font-medium text-base-content/60"
+              >Due in 5 days</span
+            >
+          </div>
+          <h4 class="text-sm font-semibold text-base-content mb-1">
+            Update compliance documentation for ChatGPT deployment
+          </h4>
+          <div class="text-xs text-base-content/60">
+            Compliance Agent · Mike Johnson
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-4">
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >primary border: var(--hz-color-status-success-border)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >primary bg: var(--hz-color-surface-primary)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >secondary bg: var(--hz-color-surface-secondary)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >secondary border: var(--hz-color-border-default)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >radius: var(--hz-radius-nested) = 16px</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >badges: status 4-variant tokens</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >sparkle: var(--hz-color-ai-sparkle)</span
+          >
+          <span
+            class="inline-flex items-center gap-1 text-[10px] font-mono text-violet-600 bg-violet-50 border border-violet-200 rounded px-1.5 py-px whitespace-nowrap"
+            >separator dot: bg-base-content/30</span
+          >
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <h2
+        class="text-lg font-semibold text-base-content mt-10 mb-4 pb-2 border-b border-base-300"
+      >
+        5. Common Violations — Token Debt
+      </h2>
+      <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+        Side-by-side comparisons of hardcoded values (current codebase) vs.
+        correct token references.
+      </p>
+      <!-- ═══════════════════════════════════════════════ -->
+
+      <!-- Violation: bg-white -->
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        &#10060; Hardcoded background
+      </p>
+      <div class="bg-base-100 border border-red-200 rounded-2xl p-5 mb-6">
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Current (wrong)</th>
+              <th>Correct</th>
+              <th>File</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Card background</td>
+              <td><code class="wrong">bg-white</code></td>
+              <td><code class="right">bg-base-100</code></td>
+              <td>card.js:75</td>
+            </tr>
+            <tr>
+              <td>Card background</td>
+              <td><code class="wrong">bg-white</code></td>
+              <td><code class="right">bg-base-100</code></td>
+              <td>metric-card.js:93</td>
+            </tr>
+            <tr>
+              <td>Priority primary bg</td>
+              <td><code class="wrong">background: white</code></td>
+              <td>
+                <code class="right">var(--hz-color-surface-primary)</code>
+              </td>
+              <td>priority-card.js:27</td>
+            </tr>
+            <tr>
+              <td>Priority secondary bg</td>
+              <td><code class="wrong">background: #f8fafc</code></td>
+              <td>
+                <code class="right">var(--hz-color-surface-secondary)</code>
+              </td>
+              <td>priority-card.js:34</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Hardcoded backgrounds break dark mode. <code>bg-base-100</code> remaps
+          automatically across all 18 modes.
+        </p>
+      </div>
+
+      <!-- Violation: radius prop -->
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        &#10060; Radius as configurable prop
+      </p>
+      <div class="bg-base-100 border border-red-200 rounded-2xl p-5 mb-6">
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Current (wrong)</th>
+              <th>Correct</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>card.js (base)</td>
+              <td>
+                <code class="wrong">radius prop → inline style "24px"</code>
+              </td>
+              <td>
+                <code class="right"
+                  >CSS: border-radius: var(--hz-radius-parent)</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>ai-value-card.js</td>
+              <td><code class="wrong">radius="24px"</code></td>
+              <td>
+                <code class="right">remove — inherits from card.js CSS</code>
+              </td>
+            </tr>
+            <tr>
+              <td>governance-card.js</td>
+              <td><code class="wrong">radius="24px"</code></td>
+              <td><code class="right">remove</code></td>
+            </tr>
+            <tr>
+              <td>inventory-card.js</td>
+              <td><code class="wrong">radius="24px"</code></td>
+              <td><code class="right">remove</code></td>
+            </tr>
+            <tr>
+              <td>strategy-card.js</td>
+              <td><code class="wrong">radius="24px"</code></td>
+              <td><code class="right">remove</code></td>
+            </tr>
+            <tr>
+              <td>tasks-overview-card.js</td>
+              <td>
+                <code class="wrong">radius="32px"</code> &#9888;&#65039;
+                inconsistent
+              </td>
+              <td><code class="right">remove</code></td>
+            </tr>
+            <tr>
+              <td>metric-card.js</td>
+              <td><code class="wrong">rounded-[32px]</code></td>
+              <td>
+                <code class="right"
+                  >CSS: border-radius: var(--hz-radius-parent)</code
+                >
+              </td>
+            </tr>
+            <tr>
+              <td>priority-card.js</td>
+              <td><code class="wrong">border-radius: 16px</code></td>
+              <td><code class="right">var(--hz-radius-nested)</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Root cause fix: remove the <code>radius</code> prop from card.js and
+          apply the token in CSS. All 6 wrappers are fixed without touching
+          them.
+        </p>
+      </div>
+
+      <!-- Violation: AI sparkle -->
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        &#10060; AI sparkle hardcoded across 5 files
+      </p>
+      <div class="bg-base-100 border border-red-200 rounded-2xl p-5 mb-6">
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Current (wrong)</th>
+              <th>Correct</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ai-value-card.js:66</td>
+              <td><code class="wrong">fill="#25CB40"</code></td>
+              <td><code class="right">var(--hz-color-ai-sparkle)</code></td>
+            </tr>
+            <tr>
+              <td>inventory-card.js:109</td>
+              <td><code class="wrong">fill="#25CB40"</code></td>
+              <td><code class="right">var(--hz-color-ai-sparkle)</code></td>
+            </tr>
+            <tr>
+              <td>tasks-overview-card.js:67</td>
+              <td><code class="wrong">fill="#25CB40"</code></td>
+              <td><code class="right">var(--hz-color-ai-sparkle)</code></td>
+            </tr>
+            <tr>
+              <td>priority-card.js:69</td>
+              <td><code class="wrong">color: #25cb40</code></td>
+              <td><code class="right">var(--hz-color-ai-sparkle)</code></td>
+            </tr>
+            <tr>
+              <td>priority-card.js:142</td>
+              <td><code class="wrong">fill="#25CB40"</code></td>
+              <td><code class="right">var(--hz-color-ai-sparkle)</code></td>
+            </tr>
+            <tr>
+              <td>metric-card.js:64</td>
+              <td><code class="wrong">fill="#2cf44c"</code></td>
+              <td><code class="right">var(--hz-color-ai-sparkle)</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          6 instances across 5 files. Extract to a shared icon component or
+          apply via <code>currentColor</code> with the token on the parent.
+        </p>
+      </div>
+
+      <!-- Violation: Badge system -->
+      <p
+        class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
+      >
+        &#10060; Priority card badges use hardcoded hex instead of status tokens
+      </p>
+      <div class="bg-base-100 border border-red-200 rounded-2xl p-5 mb-6">
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Badge</th>
+              <th>Current BG (wrong)</th>
+              <th>Correct BG</th>
+              <th>Current Text (wrong)</th>
+              <th>Correct Text</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Task</td>
+              <td><code class="wrong">#e0f2fe</code></td>
+              <td><code class="right">--hz-color-status-info-subtle</code></td>
+              <td><code class="wrong">#0369a1</code></td>
+              <td><code class="right">--hz-color-status-info-text</code></td>
+            </tr>
+            <tr>
+              <td>Expired</td>
+              <td><code class="wrong">#fee2e2</code></td>
+              <td><code class="right">--hz-color-status-error-subtle</code></td>
+              <td><code class="wrong">#dc2626</code></td>
+              <td><code class="right">--hz-color-status-error-text</code></td>
+            </tr>
+            <tr>
+              <td>Risk</td>
+              <td><code class="wrong">#fef3c7</code></td>
+              <td>
+                <code class="right">--hz-color-status-warning-subtle</code>
+              </td>
+              <td><code class="wrong">#92400e</code></td>
+              <td><code class="right">--hz-color-status-warning-text</code></td>
+            </tr>
+            <tr>
+              <td>AI</td>
+              <td><code class="wrong">#f0fdf4</code></td>
+              <td>
+                <code class="right">--hz-color-status-success-subtle</code>
+              </td>
+              <td><code class="wrong">#15803d</code></td>
+              <td><code class="right">--hz-color-status-success-text</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Each badge should use the status 4-variant model (Doc 12). This
+          enables color vision remapping and contrast mode scaling
+          automatically.
+        </p>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <h2
+        class="text-lg font-semibold text-base-content mt-10 mb-4 pb-2 border-b border-base-300"
+      >
+        6. Token Quick Reference
+      </h2>
+      <!-- ═══════════════════════════════════════════════ -->
+
+      <div class="bg-base-100 border border-base-300 rounded-2xl p-5 mb-6">
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Token / Class</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Card background</td>
+              <td><code>bg-base-100</code></td>
+              <td>All card types</td>
+            </tr>
+            <tr>
+              <td>Card border</td>
+              <td><code>var(--hz-color-border-default)</code></td>
+              <td>No hardcoded fallback</td>
+            </tr>
+            <tr>
+              <td>Top-level radius</td>
+              <td><code>var(--hz-radius-parent)</code> = 24px</td>
+              <td>Type A and B cards</td>
+            </tr>
+            <tr>
+              <td>Nested radius</td>
+              <td><code>var(--hz-radius-nested)</code> = 16px</td>
+              <td>Type C / cards inside glass</td>
+            </tr>
+            <tr>
+              <td>Pill radius</td>
+              <td><code>var(--hz-radius-pill)</code> = 9999px</td>
+              <td>Badges</td>
+            </tr>
+            <tr>
+              <td>Primary text</td>
+              <td><code>text-base-content</code></td>
+              <td>Not <code>text-slate-800</code></td>
+            </tr>
+            <tr>
+              <td>Secondary text</td>
+              <td><code>text-base-content/60</code></td>
+              <td>Not <code>text-slate-500</code></td>
+            </tr>
+            <tr>
+              <td>Muted text</td>
+              <td><code>text-base-content/40</code></td>
+              <td>Not <code>text-slate-400</code></td>
+            </tr>
+            <tr>
+              <td>Link text</td>
+              <td><code>var(--hz-color-text-link)</code></td>
+              <td>Not <code>text-sky-700</code></td>
+            </tr>
+            <tr>
+              <td>AI sparkle</td>
+              <td><code>var(--hz-color-ai-sparkle)</code></td>
+              <td>Not <code>#25CB40</code></td>
+            </tr>
+            <tr>
+              <td>Arrow button border</td>
+              <td><code>border-base-300</code></td>
+              <td>Not <code>border-gray-200</code></td>
+            </tr>
+            <tr>
+              <td>Success status bg</td>
+              <td><code>var(--hz-color-status-success-subtle)</code></td>
+              <td>Badge/indicator backgrounds</td>
+            </tr>
+            <tr>
+              <td>Success status text</td>
+              <td><code>var(--hz-color-status-success-text)</code></td>
+              <td>Badge/indicator text</td>
+            </tr>
+            <tr>
+              <td>Error status bg</td>
+              <td><code>var(--hz-color-status-error-subtle)</code></td>
+              <td>Badge/indicator backgrounds</td>
+            </tr>
+            <tr>
+              <td>Error status text</td>
+              <td><code>var(--hz-color-status-error-text)</code></td>
+              <td>Badge/indicator text</td>
+            </tr>
+            <tr>
+              <td>Warning status bg</td>
+              <td><code>var(--hz-color-status-warning-subtle)</code></td>
+              <td>Badge/indicator backgrounds</td>
+            </tr>
+            <tr>
+              <td>Warning status text</td>
+              <td><code>var(--hz-color-status-warning-text)</code></td>
+              <td>Badge/indicator text</td>
+            </tr>
+            <tr>
+              <td>Info status bg</td>
+              <td><code>var(--hz-color-status-info-subtle)</code></td>
+              <td>Badge/indicator backgrounds</td>
+            </tr>
+            <tr>
+              <td>Info status text</td>
+              <td><code>var(--hz-color-status-info-text)</code></td>
+              <td>Badge/indicator text</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
