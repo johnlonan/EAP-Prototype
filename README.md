@@ -1,5 +1,7 @@
 # Horizon 2.0 — Prototype Boilerplate
 
+_Last updated: 2026-03-30_
+
 A boilerplate for UX designers to generate working HTML/CSS prototypes from Figma designs using Claude in VS Code.
 
 ## Prerequisites
@@ -108,6 +110,12 @@ horizon-2.0-alpha/
 | Tabs | Add `data-tabs` to container, `data-tab="name"` to triggers, `data-panel="name"` to panels |
 | Accordion | Add `data-accordion` to container, `data-accordion-item` and `data-accordion-trigger` to items |
 | Load data | `Horizon.loadData('../data/file.json', callback)` |
+
+## Changelog
+
+**2026-03-30** — Added `omnibar.html` (global search/command bar component) and `conversation.html` (chat thread component). Updated `base.css` with improved responsive container behaviour and extended `tokens.css` with new design tokens. Added Figma file references to `figma/links.md`.
+
+**2026-03-28** — Extended governance rules in `.claude/CLAUDE.md` with two new rules: Chart.js enforcement for all visualisations, and precise bar geometry specification requirements.
 
 ## Contributors
 

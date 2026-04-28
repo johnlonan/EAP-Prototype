@@ -1,0 +1,39 @@
+<!-- Nav component with several motion violations -->
+<!-- Task: review these transition classes and report any issues -->
+
+<!-- Violation 1: transition-all (too broad) -->
+<nav
+  class="transition-all duration-300 ease-in-out bg-base-100 border-b border-base-200"
+>
+  <!-- Violation 2: plain numeric duration class (duration-200) -->
+  <a
+    class="nav-link transition-opacity duration-200 [transition-timing-function:var(--ease-enter)] hover:opacity-80"
+    href="/home"
+  >
+    Home
+  </a>
+
+  <!-- Violation 3: named easing on opacity (should be linear) -->
+  <div
+    class="dropdown-menu opacity-0 [transition:opacity_var(--duration-sm)_var(--ease-enter)] data-[open]:opacity-100"
+  >
+    <ul>
+      <li>Settings</li>
+      <li>Profile</li>
+    </ul>
+  </div>
+
+  <!-- Violation 4: hardcoded ms in arbitrary value -->
+  <div
+    class="sidebar transition-[width] duration-[250ms] [transition-timing-function:var(--ease-enter)] data-[collapsed]:w-16 data-[expanded]:w-64"
+  >
+    Sidebar content
+  </div>
+
+  <!-- Violation 5: no motion-reduce variant on animated element -->
+  <button
+    class="chevron transition-transform duration-[var(--duration-sm)] [transition-timing-function:var(--ease-medium-accel)] data-[open]:rotate-180"
+  >
+    ▼
+  </button>
+</nav>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toast Notifications — No Animation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 p-8 min-h-screen">
+    <h1 class="text-xl font-semibold mb-2">Notification Demo</h1>
+    <p class="text-sm text-gray-500 mb-6">
+      Click a button to trigger a toast. It should appear, then auto-dismiss
+      after 3 seconds.
+    </p>
+
+    <div class="flex gap-3 mb-8">
+      <button
+        onclick="showToast('success')"
+        class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg font-medium"
+      >
+        Success Toast
+      </button>
+      <button
+        onclick="showToast('error')"
+        class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg font-medium"
+      >
+        Error Toast
+      </button>
+      <button
+        onclick="showToast('info')"
+        class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg font-medium"
+      >
+        Info Toast
+      </button>
+    </div>
+
+    <!--
+    PROBLEM: Toasts appear and disappear instantly with no animation.
+    No entrance animation, no exit animation, no auto-dismiss transition.
+    The toast just snaps in and out.
+    Task: add proper appear/dismiss animation using Nexus motion tokens.
+    The toast should slide up from the bottom-right, then auto-dismiss
+    after 3 seconds with a matching exit animation.
+  -->
+
+    <div
+      id="toast-container"
+      class="fixed bottom-6 right-6 flex flex-col gap-3 z-50"
+    ></div>
+
+    <script>
+      const messages = {
+        success: {
+          text: 'Changes saved successfully.',
+          icon: '\u2713',
+          border: 'border-green-200',
+          iconColor: 'text-green-600'
+        },
+        error: {
+          text: 'Something went wrong. Please try again.',
+          icon: '\u2715',
+          border: 'border-red-200',
+          iconColor: 'text-red-600'
+        },
+        info: {
+          text: 'Your session will expire in 5 minutes.',
+          icon: 'i',
+          border: 'border-blue-200',
+          iconColor: 'text-blue-600'
+        }
+      };
+
+      function showToast(type) {
+        const cfg = messages[type];
+        const container = document.getElementById('toast-container');
+
+        const toast = document.createElement('div');
+        toast.className = [
+          'toast-item flex items-start gap-3 px-4 py-3 rounded-lg border shadow-md',
+          'min-w-[280px] max-w-sm bg-white',
+          cfg.border
+        ].join(' ');
+
+        const icon = document.createElement('span');
+        icon.className = 'mt-0.5 font-bold text-sm ' + cfg.iconColor;
+        icon.textContent = cfg.icon;
+
+        const msg = document.createElement('p');
+        msg.className = 'text-sm text-gray-800 flex-1';
+        msg.textContent = cfg.text;
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className =
+          'text-gray-400 hover:text-gray-600 text-lg leading-none ml-1';
+        closeBtn.textContent = '\u00d7';
+        closeBtn.addEventListener('click', function () {
+          dismissToast(toast);
+        });
+
+        toast.appendChild(icon);
+        toast.appendChild(msg);
+        toast.appendChild(closeBtn);
+
+        container.appendChild(toast);
+        setTimeout(function () {
+          dismissToast(toast);
+        }, 3000);
+      }
+
+      function dismissToast(toast) {
+        if (!toast || !toast.parentElement) return;
+        toast.parentElement.removeChild(toast);
+      }
+    </script>
+  </body>
+</html>

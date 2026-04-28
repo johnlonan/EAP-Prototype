@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Label Value Pair — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Label Value Pair
+       Layouts:  Default (vertical) · Horizontal
+       Variants: Display text · Text link · Edit–Input ·
+                 Edit–Select · Badge
+    -------------------------------------------------------- */
+
+    /* ---- Base ---- */
+    .lvp {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .lvp--horizontal {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Label (fieldset-legend) */
+    .lvp__label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .lvp__label-text {
+      font-size: var(--font-size-xs);   /* 12px */
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: 20px;
+      white-space: nowrap;
+    }
+    .lvp__label-icon {
+      width: 12px; height: 12px;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+    .lvp--horizontal .lvp__label {
+      flex-direction: row-reverse; /* info icon left of label text in Figma */
+      justify-content: flex-end;
+    }
+
+    /* Value area */
+    .lvp__value {
+      display: flex;
+      align-items: center;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .lvp__value-text {
+      font-size: var(--font-size-sm);   /* 14px */
+      font-weight: 300;
+      color: var(--text-primary);
+      line-height: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Text link variant */
+    .lvp__value--link a {
+      font-size: var(--font-size-base);  /* 16px — matches Figma */
+      color: var(--color-link, #2d637d);
+      text-decoration: none;
+      line-height: 24px;
+    }
+    .lvp__value--link a:hover { text-decoration: underline; }
+
+    /* Badge variant */
+    .lvp__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 24px;
+      padding: 0 6px;
+      border-radius: 9999px;
+      font-size: var(--font-size-sm);
+      background: #cde2eb;
+      color: var(--color-primary);
+      border: 1px solid rgba(14,78,105,0.15);
+    }
+
+    /* Input variant */
+    .lvp__input {
+      height: 40px;
+      width: 284px;
+      padding: 0 12px;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-field);
+      background: var(--bg-primary);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: 300;
+      color: var(--text-tertiary);
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .lvp__input:focus {
+      border-color: var(--border-default);
+      box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--border-default);
+    }
+    .lvp--horizontal .lvp__input { width: 284px; }
+
+    /* Select variant */
+    .lvp__select {
+      height: 40px;
+      width: 341px;
+      padding: 0 12px;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-field);
+      background: var(--bg-primary);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: 300;
+      color: var(--text-tertiary);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23656462' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+    .lvp__select:focus { border-color: var(--border-default); }
+    .lvp--horizontal .lvp__select { width: 341px; }
+
+    /* ---- Showcase ---- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-4);
+    }
+    .showcase-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+    .lvp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .lvp-col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+    .lvp-variant-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-2);
+    }
+
+    /* Real-world form example */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: var(--space-6) 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+
+    <!-- Default Layout -->
+    <div class="showcase-card">
+      <p class="section-title">Default Layout (Vertical) — All Variants</p>
+      <div class="lvp-grid">
+
+        <div>
+          <p class="lvp-variant-label">Display text</p>
+          <div class="lvp">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <div class="lvp__value">
+              <span class="lvp__value-text">Value</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Text link</p>
+          <div class="lvp">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <div class="lvp__value lvp__value--link">
+              <a href="#">text link</a>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Badge</p>
+          <div class="lvp" style="gap:4px;">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <div class="lvp__badge">Badge</div>
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Edit – Input</p>
+          <div class="lvp" style="gap:8px;">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <input class="lvp__input" type="text" placeholder="Input text">
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Edit – Select</p>
+          <div class="lvp" style="gap:8px;">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <select class="lvp__select">
+              <option value="" disabled selected>Select</option>
+              <option>Option 1</option>
+              <option>Option 2</option>
+              <option>Option 3</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Horizontal Layout -->
+    <div class="showcase-card">
+      <p class="section-title">Horizontal Layout — All Variants</p>
+      <div class="lvp-col" style="max-width:620px;">
+
+        <div>
+          <p class="lvp-variant-label">Display text</p>
+          <div class="lvp lvp--horizontal">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <div class="lvp__value">
+              <span class="lvp__value-text">Value</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Text link</p>
+          <div class="lvp lvp--horizontal">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <div class="lvp__value lvp__value--link">
+              <a href="#">text link</a>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Badge</p>
+          <div class="lvp lvp--horizontal" style="align-items:center;">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <div class="lvp__badge">Badge</div>
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Edit – Input</p>
+          <div class="lvp lvp--horizontal">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <input class="lvp__input" type="text" placeholder="Input text">
+          </div>
+        </div>
+
+        <div>
+          <p class="lvp-variant-label">Edit – Select</p>
+          <div class="lvp lvp--horizontal">
+            <div class="lvp__label">
+              <span class="lvp__label-text">Title</span>
+              <span class="lvp__label-icon" data-icon="circle-info"></span>
+            </div>
+            <select class="lvp__select">
+              <option value="" disabled selected>Select</option>
+              <option>Option 1</option>
+              <option>Option 2</option>
+              <option>Option 3</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Real-world example: form detail view -->
+    <div class="showcase-card">
+      <p class="section-title">Example — Incident Detail Form</p>
+      <div class="form-grid">
+        <div class="lvp" style="gap:2px;">
+          <div class="lvp__label"><span class="lvp__label-text">Number</span></div>
+          <div class="lvp__value"><span class="lvp__value-text">INC0045621</span></div>
+        </div>
+        <div class="lvp" style="gap:4px;">
+          <div class="lvp__label"><span class="lvp__label-text">State</span></div>
+          <div class="lvp__badge" style="width:max-content;">In Progress</div>
+        </div>
+        <div class="lvp" style="gap:2px;">
+          <div class="lvp__label"><span class="lvp__label-text">Opened</span></div>
+          <div class="lvp__value"><span class="lvp__value-text">20 Apr 2026, 09:14</span></div>
+        </div>
+        <div class="lvp" style="gap:2px;">
+          <div class="lvp__label"><span class="lvp__label-text">Priority</span></div>
+          <div class="lvp__value"><span class="lvp__value-text" style="color:var(--color-error);">1 – Critical</span></div>
+        </div>
+        <div class="lvp" style="gap:2px;">
+          <div class="lvp__label"><span class="lvp__label-text">Assigned to</span></div>
+          <div class="lvp__value lvp__value--link"><a href="#">Debashish Sahu</a></div>
+        </div>
+        <div class="lvp" style="gap:8px;">
+          <div class="lvp__label"><span class="lvp__label-text">Category</span></div>
+          <select class="lvp__select" style="width:100%;">
+            <option>Network</option>
+            <option>Software</option>
+            <option>Hardware</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Horizon.initIcons();
+    });
+  </script>
+
+</body>
+</html>

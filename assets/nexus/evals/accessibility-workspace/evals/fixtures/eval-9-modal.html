@@ -1,0 +1,23 @@
+<button onclick="openModal()">Open Settings</button>
+
+<div id="modal" class="modal" style="display: none">
+  <div class="modal-content">
+    <h2>Settings</h2>
+    <form>
+      <label>Name: <input type="text" name="name" /></label>
+      <label>Email: <input type="email" name="email" required /></label>
+      <button type="submit">Save</button>
+      <button type="button" onclick="closeModal()">Cancel</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openModal() {
+    document.getElementById('modal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+</script>

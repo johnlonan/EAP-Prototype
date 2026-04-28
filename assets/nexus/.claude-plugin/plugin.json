@@ -1,0 +1,35 @@
+{
+  "name": "nexus",
+  "description": "ServiceNow Nexus plugin for UI generation standards",
+  "version": "1.0.0",
+  "skills": "./skills/",
+  "author": {
+    "name": "ServiceNow"
+  },
+  "repository": "https://code.devsnc.com/dev/karuna",
+  "license": "MIT",
+  "keywords": [
+    "nexus",
+    "servicenow",
+    "ui-standards",
+    "design-system",
+    "accessibility",
+    "a11y",
+    "wcag",
+    "aria",
+    "i18n",
+    "internationalization",
+    "l10n",
+    "localization",
+    "rtl",
+    "responsive",
+    "breakpoints",
+    "mobile",
+    "motion",
+    "animation",
+    "transitions",
+    "tailwind",
+    "prefers-reduced-motion",
+    "code-review"
+  ]
+}

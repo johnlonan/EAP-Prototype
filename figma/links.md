@@ -162,6 +162,100 @@ containers: https://www.figma.com/design/QCczk1RjplydYWDFIYKtDY/-ALPHA--Horizon-
 breakdown-with-container-examples: https://www.figma.com/design/QCczk1RjplydYWDFIYKtDY/-ALPHA--Horizon-2.0--%3E-Foundations?node-id=4727-406&m=dev
 
 
+/* Additional links added on 20 Apr 2026 */
+nodemap: https://www.figma.com/design/XxHwSnxqcnFbki35XNhjG0/AICT---Nodemap-1?node-id=1487-34654&m=dev
+card: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=34109-21437&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=34109-21608&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2172-2049&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2179-765&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2172-2033&m=dev
+
+modal: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2437-14365&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=437-10730&m=dev
+
+alerts: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=1993-5870&m=dev
+
+tooltip: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=7704-9446&m=dev (don't create component for this but update the existing components whereever required)
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=442-3222&m=dev (don't create component for this but update the existing components whereever required)
+
+popover: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=587-1968&m=dev
+toast: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=587-1968&m=dev
+
+stacks: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=1155-8635&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=1185-2281&m=dev (don't create component for this, its for reference)
+
+avatars: 
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=277-1107&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=277-1123&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=277-1100&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=4584-19259&m=dev
+
+label-value-pair: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=30126-15924&m=dev
+
+empty-state-illustartions: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=3933-4524&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=29507-356&m=dev
+
+color-topics-icons: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=27374-4423&m=dev
+
+widgets: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=26202-13141&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2643-14609&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2643-16131&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2643-21803&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2643-23806&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2643-7335&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=3006-24775&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2643-16021&m=dev
+
+activity-card: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2350-2337&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2346-8612&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2346-7390&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=6391-28333&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2351-2338&m=dev (this is the example of activity cards)
+
+popular-content-card: 
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2350-2337&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2346-8612&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2346-7390&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=6391-28333&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2351-2338&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2366-3314&m=dev (this is the example of popular content cards)
+
+recent-conversations: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2375-2419&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2374-2269&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2366-4893&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2375-2420&m=dev (this is the example of recent conversation)
+
+other-cards: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2139-7766&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=1172-17823&m=v
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=3092-39064&m=d
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=1162-14220&m=d
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2139-7815&m=d
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2139-7794&m=d
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2139-7750&m=d
+
+
+app-card:
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2560-12519&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2560-12539&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2589-13914&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2560-13675&m=dev (this is the example of app card)
+
+quick-links: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2574-5099&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=3655-30212&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2574-5627&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=4378-35968&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=6904-7364&m=dev (this is the example of quick links)
+
+
+my-request-card: https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2574-17632&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=3983-20690&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=24006-37266&m=dev
+https://www.figma.com/design/SPmKj8MGJIDvOJhvDbNIZO/-ALPHA--Horizon-2.0--%3E-Components?node-id=2574-5145&m=dev (this is the example of my request card)
+
+
+skeleton-loader: https://daisyui.com/components/skeleton/
+
+
 * Icons
 
 https://www.figma.com/design/x3mbmEADpbXGF1vVkMhAdg/-ALPHA--Horizon-2.0--%3E-Icons?node-id=1-714&m=dev
@@ -1041,4 +1135,3 @@ https://www.figma.com/design/x3mbmEADpbXGF1vVkMhAdg/-ALPHA--Horizon-2.0--%3E-Ico
 https://www.figma.com/design/x3mbmEADpbXGF1vVkMhAdg/-ALPHA--Horizon-2.0--%3E-Icons?node-id=1-5062&m=dev
 https://www.figma.com/design/x3mbmEADpbXGF1vVkMhAdg/-ALPHA--Horizon-2.0--%3E-Icons?node-id=1-2163&m=dev
 https://www.figma.com/design/x3mbmEADpbXGF1vVkMhAdg/-ALPHA--Horizon-2.0--%3E-Icons?node-id=1-1974&m=dev
-

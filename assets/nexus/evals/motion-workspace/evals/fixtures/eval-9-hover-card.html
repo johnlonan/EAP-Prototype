@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Cards — No Hover Animation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 p-8">
+    <h1 class="text-xl font-semibold mb-2">Featured Products</h1>
+    <p class="text-sm text-gray-500 mb-6">
+      Hover over a card — it should lift, the image should subtly zoom, and a
+      "Quick View" overlay should slide up.
+    </p>
+
+    <!--
+    PROBLEM: Cards have zero hover animation. No shadow change, no image zoom,
+    no overlay reveal. Everything is completely static on hover.
+    Task: add hover micro-interactions using Nexus motion tokens:
+    1. Card lifts — shadow elevation change on hover
+    2. Image subtly zooms in — scale-up token on the image
+    3. "Quick View" overlay slides up from the bottom of the image — using group-hover
+    Use transition-shadow for the shadow (not transition-all). Image zoom and
+    overlay should use appropriate tokens. Add motion-reduce: variants.
+  -->
+
+    <div class="grid grid-cols-3 gap-6 max-w-3xl">
+      <div
+        class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden cursor-pointer"
+      >
+        <div class="relative overflow-hidden">
+          <div
+            class="w-full h-40 bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-4xl"
+          >
+            🎧
+          </div>
+          <!-- Quick View overlay — hidden by default -->
+          <div
+            class="absolute inset-x-0 bottom-0 bg-gray-900/80 text-white text-xs font-medium text-center py-2 hidden"
+          >
+            Quick View
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="text-sm font-semibold text-gray-900">
+            Studio Headphones
+          </div>
+          <div class="text-xs text-gray-500 mt-0.5">Pro Audio Series</div>
+          <div class="text-sm font-bold text-gray-900 mt-2">$249</div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden cursor-pointer"
+      >
+        <div class="relative overflow-hidden">
+          <div
+            class="w-full h-40 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-4xl"
+          >
+            ⌨️
+          </div>
+          <!-- Quick View overlay — hidden by default -->
+          <div
+            class="absolute inset-x-0 bottom-0 bg-gray-900/80 text-white text-xs font-medium text-center py-2 hidden"
+          >
+            Quick View
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="text-sm font-semibold text-gray-900">
+            Mechanical Keyboard
+          </div>
+          <div class="text-xs text-gray-500 mt-0.5">Tactile Switch</div>
+          <div class="text-sm font-bold text-gray-900 mt-2">$189</div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden cursor-pointer"
+      >
+        <div class="relative overflow-hidden">
+          <div
+            class="w-full h-40 bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center text-4xl"
+          >
+            🖱️
+          </div>
+          <!-- Quick View overlay — hidden by default -->
+          <div
+            class="absolute inset-x-0 bottom-0 bg-gray-900/80 text-white text-xs font-medium text-center py-2 hidden"
+          >
+            Quick View
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="text-sm font-semibold text-gray-900">Wireless Mouse</div>
+          <div class="text-xs text-gray-500 mt-0.5">Ergonomic Design</div>
+          <div class="text-sm font-bold text-gray-900 mt-2">$79</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skeleton Loader — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Skeleton Loader
+       Reusable loading placeholder for any component.
+
+       Usage:
+         <div class="skel" style="width:200px; height:16px;"></div>
+         <div class="skel skel--circle" style="width:32px; height:32px;"></div>
+
+       Modifiers:
+         .skel--circle   — fully round (avatar)
+         .skel--text     — 6px height, matches inline text rhythm
+         .skel--no-anim  — static (paused) shimmer
+    -------------------------------------------------------- */
+
+    /* ---- Base shimmer ---- */
+    @keyframes skel-shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position: 600px 0; }
+    }
+
+    .skel {
+      display: block;
+      border-radius: var(--radius-md);
+      background: linear-gradient(
+        90deg,
+        var(--bg-tertiary)   0%,
+        var(--bg-secondary)  40%,
+        var(--bg-tertiary)   60%,
+        var(--bg-secondary)  100%
+      );
+      background-size: 1200px 100%;
+      animation: skel-shimmer 1.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .skel--circle  { border-radius: 50%; }
+    .skel--text    { height: 6px; border-radius: 3px; }
+    .skel--no-anim { animation-play-state: paused; }
+
+    /* ---- Showcase shell ---- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase {
+      max-width: 960px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: var(--space-10);
+    }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-tertiary); margin-bottom: var(--space-4);
+    }
+    .showcase-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* ---- Pattern grid ---- */
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--space-8);
+    }
+    .pattern-label {
+      font-size: 11px; color: var(--text-tertiary);
+      margin-bottom: var(--space-3);
+    }
+
+    /* ---- Text lines group ---- */
+    .skel-lines {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    /* ---- Avatar + text row ---- */
+    .skel-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .skel-row__text {
+      display: flex; flex-direction: column; gap: 7px; flex: 1; min-width: 0;
+    }
+
+    /* ---- Card pattern ---- */
+    .skel-card {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    /* ---- List rows pattern ---- */
+    .skel-list {
+      display: flex; flex-direction: column;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .skel-list__row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .skel-list__row:last-child { border-bottom: none; }
+    .skel-list__row__text { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+
+    /* ---- Table rows pattern ---- */
+    .skel-table {
+      display: flex; flex-direction: column;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .skel-table__header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 8px 14px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .skel-table__row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 11px 14px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .skel-table__row:last-child { border-bottom: none; }
+
+    /* ---- Stat card pattern ---- */
+    .skel-stat {
+      display: flex; flex-direction: column; gap: 10px;
+      padding: var(--space-5);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+    }
+
+    /* ---- Stack card pattern ---- */
+    .skel-stack-wrap {
+      position: relative; height: 104px;
+    }
+    .skel-stack-slot {
+      position: absolute; left: 0; width: 100%;
+      height: 70px; border-radius: var(--radius-xl); overflow: hidden;
+    }
+    .skel-stack-slot:nth-child(1) { top: 0;    transform: scaleX(1);    z-index: 3; }
+    .skel-stack-slot:nth-child(2) { top: 17px; transform: scaleX(0.96); z-index: 2; opacity: 0.7; }
+    .skel-stack-slot:nth-child(3) { top: 34px; transform: scaleX(0.92); z-index: 1; opacity: 0.4; }
+    .skel-stack-slot .skel { width: 100%; height: 100%; border-radius: 0; animation-delay: calc(var(--i, 0) * 0.15s); }
+
+    /* ---- Page/form section ---- */
+    .skel-form {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6);
+    }
+    @media (max-width: 600px) { .skel-form { grid-template-columns: 1fr; } }
+    .skel-field {
+      display: flex; flex-direction: column; gap: 7px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+
+  <!-- Primitives -->
+  <div class="showcase-card">
+    <p class="section-title">Primitives</p>
+    <div class="pattern-grid">
+
+      <div>
+        <p class="pattern-label">Text lines</p>
+        <div class="skel-lines">
+          <div class="skel" style="width:45%; height:10px;"></div>
+          <div class="skel" style="width:85%; height:10px;"></div>
+          <div class="skel" style="width:72%; height:10px;"></div>
+          <div class="skel" style="width:60%; height:10px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <p class="pattern-label">Avatar sizes</p>
+        <div style="display:flex; align-items:flex-end; gap:12px;">
+          <div class="skel skel--circle" style="width:24px; height:24px;"></div>
+          <div class="skel skel--circle" style="width:32px; height:32px;"></div>
+          <div class="skel skel--circle" style="width:40px; height:40px;"></div>
+          <div class="skel skel--circle" style="width:56px; height:56px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <p class="pattern-label">Blocks</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="skel" style="width:100%; height:12px;"></div>
+          <div class="skel" style="width:100%; height:32px;"></div>
+          <div class="skel" style="width:100%; height:64px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <p class="pattern-label">Buttons / badges</p>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <div class="skel" style="width:80px; height:32px; border-radius:9999px;"></div>
+          <div class="skel" style="width:100px; height:32px; border-radius:var(--radius-field);"></div>
+          <div class="skel" style="width:56px; height:20px; border-radius:9999px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Composite patterns -->
+  <div class="showcase-card">
+    <p class="section-title">Composite Patterns</p>
+    <div class="pattern-grid">
+
+      <!-- Avatar + text row -->
+      <div>
+        <p class="pattern-label">Avatar + text row</p>
+        <div class="skel-row">
+          <div class="skel skel--circle" style="width:36px; height:36px;"></div>
+          <div class="skel-row__text">
+            <div class="skel" style="width:55%; height:10px;"></div>
+            <div class="skel" style="width:80%; height:9px;"></div>
+          </div>
+          <div class="skel" style="width:52px; height:20px; border-radius:9999px;"></div>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div>
+        <p class="pattern-label">Card (image + content)</p>
+        <div class="skel-card">
+          <div class="skel" style="width:100%; height:110px; border-radius:var(--radius-lg);"></div>
+          <div class="skel" style="width:60%; height:10px;"></div>
+          <div class="skel" style="width:100%; height:9px;"></div>
+          <div class="skel" style="width:88%; height:9px;"></div>
+        </div>
+      </div>
+
+      <!-- Stat card -->
+      <div>
+        <p class="pattern-label">Stat card</p>
+        <div class="skel-stat">
+          <div class="skel" style="width:36px; height:9px;"></div>
+          <div class="skel" style="width:70px; height:28px;"></div>
+          <div class="skel" style="width:90px; height:9px;"></div>
+        </div>
+      </div>
+
+      <!-- Page heading -->
+      <div>
+        <p class="pattern-label">Page / section heading</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="skel" style="width:40%; height:18px;"></div>
+          <div class="skel" style="width:72%; height:10px;"></div>
+          <div class="skel" style="width:60%; height:10px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Stack card -->
+  <div class="showcase-card">
+    <p class="section-title">Stack Card</p>
+    <div style="max-width:620px;">
+      <div class="skel-stack-wrap">
+        <div class="skel-stack-slot" style="--i:0;">
+          <div class="skel" style="display:flex; align-items:center; padding:0 20px; gap:12px; height:100%;">
+          </div>
+        </div>
+        <div class="skel-stack-slot" style="--i:1;"><div class="skel"></div></div>
+        <div class="skel-stack-slot" style="--i:2;"><div class="skel"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- List rows -->
+  <div class="showcase-card">
+    <p class="section-title">List Rows</p>
+    <div class="skel-list">
+      <div class="skel-list__row">
+        <div class="skel skel--circle" style="width:28px; height:28px;"></div>
+        <div class="skel-list__row__text">
+          <div class="skel" style="width:45%; height:10px;"></div>
+          <div class="skel" style="width:28%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:60px; height:9px;"></div>
+        <div class="skel" style="width:48px; height:20px; border-radius:9999px;"></div>
+      </div>
+      <div class="skel-list__row">
+        <div class="skel skel--circle" style="width:28px; height:28px;"></div>
+        <div class="skel-list__row__text">
+          <div class="skel" style="width:38%; height:10px;"></div>
+          <div class="skel" style="width:22%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:60px; height:9px;"></div>
+        <div class="skel" style="width:48px; height:20px; border-radius:9999px;"></div>
+      </div>
+      <div class="skel-list__row">
+        <div class="skel skel--circle" style="width:28px; height:28px;"></div>
+        <div class="skel-list__row__text">
+          <div class="skel" style="width:52%; height:10px;"></div>
+          <div class="skel" style="width:32%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:60px; height:9px;"></div>
+        <div class="skel" style="width:48px; height:20px; border-radius:9999px;"></div>
+      </div>
+      <div class="skel-list__row">
+        <div class="skel skel--circle" style="width:28px; height:28px;"></div>
+        <div class="skel-list__row__text">
+          <div class="skel" style="width:42%; height:10px;"></div>
+          <div class="skel" style="width:25%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:60px; height:9px;"></div>
+        <div class="skel" style="width:48px; height:20px; border-radius:9999px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="showcase-card">
+    <p class="section-title">Data Table</p>
+    <div class="skel-table">
+      <div class="skel-table__header">
+        <div class="skel" style="width:16px; height:16px; border-radius:4px;"></div>
+        <div class="skel" style="flex:1.5; height:9px;"></div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:60px; height:9px;"></div>
+        <div class="skel" style="width:56px; height:9px;"></div>
+      </div>
+      <div class="skel-table__row">
+        <div class="skel" style="width:16px; height:16px; border-radius:4px;"></div>
+        <div style="flex:1.5; display:flex; flex-direction:column; gap:5px;">
+          <div class="skel" style="width:60%; height:10px;"></div>
+          <div class="skel" style="width:40%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:52px; height:18px; border-radius:9999px;"></div>
+        <div class="skel" style="width:56px; height:9px;"></div>
+      </div>
+      <div class="skel-table__row">
+        <div class="skel" style="width:16px; height:16px; border-radius:4px;"></div>
+        <div style="flex:1.5; display:flex; flex-direction:column; gap:5px;">
+          <div class="skel" style="width:48%; height:10px;"></div>
+          <div class="skel" style="width:35%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:52px; height:18px; border-radius:9999px;"></div>
+        <div class="skel" style="width:56px; height:9px;"></div>
+      </div>
+      <div class="skel-table__row">
+        <div class="skel" style="width:16px; height:16px; border-radius:4px;"></div>
+        <div style="flex:1.5; display:flex; flex-direction:column; gap:5px;">
+          <div class="skel" style="width:55%; height:10px;"></div>
+          <div class="skel" style="width:30%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:52px; height:18px; border-radius:9999px;"></div>
+        <div class="skel" style="width:56px; height:9px;"></div>
+      </div>
+      <div class="skel-table__row">
+        <div class="skel" style="width:16px; height:16px; border-radius:4px;"></div>
+        <div style="flex:1.5; display:flex; flex-direction:column; gap:5px;">
+          <div class="skel" style="width:42%; height:10px;"></div>
+          <div class="skel" style="width:28%; height:9px;"></div>
+        </div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:80px; height:9px;"></div>
+        <div class="skel" style="width:52px; height:18px; border-radius:9999px;"></div>
+        <div class="skel" style="width:56px; height:9px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form detail view -->
+  <div class="showcase-card">
+    <p class="section-title">Form / Detail View</p>
+    <div class="skel-form">
+      <div class="skel-field">
+        <div class="skel" style="width:60px; height:9px;"></div>
+        <div class="skel" style="width:80%; height:11px;"></div>
+      </div>
+      <div class="skel-field">
+        <div class="skel" style="width:48px; height:9px;"></div>
+        <div class="skel" style="width:52px; height:20px; border-radius:9999px;"></div>
+      </div>
+      <div class="skel-field">
+        <div class="skel" style="width:56px; height:9px;"></div>
+        <div class="skel" style="width:72%; height:11px;"></div>
+      </div>
+      <div class="skel-field">
+        <div class="skel" style="width:52px; height:9px;"></div>
+        <div class="skel" style="width:60%; height:11px;"></div>
+      </div>
+      <div class="skel-field">
+        <div class="skel" style="width:72px; height:9px;"></div>
+        <div class="skel" style="width:90%; height:11px;"></div>
+      </div>
+      <div class="skel-field">
+        <div class="skel" style="width:64px; height:9px;"></div>
+        <div class="skel" style="width:100%; height:36px; border-radius:var(--radius-field);"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

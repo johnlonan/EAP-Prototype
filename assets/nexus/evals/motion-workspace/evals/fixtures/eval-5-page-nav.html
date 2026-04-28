@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SPA Pages — No Transition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50">
+    <nav class="bg-white border-b border-gray-200 px-6 py-3 flex gap-4">
+      <button
+        onclick="navigate('home')"
+        class="text-sm font-medium px-3 py-1 rounded hover:bg-gray-100"
+      >
+        Home
+      </button>
+      <button
+        onclick="navigate('incidents')"
+        class="text-sm font-medium px-3 py-1 rounded hover:bg-gray-100"
+      >
+        Incidents
+      </button>
+      <button
+        onclick="navigate('settings')"
+        class="text-sm font-medium px-3 py-1 rounded hover:bg-gray-100"
+      >
+        Settings
+      </button>
+    </nav>
+
+    <!--
+    PROBLEM: Clicking a nav button instantly swaps pages with no transition.
+    Old page disappears, new page appears — abrupt teleportation.
+    Task: add a forward/backward page-slide transition so new content slides in
+    from the right (forward) or left (backward) while old content exits the
+    opposite way. Use the Nexus page navigation pattern.
+  -->
+    <div id="page-container" class="relative overflow-hidden">
+      <div id="page-home" class="p-8">
+        <h1 class="text-2xl font-bold mb-4">Home</h1>
+        <p class="text-gray-600">
+          Welcome to the dashboard. Navigate using the buttons above.
+        </p>
+      </div>
+      <div id="page-incidents" class="p-8 hidden">
+        <h1 class="text-2xl font-bold mb-4">Incidents</h1>
+        <p class="text-gray-600">All active incidents listed here.</p>
+      </div>
+      <div id="page-settings" class="p-8 hidden">
+        <h1 class="text-2xl font-bold mb-4">Settings</h1>
+        <p class="text-gray-600">Configure your preferences.</p>
+      </div>
+    </div>
+
+    <script>
+      let currentPage = 'home';
+      const pageOrder = ['home', 'incidents', 'settings'];
+
+      function navigate(pageId) {
+        if (pageId === currentPage) return;
+
+        const oldPage = document.getElementById('page-' + currentPage);
+        const newPage = document.getElementById('page-' + pageId);
+
+        const currentIdx = pageOrder.indexOf(currentPage);
+        const nextIdx = pageOrder.indexOf(pageId);
+        const isForward = nextIdx > currentIdx;
+
+        // Instant swap — no slide animation
+        oldPage.classList.add('hidden');
+        newPage.classList.remove('hidden');
+
+        currentPage = pageId;
+      }
+    </script>
+  </body>
+</html>

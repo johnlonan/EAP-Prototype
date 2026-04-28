@@ -1,0 +1,38 @@
+{
+  "name": "@servicenow/agent-pack-nexus",
+  "version": "1.1.0",
+  "type": "module",
+  "files": [
+    "skills",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node ../scripts/build.js",
+    "publish-package": "pnpm publish",
+    "prepack": "mv skills skills_src && mkdir skills && cp -r dist/. skills/",
+    "postpack": "rm -rf skills && mv skills_src skills",
+    "eval:accessibility": "node evals/run_benchmark.js --evals evals/accessibility-workspace/evals/evals.json --skill skills/accessibility/SKILL.md --workspace evals/accessibility-workspace --model claude-opus-4-6",
+    "review-evals:accessibility": "node evals/review_evals.js --workspace evals/accessibility-workspace",
+    "eval:motion": "node evals/run_benchmark.js --evals evals/motion-workspace/evals/evals.json --skill skills/motion/SKILL.md --workspace evals/motion-workspace --model claude-opus-4-6",
+    "review-evals:motion": "node evals/review_evals.js --workspace evals/motion-workspace"
+  },
+  "author": "ServiceNow",
+  "license": "ISC",
+  "description": "Package containing instructions, assets, and resources that agents can discover and use to implement accessibility, internationalization, localization, and responsive design accurately and efficiently",
+  "keywords": [
+    "servicenow",
+    "nexus",
+    "skills",
+    "accessibility",
+    "internationalization",
+    "localization",
+    "responsive-design",
+    "agent-pack"
+  ],
+  "engines": {
+    "node": ">=22.21.1"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "0.39.0"
+  }
+}

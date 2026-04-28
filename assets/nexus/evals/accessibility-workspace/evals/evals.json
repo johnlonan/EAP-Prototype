@@ -1,0 +1,308 @@
+{
+  "skill_name": "accessibility",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "dialog-create",
+      "prompt": "Create a modeless dialog component that:\n- Can be dragged to reposition on screen\n- Has a resize handle in the bottom-right corner\n- Contains a title bar with a close button\n- Allows interaction with background content while open\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "Dialog has role=\"dialog\" (NOT alertdialog)",
+        "Dialog has aria-modal=\"false\"",
+        "Dialog has an accessible name either through a aria-labelledby attribute whose value matches the id of the title element, or via the aria-label attribute on the element with role=\"dialog\"",
+        "Close button is keyboard accessible (is a <button> element or is an accessible button based on the APG)",
+        "When focus is inside of the dialog, Escape key closes the dialog, dialog should not close if an active control inside of the dialog also uses the escape key - such as closing a dropdown",
+        "Move mode is activatable via keyboard (Spacebar on move handle)",
+        "Arrow keys reposition the dialog in move mode",
+        "Resize mode is activatable via keyboard (Spacebar on resize handle)",
+        "Arrow keys resize the dialog in resize mode",
+        "Enter or Spacebar confirms move/resize, Escape cancels - but does not close the dialog",
+        "A live region announces mode entry (e.g. \"Move mode. Use arrow keys...\")",
+        "Live region announces position changes during move (e.g. \"Position: 200px from left\")",
+        "Live region announces size changes during resize",
+        "Live region announces when a boundary is reached (e.g. \"Reached left edge\")",
+        "Focus moves to dialog on open",
+        "Focus returns to the trigger element on close",
+        "Focus remains on the moved/resized element after the operation completes",
+        "Dialog is usable at 320px viewport width (uses relative units or max-width)"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "listview-create",
+      "prompt": "Create a listview component that:\n- Displays a list of 5 sample items with columns: name, date, status\n- Allows selecting individual rows with checkboxes\n- Has row-level actions: Edit and Delete buttons\n- Shows selected count in a toolbar\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise — use a simple array of data, not a fetch call.",
+      "assertions": [
+        "Container has role=\"grid\" even if it uses a <table> element",
+        "Rows have role=\"row\" or use <tr> elements",
+        "Cells have role=\"gridcell\" or role=\"rowheader\" or role=\"columnheader\" or use <td>/<th> elements",
+        "Checkboxes have accessible labels that include the item name (e.g. \"Select Document 1\")",
+        "Selected rows have aria-selected=\"true\" on the row element",
+        "Edit and Delete buttons have accessible names that include the item context (e.g. \"Edit Document 1\")",
+        "Arrow keys navigate between cells (Up/Down between rows, Left/Right between columns)",
+        "Enter moves focus into a cell to access actionable items within",
+        "Tab moves between focusable items within a cell when inside-cell navigation is active",
+        "Escape returns from within-cell focus back to cell navigation level",
+        "Tab from the cell navigation level moves focus beyond the grid",
+        "Space toggles row selection when focused on the checkbox cell",
+        "Select-all checkbox in the header row is keyboard accessible",
+        "Selected count is announced via a live region when selection changes",
+        "Delete action confirmation is announced via a live region",
+        "Focus is managed after a delete operation (moves to next row or previous if last)",
+        "All interactive elements have a visible focus indicator",
+        "Listview adapts at 320px width (card layout or horizontal scroll with table semantics preserved)",
+        "Row actions remain accessible at 320px (not clipped or hidden)"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "eval_name": "combobox-create",
+      "prompt": "Create a typeahead/autocomplete search component that:\n- Filters a list of 8-10 predefined options as user types\n- Shows matching options in a dropdown\n- Allows selection via click or keyboard\n- Has a clear button to reset the input\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "The text input has role=\"combobox\" attribute",
+        "The input has aria-expanded attribute that toggles between \"true\" when open and \"false\" when closed",
+        "The input has aria-controls attribute whose value matches the id of the listbox element",
+        "The input has aria-autocomplete=\"list\" attribute",
+        "The dropdown container has role=\"listbox\" attribute",
+        "Each option element has role=\"option\" attribute",
+        "The currently highlighted option has aria-selected=\"true\" attribute",
+        "The input has aria-activedescendant attribute updated to the id of the currently highlighted option",
+        "The clear button has an accessible name (e.g. aria-label=\"Clear search\")",
+        "Down arrow opens the listbox when it is closed",
+        "Down and Up arrow keys navigate through options",
+        "Enter key selects the currently highlighted option",
+        "Escape key closes the listbox without selecting",
+        "Tab key closes the listbox and moves focus forward",
+        "Number of matching results is announced via a live region (e.g. \"5 results available\")",
+        "Selection is announced via a live region",
+        "Focus remains on the input element during keyboard navigation (no .focus() calls on option elements)",
+        "Combobox is usable at 320px viewport width"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "eval_name": "fab-modal-create",
+      "prompt": "Create a floating action button (FAB) that:\n- Is fixed in the bottom-right corner of the screen\n- Opens a modal dialog when clicked\n- The modal has a form with name and email fields\n- The modal has Submit and Cancel buttons\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "The FAB is a <button> element (not a <div> or <span>)",
+        "The FAB has an accessible name via aria-label or visible text content",
+        "The modal container has role=\"dialog\" attribute",
+        "The modal container has aria-modal=\"true\" attribute",
+        "The modal has aria-labelledby attribute pointing to the modal title OR has an aria-label attribute",
+        "Tab key cycles within the modal (focus trap: Tab on last focusable element moves to first)",
+        "Escape key closes the modal if focus is not already on a control with an escape key behavior such as closing a combobox.",
+        "When the modal opens, .focus() is called on an element inside the modal",
+        "Background content has the inert attribute set to true when the modal is open",
+        "Focus returns to the FAB button when the modal closes",
+        "FAB is visible and tappable at 320px (minimum 24x24px target size)",
+        "Modal is usable at 320px (form fields not clipped, uses relative/percentage width)",
+        "No sticky positioning on the modal at 320px OR the modal is fullscreen at narrow widths"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "eval_name": "form-sections-create",
+      "prompt": "Create a multi-section form with:\n- 3 sections: Personal Info, Address, Preferences\n- Each section header can be clicked to expand/collapse the section content\n- Form fields within each section\n- A Submit button at the bottom\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "Section headers use <button> elements nested inside heading elements (<h2>, <h3>, etc.) OR <button> elements with role=\"heading\" and aria-level",
+        "Each section header button has an aria-expanded attribute set to \"true\" or \"false\"",
+        "Each section header button has an aria-controls attribute whose value matches the id of the corresponding content panel",
+        "Headings have the appropriate aria-level or use native heading tags (h1-h6)",
+        "All form inputs have associated <label> elements (via for/id pairing)",
+        "Required fields are indicated with aria-required=\"true\" or the required attribute",
+        "Enter or Space on a section header button toggles the section (native button behavior or explicit keydown handler)",
+        "Tab moves through form fields within expanded sections (no tabindex=-1 on visible inputs)",
+        "Arrow keys optionally navigate between section headers",
+        "Invalid inputs have aria-invalid=\"true\" on submit failure",
+        "Error messages are linked to their input via aria-describedby",
+        "An error summary or the first invalid field is focused on submit failure",
+        "Form sections stack at 320px viewport width (no horizontal overflow)",
+        "Labels are above their inputs at 320px (not side-by-side)",
+        "No horizontal scrolling at 320px"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "eval_name": "dialog-fix",
+      "prompt": "This dialog can be dragged and resized with a mouse, but it's not accessible. Fix the accessibility issues.",
+      "assertions": [
+        "Added role=\"dialog\" to the dialog element",
+        "Added aria-labelledby attribute pointing to the title element",
+        "Close button is changed to a <button> element with an accessible name (aria-label or text content)",
+        "Added keyboard move mode: a specific key (M key or spacebar on the drag handle) activates it",
+        "Added keyboard resize mode: a specific key (R key or spacebar on the resize handle) activates it",
+        "Arrow keys reposition or resize the dialog while in the respective mode",
+        "Enter key confirms the operation, Escape cancels it",
+        "An element with an aria-live attribute is added to the DOM",
+        "Text content is set on the aria-live element when entering or exiting move/resize mode",
+        "Text content is set on the aria-live element when position or size changes during move/resize",
+        "The resize handle has tabindex=\"0\" or is changed to a <button> to make it focusable",
+        "The dialog title bar or a move handle has tabindex=\"0\" or is changed to a <button> to make it focusable"
+      ],
+      "files": ["evals/fixtures/eval-6-dialog-drag.html"]
+    },
+    {
+      "id": 7,
+      "eval_name": "listview-fix",
+      "prompt": "This listview has selection and row actions, but it's not accessible. Fix the accessibility issues.",
+      "assertions": [
+        "The container is given grid or table semantics (role=\"grid\" added or converted to <table>)",
+        "Each checkbox has an accessible label that includes the item name (aria-label or associated <label>)",
+        "Action icon spans are converted to <button> elements with aria-label attributes that include the action and item name",
+        "Selected rows have aria-selected=\"true\" attribute set",
+        "A keydown handler handles ArrowUp and ArrowDown for navigating between rows",
+        "A keydown handler handles Enter for moving into a cell to access its interactive elements",
+        "A keydown handler handles Tab and Escape for managing within-cell focus vs. row navigation",
+        "Space toggles row selection when focused on the checkbox cell",
+        "An element with aria-live attribute is added that gets updated when the selection count changes",
+        "An element with aria-live attribute or role=\"alert\" is added for delete confirmation feedback",
+        "After a delete operation, .focus() is called on an adjacent row element",
+        "Header cells use <th> elements or have role=\"columnheader\""
+      ],
+      "files": ["evals/fixtures/eval-7-listview.html"]
+    },
+    {
+      "id": 8,
+      "eval_name": "combobox-fix",
+      "prompt": "This autocomplete search works with mouse but is not accessible. Fix the accessibility issues.",
+      "assertions": [
+        "The input element has role=\"combobox\" attribute added",
+        "The input has aria-expanded attribute that toggles between \"true\" and \"false\"",
+        "The input has aria-controls attribute whose value matches the id of the results list",
+        "The input has aria-autocomplete=\"list\" attribute added",
+        "The results <ul> element has role=\"listbox\" attribute added",
+        "Each <li> option element has role=\"option\" attribute added",
+        "The currently active option has aria-selected=\"true\" AND a visual highlight (CSS class or style change)",
+        "The input has aria-activedescendant updated to the id of the active option",
+        "A keydown handler opens the results list when ArrowDown is pressed while the list is closed",
+        "ArrowUp keydown handler moves the active option upward through the list",
+        "Enter keydown handler selects the currently active option",
+        "Escape keydown handler closes the results list without selecting",
+        "An element with aria-live attribute exists that gets updated with the count of matching results",
+        "No .focus() calls are made on option elements — focus stays on the input during keyboard navigation"
+      ],
+      "files": ["evals/fixtures/eval-8-combobox.html"]
+    },
+    {
+      "id": 9,
+      "eval_name": "modal-fix",
+      "prompt": "This modal works visually but has accessibility issues. Fix them.",
+      "assertions": [
+        "Dialog role semantics are present — either the element is a native <dialog> element (which has implicit role=dialog) OR the element has role=\"dialog\" attribute explicitly added",
+        "Modal behavior is established — either the <dialog> element uses .showModal() (which sets modal behavior implicitly) OR the element has aria-modal=\"true\" attribute explicitly added",
+        "The modal has aria-labelledby attribute whose value matches the id of the <h2> heading, using aria-label to set name of modal is also acceptable",
+        "Focus is trapped within the modal when open — either native <dialog> provides this natively (when .showModal() is used) OR a keydown handler wraps Tab from the last focusable element to the first and Shift+Tab from the first to the last",
+        "Escape key closes the modal — either the native <dialog> element handles Escape automatically (when .showModal() is used) OR a keydown handler for Escape calls the close function. modal shouldn't close if interacting with another component inside the modal that also uses the escape key - such as closing a dropdown",
+        "Focus moves into the modal when it opens — either .showModal() moves focus automatically OR .focus() is called on an element inside the modal in the open function",
+        "Focus returns to the trigger button when the modal closes — either the browser restores focus automatically (native <dialog> behavior) OR .focus() is called on the trigger in the close function",
+        "When the modal opens, elements outside the modal get the inert attribute set to true OR get aria-hidden=\"true\"",
+        "The email input retains the required attribute or has aria-required=\"true\" added"
+      ],
+      "files": ["evals/fixtures/eval-9-modal.html"]
+    },
+    {
+      "id": 10,
+      "eval_name": "accordion-fix",
+      "prompt": "This accordion-style form works with mouse clicks but has accessibility issues. Fix them.",
+      "assertions": [
+        "Section header divs are replaced with <button> elements",
+        "Section header buttons are wrapped in heading elements (h2, h3, etc.) OR have role=\"heading\" with aria-level attribute",
+        "Each button has an aria-expanded attribute set to \"true\" or \"false\"",
+        "Each button has an aria-controls attribute whose value matches the id of the corresponding content panel",
+        "Each content panel has an id attribute that matches its header's aria-controls value",
+        "Enter and Space keys toggle sections (native button behavior or explicit keydown handler)",
+        "All form fields in expanded sections are reachable via Tab (no tabindex=-1 on visible inputs)",
+        "All inputs have associated <label> elements (via for/id pairing or wrapping)",
+        "Section header buttons have a :focus or :focus-visible CSS rule with a visible outline",
+        "Hidden panels use the hidden attribute or display:none (not visibility:hidden or opacity:0)"
+      ],
+      "files": ["evals/fixtures/eval-10-accordion-form.html"]
+    },
+    {
+      "id": 11,
+      "eval_name": "canvas-create",
+      "prompt": "Create a simple flowchart editor with:\n- A canvas area where nodes can be placed\n- Ability to add new nodes (Process, Decision, End)\n- Nodes can be connected with arrows\n- Nodes can be moved around the canvas\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "The canvas area uses an ARIA tree or list structure (role=\"tree\" or role=\"list\") for representing nodes",
+        "Each node has an accessible name that includes its type and label (e.g. \"Process: Start\")",
+        "Node position information is conveyed in the accessible name or description (row/column or pixel coordinates)",
+        "Connection information is available in the node's accessible description (e.g. \"connected to Decision node\")",
+        "Arrow keys navigate between nodes",
+        "Enter opens node actions or a toolbar for the focused node",
+        "A keyboard-activated move mode exists where arrow keys reposition the node, Enter confirms, Escape cancels",
+        "Escape returns to the previous navigation layer (e.g. from within-node to canvas level)",
+        "A keyboard-accessible way to add new nodes exists (button or menu)",
+        "A palette or menu allows selecting node type (Process, Decision, End) via keyboard",
+        "A visually hidden region that is associated with aria-describedby back to each node announces the nodes adjacencies (e.g. \"Process: Start, connected to Decision: Check\")",
+        "A live region announces mode changes (e.g. \"Move mode activated\")",
+        "A live region announces movement results (e.g. \"Moved to row 2, column 3\")",
+        "A visible focus indicator is present on nodes"
+      ],
+      "files": []
+    },
+    {
+      "id": 12,
+      "eval_name": "dashboard-reflow",
+      "prompt": "Create a dashboard with:\n- A sidebar navigation with 5 menu items\n- A main content area with 4 metric cards in a 2x2 grid\n- A data table showing recent activity (5 rows of sample data)\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "A @media query exists that transforms the sidebar (to drawer, hamburger menu, or horizontal nav) below approximately 640px",
+        "No element has position:sticky applied at viewport widths below 640px (either no sticky at all, or a @media query removes it)",
+        "The card grid stacks to a single column at 320px via a @media query or inherent flex-wrap",
+        "The data table is inside a container with overflow-x:auto OR a @media query transforms it to a card layout at narrow widths",
+        "All content is accessible without horizontal scrolling at 320px",
+        "No nested scroll regions exist (except the table overflow container if using horizontal scroll)",
+        "The navigation uses a <nav> element with an aria-label or aria-labelledby attribute",
+        "A <main> element is used for the primary content area",
+        "Interactive elements (links, buttons) have minimum target dimensions of 24x24px"
+      ],
+      "files": []
+    },
+    {
+      "id": 13,
+      "eval_name": "feedback-pattern",
+      "prompt": "Create a settings page where users can:\n- Toggle a dark mode switch\n- Change notification frequency (dropdown)\n- Save changes with a Save button\n- Delete their account with a Delete Account button (requires confirmation)\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "The dark mode toggle has role=\"switch\" attribute on the interactive element, or uses a native checkbox",
+        "if using ARIA, The dark mode toggle has aria-checked attribute that toggles between \"true\" and \"false\"",
+        "The toggle announces its new state via a live region or the button's accessible name (e.g. \"Dark mode on\")",
+        "The notification frequency control uses a native <select> element OR is an accessible ARIA combobox.",
+        "A selection change on the notification dropdown is announced",
+        "The save button click handler announces a result (e.g. \"Settings saved\") via a live region",
+        "An element with aria-live=\"polite\" or role=\"status\" exists in the DOM for action feedback",
+        "The Delete Account button opens a confirmation dialog",
+        "The confirmation dialog has role=\"alertdialog\" attribute (not just role=\"dialog\")",
+        "When the confirmation dialog opens, .focus() is called on an element inside the dialog",
+        "A keydown handler traps focus within the confirmation dialog (Tab cycles between focusable elements)",
+        "The cancel button handler calls .focus() on the Delete Account button to restore focus",
+        "The confirm action updates an aria-live element or navigates away with announcement",
+        "All user actions have visible or non-visual (live region) feedback"
+      ],
+      "files": []
+    },
+    {
+      "id": 14,
+      "eval_name": "inline-validation",
+      "prompt": "Create a registration form with:\n- Username (required, min 3 characters)\n- Email (required, valid format)\n- Password (required, min 8 characters, must contain number)\n- Confirm Password (must match)\n- Inline validation that shows errors as user types/blurs\n\nThe component must be a complete, self-contained HTML file with all CSS and JavaScript inline. Keep the implementation concise.",
+      "assertions": [
+        "Each input has a visible <label> element (not just placeholder text)",
+        "Each <label> is associated with its input via for/id attribute pairing or by wrapping the input",
+        "Each input has the required attribute or aria-required=\"true\"",
+        "A visual required indicator exists (asterisk character or the word \"required\" near the label)",
+        "The validation logic sets aria-invalid=\"true\" on inputs that fail validation",
+        "Each error message element has a unique id and is linked to its input via aria-describedby attribute",
+        "Error message ids are unique across all fields",
+        "Errors are announced via an aria-live=\"polite\" element on blur events",
+        "Password requirements text is visible in the DOM before or alongside the password input (not only shown on error)",
+        "The password requirements text element is linked to the password input via aria-describedby",
+        "An error summary is shown or the first invalid field is focused on form submit failure",
+        "Focus is moved to the error summary or first invalid field on submit failure",
+        "On successful form submission, text content is updated on an aria-live element to announce success",
+        "The form uses relative/percentage widths so labels appear above inputs and content does not overflow at 320px"
+      ],
+      "files": []
+    }
+  ]
+}

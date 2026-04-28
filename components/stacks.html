@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacks — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Stack — click-to-cycle card deck
+       Click a peeking card → surfaces to front, front goes back
+       Click × on front card → permanently dismiss
+    -------------------------------------------------------- */
+
+    .stack {
+      position: relative;
+      height: 104px;
+    }
+
+    .stack__slot {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition:
+        top 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 220ms ease;
+      will-change: transform, top;
+    }
+
+    /* Positions */
+    .stack__slot[data-pos="0"] { top: 0;    z-index: 3; transform: scaleX(1);    opacity: 1; transform-origin: center top; }
+    .stack__slot[data-pos="1"] { top: 17px; z-index: 2; transform: scaleX(0.96); opacity: 1; transform-origin: center top; cursor: pointer; }
+    .stack__slot[data-pos="2"] { top: 34px; z-index: 1; transform: scaleX(0.92); opacity: 1; transform-origin: center top; cursor: pointer; }
+
+    /* Entering from behind — no transition, then animated to pos 2 */
+    .stack__slot[data-pos="entering"] {
+      top: 50px; z-index: 0;
+      transform: scaleX(0.88); opacity: 0;
+      transform-origin: center top;
+      transition: none;
+      pointer-events: none;
+    }
+
+    /* Cycling — force to back during transition so it goes behind others */
+    .stack__slot[data-cycling] { z-index: 0 !important; }
+
+    /* Dismiss exit */
+    .stack__slot[data-pos="exit"] {
+      z-index: 5;
+      transform: translateX(110%) rotate(14deg) !important;
+      opacity: 0;
+      transition: transform 280ms ease-in, opacity 240ms ease-in !important;
+      pointer-events: none;
+    }
+
+    /* Hidden — used when deck shrinks below 3 */
+    .stack__slot[data-pos="hidden"] {
+      opacity: 0; pointer-events: none; z-index: 0; transition: none;
+    }
+
+    /* Hover cue on peeking cards */
+    .stack__slot[data-pos="1"]:hover .stack__slot-inner,
+    .stack__slot[data-pos="2"]:hover .stack__slot-inner {
+      border-color: var(--border-default);
+    }
+
+    /* Slot inner */
+    .stack__slot-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      padding: 0 14px 0 20px;
+      gap: 12px;
+      transition: border-color var(--transition-fast);
+    }
+    .stack__slot[data-pos="1"] .stack__slot-inner { background: var(--bg-secondary); }
+    .stack__slot[data-pos="2"] .stack__slot-inner { background: var(--bg-tertiary); }
+
+    /* × dismiss button — only visible/interactive when card is at pos 0 */
+    .card-dismiss {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      opacity: 0;
+      pointer-events: none;
+      transition: background var(--transition-fast), border-color var(--transition-fast),
+                  color var(--transition-fast), opacity var(--transition-fast);
+    }
+    .stack__slot[data-pos="0"] .card-dismiss {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .card-dismiss:hover {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+    .card-dismiss [data-icon] { width: 10px; height: 10px; pointer-events: none; }
+
+    /* Card row content */
+    .demo-row { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .demo-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--color-primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: var(--font-weight-semibold);
+      flex-shrink: 0;
+    }
+    .demo-text { flex: 1; min-width: 0; }
+    .demo-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .demo-sub { font-size: 11px; color: var(--text-tertiary); }
+    .demo-badge {
+      flex-shrink: 0; height: 20px; padding: 0 8px;
+      border-radius: 9999px; font-size: 11px;
+      display: flex; align-items: center;
+    }
+    .demo-badge--error   { background: #fde8e6; color: #c0392b; }
+    .demo-badge--warning { background: #fef3c7; color: #8a5b00; }
+    .demo-badge--success { background: #d1f0df; color: #1a6b3c; }
+
+    /* Footer */
+    .stack-footer {
+      display: flex; align-items: center; justify-content: flex-end;
+      margin-top: var(--space-3);
+    }
+    .stack-count { font-size: 11px; color: var(--text-tertiary); }
+
+    /* Empty state */
+    .stack-empty {
+      height: 104px;
+      display: none;
+      align-items: center; justify-content: center; gap: 8px;
+      border: 1.5px dashed var(--border-default);
+      border-radius: var(--radius-xl);
+      font-size: var(--font-size-xs); color: var(--text-tertiary);
+    }
+    .stack-empty.is-visible { display: flex; }
+    .stack-empty [data-icon] { width: 14px; height: 14px; opacity: 0.4; }
+
+    /* Showcase */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-tertiary); margin-bottom: var(--space-4);
+    }
+    .showcase-card {
+      background: var(--bg-primary); border-radius: var(--radius-xl);
+      padding: var(--space-8); border: 1px solid var(--border-subtle);
+    }
+    .hint-text { font-size: 11px; color: var(--text-tertiary); margin-bottom: var(--space-6); }
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+    <div class="showcase-card">
+      <p class="section-title">Interactive Stack</p>
+      <div style="max-width: 620px;">
+        <p class="hint-text">Click the card peeking behind to bring it to the front · click × to dismiss</p>
+
+        <div class="stack" id="mainStack">
+          <div class="stack__slot" data-slot="0">
+            <div class="stack__slot-inner">
+              <div class="demo-row"></div>
+              <button class="card-dismiss" aria-label="Dismiss"><span data-icon="close"></span></button>
+            </div>
+          </div>
+          <div class="stack__slot" data-slot="1">
+            <div class="stack__slot-inner">
+              <div class="demo-row"></div>
+              <button class="card-dismiss" aria-label="Dismiss"><span data-icon="close"></span></button>
+            </div>
+          </div>
+          <div class="stack__slot" data-slot="2">
+            <div class="stack__slot-inner">
+              <div class="demo-row"></div>
+              <button class="card-dismiss" aria-label="Dismiss"><span data-icon="close"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack-empty" id="stackEmpty">
+          <span data-icon="check-circle"></span>
+          All cards dismissed
+        </div>
+
+        <div class="stack-footer">
+          <span class="stack-count" id="stackCount"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Data ─────────────────────────────────────────────────────────────── */
+    let deck = [
+      { id: 'INC0045621', title: 'Network outage in Building A',  sub: 'Debashish Sahu · 2h ago',  badge: 'P1 Critical', bCls: 'error',   av: 'DS', ac: '#0e4e69' },
+      { id: 'INC0045619', title: 'VPN connectivity issues',        sub: 'Alex Kim · 4h ago',          badge: 'P2 High',     bCls: 'warning', av: 'AK', ac: '#d97706' },
+      { id: 'INC0045610', title: 'Printer offline in Floor 3',     sub: 'Maria Jones · Yesterday',    badge: 'P3 Medium',   bCls: 'success', av: 'MJ', ac: '#16a34a' },
+      { id: 'INC0045604', title: 'Email service intermittent',     sub: 'Priya Shah · 6h ago',        badge: 'P2 High',     bCls: 'warning', av: 'PS', ac: '#7c3aed' },
+      { id: 'INC0045598', title: 'DB backup failed on Node 4',     sub: 'Tom Reid · 8h ago',          badge: 'P1 Critical', bCls: 'error',   av: 'TR', ac: '#dc2626' },
+    ];
+
+    /* ── State ────────────────────────────────────────────────────────────── */
+    let head        = 0;   // index in deck[] of card at pos 0
+    let isAnimating = false;
+    const stackEl   = document.getElementById('mainStack');
+    const slots     = Array.from(stackEl.querySelectorAll('.stack__slot'));
+    // slotOrder[logicalPos] = physical slot index (0-2)
+    let slotOrder = [0, 1, 2];
+
+    /* ── Helpers ─────────────────────────────────────────────────────────── */
+    function setPos(physIdx, pos) {
+      slots[physIdx].dataset.pos = pos;
+    }
+
+    function renderCard(physIdx, item) {
+      slots[physIdx].querySelector('.demo-row').innerHTML = `
+        <div class="demo-avatar" style="background:${item.ac}">${item.av}</div>
+        <div class="demo-text">
+          <div class="demo-title">${item.id} — ${item.title}</div>
+          <div class="demo-sub">${item.sub}</div>
+        </div>
+        <span class="demo-badge demo-badge--${item.bCls}">${item.badge}</span>
+      `;
+      Horizon.initIcons(slots[physIdx]);
+    }
+
+    function updateCount() {
+      document.getElementById('stackCount').textContent =
+        deck.length > 0 ? `${deck.length} card${deck.length !== 1 ? 's' : ''} in queue` : '';
+    }
+
+    function showEmpty() {
+      stackEl.style.visibility = 'hidden';
+      document.getElementById('stackEmpty').classList.add('is-visible');
+      updateCount();
+    }
+
+    /* ── Init ────────────────────────────────────────────────────────────── */
+    function init() {
+      const visible = Math.min(deck.length, 3);
+      for (let i = 0; i < 3; i++) {
+        if (i < visible) {
+          setPos(i, String(i));
+          renderCard(i, deck[i]);
+        } else {
+          setPos(i, 'hidden');
+        }
+      }
+      updateCount();
+      Horizon.initIcons();
+    }
+
+    /* ── Cycle ───────────────────────────────────────────────────────────── */
+    // Front card goes to back; next card surfaces to front.
+    function cycle() {
+      if (isAnimating || deck.length < 2) return;
+      isAnimating = true;
+
+      const frontPhys = slotOrder[0];
+      const midPhys   = slotOrder[1];
+      const backPhys  = slotOrder[2];
+
+      head = (head + 1) % deck.length;
+
+      if (deck.length === 2) {
+        // Only 2 cards: swap front ↔ mid (no back slot)
+        slots[frontPhys].dataset.cycling = 'true';
+        setPos(frontPhys, '1');
+        setPos(midPhys, '0');
+        slotOrder = [midPhys, frontPhys, backPhys];
+        setTimeout(() => {
+          delete slots[frontPhys].dataset.cycling;
+          isAnimating = false;
+        }, 270);
+        return;
+      }
+
+      // 3+ cards: front sinks to back, mid rises to front, back shifts to mid
+      slots[frontPhys].dataset.cycling = 'true';
+      setPos(frontPhys, '2');
+      if (slots[midPhys].dataset.pos  === '1') setPos(midPhys,  '0');
+      if (slots[backPhys].dataset.pos === '2') setPos(backPhys, '1');
+      slotOrder = [midPhys, backPhys, frontPhys];
+
+      setTimeout(() => {
+        delete slots[frontPhys].dataset.cycling;
+        // If deck is larger than 3, update the back slot with new content
+        if (deck.length > 3) {
+          renderCard(frontPhys, deck[(head + 2) % deck.length]);
+          setPos(frontPhys, 'entering');
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            setPos(frontPhys, '2');
+            isAnimating = false;
+          }));
+        } else {
+          isAnimating = false;
+        }
+      }, 270);
+    }
+
+    /* ── Dismiss ─────────────────────────────────────────────────────────── */
+    // Permanently remove the front card from the deck.
+    function dismiss() {
+      if (isAnimating || deck.length === 0) return;
+      isAnimating = true;
+
+      const frontPhys = slotOrder[0];
+      const midPhys   = slotOrder[1];
+      const backPhys  = slotOrder[2];
+
+      setPos(frontPhys, 'exit');
+      if (slots[midPhys].dataset.pos  === '1') setPos(midPhys,  '0');
+      if (slots[backPhys].dataset.pos === '2') setPos(backPhys, '1');
+
+      deck.splice(head, 1);
+      if (deck.length > 0 && head >= deck.length) head = 0;
+
+      slotOrder = [midPhys, backPhys, frontPhys];
+
+      setTimeout(() => {
+        if (deck.length === 0) {
+          setPos(frontPhys, 'hidden');
+          showEmpty();
+        } else if (deck.length >= 3) {
+          // Load next card into the recycled slot at back
+          renderCard(frontPhys, deck[(head + 2) % deck.length]);
+          setPos(frontPhys, 'entering');
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            setPos(frontPhys, '2');
+          }));
+        } else {
+          // 1 or 2 cards left — just hide the recycled slot
+          setPos(frontPhys, 'hidden');
+          if (deck.length === 1) setPos(slotOrder[1], 'hidden');
+        }
+        updateCount();
+        isAnimating = false;
+      }, 295);
+
+      updateCount();
+    }
+
+    /* ── Events ──────────────────────────────────────────────────────────── */
+    stackEl.addEventListener('click', (e) => {
+      // × button → dismiss
+      if (e.target.closest('.card-dismiss')) {
+        dismiss();
+        return;
+      }
+      // Click outside the front card's area → cycle
+      const frontSlot = slots[slotOrder[0]];
+      if (!frontSlot.contains(e.target)) {
+        cycle();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+</body>
+</html>
