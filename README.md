@@ -1,6 +1,6 @@
 # Horizon 2.0 — Prototype Boilerplate
 
-_Last updated: 2026-03-30_
+_Last updated: 2026-04-20_
 
 A boilerplate for UX designers to generate working HTML/CSS prototypes from Figma designs using Claude in VS Code.
 
