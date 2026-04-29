@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget Shell — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Copied verbatim from button-iconic.html — base + neutral + primary + md
+    -------------------------------------------------------- */
+    .btn-iconic {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius-field);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), opacity var(--transition-fast);
+    }
+    .btn-iconic:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    .btn-iconic svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn-iconic [data-icon]     { width: 20px; height: 20px; }
+    .btn-iconic [data-icon] svg { width: 20px; height: 20px; display: block; }
+
+    .btn-iconic.btn-neutral { background-color: var(--bg-inverted, #171614); color: #ffffff; }
+    .btn-iconic.btn-neutral:hover  { background-color: #2a2926; }
+
+    .btn-iconic.btn-primary { background-color: var(--color-primary); color: #ffffff; }
+    .btn-iconic.btn-primary:hover  { background-color: var(--color-primary-hover); }
+
+    /* --------------------------------------------------------
+       Widget Shell
+       375×322px container. 5 states via modifier classes.
+    -------------------------------------------------------- */
+    .widget-shell {
+      position: relative;
+      width: 375px;
+      height: 322px;
+      border-radius: var(--radius-box);
+      overflow: visible; /* corners extend beyond bounds */
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+
+    /* Slot — fills the shell, clips widget content */
+    .widget-shell__slot {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-box);
+      overflow: hidden;
+    }
+
+    /* ── State: default — no chrome, just the slot ── */
+    /* (no extra styles) */
+
+    /* ── State: edit — dashed dark border + dark close btn ── */
+    .widget-shell--edit {
+      border: 2px dashed var(--color-primary);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+
+    /* ── State: hover — dashed dark border + medium shadow + primary close btn ── */
+    .widget-shell--hover {
+      border: 2px dashed var(--color-primary);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+
+    /* ── State: pressed — solid border + large shadow ── */
+    .widget-shell--pressed {
+      border: 2px solid var(--color-primary);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+
+    /* ── State: blank — grey placeholder, no content ── */
+    .widget-shell--blank .widget-shell__slot {
+      background: var(--color-secondary, #e3e2df);
+    }
+
+    /* ── Close button — absolute top-right ── */
+    .widget-shell__close {
+      position: absolute;
+      top: 11px;
+      right: 11px;
+      z-index: 10;
+    }
+
+    /* ── Corner resize handles — bottom-left and bottom-right ── */
+    .widget-shell__corner {
+      position: absolute;
+      bottom: -2px;
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+    }
+    .widget-shell__corner--bl {
+      left: -2px;
+      border-bottom: 2px solid var(--color-primary);
+      border-left: 2px solid var(--color-primary);
+      border-bottom-left-radius: var(--radius-lg);
+    }
+    .widget-shell__corner--br {
+      right: -2px;
+      border-bottom: 2px solid var(--color-primary);
+      border-right: 2px solid var(--color-primary);
+      border-bottom-right-radius: var(--radius-lg);
+    }
+
+    /* ── Slot placeholder (shown in default/edit/hover/pressed) ── */
+    .widget-placeholder {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-disabled);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+    }
+
+    /* ── Close btn + corners hidden by default in dashboard ── */
+    .widget-dashboard .widget-shell__close,
+    .widget-dashboard .widget-shell__corner { display: none; }
+
+    /* ── Edit mode: show chrome on all shells ── */
+    .widget-dashboard.is-edit-mode .widget-shell:not(.widget-shell--blank) {
+      border: 2px dashed var(--color-primary);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+    .widget-dashboard.is-edit-mode .widget-shell:not(.widget-shell--blank) .widget-shell__corner { display: block; }
+    .widget-dashboard.is-edit-mode .widget-shell:not(.widget-shell--blank) .widget-shell__close  { display: inline-flex; }
+
+    /* ── Hover state within edit mode ── */
+    .widget-dashboard.is-edit-mode .widget-shell.is-hovered:not(.widget-shell--blank) {
+      border: 2px dashed var(--color-primary);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+
+    /* ── Pressed state within edit mode ── */
+    .widget-dashboard.is-edit-mode .widget-shell.is-pressed:not(.widget-shell--blank) {
+      border: 2px solid var(--color-primary);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+
+    /* ── Blank transition ── */
+    .widget-shell--blank .widget-shell__slot {
+      background: var(--color-secondary, #e3e2df);
+      transition: background 0.2s ease;
+    }
+
+    /* ── Drag states ── */
+    .widget-dashboard.is-edit-mode .widget-shell:not(.widget-shell--blank) { cursor: grab; }
+    .widget-shell.is-dragging { opacity: 0.35; cursor: grabbing; }
+    .widget-shell.is-drag-over:not(.is-dragging) {
+      outline: 2px dashed var(--color-primary);
+      outline-offset: 4px;
+    }
+
+    /* ── Dashboard grid ── */
+    .widget-dashboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .widget-dashboard .widget-shell {
+      width: 100%;
+      height: 322px;
+    }
+
+    /* ── Dashboard toolbar ── */
+    .dashboard-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+    }
+    .dashboard-toolbar__hint {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .dashboard-toolbar__hint.is-visible { opacity: 1; }
+
+    /* ── Edit layout button ── */
+    .btn-edit-layout {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-primary);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+    .btn-edit-layout:hover { background: var(--bg-secondary); }
+    .btn-edit-layout.is-active {
+      background: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+    .btn-edit-layout [data-icon]     { width: 14px; height: 14px; }
+    .btn-edit-layout [data-icon] svg { width: 14px; height: 14px; display: block; }
+
+    /* ── Mini widget content ── */
+    .mini-widget {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.06);
+    }
+    .mini-widget__header {
+      display: flex;
+      align-items: center;
+      padding: 16px 16px 0 24px;
+      flex-shrink: 0;
+    }
+    .mini-widget__title {
+      flex: 1;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 24px;
+    }
+    .mini-widget__body {
+      flex: 1;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+    /* Skeleton rows for mini widget preview */
+    .mini-row {
+      height: 52px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      flex-shrink: 0;
+    }
+    .mini-row--sm { height: 36px; }
+    .mini-row--xs { height: 20px; border-radius: var(--radius-lg); }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      flex: 1;
+    }
+    .mini-cell {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+    }
+    .mini-app-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr 1fr;
+      gap: 4px;
+      flex: 1;
+    }
+    .mini-app {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-2xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mini-app-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-xl);
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .states-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      align-items: flex-start;
+    }
+    .state-col  { display: flex; flex-direction: column; gap: var(--space-3); }
+    .state-label {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">Widget Shell — Edit Mode States</p>
+  <div class="states-row">
+
+    <!-- Default — clean slot, no chrome -->
+    <div class="state-col">
+      <span class="state-label">Default</span>
+      <div class="widget-shell">
+        <div class="widget-shell__slot">
+          <div class="widget-placeholder">Widget content</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit — dashed border + dark close button + corners -->
+    <div class="state-col">
+      <span class="state-label">Edit</span>
+      <div class="widget-shell widget-shell--edit">
+        <div class="widget-shell__slot">
+          <div class="widget-placeholder">Widget content</div>
+        </div>
+        <button class="btn-iconic btn-neutral widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+    </div>
+
+    <!-- Hover — dashed border + primary close button + corners -->
+    <div class="state-col">
+      <span class="state-label">Hover</span>
+      <div class="widget-shell widget-shell--hover">
+        <div class="widget-shell__slot">
+          <div class="widget-placeholder">Widget content</div>
+        </div>
+        <button class="btn-iconic btn-primary widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+    </div>
+
+    <!-- Pressed — solid border + large shadow + corners -->
+    <div class="state-col">
+      <span class="state-label">Pressed</span>
+      <div class="widget-shell widget-shell--pressed">
+        <div class="widget-shell__slot">
+          <div class="widget-placeholder">Widget content</div>
+        </div>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+    </div>
+
+    <!-- Blank — empty slot placeholder -->
+    <div class="state-col">
+      <span class="state-label">Blank</span>
+      <div class="widget-shell widget-shell--blank">
+        <div class="widget-shell__slot"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Interactive Dashboard Demo ── -->
+  <div>
+    <p class="section-title">Widget Dashboard — Interactive Demo</p>
+
+    <div class="dashboard-toolbar">
+      <span style="font-family:var(--font-sans);font-size:var(--font-size-sm);color:var(--text-primary);font-weight:var(--font-weight-semibold);">My Dashboard</span>
+      <span class="dashboard-toolbar__hint" id="editHint">Drag to reorder · Click × to remove</span>
+      <button class="btn-edit-layout" id="btnEditLayout">
+        <span data-icon="sliders"></span>
+        <span id="btnEditLabel">Edit layout</span>
+      </button>
+    </div>
+
+    <div class="widget-dashboard" id="widgetDashboard">
+
+      <!-- Widget 1 — Requests -->
+      <div class="widget-shell">
+        <div class="widget-shell__slot">
+          <div class="mini-widget">
+            <div class="mini-widget__header">
+              <span class="mini-widget__title">Requests</span>
+            </div>
+            <div class="mini-widget__body">
+              <div class="mini-row"></div>
+              <div class="mini-row"></div>
+              <div class="mini-row--sm"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-iconic btn-neutral widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+
+      <!-- Widget 2 — Quick links -->
+      <div class="widget-shell">
+        <div class="widget-shell__slot">
+          <div class="mini-widget">
+            <div class="mini-widget__header">
+              <span class="mini-widget__title">Quick links</span>
+            </div>
+            <div class="mini-widget__body">
+              <div class="mini-grid">
+                <div class="mini-cell"></div>
+                <div class="mini-cell"></div>
+                <div class="mini-cell"></div>
+                <div class="mini-cell"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-iconic btn-neutral widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+
+      <!-- Widget 3 — Featured apps -->
+      <div class="widget-shell">
+        <div class="widget-shell__slot">
+          <div class="mini-widget">
+            <div class="mini-widget__header">
+              <span class="mini-widget__title">Featured apps</span>
+            </div>
+            <div class="mini-widget__body">
+              <div class="mini-app-grid">
+                <div class="mini-app"><div class="mini-app-dot" style="background:#0072c6;"></div></div>
+                <div class="mini-app"><div class="mini-app-dot" style="background:#005cb9;"></div></div>
+                <div class="mini-app"><div class="mini-app-dot" style="background:#2d8cff;"></div></div>
+                <div class="mini-app"><div class="mini-app-dot" style="background:#6264a7;"></div></div>
+                <div class="mini-app"><div class="mini-app-dot" style="background:#00724d;"></div></div>
+                <div class="mini-app"><div class="mini-app-dot" style="background:#d31245;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-iconic btn-neutral widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+
+      <!-- Widget 4 — Popular content -->
+      <div class="widget-shell">
+        <div class="widget-shell__slot">
+          <div class="mini-widget">
+            <div class="mini-widget__header">
+              <span class="mini-widget__title">Popular content</span>
+            </div>
+            <div class="mini-widget__body">
+              <div class="mini-row--xs"></div>
+              <div class="mini-row--xs"></div>
+              <div class="mini-row--xs"></div>
+              <div class="mini-row--xs"></div>
+              <div class="mini-row--xs"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-iconic btn-neutral widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+
+      <!-- Widget 5 — Recent conversations -->
+      <div class="widget-shell">
+        <div class="widget-shell__slot">
+          <div class="mini-widget">
+            <div class="mini-widget__header">
+              <span class="mini-widget__title">Recent conversations</span>
+            </div>
+            <div class="mini-widget__body">
+              <div class="mini-row--sm"></div>
+              <div class="mini-row--sm"></div>
+              <div class="mini-row--sm"></div>
+              <div class="mini-row--sm"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-iconic btn-neutral widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+
+      <!-- Widget 6 — Blank slot -->
+      <div class="widget-shell widget-shell--blank">
+        <div class="widget-shell__slot"></div>
+        <button class="btn-iconic btn-neutral widget-shell__close" aria-label="Remove widget">
+          <span data-icon="close"></span>
+        </button>
+        <div class="widget-shell__corner widget-shell__corner--bl"></div>
+        <div class="widget-shell__corner widget-shell__corner--br"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+
+    const dashboard = document.getElementById('widgetDashboard');
+    const btnEdit   = document.getElementById('btnEditLayout');
+    const btnLabel  = document.getElementById('btnEditLabel');
+    const hint      = document.getElementById('editHint');
+
+    let draggedShell = null;
+
+    /* ── Edit mode toggle ── */
+    btnEdit.addEventListener('click', () => {
+      const active = dashboard.classList.toggle('is-edit-mode');
+      btnEdit.classList.toggle('is-active', active);
+      btnLabel.textContent = active ? 'Done' : 'Edit layout';
+      hint.classList.toggle('is-visible', active);
+
+      shells().forEach(shell => {
+        shell.setAttribute('draggable', active && !shell.classList.contains('widget-shell--blank') ? 'true' : 'false');
+        if (!active) {
+          shell.classList.remove('is-hovered', 'is-pressed', 'is-dragging', 'is-drag-over');
+          resetCloseBtn(shell);
+        }
+      });
+    });
+
+    /* ── Per-shell interactions ── */
+    dashboard.addEventListener('mouseenter', (e) => {
+      const shell = e.target.closest('.widget-shell');
+      if (!shell || !inEditMode() || isBlank(shell)) return;
+      shell.classList.add('is-hovered');
+      setCloseBtn(shell, 'primary');
+    }, true);
+
+    dashboard.addEventListener('mouseleave', (e) => {
+      const shell = e.target.closest('.widget-shell');
+      if (!shell) return;
+      shell.classList.remove('is-hovered', 'is-pressed');
+      resetCloseBtn(shell);
+    }, true);
+
+    dashboard.addEventListener('mousedown', (e) => {
+      const shell = e.target.closest('.widget-shell');
+      if (!shell || !inEditMode() || isBlank(shell)) return;
+      if (e.target.closest('.widget-shell__close')) return;
+      shell.classList.remove('is-hovered');
+      shell.classList.add('is-pressed');
+    });
+
+    dashboard.addEventListener('mouseup', (e) => {
+      const shell = e.target.closest('.widget-shell');
+      if (!shell || !inEditMode()) return;
+      shell.classList.remove('is-pressed');
+      if (!isBlank(shell)) shell.classList.add('is-hovered');
+    });
+
+    /* Close buttons */
+    dashboard.addEventListener('click', (e) => {
+      const btn = e.target.closest('.widget-shell__close');
+      if (!btn) return;
+      const shell = btn.closest('.widget-shell');
+      shell.classList.remove('is-hovered', 'is-pressed');
+      shell.classList.add('widget-shell--blank');
+      shell.setAttribute('draggable', 'false');
+      resetCloseBtn(shell);
+    });
+
+    /* ── Drag-and-drop reorder ── */
+    dashboard.addEventListener('dragstart', (e) => {
+      const shell = e.target.closest('.widget-shell');
+      if (!shell || !inEditMode() || isBlank(shell)) { e.preventDefault(); return; }
+      draggedShell = shell;
+      shell.classList.add('is-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      /* Without a tiny delay the ghost image captures the opacity:0.35 state */
+      requestAnimationFrame(() => shell.classList.add('is-dragging'));
+    });
+
+    dashboard.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const shell = e.target.closest('.widget-shell');
+      if (!shell || shell === draggedShell) return;
+      /* Clear previous drag-over highlight */
+      shells().forEach(s => s !== shell && s.classList.remove('is-drag-over'));
+      shell.classList.add('is-drag-over');
+    });
+
+    dashboard.addEventListener('dragleave', (e) => {
+      const shell = e.target.closest('.widget-shell');
+      if (shell && !shell.contains(e.relatedTarget)) shell.classList.remove('is-drag-over');
+    });
+
+    dashboard.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const target = e.target.closest('.widget-shell');
+      if (!target || !draggedShell || target === draggedShell) return;
+
+      /* Swap positions by exchanging next siblings */
+      const allShells = shells();
+      const fromIdx   = allShells.indexOf(draggedShell);
+      const toIdx     = allShells.indexOf(target);
+
+      if (fromIdx < toIdx) {
+        dashboard.insertBefore(draggedShell, target.nextSibling);
+      } else {
+        dashboard.insertBefore(draggedShell, target);
+      }
+
+      cleanup();
+    });
+
+    dashboard.addEventListener('dragend', () => cleanup());
+
+    /* ── Helpers ── */
+    function shells()    { return [...dashboard.querySelectorAll('.widget-shell')]; }
+    function inEditMode(){ return dashboard.classList.contains('is-edit-mode'); }
+    function isBlank(s)  { return s.classList.contains('widget-shell--blank'); }
+
+    function cleanup() {
+      shells().forEach(s => s.classList.remove('is-dragging', 'is-drag-over'));
+      draggedShell = null;
+    }
+
+    function setCloseBtn(shell, variant) {
+      const btn = shell.querySelector('.widget-shell__close');
+      if (!btn) return;
+      btn.classList.toggle('btn-primary', variant === 'primary');
+      btn.classList.toggle('btn-neutral',  variant !== 'primary');
+    }
+
+    function resetCloseBtn(shell) { setCloseBtn(shell, 'neutral'); }
+  });
+</script>
+
+</body>
+</html>

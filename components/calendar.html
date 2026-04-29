@@ -125,7 +125,7 @@
       font-family: var(--font-sans);
       font-size: 11px;
       color: var(--text-primary);
-      border-radius: 8px;
+      border-radius: var(--radius-lg);
       cursor: pointer;
       transition: background-color var(--transition-fast);
     }
@@ -142,20 +142,20 @@
     .cal__day--selected {
       background-color: var(--color-primary, #0e4e69) !important;
       color: white !important;
-      border-radius: 8px;
+      border-radius: var(--radius-lg);
     }
 
     /* Range start / end */
     .cal__day--range-start {
       background-color: var(--color-primary, #0e4e69) !important;
       color: white !important;
-      border-radius: 8px 0 0 8px;
+      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
     }
 
     .cal__day--range-end {
       background-color: var(--color-primary, #0e4e69) !important;
       color: white !important;
-      border-radius: 0 8px 8px 0;
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
     }
 
     /* Range middle (between start and end) */

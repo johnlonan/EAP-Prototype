@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History Card — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Copied verbatim from button.html — base + secondary + primary
+    -------------------------------------------------------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 16px;
+      height: 40px;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.8;
+      white-space: nowrap;
+      border: none;
+      border-radius: var(--radius-field);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: var(--color-primary-content);
+    }
+    .btn-primary:hover  { background-color: var(--color-primary-hover); }
+    .btn-primary:active { background-color: var(--color-primary-active); }
+    .btn-secondary {
+      background-color: var(--color-secondary);
+      color: var(--color-secondary-content);
+    }
+    .btn-secondary:hover  { background-color: var(--color-secondary-hover); }
+    .btn-secondary:active { background-color: var(--color-secondary-active); }
+
+    /* --------------------------------------------------------
+       Copied verbatim from tabs.html — base + boxed variant
+    -------------------------------------------------------- */
+    .tabs {
+      display: flex;
+      align-items: center;
+    }
+    .tab {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 1px 12px;
+      height: 40px;
+      border-radius: var(--radius-field) var(--radius-field) 0 0;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-tertiary);
+      cursor: pointer;
+      border: none;
+      background: none;
+      white-space: nowrap;
+      transition: color var(--transition-fast), background-color var(--transition-fast);
+    }
+    .tab:hover:not(.tab--active) { color: var(--text-primary); }
+    .tab--active { color: var(--text-primary); }
+    .tab--active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      border-radius: 9999px;
+      background-color: var(--text-primary);
+    }
+    .tabs--boxed {
+      background-color: #f9f8f6;
+      border: 1px solid var(--color-neutral-300);
+      padding: 4px;
+      border-radius: var(--radius-2xl);
+    }
+    .tabs--boxed .tab {
+      border-radius: var(--radius-field);
+    }
+    .tabs--boxed .tab--active::after { display: none; }
+    .tabs--boxed .tab--active {
+      background-color: var(--color-secondary);
+      color: var(--text-primary);
+    }
+    .tabs--boxed .tab:hover:not(.tab--active) {
+      background-color: var(--color-neutral-200);
+    }
+
+    /* --------------------------------------------------------
+       History Card
+       374×466px. Boxed tabs + timeline + footer buttons.
+    -------------------------------------------------------- */
+    .hc-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 2px -1px rgba(0,0,0,0.10);
+      width: 374px;
+      height: 466px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Content area */
+    .hc-card__content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    /* Full-width tabs */
+    .hc-card__content .tabs {
+      width: 100%;
+    }
+    .hc-card__content .tab {
+      flex: 1;
+      justify-content: center;
+    }
+
+    /* ── Timeline ── */
+    .hc-timeline {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hc-timeline-item {
+      display: flex;
+      flex-direction: row;
+      height: 91px;
+      flex-shrink: 0;
+    }
+
+    /* Left track: circle + connector line */
+    .hc-timeline-item__track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 2px;
+    }
+
+    /* Dark circle with check icon */
+    .hc-timeline-item__circle {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--bg-inverted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #ffffff;
+    }
+    .hc-timeline-item__circle [data-icon]     { width: 20px; height: 20px; }
+    .hc-timeline-item__circle [data-icon] svg { width: 20px; height: 20px; display: block; }
+
+    /* Vertical connector line */
+    .hc-timeline-item__line {
+      flex: 1;
+      width: 2px;
+      background: var(--border-default);
+      border-radius: var(--radius-full);
+      min-height: 4px;
+    }
+
+    /* Last item hides the connector */
+    .hc-timeline-item:last-child .hc-timeline-item__line {
+      display: none;
+    }
+
+    /* Content alongside the circle */
+    .hc-timeline-item__body {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .hc-timeline-item__title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+
+    .hc-timeline-item__text {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-base);
+      font-weight: 300;
+      color: var(--text-primary);
+      line-height: 24px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+
+    /* ── Footer ── */
+    .hc-card__footer {
+      padding: 16px;
+      flex-shrink: 0;
+      display: flex;
+      gap: 8px;
+    }
+    .hc-card__footer .btn {
+      flex: 1;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .cards-row { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-start; }
+    .card-col  { display: flex; flex-direction: column; gap: var(--space-2); }
+    .card-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">History Card</p>
+  <div class="cards-row">
+
+    <div class="card-col">
+      <span class="card-label">Default</span>
+      <div class="hc-card">
+
+        <div class="hc-card__content">
+
+          <!-- Boxed tabs -->
+          <div class="tabs tabs--boxed" role="tablist">
+            <button class="tab tab--active" role="tab">Updates</button>
+            <button class="tab" role="tab">History</button>
+          </div>
+
+          <!-- Timeline -->
+          <div class="hc-timeline">
+
+            <div class="hc-timeline-item">
+              <div class="hc-timeline-item__track">
+                <div class="hc-timeline-item__circle">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="hc-timeline-item__line"></div>
+              </div>
+              <div class="hc-timeline-item__body">
+                <p class="hc-timeline-item__title">Request submitted</p>
+                <p class="hc-timeline-item__text">Laptop replacement request raised for Sarah Johnson</p>
+              </div>
+            </div>
+
+            <div class="hc-timeline-item">
+              <div class="hc-timeline-item__track">
+                <div class="hc-timeline-item__circle">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="hc-timeline-item__line"></div>
+              </div>
+              <div class="hc-timeline-item__body">
+                <p class="hc-timeline-item__title">Assigned to IT team</p>
+                <p class="hc-timeline-item__text">Routed to IT Service Desk for hardware provisioning</p>
+              </div>
+            </div>
+
+            <div class="hc-timeline-item">
+              <div class="hc-timeline-item__track">
+                <div class="hc-timeline-item__circle">
+                  <span data-icon="check"></span>
+                </div>
+                <div class="hc-timeline-item__line"></div>
+              </div>
+              <div class="hc-timeline-item__body">
+                <p class="hc-timeline-item__title">Approved by manager</p>
+                <p class="hc-timeline-item__text">Hardware specs reviewed and approved, order placed</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="hc-card__footer">
+          <button class="btn btn-secondary">Button</button>
+          <button class="btn btn-primary">Button</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+  });
+</script>
+
+</body>
+</html>

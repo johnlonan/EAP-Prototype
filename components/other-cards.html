@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Other Cards (Promo) — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Promo Card
+       Two variants:
+         .promo-card--features — left icon sidebar + raised inner card
+         .promo-card            — simple, raised inner card only
+    -------------------------------------------------------- */
+    .promo-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 2px -1px rgba(0,0,0,0.10);
+      width: 375px;
+      height: 322px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* ── Feature sidebar (left column) ── */
+    .promo-card__sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      flex-shrink: 0;
+      align-self: stretch;
+      justify-content: flex-end;
+    }
+
+    /* 56px pill icon circle — raised bg */
+    .promo-card__icon-pill {
+      width: 56px;
+      height: 56px;
+      border-radius: 9999px;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .promo-card__icon-pill [data-icon]     { width: 24px; height: 24px; color: var(--text-primary); }
+    .promo-card__icon-pill [data-icon] svg { width: 24px; height: 24px; display: block; }
+
+    /* ── Content wrapper (right column or full-width) ── */
+    .promo-card__content-wrap {
+      flex: 1;
+      min-width: 0;
+      align-self: stretch;
+      padding: 8px 8px 8px 0; /* no left pad when sidebar present */
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Full-width when no sidebar */
+    .promo-card:not(.promo-card--features) .promo-card__content-wrap {
+      padding: 8px;
+    }
+
+    /* ── Inner raised card ── */
+    .promo-card__inner {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-3xl);
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* 56px white icon circle — sits at top of inner card */
+    .promo-card__featured-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 9999px;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .promo-card__featured-icon [data-icon]     { width: 24px; height: 24px; color: var(--text-primary); }
+    .promo-card__featured-icon [data-icon] svg { width: 24px; height: 24px; display: block; }
+
+    /* Text block — anchored at bottom of inner card */
+    .promo-card__text {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .promo-card__heading {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: 28px;
+    }
+    .promo-card__body {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-light);
+      color: var(--text-tertiary);
+      line-height: 20px;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-tertiary); }
+    .showcase { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .cards-row { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-start; }
+    .card-col  { display: flex; flex-direction: column; gap: var(--space-2); }
+    .card-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">Promo Card (Other Cards)</p>
+  <div class="cards-row">
+
+    <!-- ── With features sidebar ── -->
+    <div class="card-col">
+      <span class="card-label">With feature icons</span>
+      <div class="promo-card promo-card--features">
+
+        <div class="promo-card__sidebar">
+          <div class="promo-card__icon-pill">
+            <span data-icon="thumbtack"></span>
+          </div>
+          <div class="promo-card__icon-pill">
+            <span data-icon="address-card"></span>
+          </div>
+          <div class="promo-card__icon-pill">
+            <span data-icon="sliders"></span>
+          </div>
+          <div class="promo-card__icon-pill">
+            <span data-icon="magic"></span>
+          </div>
+        </div>
+
+        <div class="promo-card__content-wrap">
+          <div class="promo-card__inner">
+            <div class="promo-card__featured-icon">
+              <span data-icon="theme"></span>
+            </div>
+            <div class="promo-card__text">
+              <p class="promo-card__heading">Explore what's possible with Now Assist</p>
+              <p class="promo-card__body">Discover AI-powered features across ITSM, HR, and IT Operations.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Simple (no sidebar) ── -->
+    <div class="card-col">
+      <span class="card-label">Simple (no feature icons)</span>
+      <div class="promo-card">
+
+        <div class="promo-card__content-wrap">
+          <div class="promo-card__inner">
+            <div class="promo-card__featured-icon">
+              <span data-icon="theme"></span>
+            </div>
+            <div class="promo-card__text">
+              <p class="promo-card__heading">Explore what's possible with Now Assist</p>
+              <p class="promo-card__body">Discover AI-powered features across ITSM, HR, and IT Operations.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+  });
+</script>
+
+</body>
+</html>

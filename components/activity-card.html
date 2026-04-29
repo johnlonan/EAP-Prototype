@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Card — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Copied verbatim from badge.html — base + xs size
+    -------------------------------------------------------- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 9999px;
+      font-family: var(--font-sans);
+      font-weight: var(--font-weight-normal);
+      white-space: nowrap;
+      vertical-align: middle;
+      height: 24px;
+      padding: 0 8px;
+      font-size: var(--font-size-xs);
+      background-color: var(--color-neutral-800);
+      color: white;
+      border: 1px solid transparent;
+    }
+    .badge [data-icon] { flex-shrink: 0; width: 10px; height: 10px; }
+    .badge--xs { height: 16px; padding: 0 5px; font-size: 10px; gap: 3px; }
+    .badge--xs [data-icon] { width: 8px; height: 8px; }
+    .badge--xs [data-icon] svg { width: 8px; height: 8px; display: block; }
+
+    /* Soft-bordered variants — chained for specificity */
+    .badge.badge--xs.badge--error   { background-color: #fff7f6; color: #c0392b; border-color: #e2161c; }
+    .badge.badge--xs.badge--warning { background-color: #fffbc9; color: #8a5b00; border-color: #8d6e00; }
+
+    /* --------------------------------------------------------
+       Copied verbatim from avatar-with-image.html — base + lg
+    -------------------------------------------------------- */
+    .avatar-with-img {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+    }
+    .avatar-with-img__main {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-lg, 8px);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      background-color: var(--bg-secondary);
+    }
+    .avatar-with-img__main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .avatar-with-img__overlay {
+      position: absolute;
+      bottom: -4px;
+      right: -6px;
+      border-radius: 9999px;
+      border: 2px solid white;
+      background-color: var(--color-neutral-800, #343331);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-sans);
+      font-weight: var(--font-weight-semibold);
+      color: white;
+      overflow: hidden;
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      font-size: 10px;
+    }
+    .avatar-with-img__overlay img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-with-img--lg { width: 56px; height: 56px; }
+    .avatar-with-img--lg .avatar-with-img__overlay {
+      width: 32px; height: 32px; font-size: 12px;
+      right: -7px; bottom: -5px; border-width: 2.5px;
+    }
+
+    /* --------------------------------------------------------
+       Activity Highlights Card
+       375×322px. scroll behaviour is live.
+    -------------------------------------------------------- */
+    .activity-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 2px -1px rgba(0,0,0,0.10);
+      width: 375px;
+      height: 322px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* Header */
+    .activity-card__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 0 24px;
+      flex-shrink: 0;
+    }
+    .activity-card__title {
+      flex: 1;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    /* Ghost xs icon button */
+    .activity-card__nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    .activity-card__nav-btn:hover  { background: var(--color-ghost-hover); }
+    .activity-card__nav-btn:active { background: var(--color-ghost-active); }
+    .activity-card__nav-btn [data-icon]     { width: 12px; height: 12px; }
+    .activity-card__nav-btn [data-icon] svg { width: 12px; height: 12px; display: block; }
+
+    /* Scrollable body — native scrollbar hidden */
+    .activity-card__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 16px 8px 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      min-height: 0;
+      scrollbar-width: none; /* Firefox */
+    }
+    .activity-card__body::-webkit-scrollbar { display: none; }
+
+    /* Activity item row */
+    .activity-card__item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 8px 8px 8px;
+      border-radius: var(--radius-2xl);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .activity-card__item:hover { background: var(--bg-secondary); }
+
+    .activity-card__item-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+    }
+    .activity-card__item-label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      line-height: 20px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    /* "View all" at bottom of scroll content */
+    .activity-card__scroll-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0 4px;
+      flex-shrink: 0;
+    }
+    .activity-card__view-all {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 16px;
+      border-radius: var(--radius-xl);
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color var(--transition-fast);
+    }
+    .activity-card__view-all:hover { background: var(--color-ghost-hover); }
+
+    /* Fade gradient — absolute over the body */
+    .activity-card__fade {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), #ffffff);
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    /* Custom scrollbar thumb — positioned on the card */
+    .activity-card__scrollbar {
+      position: absolute;
+      right: 7px;
+      top: 40px; /* below header, updated by JS */
+      width: 4px;
+      pointer-events: none;
+    }
+    .activity-card__scrollbar-thumb {
+      width: 4px;
+      height: 80px;
+      background: var(--color-neutral-500, #8a8986);
+      border-radius: 9999px;
+    }
+
+    /* Empty state */
+    .activity-card__empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 16px 24px;
+      height: 100%;
+      text-align: center;
+    }
+    .activity-card__empty [data-icon]     { width: 24px; height: 24px; color: var(--text-tertiary); }
+    .activity-card__empty [data-icon] svg { width: 24px; height: 24px; display: block; }
+    .activity-card__empty-title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-lg);
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+
+    /* Avatar photo placeholder */
+    .avatar-photo {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #7ab8d0 0%, #0e4e69 100%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-photo svg { width: 55%; height: 55%; opacity: 0.8; }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .cards-row { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-start; }
+    .card-col  { display: flex; flex-direction: column; gap: var(--space-2); }
+    .card-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">Activity Highlights Card</p>
+  <div class="cards-row">
+
+    <!-- ── Interactive scrollable card ── -->
+    <div class="card-col">
+      <span class="card-label">Default — scroll to see "View all"</span>
+      <div class="activity-card" id="activity-card-main">
+        <div class="activity-card__header">
+          <span class="activity-card__title">Needs attention</span>
+          <button class="activity-card__nav-btn" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+
+        <div class="activity-card__body" id="activity-card-body">
+
+          <div class="activity-card__item">
+            <div class="avatar-with-img avatar-with-img--lg">
+              <div class="avatar-with-img__main">
+                <div class="avatar-photo">
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="4" fill="white" fill-opacity="0.8"/><path d="M4 21c0-5 3.6-8 8-8s8 3 8 8" fill="white" fill-opacity="0.8"/></svg>
+                </div>
+              </div>
+              <div class="avatar-with-img__overlay">JD</div>
+            </div>
+            <div class="activity-card__item-text">
+              <span class="activity-card__item-label">Resolve network outage affecting Asia-Pacific region.</span>
+              <span class="badge badge--xs badge--error"><span data-icon="clock"></span>Overdue 1 day</span>
+            </div>
+          </div>
+
+          <div class="activity-card__item">
+            <div class="avatar-with-img avatar-with-img--lg">
+              <div class="avatar-with-img__main">
+                <div class="avatar-photo" style="background:linear-gradient(135deg,#a8d5b5,#1a6b3c);">
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="4" fill="white" fill-opacity="0.8"/><path d="M4 21c0-5 3.6-8 8-8s8 3 8 8" fill="white" fill-opacity="0.8"/></svg>
+                </div>
+              </div>
+              <div class="avatar-with-img__overlay">MK</div>
+            </div>
+            <div class="activity-card__item-text">
+              <span class="activity-card__item-label">Review change request for database schema migration.</span>
+              <span class="badge badge--xs badge--error"><span data-icon="clock"></span>Overdue 1 day</span>
+            </div>
+          </div>
+
+          <div class="activity-card__item">
+            <div class="avatar-with-img avatar-with-img--lg">
+              <div class="avatar-with-img__main">
+                <div class="avatar-photo" style="background:linear-gradient(135deg,#c4b5e8,#5a3e8a);">
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="4" fill="white" fill-opacity="0.8"/><path d="M4 21c0-5 3.6-8 8-8s8 3 8 8" fill="white" fill-opacity="0.8"/></svg>
+                </div>
+              </div>
+              <div class="avatar-with-img__overlay">SA</div>
+            </div>
+            <div class="activity-card__item-text">
+              <span class="activity-card__item-label">Approve security certificate renewal for production servers.</span>
+              <span class="badge badge--xs badge--warning"><span data-icon="clock"></span>Due in 3 days</span>
+            </div>
+          </div>
+
+          <div class="activity-card__item">
+            <div class="avatar-with-img avatar-with-img--lg">
+              <div class="avatar-with-img__main">
+                <div class="avatar-photo" style="background:linear-gradient(135deg,#fdc5a0,#b5420a);">
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="4" fill="white" fill-opacity="0.8"/><path d="M4 21c0-5 3.6-8 8-8s8 3 8 8" fill="white" fill-opacity="0.8"/></svg>
+                </div>
+              </div>
+              <div class="avatar-with-img__overlay">RL</div>
+            </div>
+            <div class="activity-card__item-text">
+              <span class="activity-card__item-label">Complete vendor assessment for Q2 procurement cycle.</span>
+              <span class="badge badge--xs badge--warning"><span data-icon="clock"></span>Due in 3 days</span>
+            </div>
+          </div>
+
+          <div class="activity-card__item">
+            <div class="avatar-with-img avatar-with-img--lg">
+              <div class="avatar-with-img__main">
+                <div class="avatar-photo" style="background:linear-gradient(135deg,#f5c5d0,#943870);">
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="4" fill="white" fill-opacity="0.8"/><path d="M4 21c0-5 3.6-8 8-8s8 3 8 8" fill="white" fill-opacity="0.8"/></svg>
+                </div>
+              </div>
+              <div class="avatar-with-img__overlay">BN</div>
+            </div>
+            <div class="activity-card__item-text">
+              <span class="activity-card__item-label">Update access permissions for contractors in EMEA.</span>
+              <span class="badge badge--xs badge--warning"><span data-icon="clock"></span>Due in 5 days</span>
+            </div>
+          </div>
+
+          <!-- View all — visible at bottom of scroll -->
+          <div class="activity-card__scroll-footer">
+            <button class="activity-card__view-all">View all</button>
+          </div>
+
+        </div><!-- /.activity-card__body -->
+
+        <!-- Fade gradient — sits over the body, managed by JS -->
+        <div class="activity-card__fade" id="activity-card-fade"></div>
+
+        <!-- Custom scrollbar thumb -->
+        <div class="activity-card__scrollbar" id="activity-card-scrollbar">
+          <div class="activity-card__scrollbar-thumb"></div>
+        </div>
+
+      </div><!-- /.activity-card -->
+    </div>
+
+    <!-- ── Empty state (separate static state) ── -->
+    <div class="card-col">
+      <span class="card-label">Empty state</span>
+      <div class="activity-card">
+        <div class="activity-card__header">
+          <span class="activity-card__title">Needs attention</span>
+          <button class="activity-card__nav-btn" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+        <div class="activity-card__body" style="overflow-y:hidden;">
+          <div class="activity-card__empty">
+            <span data-icon="circle-question"></span>
+            <p class="activity-card__empty-title">Nothing's high priority right now</p>
+            <button class="activity-card__view-all">View all</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+
+    const card      = document.getElementById('activity-card-main');
+    const body      = document.getElementById('activity-card-body');
+    const fade      = document.getElementById('activity-card-fade');
+    const scrollbar = document.getElementById('activity-card-scrollbar');
+
+    if (!card || !body) return;
+
+    const HEADER_H = 40;   // px — header occupies top ~40px of card
+    const THUMB_H  = 80;   // px — fixed thumb height (Figma spec)
+
+    function update() {
+      const { scrollTop, scrollHeight, clientHeight } = body;
+      const maxScroll = scrollHeight - clientHeight;
+      if (maxScroll <= 0) {
+        fade.style.opacity = '0';
+        scrollbar.style.display = 'none';
+        return;
+      }
+
+      const progress = scrollTop / maxScroll;           // 0 → 1
+      const atBottom = scrollTop >= maxScroll - 2;
+
+      // Fade: visible when not at bottom
+      fade.style.opacity = atBottom ? '0' : '1';
+
+      // Thumb: travels from just below header to bottom of card
+      const trackH      = card.offsetHeight - HEADER_H;
+      const maxThumbTop = trackH - THUMB_H;
+      const thumbTop    = HEADER_H + progress * maxThumbTop;
+      scrollbar.style.top = thumbTop + 'px';
+    }
+
+    body.addEventListener('scroll', update, { passive: true });
+    update(); // initialise on load
+  });
+</script>
+
+</body>
+</html>

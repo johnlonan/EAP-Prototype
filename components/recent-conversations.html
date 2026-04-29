@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recent Conversations Card — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Recent Conversations Card
+       375×322px. Scrollable body, fade + custom scrollbar.
+       Header has title only — no action button.
+       Each item: 64px tall, conversation title + dot + timestamp.
+    -------------------------------------------------------- */
+    .rc-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 2px -1px rgba(0,0,0,0.10);
+      width: 375px;
+      height: 322px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* Header — title only, no button */
+    .rc-card__header {
+      display: flex;
+      align-items: center;
+      padding: 16px 16px 0 24px;
+      flex-shrink: 0;
+    }
+    .rc-card__title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 24px;
+    }
+
+    /* Scrollable body */
+    .rc-card__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      scrollbar-width: none;
+    }
+    .rc-card__body::-webkit-scrollbar { display: none; }
+
+    /* Conversation item row — fixed 64px height */
+    .rc-item {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: var(--radius-2xl);
+      flex-shrink: 0;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .rc-item:hover { background: var(--bg-secondary); }
+
+    .rc-item__text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .rc-item__heading {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* Meta row: dot + timestamp */
+    .rc-item__meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rc-item__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background-color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .rc-item__timestamp {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-light);
+      color: var(--text-tertiary);
+      line-height: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* Fade gradient */
+    .rc-card__fade {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), #ffffff);
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    /* Custom scrollbar thumb */
+    .rc-card__scrollbar {
+      position: absolute;
+      right: 4px;
+      width: 4px;
+      pointer-events: none;
+    }
+    .rc-card__scrollbar-thumb {
+      width: 4px;
+      height: 80px;
+      background: var(--color-neutral-500, #8a8986);
+      border-radius: 9999px;
+    }
+
+    /* Empty state */
+    .rc-card__empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 16px 24px;
+      height: 100%;
+      text-align: center;
+    }
+    .rc-card__empty [data-icon]     { width: 24px; height: 24px; color: var(--text-tertiary); }
+    .rc-card__empty [data-icon] svg { width: 24px; height: 24px; display: block; }
+    .rc-card__empty-title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-lg);
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+
+    /* "View all" at bottom of scroll content */
+    .rc-card__scroll-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0 4px;
+      flex-shrink: 0;
+    }
+    .rc-card__view-all {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 16px;
+      border-radius: var(--radius-xl);
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color var(--transition-fast);
+    }
+    .rc-card__view-all:hover { background: var(--color-ghost-hover); }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .cards-row { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-start; }
+    .card-col  { display: flex; flex-direction: column; gap: var(--space-2); }
+    .card-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">Recent Conversations Card</p>
+  <div class="cards-row">
+
+    <!-- ── Interactive scrollable card ── -->
+    <div class="card-col">
+      <span class="card-label">Default — scroll to see more</span>
+      <div class="rc-card" id="rc-card-main">
+
+        <div class="rc-card__header">
+          <span class="rc-card__title">Recent chat update</span>
+        </div>
+
+        <div class="rc-card__body" id="rc-card-body">
+
+          <div class="rc-item">
+            <div class="rc-item__text">
+              <p class="rc-item__heading">VPN not working on my MacBook</p>
+              <div class="rc-item__meta">
+                <span class="rc-item__dot"></span>
+                <span class="rc-item__timestamp">Today</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rc-item">
+            <div class="rc-item__text">
+              <p class="rc-item__heading">Request for Adobe Creative Cloud licence</p>
+              <div class="rc-item__meta">
+                <span class="rc-item__dot"></span>
+                <span class="rc-item__timestamp">Today</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rc-item">
+            <div class="rc-item__text">
+              <p class="rc-item__heading">How do I reset my password?</p>
+              <div class="rc-item__meta">
+                <span class="rc-item__dot"></span>
+                <span class="rc-item__timestamp">Yesterday</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rc-item">
+            <div class="rc-item__text">
+              <p class="rc-item__heading">Submit PTO request for next month</p>
+              <div class="rc-item__meta">
+                <span class="rc-item__dot"></span>
+                <span class="rc-item__timestamp">Yesterday</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rc-item">
+            <div class="rc-item__text">
+              <p class="rc-item__heading">Onboarding — which laptop should I order?</p>
+              <div class="rc-item__meta">
+                <span class="rc-item__dot"></span>
+                <span class="rc-item__timestamp">2 days ago</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rc-item">
+            <div class="rc-item__text">
+              <p class="rc-item__heading">Printer setup in Conference Room B</p>
+              <div class="rc-item__meta">
+                <span class="rc-item__dot"></span>
+                <span class="rc-item__timestamp">3 days ago</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rc-card__scroll-footer">
+            <button class="rc-card__view-all">View all</button>
+          </div>
+
+        </div><!-- /.rc-card__body -->
+
+        <div class="rc-card__fade" id="rc-card-fade"></div>
+        <div class="rc-card__scrollbar" id="rc-card-scrollbar">
+          <div class="rc-card__scrollbar-thumb"></div>
+        </div>
+
+      </div><!-- /.rc-card -->
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div class="card-col">
+      <span class="card-label">Empty state</span>
+      <div class="rc-card">
+        <div class="rc-card__header">
+          <span class="rc-card__title">Recent chat update</span>
+        </div>
+        <div class="rc-card__body" style="overflow-y:hidden;">
+          <div class="rc-card__empty">
+            <span data-icon="chat"></span>
+            <p class="rc-card__empty-title">No recent conversations</p>
+            <button class="rc-card__view-all">Start a chat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+
+    const card      = document.getElementById('rc-card-main');
+    const body      = document.getElementById('rc-card-body');
+    const fade      = document.getElementById('rc-card-fade');
+    const scrollbar = document.getElementById('rc-card-scrollbar');
+
+    if (!card || !body) return;
+
+    const HEADER_H = 51;
+    const THUMB_H  = 80;
+
+    function update() {
+      const { scrollTop, scrollHeight, clientHeight } = body;
+      const maxScroll = scrollHeight - clientHeight;
+      if (maxScroll <= 0) {
+        fade.style.opacity = '0';
+        scrollbar.style.display = 'none';
+        return;
+      }
+
+      scrollbar.style.display = '';
+      const progress = scrollTop / maxScroll;
+      const atBottom = scrollTop >= maxScroll - 2;
+
+      fade.style.opacity = atBottom ? '0' : '1';
+
+      const trackH      = card.offsetHeight - HEADER_H;
+      const maxThumbTop = trackH - THUMB_H;
+      scrollbar.style.top = (HEADER_H + progress * maxThumbTop) + 'px';
+    }
+
+    body.addEventListener('scroll', update, { passive: true });
+    update();
+  });
+</script>
+
+</body>
+</html>

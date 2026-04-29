@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Card — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Copied verbatim from button-iconic.html — base + ghost + xs
+    -------------------------------------------------------- */
+    .btn-iconic {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius-field);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), opacity var(--transition-fast);
+    }
+    .btn-iconic:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    .btn-iconic svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn-iconic.btn-ghost     { background-color: transparent; color: var(--text-primary); }
+    .btn-iconic.btn-ghost:hover  { background-color: var(--color-ghost-hover); }
+    .btn-iconic.btn-ghost:active { background-color: var(--color-ghost-active); }
+    .btn-iconic.btn-xs { width: 24px; height: 24px; border-radius: var(--radius-lg); }
+    .btn-iconic.btn-xs [data-icon]     { width: 12px; height: 12px; }
+    .btn-iconic.btn-xs [data-icon] svg { width: 12px; height: 12px; display: block; }
+
+    /* --------------------------------------------------------
+       App Card
+       375×248px. 2 rows × 3 app buttons.
+    -------------------------------------------------------- */
+    .apps-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 2px 0 rgba(0,0,0,0.10);
+      width: 375px;
+      height: 248px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Header */
+    .apps-card__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 0 24px;
+      flex-shrink: 0;
+    }
+    .apps-card__title {
+      flex: 1;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 24px;
+    }
+
+    /* Grid content */
+    .apps-card__content {
+      flex: 1;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .apps-card__row {
+      display: flex;
+      flex: 1;
+    }
+
+    /* Individual app button */
+    .app-btn {
+      flex: 1;
+      height: 96px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 12px;
+      border-radius: var(--radius-3xl);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: background-color var(--transition-fast);
+    }
+    .app-btn:hover  { background: var(--bg-secondary); }
+    .app-btn:active { background: var(--bg-tertiary); }
+    .app-btn.is-active { background: var(--bg-secondary); }
+
+    /* 48×48 app icon — coloured rounded square */
+    .app-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: #ffffff;
+    }
+
+    /* App label */
+    .app-label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.8;
+      white-space: nowrap;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .cards-row { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-start; }
+    .card-col  { display: flex; flex-direction: column; gap: var(--space-2); }
+    .card-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">App Card</p>
+  <div class="cards-row">
+
+    <!-- ── Default ── -->
+    <div class="card-col">
+      <span class="card-label">Default</span>
+      <div class="apps-card">
+
+        <div class="apps-card__header">
+          <span class="apps-card__title">Featured apps</span>
+          <button class="btn-iconic btn-ghost btn-xs" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+
+        <div class="apps-card__content">
+          <div class="apps-card__row">
+            <button class="app-btn" aria-label="Outlook">
+              <div class="app-icon" style="background:#0072c6;">O</div>
+              <span class="app-label">Outlook</span>
+            </button>
+            <button class="app-btn" aria-label="Workday">
+              <div class="app-icon" style="background:#005cb9;">W</div>
+              <span class="app-label">Workday</span>
+            </button>
+            <button class="app-btn" aria-label="Zoom">
+              <div class="app-icon" style="background:#2d8cff;">Z</div>
+              <span class="app-label">Zoom</span>
+            </button>
+          </div>
+          <div class="apps-card__row">
+            <button class="app-btn is-active" aria-label="Teams">
+              <div class="app-icon" style="background:#6264a7;">T</div>
+              <span class="app-label">Teams</span>
+            </button>
+            <button class="app-btn" aria-label="Fidelity">
+              <div class="app-icon" style="background:#00724d;">F</div>
+              <span class="app-label">Fidelity</span>
+            </button>
+            <button class="app-btn" aria-label="ADP">
+              <div class="app-icon" style="background:#d31245;">A</div>
+              <span class="app-label">ADP</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div class="card-col">
+      <span class="card-label">Empty state</span>
+      <div class="apps-card">
+        <div class="apps-card__header">
+          <span class="apps-card__title">Featured apps</span>
+          <button class="btn-iconic btn-ghost btn-xs" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+        <div class="apps-card__content" style="align-items:center;justify-content:center;gap:12px;">
+          <span data-icon="grid" style="width:24px;height:24px;color:var(--text-tertiary);"></span>
+          <p style="font-family:var(--font-sans);font-size:var(--font-size-lg);color:var(--text-primary);line-height:24px;">No featured apps yet</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+  });
+</script>
+
+</body>
+</html>

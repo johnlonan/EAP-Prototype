@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Request Card — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Copied verbatim from badge.html — base + sm + neutral-tertiary
+    -------------------------------------------------------- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 9999px;
+      font-family: var(--font-sans);
+      font-weight: var(--font-weight-normal);
+      white-space: nowrap;
+      vertical-align: middle;
+      height: 24px;
+      padding: 0 8px;
+      font-size: var(--font-size-xs);
+      background-color: var(--color-neutral-800);
+      color: white;
+      border: 1px solid transparent;
+    }
+    .badge--sm { height: 20px; padding: 0 6px; font-size: 11px; gap: 3px; }
+    .badge--sm [data-icon] { width: 9px; height: 9px; }
+
+    .badge--neutral-tertiary {
+      background-color: var(--color-neutral-200, #edece9);
+      color: var(--color-neutral-800, #343331);
+      border-color: transparent;
+    }
+
+    /* Info soft — bg + border using existing --color-info tokens */
+    .badge--info-soft {
+      background-color: var(--color-info-content, #f4f9ff);
+      color: var(--color-info, #2a6edc);
+      border-color: var(--color-info, #2a6edc);
+    }
+
+    /* --------------------------------------------------------
+       Copied verbatim from button-iconic.html — base + ghost + xs
+    -------------------------------------------------------- */
+    .btn-iconic {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius-field);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), opacity var(--transition-fast);
+    }
+    .btn-iconic:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    .btn-iconic svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn-iconic.btn-ghost     { background-color: transparent; color: var(--text-primary); }
+    .btn-iconic.btn-ghost:hover  { background-color: var(--color-ghost-hover); }
+    .btn-iconic.btn-ghost:active { background-color: var(--color-ghost-active); }
+    .btn-iconic.btn-xs { width: 24px; height: 24px; border-radius: var(--radius-lg); }
+    .btn-iconic.btn-xs [data-icon]     { width: 12px; height: 12px; }
+    .btn-iconic.btn-xs [data-icon] svg { width: 12px; height: 12px; display: block; }
+
+    /* --------------------------------------------------------
+       My Request Card
+       375px wide, height auto. Stacked request items + footer.
+    -------------------------------------------------------- */
+    .mr-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 2px 0 rgba(0,0,0,0.10);
+      width: 375px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Header */
+    .mr-card__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 0 24px;
+      flex-shrink: 0;
+    }
+    .mr-card__title {
+      flex: 1;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 24px;
+    }
+
+    /* Content — stacked request items */
+    .mr-card__content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    /* Individual request item — inner card */
+    .mr-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    .mr-item:hover { background: var(--bg-secondary); }
+
+    /* Badges row */
+    .mr-item__badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Request title — 16px, single line truncated */
+    .mr-item__title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-primary);
+      line-height: 24px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* Meta — "Updated X ago" */
+    .mr-item__meta {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-light);
+      color: var(--text-tertiary);
+      line-height: 20px;
+    }
+
+    /* Footer — "View more" full-width secondary button */
+    .mr-card__footer {
+      padding: 0 16px 16px;
+      flex-shrink: 0;
+    }
+    .mr-card__view-more {
+      width: 100%;
+      height: 40px;
+      background: var(--color-secondary, #e3e2df);
+      color: var(--color-secondary-content, #343331);
+      border: none;
+      border-radius: var(--radius-xl);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-normal);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color var(--transition-fast);
+    }
+    .mr-card__view-more:hover  { background: var(--color-secondary-hover, #d4d3d0); }
+    .mr-card__view-more:active { background: var(--color-secondary-active, #c8c7c4); }
+
+    /* Empty state */
+    .mr-card__empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .mr-card__empty [data-icon]     { width: 24px; height: 24px; color: var(--text-tertiary); }
+    .mr-card__empty [data-icon] svg { width: 24px; height: 24px; display: block; }
+    .mr-card__empty-title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-lg);
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .cards-row { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-start; }
+    .card-col  { display: flex; flex-direction: column; gap: var(--space-2); }
+    .card-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">My Request Card</p>
+  <div class="cards-row">
+
+    <!-- ── Default (3 items + View more) ── -->
+    <div class="card-col">
+      <span class="card-label">Default</span>
+      <div class="mr-card">
+
+        <div class="mr-card__header">
+          <span class="mr-card__title">Requests</span>
+          <button class="btn-iconic btn-ghost btn-xs" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+
+        <div class="mr-card__content">
+
+          <div class="mr-item">
+            <div class="mr-item__badges">
+              <span class="badge badge--sm badge--neutral-tertiary">HR request</span>
+              <span class="badge badge--sm badge--info-soft">In progress</span>
+            </div>
+            <p class="mr-item__title">New employee onboarding setup request for Q2</p>
+            <p class="mr-item__meta">Updated 2 hours ago</p>
+          </div>
+
+          <div class="mr-item">
+            <div class="mr-item__badges">
+              <span class="badge badge--sm badge--neutral-tertiary">IT request</span>
+              <span class="badge badge--sm badge--info-soft">In progress</span>
+            </div>
+            <p class="mr-item__title">Laptop replacement for Sarah Johnson</p>
+            <p class="mr-item__meta">Updated 5 hours ago</p>
+          </div>
+
+          <div class="mr-item">
+            <div class="mr-item__badges">
+              <span class="badge badge--sm badge--neutral-tertiary">Facilities</span>
+              <span class="badge badge--sm badge--info-soft">In progress</span>
+            </div>
+            <p class="mr-item__title">Conference room booking — Board meeting April 30</p>
+            <p class="mr-item__meta">Updated yesterday</p>
+          </div>
+
+        </div>
+
+        <div class="mr-card__footer">
+          <button class="mr-card__view-more">View more</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div class="card-col">
+      <span class="card-label">Empty state</span>
+      <div class="mr-card">
+        <div class="mr-card__header">
+          <span class="mr-card__title">Requests</span>
+          <button class="btn-iconic btn-ghost btn-xs" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+        <div class="mr-card__empty">
+          <span data-icon="document-blank"></span>
+          <p class="mr-card__empty-title">No open requests</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+  });
+</script>
+
+</body>
+</html>

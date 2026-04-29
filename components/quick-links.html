@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Links Card — Horizon 2.0</title>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/interactions.js" defer></script>
+  <style>
+    /* --------------------------------------------------------
+       Copied verbatim from button-iconic.html — base + ghost + xs
+    -------------------------------------------------------- */
+    .btn-iconic {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius-field);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), opacity var(--transition-fast);
+    }
+    .btn-iconic:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    .btn-iconic svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn-iconic.btn-ghost     { background-color: transparent; color: var(--text-primary); }
+    .btn-iconic.btn-ghost:hover  { background-color: var(--color-ghost-hover); }
+    .btn-iconic.btn-ghost:active { background-color: var(--color-ghost-active); }
+    .btn-iconic.btn-xs { width: 24px; height: 24px; border-radius: var(--radius-lg); }
+    .btn-iconic.btn-xs [data-icon]     { width: 12px; height: 12px; }
+    .btn-iconic.btn-xs [data-icon] svg { width: 12px; height: 12px; display: block; }
+
+    /* --------------------------------------------------------
+       Quick Links Card
+       Fixed width 375px, height auto (grows with content).
+       2×2 grid of link items.
+    -------------------------------------------------------- */
+    .ql-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-box);
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10), 0 1px 2px 0 rgba(0,0,0,0.10);
+      width: 375px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Header */
+    .ql-card__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 16px 0 24px;
+      flex-shrink: 0;
+    }
+    .ql-card__title {
+      flex: 1;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 24px;
+    }
+
+    /* 2×2 grid */
+    .ql-card__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    /* Link item */
+    .ql-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      text-align: left;
+      transition: background-color var(--transition-fast);
+    }
+    .ql-item:hover  { background: var(--bg-secondary); }
+    .ql-item:active { background: var(--bg-tertiary); }
+
+    /* Thumbnail — 48px tall, full width */
+    .ql-item__thumb {
+      height: 48px;
+      width: 100%;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      color: var(--text-disabled);
+    }
+    .ql-item__thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .ql-item__thumb [data-icon]     { width: 20px; height: 20px; }
+    .ql-item__thumb [data-icon] svg { width: 20px; height: 20px; display: block; }
+
+    /* Thumbnail with a coloured brand icon */
+    .ql-item__thumb--branded {
+      border-color: transparent;
+    }
+
+    /* Label — 2-line clamped */
+    .ql-item__label {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+      color: var(--text-secondary);
+      line-height: 20px;
+      min-height: 40px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Empty state */
+    .ql-card__empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .ql-card__empty [data-icon]     { width: 24px; height: 24px; color: var(--text-tertiary); }
+    .ql-card__empty [data-icon] svg { width: 24px; height: 24px; display: block; }
+    .ql-card__empty-title {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-lg);
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+
+    /* --------------------------------------------------------
+       Showcase layout
+    -------------------------------------------------------- */
+    body { padding: var(--space-8); background: var(--bg-secondary); }
+    .showcase { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+    .section-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+    .cards-row { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: flex-start; }
+    .card-col  { display: flex; flex-direction: column; gap: var(--space-2); }
+    .card-label { font-size: var(--font-size-xs); color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<div class="showcase">
+  <p class="section-title">Quick Links Card</p>
+  <div class="cards-row">
+
+    <!-- ── Default (2×2 grid with content) ── -->
+    <div class="card-col">
+      <span class="card-label">Default</span>
+      <div class="ql-card">
+        <div class="ql-card__header">
+          <span class="ql-card__title">Quick links</span>
+          <button class="btn-iconic btn-ghost btn-xs" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+
+        <div class="ql-card__grid">
+
+          <button class="ql-item">
+            <div class="ql-item__thumb" style="background:var(--bg-secondary);">
+              <span data-icon="document-excel"></span>
+            </div>
+            <p class="ql-item__label">Expense</p>
+          </button>
+
+          <button class="ql-item">
+            <div class="ql-item__thumb">
+              <span data-icon="image"></span>
+            </div>
+            <p class="ql-item__label">How to file expenses for holiday dinner 2025</p>
+          </button>
+
+          <button class="ql-item">
+            <div class="ql-item__thumb ql-item__thumb--branded" style="background:#2d8cff;">
+              <span data-icon="video" style="color:#fff;"></span>
+            </div>
+            <p class="ql-item__label">Zoom</p>
+          </button>
+
+          <button class="ql-item">
+            <div class="ql-item__thumb">
+              <span data-icon="image"></span>
+            </div>
+            <p class="ql-item__label">Lorem ipsum elementum dolor eu vulputate eu posuere.</p>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div class="card-col">
+      <span class="card-label">Empty state</span>
+      <div class="ql-card">
+        <div class="ql-card__header">
+          <span class="ql-card__title">Quick links</span>
+          <button class="btn-iconic btn-ghost btn-xs" aria-label="View all">
+            <span data-icon="arrow-right"></span>
+          </button>
+        </div>
+        <div class="ql-card__empty">
+          <span data-icon="thumbtack"></span>
+          <p class="ql-card__empty-title">No quick links yet</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    Horizon.initIcons();
+  });
+</script>
+
+</body>
+</html>

@@ -18,7 +18,7 @@
     .card {
       background: var(--surface-primary, #ffffff);
       border: 1px solid var(--border-subtle, #edece9);
-      border-radius: 32px;
+      border-radius: var(--radius-box);
       overflow: hidden;
       box-shadow: 0 1px 2px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
       display: flex;
@@ -52,12 +52,12 @@
     .card__media {
       width: 100%;
       aspect-ratio: 347 / 195;
-      border-radius: 24px;
+      border-radius: var(--radius-3xl);
       background: var(--bg-tertiary);
       overflow: hidden;
       position: relative;
     }
-    .card__media--sm { border-radius: 16px; }
+    .card__media--sm { border-radius: var(--radius-2xl); }
     .card--side .card__media {
       height: 100%;
       aspect-ratio: unset;
@@ -95,7 +95,7 @@
     /* ---- Slot placeholder ---- */
     .card__slot {
       height: 40px;
-      border-radius: 8px;
+      border-radius: var(--radius-lg);
       background: var(--bg-tertiary);
     }
     .card__slot-label {
@@ -197,7 +197,7 @@
       <p class="section-title">Side (horizontal) · With Media</p>
       <div class="card card--side">
         <div class="card__figure" style="flex:1; padding: 8px 0 8px 8px;">
-          <div class="card__media" style="height:100%; aspect-ratio:unset; border-radius:24px;">
+          <div class="card__media" style="height:100%; aspect-ratio:unset; border-radius:var(--radius-3xl);">
             <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80" alt="Office">
           </div>
         </div>
@@ -206,7 +206,7 @@
           <div class="card__slot"></div>
         </div>
         <div class="card__figure card__figure--end" style="flex:1; padding: 8px 8px 8px 0;">
-          <div class="card__media" style="height:100%; aspect-ratio:unset; border-radius:24px;">
+          <div class="card__media" style="height:100%; aspect-ratio:unset; border-radius:var(--radius-3xl);">
             <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80" alt="Office">
           </div>
         </div>
