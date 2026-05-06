@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planning | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── PI Hero Cards ───────────────────────────────── */
+    .pi-hero {
+      flex: 1;
+      padding: 24px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.25s ease;
+      opacity: 0.55;
+      min-width: 0;
+    }
+    .pi-hero:hover {
+      opacity: 0.75;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .pi-hero.active {
+      opacity: 1;
+      flex: 1.3;
+      border: 2px solid var(--color-primary);
+      background: rgba(255,255,255,0.75);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .pi-hero-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .pi-hero-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .pi-hero-dates {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .pi-hero-stats {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .pi-hero-big {
+      display: flex;
+      flex-direction: column;
+    }
+    .pi-hero-big-val {
+      font-size: 36px;
+      font-weight: var(--font-weight-bold);
+      line-height: 1;
+    }
+    .pi-hero-big-label {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+    .pi-hero-detail {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .pi-hero-bar {
+      height: 6px;
+      background: var(--color-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .pi-hero-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .pi-hero-insight {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 12px;
+      margin-top: auto;
+      background: #F0FAFA;
+      border: 1px solid #B3EDE8;
+      border-radius: var(--radius-field);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .pi-hero-footer {
+      font-size: 11px;
+      margin-top: auto;
+    }
+    .pi-footer-btn {
+      flex:1; display:inline-flex; align-items:center; justify-content:center; gap:5px;
+      font-size:11px; font-weight:500; color:var(--color-link); text-decoration:none;
+      padding:6px 0; border:1px solid rgba(42,110,220,0.15); border-radius:var(--radius-lg);
+      transition:background var(--transition-fast);
+      font-family:var(--font-sans);
+    }
+    .pi-footer-btn:hover { background:rgba(42,110,220,0.05); }
+    .pi-footer-btn.disabled { pointer-events:none; }
+
+    /* ── Team Chips (context panel) ──────────────────── */
+    .team-chip {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: var(--radius-field);
+      border: 1px solid rgba(255,255,255,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .team-chip.warn {
+      border-color: rgba(226,22,28,0.25);
+    }
+    .team-chip-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .team-chip-bar {
+      height: 4px;
+      background: var(--color-secondary);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .team-chip-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+    .team-chip-pct {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+    }
+
+    /* ── Context Panel shared ────────────────────────── */
+    .ctx-metric {
+      text-align: center;
+      min-width: 60px;
+    }
+    .ctx-metric-val {
+      font-size: 24px;
+      font-weight: var(--font-weight-bold);
+      display: block;
+    }
+    .ctx-metric-val.green { color: var(--color-success); }
+    .ctx-metric-val.amber { color: #D97706; }
+    .ctx-metric-label {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .readiness-item {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+    }
+    .readiness-item.ok {
+      background: var(--color-success-content);
+      color: var(--color-success);
+    }
+    .readiness-item.warn {
+      background: var(--color-warning-content);
+      color: var(--color-warning);
+    }
+
+    /* ── Floating Omnibar ────────────────────────────── */
+    .intent-chip {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text-tertiary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all var(--transition-fast);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .intent-chip:hover {
+      background: white;
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav id="left-nav"></nav>
+    <main class="content-viewport" style="display:flex; flex-direction:column;">
+
+      <!-- ═══════════ 1. Simple Header ═══════════ -->
+      <div style="text-align:center; padding:32px 32px 0;">
+        <div id="today-date" style="font-size:12px; color:var(--text-tertiary); margin-bottom:6px;"></div>
+        <h1 id="greeting" style="font-size:28px; font-weight:400; color:var(--text-primary); margin:0;">Good morning, James</h1>
+        <div style="font-size:13px; color:var(--text-tertiary); margin-top:4px;">Product Manager &middot; Enterprise Reporting ART</div>
+      </div>
+
+      <!-- ═══════════ 2. Three PI Hero Cards ═══════════ -->
+      <div style="padding:24px 32px; display:flex; gap:20px; align-items:stretch;">
+
+        <!-- PI-24 (Closed — muted) -->
+        <div class="pi-hero" data-pi="pi-24" onclick="switchPI('pi-24')">
+          <div class="pi-hero-header">
+            <div>
+              <div class="pi-hero-name">PI-24</div>
+              <div class="pi-hero-dates">Oct 1 &ndash; Dec 15, 2025</div>
+            </div>
+            <span class="pill pill-green" style="font-size:11px;">Closed</span>
+          </div>
+
+          <div class="pi-hero-stats">
+            <div class="pi-hero-big">
+              <span class="pi-hero-big-val" style="color:#5B9A6F;">86%</span>
+              <span class="pi-hero-big-label">Predictability</span>
+            </div>
+            <div style="flex:1;"></div>
+            <div style="text-align:right; font-size:13px; color:var(--text-secondary);">
+              <div><strong>12</strong>/14 delivered</div>
+              <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">2 partial · carried forward</div>
+            </div>
+          </div>
+
+          <div class="pi-hero-progress">
+            <div class="pi-hero-bar"><div class="pi-hero-fill" style="width:86%; background:var(--color-success);"></div></div>
+          </div>
+
+          <div class="pi-hero-footer" style="display:flex; gap:8px;">
+            <a href="feature-backlog.html?pi=pi-24&from=planning" onclick="event.stopPropagation();" class="pi-footer-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Features
+            </a>
+            <span class="pi-footer-btn disabled" style="cursor:default; opacity:0.4;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+              Board
+            </span>
+          </div>
+        </div>
+
+        <!-- PI-25 (Active — dominant, expanded) -->
+        <div class="pi-hero active" data-pi="pi-25" onclick="switchPI('pi-25')">
+          <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--color-primary); color:white; font-size:10px; font-weight:600; padding:2px 12px; border-radius:var(--radius-full); letter-spacing:0.05em; text-transform:uppercase; z-index:2;">Active</div>
+          <div class="pi-hero-header">
+            <div>
+              <div class="pi-hero-name">PI-25</div>
+              <div class="pi-hero-dates">Dec 17, 2025 &ndash; Mar 10, 2026</div>
+            </div>
+            <span class="pill pill-cyan" style="font-size:11px;">Sprint 3 of 5</span>
+          </div>
+
+          <div class="pi-hero-stats">
+            <div class="pi-hero-big">
+              <span class="pi-hero-big-val" style="color:var(--text-primary);">37</span>
+              <span class="pi-hero-big-label">Days remaining</span>
+            </div>
+            <div style="flex:1;"></div>
+            <div style="text-align:right;">
+              <div style="font-size:13px; color:var(--text-secondary);"><strong>14</strong> Features committed</div>
+              <div style="display:flex; gap:8px; margin-top:6px; justify-content:flex-end; flex-wrap:wrap;">
+                <span style="font-size:11px; color:#5B9A6F; font-weight:500;">6 on track</span>
+                <span style="font-size:11px; color:var(--color-info); font-weight:500;">4 in progress</span>
+                <span style="font-size:11px; color:#E07A5F; font-weight:500;">2 at risk</span>
+                <span style="font-size:11px; color:var(--text-disabled); font-weight:500;">2 not started</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pi-hero-progress">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-tertiary); margin-bottom:4px;">
+              <span>Day 47 of 84</span>
+              <span>56% complete</span>
+            </div>
+            <div class="pi-hero-bar"><div class="pi-hero-fill" style="width:56%; background:var(--color-info);"></div></div>
+          </div>
+
+          <!-- AI insight woven into the card -->
+          <div class="pi-hero-insight">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;"><path d="M2.11 4.94C3.46 4.51 4.51 3.46 4.94 2.11L5.49 .37C5.65-.12 6.35-.12 6.51.37L7.06 2.12C7.49 3.46 8.54 4.51 9.89 4.94L11.63 5.49C12.12 5.65 12.12 6.35 11.63 6.51L9.88 7.06C8.54 7.49 7.49 8.54 7.06 9.88L6.51 11.63C6.35 12.12 5.65 12.12 5.49 11.63L4.94 9.89C4.51 8.54 3.46 7.49 2.12 7.06L.37 6.51C-.12 6.35-.12 5.65.37 5.49L2.11 4.94Z" fill="#00C7B1"/></svg>
+            <span>Nova over-committed at 109%. Reporting module API (WSJF 18) and Real-time pipeline (WSJF 16) at risk — 34 business value points exposed.</span>
+          </div>
+          <div class="pi-hero-footer" style="display:flex; gap:8px;">
+            <a href="feature-backlog.html?pi=pi-25&from=planning" onclick="event.stopPropagation();" class="pi-footer-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Features
+            </a>
+            <a href="pi-board.html?from=planning" onclick="event.stopPropagation();" class="pi-footer-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+              Board
+            </a>
+          </div>
+        </div>
+
+        <!-- PI-26 (Planning — urgent undertone) -->
+        <div class="pi-hero" data-pi="pi-26" onclick="switchPI('pi-26')">
+          <div class="pi-hero-header">
+            <div>
+              <div class="pi-hero-name">PI-26</div>
+              <div class="pi-hero-dates">Mar 12 &ndash; Jun 2, 2026</div>
+            </div>
+            <span class="pill pill-amber" style="font-size:11px;">Planning</span>
+          </div>
+
+          <div class="pi-hero-stats">
+            <div class="pi-hero-big">
+              <span class="pi-hero-big-val" style="color:#D97706;">12</span>
+              <span class="pi-hero-big-label">Days to PI Planning</span>
+            </div>
+            <div style="flex:1;"></div>
+            <div style="text-align:right;">
+              <div style="font-size:13px; color:var(--text-secondary);"><strong>12</strong> Features in pool</div>
+              <div style="display:flex; gap:8px; margin-top:6px; justify-content:flex-end; flex-wrap:wrap;">
+                <span style="font-size:11px; color:#5B9A6F; font-weight:500;">7 ready</span>
+                <span style="font-size:11px; color:#D97706; font-weight:500;">3 missing WSJF</span>
+                <span style="font-size:11px; color:var(--text-disabled); font-weight:500;">4 no estimate</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pi-hero-progress">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-tertiary); margin-bottom:4px;">
+              <span>Readiness</span>
+              <span>58%</span>
+            </div>
+            <div class="pi-hero-bar"><div class="pi-hero-fill" style="width:58%; background:#D97706;"></div></div>
+          </div>
+
+          <!-- AI insight woven into the card -->
+          <div class="pi-hero-insight">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;"><path d="M2.11 4.94C3.46 4.51 4.51 3.46 4.94 2.11L5.49 .37C5.65-.12 6.35-.12 6.51.37L7.06 2.12C7.49 3.46 8.54 4.51 9.89 4.94L11.63 5.49C12.12 5.65 12.12 6.35 11.63 6.51L9.88 7.06C8.54 7.49 7.49 8.54 7.06 9.88L6.51 11.63C6.35 12.12 5.65 12.12 5.49 11.63L4.94 9.89C4.51 8.54 3.46 7.49 2.12 7.06L.37 6.51C-.12 6.35-.12 5.65.37 5.49L2.11 4.94Z" fill="#00C7B1"/></svg>
+            <span>3 Features missing WSJF scores. Backlog must be finalised in 5 working days for PI Planning readiness. <a href="feature-backlog.html?pi=pi-26&from=planning" style="color:var(--color-link); font-weight:500; text-decoration:none;">Score Features</a></span>
+          </div>
+          <div class="pi-hero-footer" style="display:flex; gap:8px;">
+            <a href="feature-backlog.html?pi=pi-26&from=planning" onclick="event.stopPropagation();" class="pi-footer-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Features
+            </a>
+            <a href="pi-board.html?pi=pi-26&from=planning" onclick="event.stopPropagation();" class="pi-footer-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+              Board
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════ 3. Context Panels ═══════════ -->
+
+      <!-- PI-24 Context — Delivery Summary with BV comparison -->
+      <div id="ctx-pi-24" style="display:none; padding:0 32px 32px;">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+          <a href="#" onclick="return false;" style="font-size:12px; font-weight:500; color:var(--text-disabled); text-decoration:none; cursor:default;">Delivery report coming soon</a>
+        </div>
+        <div style="display:flex; gap:20px;">
+          <!-- Delivery metrics -->
+          <div style="flex:1; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7);">
+            <div style="font-size:14px; font-weight:500; color:var(--text-primary); margin-bottom:16px; display:flex; align-items:center; gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Delivery summary</div>
+            <div style="display:flex; gap:16px; margin-bottom:16px;">
+              <div style="text-align:center; flex:1;"><div style="font-size:28px; font-weight:700; color:var(--color-success);">86%</div><div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Predictability</div></div>
+              <div style="text-align:center; flex:1;"><div style="font-size:28px; font-weight:700;">12<span style="font-size:16px; color:var(--text-tertiary);">/14</span></div><div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Features delivered</div></div>
+              <div style="text-align:center; flex:1;"><div style="font-size:28px; font-weight:700; color:#D97706;">2</div><div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Partial deliveries</div></div>
+            </div>
+            <!-- BV comparison bar -->
+            <div style="padding-top:12px; border-top:1px solid rgba(0,0,0,0.06);">
+              <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:10px;">
+                <span style="font-size:12px; font-weight:500; color:var(--text-secondary);">Business value delivered</span>
+                <span style="font-size:14px; font-weight:600; color:var(--text-primary);">131</span>
+                <span style="font-size:12px; color:var(--text-tertiary);">of 152 planned</span>
+                <span style="font-size:12px; font-weight:600; color:#5B9A6F;">(86%)</span>
+              </div>
+              <div style="position:relative; height:12px; background:rgba(42,110,220,0.12); border-radius:6px; overflow:visible;">
+                <div style="width:86%; height:100%; background:#5B9A6F; border-radius:6px; transition:width 0.5s ease;"></div>
+                <!-- 80% threshold marker -->
+                <div style="position:absolute; left:80%; top:-3px; width:1px; height:18px; background:rgba(0,0,0,0.2);"></div>
+                <div style="position:absolute; left:80%; top:16px; font-size:9px; color:var(--text-disabled); transform:translateX(-50%);">80%</div>
+              </div>
+            </div>
+          </div>
+          <!-- Carried forward -->
+          <div style="flex:1; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7);">
+            <div style="font-size:14px; font-weight:500; color:var(--text-primary); margin-bottom:16px; display:flex; align-items:center; gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M4 18v-2a4 4 0 014-4h12"/></svg>Carried forward</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="padding:12px 16px; background:rgba(42,110,220,0.03); border-left:3px solid var(--color-info); border-radius:0 var(--radius-lg) var(--radius-lg) 0;">
+                <div style="font-size:13px; font-weight:500;">Customer portal SSO</div>
+                <div style="font-size:12px; color:var(--text-tertiary); margin-top:2px;">60% complete · Moved to PI-25 Sprint 2<span style="font-size:10px; padding:1px 8px; background:var(--color-info-content); color:var(--color-info); border-radius:var(--radius-full); margin-left:4px;">In PI-25</span></div>
+              </div>
+              <div style="padding:12px 16px; background:rgba(0,0,0,0.015); border-left:3px solid var(--text-disabled); border-radius:0 var(--radius-lg) var(--radius-lg) 0;">
+                <div style="font-size:13px; font-weight:500;">Advanced report scheduling</div>
+                <div style="font-size:12px; color:var(--text-tertiary); margin-top:2px;">45% complete · Deprioritised — not in PI-25<span style="font-size:10px; padding:1px 8px; background:var(--bg-tertiary); color:var(--text-tertiary); border-radius:var(--radius-full); margin-left:4px;">Deprioritised</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PI-25 Context — Team Capacity + Upcoming Dates -->
+      <div id="ctx-pi-25" style="padding:0 32px 32px;">
+        <div style="display:flex; gap:20px;">
+          <!-- Team capacity bars -->
+          <div style="flex:3; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+              <div>
+                <div style="font-size:14px; font-weight:500; color:var(--text-primary); display:flex; align-items:center; gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Team capacity</div>
+                <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">PI-25 committed vs available</div>
+              </div>
+              <div style="font-size:12px; color:var(--text-tertiary);">ART total: <strong style="color:var(--text-primary);">83%</strong></div>
+            </div>
+            <div id="team-capacity-bars" style="display:flex; flex-direction:column; gap:10px;"></div>
+          </div>
+          <!-- Upcoming dates -->
+          <div style="flex:2; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7);">
+            <div style="font-size:14px; font-weight:500; color:var(--text-primary); margin-bottom:16px; display:flex; align-items:center; gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Upcoming</div>
+            <div id="timeline-dates" style="display:flex; flex-direction:column; gap:0;"></div>
+          </div>
+        </div>
+
+        <!-- Features requiring attention -->
+        <div style="margin-top:20px; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7);">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <div style="font-size:14px; font-weight:500; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Features requiring attention
+            </div>
+            <a href="feature-backlog.html?pi=pi-25&from=planning" style="font-size:12px; font-weight:500; color:var(--color-link); text-decoration:none;">View all 14</a>
+          </div>
+
+          <!-- At-risk Feature 1 -->
+          <div style="padding:10px 14px; border-left:4px solid #E07A5F; background:rgba(224,122,95,0.05); border-radius:0 10px 10px 0; margin-bottom:8px; cursor:pointer;" onclick="window.location.href='feature-backlog.html?pi=pi-25&from=planning'">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:13px; font-weight:500; color:var(--text-primary);">Reporting module API - SLA</span>
+              <span style="font-size:11px; font-weight:500; padding:2px 8px; border-radius:9999px; background:rgba(224,122,95,0.12); color:#E07A5F;">At risk</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:3px;">Nova · 30% complete · Rank 2 · WSJF 18</div>
+          </div>
+
+          <!-- Blocked Feature -->
+          <div style="padding:10px 14px; border-left:4px solid #CC0000; background:rgba(204,0,0,0.04); border-radius:0 10px 10px 0; margin-bottom:8px; cursor:pointer;" onclick="window.location.href='feature-backlog.html?pi=pi-25&from=planning'">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:13px; font-weight:500; color:var(--text-primary);">Real-time reporting pipeline</span>
+              <span style="font-size:11px; font-weight:500; padding:2px 8px; border-radius:9999px; background:rgba(204,0,0,0.08); color:#CC0000;">Blocked</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:3px;">Orion · 10% complete · Rank 5 · WSJF 16</div>
+          </div>
+
+          <!-- At-risk Feature 2 -->
+          <div style="padding:10px 14px; border-left:4px solid #E07A5F; background:rgba(224,122,95,0.05); border-radius:0 10px 10px 0; cursor:pointer;" onclick="window.location.href='feature-backlog.html?pi=pi-25&from=planning'">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:13px; font-weight:500; color:var(--text-primary);">API rate limiting and quotas</span>
+              <span style="font-size:11px; font-weight:500; padding:2px 8px; border-radius:9999px; background:rgba(224,122,95,0.12); color:#E07A5F;">At risk</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:3px;">Nova · 20% complete · Rank 9 · WSJF 12</div>
+          </div>
+
+          <!-- AI insight -->
+          <div style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; padding:8px 12px; background:#F0FAFA; border-radius:var(--radius-field); border:1px solid #B3EDE8;">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="flex-shrink:0; margin-top:2px;"><path d="M2.11 4.94C3.46 4.51 4.51 3.46 4.94 2.11L5.49 .37C5.65-.12 6.35-.12 6.51.37L7.06 2.12C7.49 3.46 8.54 4.51 9.89 4.94L11.63 5.49C12.12 5.65 12.12 6.35 11.63 6.51L9.88 7.06C8.54 7.49 7.49 8.54 7.06 9.88L6.51 11.63C6.35 12.12 5.65 12.12 5.49 11.63L4.94 9.89C4.51 8.54 3.46 7.49 2.12 7.06L.37 6.51C-.12 6.35-.12 5.65.37 5.49L2.11 4.94Z" fill="#00C7B1"/></svg>
+            <span style="font-size:11px; color:var(--text-secondary); line-height:1.5;">34 value points at risk across Nova and Orion. Both at-risk Features are in Enterprise reporting capability.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PI-26 Context — Readiness + Capacity Preview -->
+      <div id="ctx-pi-26" style="display:none; padding:0 32px 32px;">
+        <div style="display:flex; gap:20px;">
+          <!-- Readiness checklist -->
+          <div style="flex:1; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+              <div style="font-size:14px; font-weight:500; color:var(--text-primary); display:flex; align-items:center; gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Backlog readiness</div>
+            </div>
+            <!-- Bar with thresholds -->
+            <div style="position:relative; height:10px; background:var(--color-secondary); border-radius:5px; overflow:visible; margin-bottom:6px;">
+              <div style="width:58%; height:100%; background:#D97706; border-radius:5px; transition:width 0.5s ease;"></div>
+              <!-- 50% minimum marker -->
+              <div style="position:absolute; left:50%; top:-2px; width:1px; height:14px; background:rgba(0,0,0,0.15);"></div>
+              <!-- 80% target marker -->
+              <div style="position:absolute; left:80%; top:-2px; width:1px; height:14px; background:rgba(0,0,0,0.25);"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+              <span style="font-size:11px; color:#D97706; font-weight:500;">58% ready</span>
+              <span style="font-size:11px; color:var(--text-disabled);">Target: 80%</span>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <div class="readiness-item ok">&#10003; 9 have descriptions</div>
+              <div class="readiness-item ok">&#10003; 8 have estimates</div>
+              <div class="readiness-item ok">&#10003; 7 AC defined</div>
+              <div class="readiness-item warn">&#9888; 3 missing WSJF</div>
+              <div class="readiness-item warn">&#9888; 4 no estimate</div>
+              <div class="readiness-item warn">&#9888; 2 no description</div>
+            </div>
+          </div>
+          <!-- PI Planning countdown -->
+          <div style="flex:1; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7); display:flex; flex-direction:column;">
+            <div style="font-size:14px; font-weight:500; color:var(--text-primary); margin-bottom:20px; display:flex; align-items:center; gap:8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>PI Planning timeline</div>
+            <!-- Horizontal mini-timeline -->
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+              <div style="display:flex; align-items:center; gap:0; position:relative; margin:0 8px;">
+                <!-- Today marker -->
+                <div style="display:flex; flex-direction:column; align-items:center; z-index:2;">
+                  <div style="width:10px; height:10px; border-radius:50%; background:var(--color-primary);"></div>
+                  <div style="font-size:10px; font-weight:600; color:var(--color-primary); margin-top:6px; white-space:nowrap;">Today</div>
+                </div>
+                <!-- Line segment -->
+                <div style="flex:5; height:2px; background:linear-gradient(to right, var(--color-primary), #D97706); margin:0 -1px; margin-bottom:18px;"></div>
+                <!-- Backlog deadline marker -->
+                <div style="display:flex; flex-direction:column; align-items:center; z-index:2;">
+                  <div style="width:10px; height:10px; border-radius:50%; background:#D97706;"></div>
+                  <div style="font-size:10px; font-weight:600; color:#D97706; margin-top:6px; white-space:nowrap;">Apr 15</div>
+                  <div style="font-size:9px; color:var(--text-tertiary); white-space:nowrap;">Backlog due</div>
+                </div>
+                <!-- Line segment -->
+                <div style="flex:7; height:2px; background:linear-gradient(to right, #D97706, var(--color-info)); margin:0 -1px; margin-bottom:18px;"></div>
+                <!-- PI Planning marker -->
+                <div style="display:flex; flex-direction:column; align-items:center; z-index:2;">
+                  <div style="width:12px; height:12px; border-radius:50%; background:var(--color-info);"></div>
+                  <div style="font-size:10px; font-weight:600; color:var(--color-info); margin-top:6px; white-space:nowrap;">Apr 20</div>
+                  <div style="font-size:9px; color:var(--text-tertiary); white-space:nowrap;">PI Planning</div>
+                </div>
+              </div>
+              <!-- Labels -->
+              <div style="display:flex; justify-content:space-between; margin-top:16px; padding:0 8px;">
+                <span style="font-size:11px; color:var(--text-tertiary);">5 working days to backlog deadline</span>
+                <span style="font-size:11px; color:var(--text-tertiary);">12 days to PI Planning</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features needing action -->
+        <div style="margin-top:20px; padding:20px 24px; background:rgba(255,255,255,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:20px; border:1px solid rgba(255,255,255,0.7);">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <div style="font-size:14px; font-weight:500; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Features needing action
+            </div>
+            <a href="feature-backlog.html?pi=pi-26&from=planning" style="font-size:12px; font-weight:500; color:var(--color-link); text-decoration:none;">Open backlog</a>
+          </div>
+
+          <!-- Needs scoring -->
+          <div style="padding:10px 14px; border-left:4px solid #D97706; background:rgba(217,119,6,0.04); border-radius:0 10px 10px 0; margin-bottom:8px; cursor:pointer;" onclick="window.location.href='feature-backlog.html?pi=pi-26&from=planning'">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:13px; font-weight:500; color:var(--text-primary);">Automated compliance reporting</span>
+              <span style="font-size:11px; font-weight:500; padding:2px 8px; border-radius:9999px; background:rgba(217,119,6,0.12); color:#D97706;">Needs WSJF</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:3px;">Regulatory compliance · 4 customer signals · No estimate</div>
+          </div>
+
+          <div style="padding:10px 14px; border-left:4px solid #D97706; background:rgba(217,119,6,0.04); border-radius:0 10px 10px 0; margin-bottom:8px; cursor:pointer;" onclick="window.location.href='feature-backlog.html?pi=pi-26&from=planning'">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:13px; font-weight:500; color:var(--text-primary);">AI-powered churn prediction</span>
+              <span style="font-size:11px; font-weight:500; padding:2px 8px; border-radius:9999px; background:rgba(217,119,6,0.12); color:#D97706;">Needs WSJF</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:3px;">Customer retention · 14 customer signals · No estimate</div>
+          </div>
+
+          <div style="padding:10px 14px; border-left:4px solid #D97706; background:rgba(217,119,6,0.04); border-radius:0 10px 10px 0; cursor:pointer;" onclick="window.location.href='feature-backlog.html?pi=pi-26&from=planning'">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:13px; font-weight:500; color:var(--text-primary);">Loyalty program integration</span>
+              <span style="font-size:11px; font-weight:500; padding:2px 8px; border-radius:9999px; background:rgba(217,119,6,0.12); color:#D97706;">Needs WSJF</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:3px;">Customer retention · 8 customer signals · No estimate</div>
+          </div>
+
+          <div style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; padding:8px 12px; background:#F0FAFA; border-radius:var(--radius-field); border:1px solid #B3EDE8;">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="flex-shrink:0; margin-top:2px;"><path d="M2.11 4.94C3.46 4.51 4.51 3.46 4.94 2.11L5.49 .37C5.65-.12 6.35-.12 6.51.37L7.06 2.12C7.49 3.46 8.54 4.51 9.89 4.94L11.63 5.49C12.12 5.65 12.12 6.35 11.63 6.51L9.88 7.06C8.54 7.49 7.49 8.54 7.06 9.88L6.51 11.63C6.35 12.12 5.65 12.12 5.49 11.63L4.94 9.89C4.51 8.54 3.46 7.49 2.12 7.06L.37 6.51C-.12 6.35-.12 5.65.37 5.49L2.11 4.94Z" fill="#00C7B1"/></svg>
+            <span style="font-size:11px; color:var(--text-secondary); line-height:1.5;">These 3 Features cannot be ranked until WSJF scoring is complete. Score them to improve capacity planning accuracy.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spacer for floating omnibar -->
+      <div style="height:120px; flex-shrink:0;"></div>
+    </main>
+  </div>
+
+  <!-- Scroll hint gradient -->
+  <div style="position:fixed; bottom:0; left:64px; right:0; height:100px; background:linear-gradient(to top, rgba(229,237,240,0.95) 0%, rgba(229,237,240,0.6) 50%, rgba(229,237,240,0) 100%); pointer-events:none; z-index:150;"></div>
+
+  <!-- ═══════════ Floating Omnibar (fixed to viewport) ═══════════ -->
+  <div id="floating-omnibar" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; align-items:center; gap:8px;">
+    <!-- Intent chips above the bar -->
+    <div style="display:flex; gap:6px;">
+      <button class="intent-chip">Show at-risk Features</button>
+      <button class="intent-chip">What's not ready for PI-26?</button>
+      <button class="intent-chip">Compare PI-25 to PI-24</button>
+    </div>
+    <!-- Omnibar -->
+    <div style="width:520px; display:inline-flex; align-items:center; padding:6px 8px; background:var(--bg-tertiary, #EDECE9); border-radius:45px; box-shadow:0 8px 10px -6px rgba(0,0,0,0.10), 0 20px 25px -5px rgba(0,0,0,0.10); outline:1px solid var(--bg-tertiary, #EDECE9); outline-offset:-1px;">
+      <div style="flex:1; background:white; border-radius:32px; box-shadow:0 0 8px rgba(0,0,0,0.05); display:inline-flex; align-items:center; padding:6px 6px 6px 20px; gap:16px;">
+        <input type="text" placeholder="Ask about planning health..." style="flex:1; border:none; outline:none; font-size:15px; font-weight:300; color:var(--text-primary); background:transparent; font-family:var(--font-sans);"/>
+        <button style="width:38px; height:38px; border-radius:var(--radius-full); background:var(--color-accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="1" width="6" height="9" rx="3" fill="white"/><path d="M2 8C2 11.314 4.686 14 8 14M14 8C14 11.314 11.314 14 8 14M8 14V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ Nav + Scripts ═══════════ -->
+  <script src="../shared/nav.js"></script>
+  <script>renderNav('home', {avatar:'../../assets/images/avatar-james.png', name:'James', links:{0:'planning.html', 3:'feature-backlog.html', 4:'pi-board.html'}});</script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('planning');</script>
+  <script>
+    // ── Dynamic date + greeting ──
+    (function() {
+      var d = new Date();
+      var el = document.getElementById('today-date');
+      if (el) el.textContent = d.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric', year:'numeric'});
+      var h = d.getHours();
+      var greeting = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+      var greetEl = document.getElementById('greeting');
+      if (greetEl) greetEl.textContent = greeting + ', James';
+    })();
+
+    // ── PI switching ──
+    function switchPI(pi) {
+      document.querySelectorAll('.pi-hero').forEach(function(c) { c.classList.remove('active'); });
+      var card = document.querySelector('[data-pi="' + pi + '"]');
+      if (card) card.classList.add('active');
+      ['pi-24','pi-25','pi-26'].forEach(function(p) {
+        var el = document.getElementById('ctx-' + p);
+        if (el) el.style.display = p === pi ? 'block' : 'none';
+      });
+    }
+
+    // ── Team Capacity Bars ──
+    (function() {
+      var teams = [
+        {name:'Orion', committed:42, capacity:47},
+        {name:'Nova', committed:48, capacity:44},
+        {name:'Apex', committed:38, capacity:50},
+        {name:'Atlas', committed:40, capacity:46},
+        {name:'Vega', committed:26, capacity:38},
+      ];
+      var container = document.getElementById('team-capacity-bars');
+      if (!container) return;
+
+      teams.forEach(function(t) {
+        var pct = Math.round((t.committed / t.capacity) * 100);
+        var over = pct > 100;
+        var barColor = pct > 100 ? '#E07A5F' : pct >= 85 ? 'rgba(217,119,6,0.5)' : 'rgba(42,110,220,0.35)';
+        var pctColor = pct > 100 ? '#E07A5F' : pct >= 85 ? '#D97706' : 'var(--text-tertiary)';
+        var fillWidth = Math.min(pct, 100);
+
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex; align-items:center; gap:12px;';
+        row.innerHTML =
+          '<span style="font-size:12px; font-weight:500; color:var(--text-primary); min-width:48px;">' + t.name + '</span>' +
+          '<div style="flex:1; height:8px; background:var(--color-secondary); border-radius:4px; overflow:hidden; position:relative;">' +
+            '<div style="width:' + fillWidth + '%; height:100%; border-radius:4px; background:' + barColor + '; transition:width 0.6s ease;"></div>' +
+            '<div style="position:absolute; left:100%; top:0; width:1px; height:100%; background:rgba(0,0,0,0.15);"></div>' +
+          '</div>' +
+          '<span style="font-size:12px; font-weight:600; min-width:48px; text-align:right; color:' + (over ? '#E07A5F' : 'var(--text-secondary)') + ';">' + t.committed + '/' + t.capacity + '</span>' +
+          '<span style="font-size:11px; min-width:36px; text-align:right; font-weight:600; color:' + pctColor + ';">' + pct + '%</span>';
+        container.appendChild(row);
+      });
+    })();
+
+    // ── Key Dates Timeline ──
+    (function() {
+      var dates = [
+        {date:'Apr 15', label:'Sprint 3 ends', status:'upcoming', days:'7 days'},
+        {date:'Apr 16', label:'Sprint 4 starts', status:'upcoming', days:'8 days'},
+        {date:'Apr 20', label:'PI-26 PI Planning', status:'milestone', days:'12 days'},
+        {date:'May 13', label:'PI-25 System Demo', status:'future', days:'35 days'},
+        {date:'May 14', label:'PI-25 I&A', status:'future', days:'36 days'},
+      ];
+
+      var container = document.getElementById('timeline-dates');
+      if (!container) return;
+
+      dates.forEach(function(d, i) {
+        var isLast = i === dates.length - 1;
+        var isFirst = i === 0;
+        var isMilestone = d.status === 'milestone';
+        var dotColor = isFirst ? 'var(--text-primary)' : 'var(--text-disabled)';
+        var labelWeight = isFirst ? '500' : '400';
+        var milestoneTag = isMilestone ? '<span style="font-size:10px; padding:1px 6px; background:var(--color-info-content); color:var(--color-info); border-radius:var(--radius-full); margin-left:6px;">Milestone</span>' : '';
+
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex; align-items:flex-start; gap:12px; position:relative;';
+        row.innerHTML =
+          // Timeline dot and line
+          '<div style="display:flex; flex-direction:column; align-items:center; min-width:12px; padding-top:2px;">' +
+            '<div style="width:8px; height:8px; border-radius:50%; background:' + dotColor + '; flex-shrink:0;"></div>' +
+            (isLast ? '' : '<div style="width:1px; flex:1; min-height:24px; background:var(--border-subtle); margin:4px 0;"></div>') +
+          '</div>' +
+          // Content
+          '<div style="flex:1; padding-bottom:' + (isLast ? '0' : '12px') + ';">' +
+            '<div style="display:flex; align-items:center; justify-content:space-between;">' +
+              '<span style="font-size:13px; font-weight:' + labelWeight + '; color:var(--text-primary);">' + d.label + milestoneTag + '</span>' +
+              '<span style="font-size:11px; color:var(--text-tertiary); font-weight:400;">' + d.days + '</span>' +
+            '</div>' +
+            '<div style="font-size:11px; color:var(--text-tertiary); margin-top:1px;">' + d.date + '</div>' +
+          '</div>';
+        container.appendChild(row);
+      });
+    })();
+  </script>
+</body>
+</html>

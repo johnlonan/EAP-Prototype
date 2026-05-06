@@ -153,6 +153,15 @@ EAP.renderTrack = function() {
   }
   filterHtml += '</div>';
 
+  // Filter-aware empty state — when chips/persona empty the board, surface
+  // a clear-filter affordance instead of rendering empty workflow columns.
+  if (!all.length && EAP.hasClearableFilters()) {
+    return '<div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;">' +
+      filterHtml + contextHtml +
+      '<div style="flex:1;display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div>' +
+      '</div>';
+  }
+
   // Bucket into workflow columns
   var bk = {};
   EAP.trackColumns.forEach(function(c) { bk[c] = []; });
@@ -174,7 +183,7 @@ EAP.renderTrack = function() {
   EAP.trackColumns.forEach(function(col) {
     var items = bk[col] || [];
     h += '<div style="width:' + colW + 'px;flex-shrink:0;display:flex;flex-direction:column;">';
-    h += '<div style="padding:8px 10px;border-radius:10px 10px 0 0;background:rgba(14,78,105,0.08);border-bottom:2px solid rgba(14,78,105,0.18);display:flex;align-items:center;justify-content:space-between;">';
+    h += '<div style="padding:8px 10px;border-radius:10px 10px 0 0;background:linear-gradient(135deg, rgba(140,215,180,0.10), rgba(140,195,220,0.10));border-bottom:1px solid rgba(14,78,105,0.10);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);display:flex;align-items:center;justify-content:space-between;">';
     h += '<span style="font-size:10px;font-weight:500;color:#374151;text-transform:uppercase;letter-spacing:0.03em;">' + col + '</span>';
     h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;">' + items.length + '</span></div>';
     h += '<div style="' + TCB + '">';

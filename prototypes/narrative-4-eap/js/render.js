@@ -62,7 +62,39 @@ EAP.renderFilterBar = function() {
 
   if (s.tab === 'hierarchy') {
     s.hierHide = s.hierHide || {};
-    h += '<span class="fbar-label">PI</span>' +
+    var hgv = s.hierGroupBy || 'goal';
+    var hgActive = (hgv !== 'goal') ? ' fbar-select-on' : '';
+    // Hide scope-redundant groupings (same logic as Timeline dropdown)
+    var hRedundantByScope = {
+      'team':           ['team', 'art', 'st'],
+      'art':            ['art', 'st'],
+      'solution-train': ['st']
+    }[s.context] || [];
+    function hOpt(value, label) {
+      if (hRedundantByScope.indexOf(value) !== -1) return '';
+      return '<option value="' + value + '"' + (hgv === value ? ' selected' : '') + '>Group by: ' + label + '</option>';
+    }
+    h += '<select class="fbar-select' + hgActive + '" id="hier-group-select" data-prefix="' + EAP.icon('layout-list', 12) + '">' +
+      hOpt('goal', 'Goal') +
+      '<optgroup label="Strategy">' +
+        hOpt('product', 'Product') +
+        '<option disabled>Group by: Initiative · coming</option>' +
+        '<option disabled>Group by: Value Stream · coming</option>' +
+      '</optgroup>' +
+      '<optgroup label="Classification">' +
+        hOpt('size', 'Size') +
+      '</optgroup>' +
+      '<optgroup label="Org &amp; accountability">' +
+        hOpt('owner', 'Owner') +
+        hOpt('art', 'ART') +
+        hOpt('st', 'Solution Train') +
+      '</optgroup>' +
+      '<optgroup label="Status">' +
+        hOpt('state', 'State') +
+        hOpt('risk', 'Risk') +
+      '</optgroup>' +
+      '</select>' +
+      '<div class="fbar-sep"></div><span class="fbar-label">PI</span>' +
       '<select class="fbar-select" id="hier-pi-sel"><option value="All">All PIs</option><option value="PI 26">PI 26 — Current</option><option value="PI 27">PI 27</option></select>' +
       '<div class="fbar-sep"></div><span class="fbar-label">Show</span>' +
       ['Capability', 'Feature', 'Story'].map(function(lv) {
@@ -96,6 +128,57 @@ EAP.renderFilterBar = function() {
     h += '<div class="fbar-spacer"></div>';
   }
 
+  // Group-by dropdown — Timeline only. Sectioned by lens (Strategy /
+   // Classification / Org & accountability / Status). Default option +
+   // ART/Solution Train hidden when redundant with the level's natural default.
+   // ALL options carry the "Group by:" prefix so the selected state always
+   // shows the dimension name with its label (matches the Dependencies dropdown).
+   // Hide scope-redundant options: at narrower scopes, dimensions you've already
+   // filtered to don't make sense as a grouping.
+  if (s.tab === 'timeline') {
+    var defMap = {
+      Epic:       { label: 'Goal',  redundant: 'goal' },
+      Capability: { label: 'ART',   redundant: 'art' },
+      Feature:    { label: 'PI',    redundant: null },
+      WorkItem:   { label: 'Team',  redundant: null }
+    };
+    var def = defMap[s.level] || { label: 'Default', redundant: null };
+    var gv = s.tlGroupBy || 'default';
+    var gActive = (gv !== 'default') ? ' fbar-select-on' : '';
+    // Scope-redundant: at e.g. Team scope, grouping by Team is pointless
+    var redundantByScope = {
+      'team':           ['team', 'art', 'st'],
+      'art':            ['art', 'st'],
+      'solution-train': ['st']
+    }[s.context] || [];
+    h += '<select class="fbar-select' + gActive + '" id="tl-group-select" data-prefix="' + EAP.icon('layout-list', 12) + '">';
+    h += '<option value="default"' + (gv === 'default' ? ' selected' : '') + '>Group by: ' + def.label + '</option>';
+    function tlOpt(value, label) {
+      if (def.redundant === value) return '';
+      if (redundantByScope.indexOf(value) !== -1) return '';
+      return '<option value="' + value + '"' + (gv === value ? ' selected' : '') + '>Group by: ' + label + '</option>';
+    }
+    h += '<optgroup label="Strategy">';
+    h += tlOpt('goal',    'Goal');
+    h += tlOpt('product', 'Product');
+    h += '<option disabled>Group by: Initiative · coming</option>';
+    h += '<option disabled>Group by: Value Stream · coming</option>';
+    h += '</optgroup>';
+    h += '<optgroup label="Classification">';
+    h += tlOpt('size',    'Size');
+    h += '</optgroup>';
+    h += '<optgroup label="Org &amp; accountability">';
+    h += tlOpt('owner',   'Owner');
+    h += tlOpt('art',     'ART');
+    h += tlOpt('st',      'Solution Train');
+    h += '</optgroup>';
+    h += '<optgroup label="Status">';
+    h += tlOpt('state',   'State');
+    h += tlOpt('risk',    'Risk');
+    h += '</optgroup>';
+    h += '</select>';
+  }
+
   // Right-side toggles — all with icons
   if (s.tab === 'planning') h += '<span class="fbar-vtog' + (s.splitView ? ' on' : '') + '" id="split-toggle">' + EAP.icon('columns', 14) + ' Split</span>';
   if ((s.tab === 'board' || s.tab === 'taskboard' || s.tab === 'timeline') && (s.level === 'Feature' || s.level === 'WorkItem')) {
@@ -111,7 +194,7 @@ EAP.renderFilterBar = function() {
       '</select>';
   }
   if (s.tab === 'board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">' + EAP.icon('rows', 14) + ' Compact</span>';
-  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('sparkle', 14) + ' Insights</span>';
+  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('sparkle', 16) + ' Insights</span>';
 
   el.innerHTML = h;
 
@@ -132,6 +215,15 @@ EAP.renderFilterBar = function() {
   });
   var dn = document.getElementById('density-toggle');
   if (dn) dn.addEventListener('click', function() { EAP.state.boardDensity = EAP.state.boardDensity === 'compact' ? 'default' : 'compact'; EAP.render(); });
+  var tg = document.getElementById('tl-group-select');
+  if (tg) tg.addEventListener('change', function() { EAP.state.tlGroupBy = this.value; EAP.render(); });
+  var hg = document.getElementById('hier-group-select');
+  if (hg) hg.addEventListener('change', function() {
+    EAP.state.hierGroupBy = this.value;
+    // Reset open state so the new tree opens at top-level by default
+    EAP.state.openHierarchy = {};
+    EAP.render();
+  });
 
   // Hierarchy show/hide toggles
   document.querySelectorAll('[data-hier-check]').forEach(function(pill) {
@@ -174,6 +266,19 @@ EAP.renderContent = function() {
     t.addEventListener('click', function(e) { e.stopPropagation(); EAP.toggleHierarchy(t.dataset.hierToggle); });
   });
 
+  // Wire empty-state Clear-filters button — remember the clear for this tab
+  // so it doesn't snap back when the persona-default would re-apply.
+  var esc = document.getElementById('empty-state-clear');
+  if (esc) esc.addEventListener('click', function() {
+    var s = EAP.state;
+    s.mineOnly = false;
+    s.mineOverrides = s.mineOverrides || {};
+    s.mineOverrides[s.tab] = false;
+    s.trackMember = 'All';
+    s.trackTeam = 'All';
+    EAP.render();
+  });
+
   // Wire track member/team chips
   el.querySelectorAll('[data-track-member]').forEach(function(chip) {
     chip.addEventListener('click', function() { EAP.state.trackMember = chip.dataset.trackMember; EAP.render(); });
@@ -184,9 +289,9 @@ EAP.renderContent = function() {
 
   // Wire hierarchy expand/collapse buttons
   var eb = document.getElementById('hier-expand');
-  if (eb) eb.addEventListener('click', function() { EAP.setAllHier(EAP.hierarchy, true); EAP.render(); });
+  if (eb) eb.addEventListener('click', function() { EAP.setAllHier(EAP.buildHierarchyTree(), true); EAP.render(); });
   var cb = document.getElementById('hier-collapse');
-  if (cb) cb.addEventListener('click', function() { EAP.setAllHier(EAP.hierarchy, false); EAP.render(); });
+  if (cb) cb.addEventListener('click', function() { EAP.setAllHier(EAP.buildHierarchyTree(), false); EAP.render(); });
 
   // Wire milestone hover tooltips
   el.querySelectorAll('[data-ms-tip]').forEach(function(ms) {

@@ -18,7 +18,7 @@ EAP.renderInsights = function() {
 
   // ── Panel header ──
   var h = '<div class="ins-hdr">' +
-    '<div class="ins-hdr-left">' + EAP.icon('sparkle', 14) + '<span>Insights</span></div>' +
+    '<div class="ins-hdr-left">' + EAP.icon('sparkle', 16) + '<span>Insights</span></div>' +
     '<div class="ins-hdr-right"><span class="ins-fresh">' + EAP.icon('clock', 10) + ' Just now</span>' +
     '<button class="ins-close" onclick="EAP.toggleInsights()">' + EAP.icon('x', 14) + '</button></div></div>';
 
@@ -186,13 +186,25 @@ EAP.renderInsights = function() {
   h += '</div>';
   el.innerHTML = h;
   if (d.gauge || d.predict) setTimeout(function() { EAP.drawGauge(d.predict ? d.predict.value : d.gauge.value); }, 50);
+
+  // Cursor affordance — click handling is wired via document capture
+  // listener in interactions-pass.js (single source of truth for clicks).
+  el.querySelectorAll('.ins-sig[data-insight-target]').forEach(function(card) {
+    card.style.cursor = 'pointer';
+  });
 };
 
 // ── Signal card ───────────────────────────────────────
 function renderSignal(s, id) {
   var isAi = !!s.ai;
   var sigId = 'sig-' + id;
-  var h = '<div class="ins-sig ' + s.level + (isAi ? ' ins-sig-ai' : '') + '" id="' + sigId + '">';
+  // data-* attributes drive the click listener wired in renderInsights() above
+  // (direct addEventListener on the rendered DOM — no inline onclick, no
+  // dependency on any other module being loaded).
+  var targetAttrs = s.target
+    ? ' data-insight-target="' + s.target + '" data-insight-name="' + (s.targetName || s.target) + '"'
+    : '';
+  var h = '<div class="ins-sig ' + s.level + (isAi ? ' ins-sig-ai' : '') + '" id="' + sigId + '"' + targetAttrs + '>';
   h += '<div class="ins-sig-actions"><button class="ins-sig-act" title="Snooze" data-sig-snooze="' + sigId + '">' + EAP.icon('clock', 11) + '</button><button class="ins-sig-act" title="Dismiss" data-sig-dismiss="' + sigId + '">' + EAP.icon('x', 11) + '</button></div>';
   h += '<div class="ins-sig-title">';
   if (isAi) h += '<span class="ins-sig-sparkle">' + EAP.icon('sparkle', 11) + '</span>';

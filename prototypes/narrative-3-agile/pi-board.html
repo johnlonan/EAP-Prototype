@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PI Planning Board | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── Zone 1: Sticky Header ───────────────────────── */
+    .board-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 56px;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 32px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .back-btn {
+      display: none;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(0,0,0,0.15);
+      background: transparent;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+      transition: background var(--transition-fast);
+      font-size: 14px;
+      font-family: var(--font-sans);
+    }
+    .back-btn:hover { background: var(--color-ghost-hover); }
+    .back-btn.visible { display: inline-flex; }
+
+    .board-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-left: 4px;
+    }
+
+    .header-spacer { flex: 1; }
+
+    .confidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .confidence-badge.green { background: #EAF3DE; color: #3B6D11; }
+    .confidence-badge.amber { background: #FEF3E2; color: #854F0B; }
+    .confidence-badge.red   { background: #FDEAEA; color: #A32D2D; }
+
+    /* ── Zone 2: Health + View Controls ──────────────── */
+    .health-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+      background: rgba(255,255,255,0.4);
+      border-radius: var(--radius-field);
+      padding: 8px 16px;
+    }
+    .health-stats .sep {
+      color: var(--text-disabled);
+      font-weight: 300;
+    }
+    .health-stats .coral { color: #E07A5F; font-weight: 600; }
+    .health-stats .purple { color: #7C3AED; font-weight: 600; }
+
+    /* Pill toggle group */
+    .pill-toggle {
+      display: inline-flex;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: var(--radius-field);
+      overflow: hidden;
+    }
+    .pill-toggle button {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all var(--transition-fast);
+    }
+    .pill-toggle button.active {
+      background: var(--color-primary);
+      color: white;
+    }
+    .pill-toggle button:not(.active):hover {
+      background: var(--color-ghost-hover);
+    }
+
+    .trace-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #feature-trace {
+      font-size: 11px;
+      padding: 3px 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: var(--radius-field);
+      background: rgba(255,255,255,0.7);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      cursor: pointer;
+      outline: none;
+      max-width: 160px;
+    }
+
+    #trace-clear {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: var(--color-ghost-hover);
+      color: var(--text-tertiary);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition-fast);
+    }
+    #trace-clear:hover { background: var(--color-ghost-active); }
+
+    /* Display toggle */
+    .display-toggle {
+      display: inline-flex;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: var(--radius-field);
+      overflow: hidden;
+    }
+    .display-toggle button {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all var(--transition-fast);
+    }
+    .display-toggle button.active {
+      background: var(--color-primary);
+      color: white;
+    }
+    .display-toggle button:not(.active):hover {
+      background: var(--color-ghost-hover);
+    }
+
+    /* ── Dependency Toggle Button ────────────────────── */
+    .dep-toggle {
+      height:28px; padding:0 10px; border-radius:var(--radius-full);
+      border:1px solid var(--border-default); background:white;
+      font-size:11px; font-weight:500; color:var(--text-secondary);
+      cursor:pointer; font-family:var(--font-sans);
+      display:inline-flex; align-items:center; gap:4px;
+      transition:all var(--transition-fast);
+    }
+    .dep-toggle.active { background:var(--color-primary); color:white; border-color:var(--color-primary); }
+
+    /* ── Legend Bar ───────────────────────────────────── */
+    .legend-bar {
+      display: none;
+      padding: 6px 32px;
+      background: rgba(255,255,255,0.3);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+    .legend-bar.visible {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .legend-swatch.swatch-past    { background: var(--bg-tertiary); border: 1px solid rgba(0,0,0,0.08); }
+    .legend-swatch.swatch-current { background: white; border: 1px solid rgba(0,0,0,0.08); }
+    .legend-swatch.swatch-future  { background: white; border: 1px dashed rgba(0,0,0,0.2); }
+    .legend-sep {
+      width: 1px;
+      height: 12px;
+      background: rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+
+    /* ── Zone 3: Board Matrix ────────────────────────── */
+    .board-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 0 0 0 0;
+    }
+    .board-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+    .board-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: 220px repeat(5, minmax(190px, 1fr));
+      min-width: 1170px;
+    }
+
+    /* ── Sprint Headers ──────────────────────────────── */
+    .sprint-header {
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-right: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: rgba(255,255,255,0.25);
+      text-align: center;
+    }
+    .sprint-meta {
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+    }
+    .sprint-header:first-child {
+      font-size: 10px;
+      font-weight: 600;
+      color: #727a90;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .sprint-header.past {
+      color: var(--text-disabled);
+    }
+    .sprint-header.current {
+      background:rgba(42,110,220,0.1);
+      border-bottom:3px solid var(--color-info);
+      position:relative;
+      color: var(--color-info);
+    }
+    .sprint-header.future {
+      color: var(--text-tertiary);
+    }
+
+    .sprint-badge {
+      font-size: 9px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+    }
+    .sprint-badge.complete { background: #EAF3DE; color: #3B6D11; }
+    .sprint-badge.current-badge { background: rgba(42,110,220,0.1); color: var(--color-info); }
+    .sprint-badge.planned { background: rgba(0,0,0,0.04); color: var(--text-tertiary); }
+
+    .sprint-pts {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+    }
+
+    /* ── Team Cells (left column) ────────────────────── */
+    .team-cell {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-right: 2px solid rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      position: relative;
+    }
+    .team-cell-bar {
+      flex:1; height:4px; background:var(--color-secondary); border-radius:2px; overflow:hidden;
+    }
+    .team-cell-bar-fill {
+      height:100%; border-radius:2px; transition:width 0.4s ease;
+    }
+    .team-cell-pct {
+      font-size:10px; font-weight:600; white-space:nowrap;
+    }
+    .team-cell:hover { background: rgba(255,255,255,0.35); }
+    .team-cell.focused { background: rgba(255,255,255,0.4); }
+    .team-cell.dimmed { opacity: 0.35; }
+
+    .team-cell.problem {
+      border-left: 3px solid #E07A5F;
+    }
+
+    .team-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .team-objective {
+      font-size: 10px;
+      font-style: italic;
+      color: var(--text-tertiary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .team-capacity-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+    .cap-track {
+      flex: 1;
+      height: 4px;
+      background: var(--color-secondary);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .cap-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+    .cap-fill.ok { background: var(--color-info); }
+    .cap-fill.over { background: #E07A5F; }
+    .cap-label {
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .team-confidence {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .conf-dots {
+      letter-spacing: 1px;
+      font-size: 10px;
+    }
+    .conf-dots .filled { color: var(--color-info); }
+    .conf-dots .empty  { color: var(--color-secondary); }
+
+    .team-meta {
+      font-size: 10px;
+      color: var(--text-disabled);
+    }
+
+    .low-conf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      background: #FDEAEA;
+      color: #A32D2D;
+    }
+
+    /* ── Sprint Cells ────────────────────────────────── */
+    .sprint-cell {
+      padding: 8px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-right: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 100px;
+      transition: opacity 0.2s ease;
+    }
+    .sprint-cell.dimmed { opacity: 0.15; }
+    .sprint-cell.team-dimmed { opacity: 0.35; }
+
+    .sprint-cell.past-cell    { background: rgba(0,0,0,0.015); }
+    .sprint-cell.current-cell { background: rgba(42,110,220,0.035); }
+    .sprint-cell.future-cell  { background: transparent; }
+    .sprint-cell.over-cap     { background: rgba(224,122,95,0.04); }
+
+    .cell-cap {
+      margin-top: auto;
+      font-size: 9px;
+      color: var(--text-disabled);
+      text-align: right;
+      padding-top: 4px;
+    }
+    .cell-cap.over { color: #E07A5F; font-weight: 600; }
+
+    /* ── Feature Cards ───────────────────────────────── */
+    .fcard {
+      position: relative;
+      padding: 7px 8px;
+      border-radius: var(--radius-lg);
+      font-family: var(--font-sans);
+      transition: all 0.15s ease;
+      cursor: default;
+    }
+    .fcard:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+    .fcard.dimmed {
+      opacity: 0.12;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Past */
+    .fcard.past {
+      background: var(--bg-tertiary);
+      border: 1px solid transparent;
+    }
+    .fcard.past .fcard-name {
+      color: var(--text-tertiary);
+    }
+    .fcard.past.complete::before {
+      content: '\2713';
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      font-size: 10px;
+      color: #5B9A6F;
+      font-weight: 700;
+    }
+
+    /* Current */
+    .fcard.current {
+      background: white;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* Future */
+    .fcard.future {
+      background: white;
+      border: 1px dashed rgba(0,0,0,0.12);
+    }
+    .fcard.future .fcard-name {
+      color: var(--text-secondary);
+    }
+
+    /* Status left-border accents */
+    .fcard.on-track    { border-left: 2px solid #5B9A6F; }
+    .fcard.at-risk     { border-left: 2px solid #E07A5F; }
+    .fcard.blocked     { border-left: 2px solid #CC0000; }
+    .fcard.complete    { border-left: 2px solid #5B9A6F; }
+    .fcard.not-started { border-left: 2px solid var(--text-disabled); }
+    .fcard.past.complete { border-left: 2px solid transparent; }
+
+    .fcard-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .fcard-id {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-disabled);
+      letter-spacing: 0.02em;
+    }
+    .fcard-assignee {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(42,110,220,0.1);
+      color: var(--color-info);
+      font-size: 8px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .fcard-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .fcard-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 9px;
+      color: var(--text-tertiary);
+    }
+
+    .fcard-pill {
+      font-size: 8px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+    .fcard-pill.on-track    { background: #EAF3DE; color: #3B6D11; }
+    .fcard-pill.at-risk     { background: #FEF3E2; color: #854F0B; }
+    .fcard-pill.blocked     { background: #FDEAEA; color: #A32D2D; }
+    .fcard-pill.complete    { background: #EAF3DE; color: #3B6D11; }
+    .fcard-pill.not-started { background: rgba(0,0,0,0.04); color: var(--text-tertiary); }
+    .fcard-pill.planned     { background: rgba(0,0,0,0.04); color: var(--text-tertiary); }
+
+    .fcard-dep {
+      margin-top: 3px;
+    }
+
+    /* ── Dependency Badges ───────────────────────────── */
+    .dep-badge {
+      font-size: 8px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .dep-badge.ok       { background: rgba(42,110,220,0.08); color: var(--color-link); }
+    .dep-badge.at-risk  { background: rgba(217,119,6,0.1); color: #D97706; }
+    .dep-badge.blocked  { background: rgba(204,0,0,0.08); color: #CC0000; }
+    .dep-badge.external { background: rgba(124,58,237,0.08); color: #7C3AED; }
+
+    /* ── Compact mode ────────────────────────────────── */
+    .board-grid.compact .fcard { padding: 4px 6px; }
+    .board-grid.compact .fcard-meta { display: none; }
+    .board-grid.compact .fcard-dep { display: none; }
+    .board-grid.compact .fcard-top .fcard-assignee { display: none; }
+    .board-grid.compact .fcard-name { font-size: 10px; -webkit-line-clamp: 1; }
+    .board-grid.compact .sprint-cell { gap: 3px; min-height: 60px; }
+
+    /* ── Bottom gradient + spacer ────────────────────── */
+    .board-spacer {
+      height: 120px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav id="left-nav"></nav>
+    <main class="content-viewport" style="overflow:hidden; display:flex; flex-direction:column;">
+
+      <!-- ═══════════ Zone 1: Sticky Header ═══════════ -->
+      <div class="board-header">
+        <button class="back-btn" id="back-btn" onclick="window.location.href='planning.html'" title="Back to Planning">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="board-title">PI Planning Board</span>
+        <div class="header-spacer"></div>
+        <select id="pi-selector" onchange="switchBoardPI(this.value)" style="height:32px; padding:0 28px 0 12px; background:var(--color-secondary); border:none; border-radius:var(--radius-lg); font-size:12px; font-weight:500; color:var(--color-secondary-content); cursor:pointer; font-family:var(--font-sans); appearance:none; -webkit-appearance:none; background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22 fill=%22none%22%3E%3Cpath d=%22M3 5l3 3 3-3%22 stroke=%22%23343331%22 stroke-width=%221.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 10px center;">
+          <option value="pi-23">PI-23 (Closed)</option>
+          <option value="pi-24">PI-24 (Closed)</option>
+          <option value="pi-25" selected>PI-25 (Active)</option>
+          <option value="pi-26">PI-26 (Planning)</option>
+          <option value="pi-27">PI-27 (Future)</option>
+        </select>
+        <div style="width:180px; height:32px; padding:0 10px; background:white; border-radius:var(--radius-lg); outline:1px solid var(--border-default); outline-offset:-1px; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="board-search" placeholder="Search board..." oninput="searchBoard()" style="border:none; outline:none; font-size:12px; color:var(--text-primary); background:transparent; width:100%; font-family:var(--font-sans);"/>
+        </div>
+        <span class="confidence-badge amber" id="confidence-badge">3.6 Confidence</span>
+      </div>
+
+      <!-- ═══════════ Zone 2a: Health Bar ═══════════ -->
+      <div style="position:sticky; top:56px; z-index:99; padding:8px 32px; font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:0; border-bottom:1px solid rgba(0,0,0,0.03); background:rgba(255,255,255,0.4); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
+        <div class="health-stats" id="health-stats">
+          <span>14 Features</span>
+          <span class="sep">&middot;</span>
+          <span>83% capacity</span>
+          <span class="sep">&middot;</span>
+          <span>3.6 confidence</span>
+          <span class="sep">&middot;</span>
+          <span class="coral">3 at risk</span>
+          <span class="sep">&middot;</span>
+          <span>2 internal deps</span>
+          <span class="sep">&middot;</span>
+          <span class="purple">1 external dep</span>
+        </div>
+        <div style="flex:1;"></div>
+        <button onclick="toggleLegend()" style="font-size:10px; color:var(--text-tertiary); background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:3px; font-family:var(--font-sans);">&#9432; Legend</button>
+      </div>
+
+      <!-- ═══════════ Zone 2b: Controls Bar ═══════════ -->
+      <div style="position:sticky; top:93px; z-index:98; padding:8px 32px; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(0,0,0,0.04); background:rgba(255,255,255,0.35); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
+        <!-- Left: view toggles -->
+        <div class="pill-toggle" id="view-toggle">
+          <button class="active" onclick="setView('overview')">Overview</button>
+          <button onclick="setView('risk')">Risk</button>
+        </div>
+        <button class="dep-toggle" onclick="toggleDependencies()" id="dep-toggle-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          Dependencies
+        </button>
+        <div style="flex:1;"></div>
+        <!-- Right: search, trace, compact -->
+        <div class="trace-wrap">
+          <select id="feature-trace" onchange="traceFeature(this.value)">
+            <option value="">All Features</option>
+          </select>
+          <button id="trace-clear" onclick="traceFeature(''); document.getElementById('feature-trace').value='';">&#215;</button>
+        </div>
+        <div class="display-toggle" id="display-toggle">
+          <button class="active" onclick="setDisplay('default')">Default</button>
+          <button onclick="setDisplay('compact')">Compact</button>
+        </div>
+      </div>
+
+      <!-- Legend bar (collapsed by default) -->
+      <div class="legend-bar" id="legend-bar">
+        <span style="font-weight:600; color:var(--text-secondary); margin-right:4px;">Status:</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:#EAF3DE; border:1px solid #3B6D11;"></span> On track / Done</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:#FEF3E2; border:1px solid #854F0B;"></span> At risk</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:#FDEAEA; border:1px solid #A32D2D;"></span> Blocked</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.1);"></span> Not started</span>
+        <span class="legend-sep"></span>
+        <span style="font-weight:600; color:var(--text-secondary); margin-right:4px;">Deps:</span>
+        <span class="legend-item"><span class="dep-badge ok" style="font-size:9px;">Resolved</span></span>
+        <span class="legend-item"><span class="dep-badge at-risk" style="font-size:9px;">At risk</span></span>
+        <span class="legend-item"><span class="dep-badge blocked" style="font-size:9px;">Blocked</span></span>
+        <span class="legend-item"><span class="dep-badge external" style="font-size:9px;">External</span></span>
+        <span class="legend-sep"></span>
+        <span style="font-weight:600; color:var(--text-secondary); margin-right:4px;">Sprints:</span>
+        <span class="legend-item"><span class="legend-swatch swatch-past"></span> Past</span>
+        <span class="legend-item"><span class="legend-swatch swatch-current"></span> Current</span>
+        <span class="legend-item"><span class="legend-swatch swatch-future"></span> Future</span>
+      </div>
+
+      <!-- ═══════════ Zone 3: Board Matrix ═══════════ -->
+      <div class="board-scroll" id="board-scroll" style="position:relative;">
+        <div class="board-grid" id="board-grid">
+          <!-- Rendered by JS -->
+        </div>
+        <svg id="dep-lines" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; display:none;"></svg>
+        <div class="board-spacer"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Bottom gradient overlay -->
+  <div style="position:fixed; bottom:0; left:64px; right:0; height:80px; background:linear-gradient(to top, rgba(229,237,240,0.95) 0%, rgba(229,237,240,0) 100%); pointer-events:none; z-index:150;"></div>
+
+  <!-- ═══════════ Nav ═══════════ -->
+  <script src="../shared/nav.js"></script>
+  <script>renderNav('board', {avatar:'../../assets/images/avatar-james.png', name:'James', links:{0:'planning.html', 3:'feature-backlog.html', 4:'pi-board.html'}});</script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('pi-board');</script>
+
+  <script>
+    /* ── Data ─────────────────────────────────────────── */
+    var sprintLabels = [
+      { name:'Sprint 1', phase:'past', detail:'Complete', totalPts:49, dates:'Dec 18 – Dec 31' },
+      { name:'Sprint 2', phase:'past', detail:'Complete', totalPts:47, dates:'Jan 1 – Jan 14' },
+      { name:'Sprint 3', phase:'current', detail:'Current', totalPts:50, dates:'Jan 15 – Jan 28' },
+      { name:'Sprint 4', phase:'future', detail:'Planned', totalPts:43, dates:'Jan 29 – Feb 11' },
+      { name:'Sprint 5', phase:'future', detail:'Planned', totalPts:16, dates:'Feb 12 – Feb 25' }
+    ];
+
+    var boardTeams = [
+      {
+        name:'Orion', members:6, velocity:47, confidence:4,
+        objective:'Deliver onboarding API and unblock reporting pipeline',
+        sprints:[
+          {pts:12, cap:9, phase:'past', features:[
+            {id:'F-01', name:'Customer onboarding API v2', pts:9, status:'complete', assignee:'JS', stories:4},
+            {id:'F-01', name:'Infra setup', pts:3, status:'complete', assignee:'KR', stories:2}
+          ]},
+          {pts:11, cap:9, phase:'past', features:[
+            {id:'F-01', name:'Customer onboarding API v2', pts:6, status:'complete', assignee:'JS', stories:3},
+            {id:'F-05', name:'Pipeline foundation', pts:5, status:'complete', assignee:'AL', stories:2}
+          ]},
+          {pts:10, cap:9, phase:'current', features:[
+            {id:'F-05', name:'Real-time reporting pipeline', pts:7, status:'blocked', assignee:'AL', stories:3, dep:{text:'\u2190 Atlas S1', type:'blocked'}},
+            {id:'F-01', name:'API bug fixes', pts:3, status:'on-track', assignee:'JS', stories:2}
+          ]},
+          {pts:9, cap:9, phase:'future', features:[
+            {id:'F-05', name:'Real-time reporting pipeline', pts:9, status:'not-started', assignee:'AL', stories:4}
+          ]},
+          {pts:5, cap:9, phase:'future', features:[
+            {id:'F-01', name:'Hardening & testing', pts:5, status:'not-started', assignee:'JS', stories:3}
+          ]}
+        ]
+      },
+      {
+        name:'Nova', members:5, velocity:44, confidence:2,
+        objective:'Complete SLA reporting and begin rate limiting',
+        sprints:[
+          {pts:11, cap:9, phase:'past', features:[
+            {id:'F-02', name:'Reporting module API', pts:8, status:'at-risk', assignee:'MP', stories:4},
+            {id:'F-02', name:'Tech debt cleanup', pts:3, status:'complete', assignee:'SR', stories:2}
+          ]},
+          {pts:10, cap:9, phase:'past', features:[
+            {id:'F-02', name:'Reporting module API', pts:5, status:'at-risk', assignee:'MP', stories:3},
+            {id:'F-06', name:'SSO integration', pts:5, status:'on-track', assignee:'TN', stories:2}
+          ]},
+          {pts:12, cap:9, phase:'current', features:[
+            {id:'F-06', name:'SSO integration', pts:6, status:'on-track', assignee:'TN', stories:3},
+            {id:'F-09', name:'API rate limiting', pts:6, status:'at-risk', assignee:'MP', stories:3, dep:{text:'\u2190 Ext: Platform ART', type:'external'}}
+          ]},
+          {pts:10, cap:9, phase:'future', features:[
+            {id:'F-09', name:'API rate limiting', pts:6, status:'at-risk', assignee:'MP', stories:3, dep:{text:'\u2192 Apex S5', type:'at-risk'}},
+            {id:'F-09', name:'Rate limit config', pts:4, status:'not-started', assignee:'SR', stories:2}
+          ]},
+          {pts:5, cap:9, phase:'future', features:[
+            {id:'F-09', name:'Buffer & testing', pts:5, status:'not-started', assignee:'TN', stories:2}
+          ]}
+        ]
+      },
+      {
+        name:'Apex', members:6, velocity:50, confidence:4,
+        objective:'Ship retention dashboard and begin segment view',
+        sprints:[
+          {pts:10, cap:10, phase:'past', features:[
+            {id:'F-03', name:'Customer retention dashboard', pts:8, status:'complete', assignee:'PK', stories:4},
+            {id:'F-03', name:'UX polish', pts:2, status:'complete', assignee:'LW', stories:1}
+          ]},
+          {pts:9, cap:10, phase:'past', features:[
+            {id:'F-03', name:'Retention dashboard v2', pts:4, status:'on-track', assignee:'PK', stories:2},
+            {id:'F-10', name:'Retention insights', pts:5, status:'on-track', assignee:'LW', stories:3}
+          ]},
+          {pts:10, cap:10, phase:'current', features:[
+            {id:'F-10', name:'Retention insights', pts:7, status:'on-track', assignee:'LW', stories:4},
+            {id:'F-14', name:'Multi-region failover', pts:3, status:'not-started', assignee:'PK', stories:2}
+          ]},
+          {pts:8, cap:10, phase:'future', features:[
+            {id:'F-14', name:'Multi-region failover', pts:8, status:'not-started', assignee:'PK', stories:4}
+          ]},
+          {pts:1, cap:10, phase:'future', features:[
+            {id:'F-14', name:'Failover testing', pts:1, status:'not-started', assignee:'PK', stories:1, dep:{text:'\u2190 Nova S4', type:'at-risk'}}
+          ]}
+        ]
+      },
+      {
+        name:'Atlas', members:5, velocity:46, confidence:4,
+        objective:'Deliver audit trail and data export capabilities',
+        sprints:[
+          {pts:9, cap:9, phase:'past', features:[
+            {id:'F-04', name:'Audit trail', pts:6, status:'on-track', assignee:'RG', stories:3, dep:{text:'\u2192 Orion S3', type:'ok'}},
+            {id:'F-12', name:'Data export', pts:3, status:'on-track', assignee:'HS', stories:2}
+          ]},
+          {pts:9, cap:9, phase:'past', features:[
+            {id:'F-04', name:'Audit trail config', pts:4, status:'on-track', assignee:'RG', stories:2},
+            {id:'F-12', name:'Data export CSV/JSON', pts:5, status:'complete', assignee:'HS', stories:3, dep:{text:'\u2192 Orion S3', type:'ok'}}
+          ]},
+          {pts:10, cap:9, phase:'current', features:[
+            {id:'F-08', name:'Bulk user provisioning', pts:7, status:'on-track', assignee:'RG', stories:4},
+            {id:'F-04', name:'Audit trail testing', pts:3, status:'on-track', assignee:'HS', stories:2}
+          ]},
+          {pts:9, cap:9, phase:'future', features:[
+            {id:'F-08', name:'Bulk provisioning API', pts:6, status:'not-started', assignee:'RG', stories:3},
+            {id:'F-08', name:'Integration layer', pts:3, status:'not-started', assignee:'HS', stories:2}
+          ]},
+          {pts:3, cap:9, phase:'future', features:[
+            {id:'F-08', name:'Hardening', pts:3, status:'not-started', assignee:'RG', stories:2}
+          ]}
+        ]
+      },
+      {
+        name:'Vega', members:4, velocity:38, confidence:3,
+        objective:'Start mobile board view and improve webhook reliability',
+        sprints:[
+          {pts:7, cap:8, phase:'past', features:[
+            {id:'F-07', name:'Mobile sprint board', pts:7, status:'on-track', assignee:'DM', stories:4}
+          ]},
+          {pts:8, cap:8, phase:'past', features:[
+            {id:'F-07', name:'Mobile sprint board', pts:5, status:'on-track', assignee:'DM', stories:3},
+            {id:'F-11', name:'Webhook reliability', pts:3, status:'on-track', assignee:'YP', stories:2}
+          ]},
+          {pts:8, cap:8, phase:'current', features:[
+            {id:'F-11', name:'Webhook reliability', pts:5, status:'on-track', assignee:'YP', stories:3},
+            {id:'F-13', name:'Offline mode', pts:3, status:'on-track', assignee:'DM', stories:2}
+          ]},
+          {pts:7, cap:8, phase:'future', features:[
+            {id:'F-13', name:'Offline mode mobile', pts:7, status:'on-track', assignee:'DM', stories:4}
+          ]},
+          {pts:2, cap:8, phase:'future', features:[
+            {id:'F-13', name:'Testing', pts:2, status:'not-started', assignee:'YP', stories:1}
+          ]}
+        ]
+      }
+    ];
+
+    /* ── State ────────────────────────────────────────── */
+    var currentView = 'overview';
+    var currentDisplay = 'default';
+    var tracedFeature = '';
+    var focusedTeam = '';
+
+    /* ── Init ─────────────────────────────────────────── */
+    (function init() {
+      // Show back button if came from planning
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('from') === 'planning') {
+        document.getElementById('back-btn').classList.add('visible');
+      }
+
+      populateFeatureTrace();
+      renderBoard();
+    })();
+
+    /* ── Populate feature trace dropdown ──────────────── */
+    function populateFeatureTrace() {
+      var sel = document.getElementById('feature-trace');
+      var seen = {};
+      boardTeams.forEach(function(team) {
+        team.sprints.forEach(function(s) {
+          s.features.forEach(function(f) {
+            if (!seen[f.id]) {
+              seen[f.id] = f.id + ' ' + f.name.split(' ').slice(0,3).join(' ');
+            }
+          });
+        });
+      });
+      var ids = Object.keys(seen).sort();
+      ids.forEach(function(id) {
+        var opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = seen[id];
+        sel.appendChild(opt);
+      });
+    }
+
+    /* ── Render Board ─────────────────────────────────── */
+    function renderBoard() {
+      var grid = document.getElementById('board-grid');
+      var html = '';
+
+      // Header row
+      html += '<div class="sprint-header">Teams / Sprints</div>';
+      sprintLabels.forEach(function(sp) {
+        html += '<div class="sprint-header ' + sp.phase + '">';
+        html += sp.name;
+        html += '<div class="sprint-meta">' + sp.dates + '</div>';
+        if (sp.phase === 'current') {
+          html += '<div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;">';
+          html += '<span style="font-size:9px; font-weight:700; color:white; background:var(--color-info); padding:2px 8px; border-radius:var(--radius-full); text-transform:uppercase; letter-spacing:0.04em;">Current</span>';
+          html += '<span style="font-size:9px; font-weight:600; color:var(--color-info);">3 days left</span>';
+          html += '</div>';
+        } else if (sp.phase === 'past') {
+          html += '<div style="margin-top:4px;"><span class="sprint-badge complete">\u2713 ' + sp.detail + '</span> <span class="sprint-pts">' + sp.totalPts + ' pts</span></div>';
+        } else {
+          html += '<div style="margin-top:4px;"><span class="sprint-badge planned">' + sp.detail + '</span> <span class="sprint-pts">' + sp.totalPts + ' pts</span></div>';
+        }
+        html += '</div>';
+      });
+
+      // Team rows
+      boardTeams.forEach(function(team) {
+        var totalPts = 0;
+        var totalCap = 0;
+        team.sprints.forEach(function(s) { totalPts += s.pts; totalCap += s.cap; });
+        var capPct = Math.round((totalPts / totalCap) * 100);
+        var isProblem = team.confidence <= 2;
+        var teamDimmed = focusedTeam && focusedTeam !== team.name;
+
+        // Team cell
+        var pct = capPct;
+        var isOver = pct > 100;
+        var barColor = isOver ? '#E07A5F' : 'var(--color-info)';
+        html += '<div class="team-cell' + (isProblem ? ' problem' : '') + (teamDimmed ? ' dimmed' : '') + (focusedTeam === team.name ? ' focused' : '') + '" data-team="' + team.name + '" onclick="toggleTeamFocus(\'' + team.name + '\')">';
+        html += '  <div class="team-name">' + team.name;
+        if (isProblem) {
+          html += ' <span class="low-conf-badge">\u26a0 Low confidence</span>';
+        }
+        html += '</div>';
+        html += '  <div class="team-objective">' + team.objective + '</div>';
+        html += '  <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px;">';
+        html += '    <div style="display:flex; align-items:center; gap:6px;">';
+        html += '      <span style="font-size:9px; color:var(--text-disabled); text-transform:uppercase; letter-spacing:0.05em; min-width:52px;">Capacity</span>';
+        html += '      <div class="team-cell-bar"><div class="team-cell-bar-fill" style="width:' + Math.min(pct,100) + '%; background:' + barColor + ';"></div></div>';
+        html += '      <span class="team-cell-pct" style="color:' + (isOver ? '#E07A5F' : 'var(--text-tertiary)') + ';">' + pct + '%</span>';
+        html += '    </div>';
+        html += '    <div style="display:flex; align-items:center; gap:6px;">';
+        html += '      <span style="font-size:9px; color:var(--text-disabled); text-transform:uppercase; letter-spacing:0.05em; min-width:52px;">Confidence</span>';
+        for (var d = 1; d <= 5; d++) {
+          var dotColor = d <= team.confidence ? (team.confidence >= 4 ? '#5B9A6F' : team.confidence >= 3 ? '#D97706' : '#E07A5F') : 'var(--color-secondary)';
+          html += '<div style="width:6px; height:6px; border-radius:50%; background:' + dotColor + ';"></div>';
+        }
+        html += '      <span style="font-size:10px; font-weight:600; color:' + (team.confidence >= 4 ? '#5B9A6F' : team.confidence >= 3 ? '#D97706' : '#E07A5F') + ';">' + team.confidence + '/5</span>';
+        html += '    </div>';
+        html += '  </div>';
+        html += '  <div style="font-size:9px; color:var(--text-disabled); margin-top:2px;">' + team.members + ' members \u00b7 Vel ' + team.velocity + '</div>';
+        html += '</div>';
+
+        // Sprint cells
+        team.sprints.forEach(function(s, si) {
+          var overCap = s.pts > s.cap;
+          var phaseClass = s.phase === 'past' ? 'past-cell' : s.phase === 'current' ? 'current-cell' : 'future-cell';
+          if (overCap) phaseClass += ' over-cap';
+          var cellDimmed = teamDimmed ? ' team-dimmed' : '';
+
+          html += '<div class="sprint-cell ' + phaseClass + cellDimmed + '" data-team="' + team.name + '" data-sprint="' + si + '">';
+
+          s.features.forEach(function(f) {
+            var cardPhase = s.phase;
+            var isComplete = f.status === 'complete';
+            var cardDimmed = '';
+
+            // Risk filter
+            if (currentView === 'risk' && f.status !== 'at-risk' && f.status !== 'blocked') {
+              cardDimmed = ' dimmed';
+            }
+            // Feature trace
+            if (tracedFeature && f.id !== tracedFeature) {
+              cardDimmed = ' dimmed';
+            }
+
+            if (cardPhase === 'past') {
+              // Minimal past card
+              html += '<div class="fcard past' + (isComplete ? ' complete' : ' ' + f.status) + cardDimmed + '" data-feature-id="' + f.id + '" data-team="' + team.name + '"' + (f.dep ? ' data-dep=\'' + JSON.stringify(f.dep).replace(/'/g, '&#39;') + '\'' : '') + ' onclick="window.location.href=\'feature-detail.html?from=board\'" style="cursor:pointer;">';
+              html += '<div class="fcard-name">' + f.name + '</div>';
+              html += '<div class="fcard-meta">';
+              html += '<span>' + f.pts + ' pts</span>';
+              html += '<span class="fcard-pill ' + f.status + '">' + statusLabel(f.status) + '</span>';
+              html += '</div>';
+              if (f.dep) {
+                html += '<div class="fcard-dep"><span class="dep-badge ' + f.dep.type + '">' + f.dep.text + (f.dep.type === 'ok' ? ' \u2713' : '') + '</span></div>';
+              }
+              html += '</div>';
+            } else if (cardPhase === 'current') {
+              // Full current card
+              html += '<div class="fcard current ' + f.status + cardDimmed + '" data-feature-id="' + f.id + '" data-team="' + team.name + '"' + (f.dep ? ' data-dep=\'' + JSON.stringify(f.dep).replace(/'/g, '&#39;') + '\'' : '') + ' onclick="window.location.href=\'feature-detail.html?from=board\'" style="cursor:pointer;">';
+              html += '<div class="fcard-top">';
+              html += '<span class="fcard-id">' + f.id + '</span>';
+              html += '<span class="fcard-assignee" title="' + f.assignee + '">' + f.assignee + '</span>';
+              html += '</div>';
+              html += '<div class="fcard-name">' + f.name + '</div>';
+              html += '<div class="fcard-meta">';
+              html += '<span>' + f.pts + ' pts</span>';
+              html += '<span>' + f.stories + ' stories</span>';
+              html += '<span class="fcard-pill ' + f.status + '">' + statusLabel(f.status) + '</span>';
+              html += '</div>';
+              if (f.dep) {
+                html += '<div class="fcard-dep"><span class="dep-badge ' + f.dep.type + '">' + f.dep.text + (f.dep.type === 'ok' ? ' \u2713' : '') + '</span></div>';
+              }
+              html += '</div>';
+            } else {
+              // Future card (tentative)
+              html += '<div class="fcard future ' + f.status + cardDimmed + '" data-feature-id="' + f.id + '" data-team="' + team.name + '"' + (f.dep ? ' data-dep=\'' + JSON.stringify(f.dep).replace(/'/g, '&#39;') + '\'' : '') + ' onclick="window.location.href=\'feature-detail.html?from=board\'" style="cursor:pointer;">';
+              html += '<div class="fcard-top">';
+              html += '<span class="fcard-id">' + f.id + '</span>';
+              html += '<span class="fcard-assignee" title="' + f.assignee + '">' + f.assignee + '</span>';
+              html += '</div>';
+              html += '<div class="fcard-name">' + f.name + '</div>';
+              html += '<div class="fcard-meta">';
+              html += '<span>' + f.pts + ' pts</span>';
+              html += '<span class="fcard-pill planned">Planned</span>';
+              html += '</div>';
+              if (f.dep) {
+                html += '<div class="fcard-dep"><span class="dep-badge ' + f.dep.type + '">' + f.dep.text + (f.dep.type === 'ok' ? ' \u2713' : '') + '</span></div>';
+              }
+              html += '</div>';
+            }
+          });
+
+          // Cell capacity bar
+          var capClass = overCap ? ' over' : '';
+          html += '<div class="cell-cap' + capClass + '">' + s.pts + '/' + s.cap + ' pts</div>';
+          html += '</div>';
+        });
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function statusLabel(status) {
+      switch(status) {
+        case 'on-track':    return 'On track';
+        case 'at-risk':     return 'At risk';
+        case 'blocked':     return 'Blocked';
+        case 'complete':    return 'Done';
+        case 'not-started': return 'Not started';
+        default:            return status;
+      }
+    }
+
+    /* ── View Toggle (Overview / Risk) ───────────────── */
+    function setView(view) {
+      currentView = view;
+      var btns = document.querySelectorAll('#view-toggle button');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (view === 'overview') btns[0].classList.add('active');
+      else btns[1].classList.add('active');
+      renderBoard();
+    }
+
+    /* ── Display Toggle (Default / Compact) ──────────── */
+    function setDisplay(mode) {
+      currentDisplay = mode;
+      var btns = document.querySelectorAll('#display-toggle button');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (mode === 'default') btns[0].classList.add('active');
+      else btns[1].classList.add('active');
+
+      var grid = document.getElementById('board-grid');
+      if (mode === 'compact') {
+        grid.classList.add('compact');
+      } else {
+        grid.classList.remove('compact');
+      }
+    }
+
+    /* ── Feature Trace ───────────────────────────────── */
+    function traceFeature(fid) {
+      tracedFeature = fid;
+      document.getElementById('trace-clear').style.display = fid ? 'flex' : 'none';
+      renderBoard();
+    }
+
+    /* ── Team Focus ──────────────────────────────────── */
+    function toggleTeamFocus(name) {
+      focusedTeam = focusedTeam === name ? '' : name;
+      renderBoard();
+    }
+
+    /* ── Legend Toggle ────────────────────────────────── */
+    function toggleLegend() {
+      var bar = document.getElementById('legend-bar');
+      bar.classList.toggle('visible');
+    }
+
+    /* ── Board Search ────────────────────────────────── */
+    function searchBoard() {
+      var q = document.getElementById('board-search').value.toLowerCase();
+      document.querySelectorAll('.fcard').forEach(function(card) {
+        var text = card.textContent.toLowerCase();
+        if (!q) { card.classList.remove('dimmed'); return; }
+        card.classList.toggle('dimmed', !text.includes(q));
+      });
+    }
+
+    /* ── Dependency Lines ─────────────────────────────── */
+    var depStyles = {
+      'ok': {stroke:'#4A90D9', strokeWidth:2, dashArray:'8,4', icon:'\u2713', bg:'rgba(74,144,217,0.12)', label:'Resolved'},
+      'at-risk': {stroke:'#D97706', strokeWidth:2.5, dashArray:'', icon:'\u26A0', bg:'rgba(217,119,6,0.12)', label:'At risk'},
+      'blocked': {stroke:'#CC0000', strokeWidth:3, dashArray:'', icon:'\u25CF', bg:'rgba(204,0,0,0.12)', label:'Blocked'},
+      'external': {stroke:'#7C3AED', strokeWidth:2, dashArray:'6,4', icon:'\u2197', bg:'rgba(124,58,237,0.12)', label:'External'}
+    };
+
+    function drawDependencyLines() {
+      var svg = document.getElementById('dep-lines');
+      var container = document.getElementById('board-scroll');
+      if (!svg || !container) return;
+
+      svg.innerHTML = '';
+      svg.setAttribute('width', container.scrollWidth);
+      svg.setAttribute('height', container.scrollHeight);
+
+      var containerRect = container.getBoundingClientRect();
+
+      document.querySelectorAll('.fcard[data-dep]').forEach(function(card) {
+        var depData;
+        try { depData = JSON.parse(card.getAttribute('data-dep')); } catch(e) { return; }
+        var targetCard = findDepTarget(depData.text);
+        if (!targetCard) return;
+
+        var fromRect = card.getBoundingClientRect();
+        var toRect = targetCard.getBoundingClientRect();
+        var style = depStyles[depData.type] || depStyles['ok'];
+
+        var isIncoming = depData.text.indexOf('\u2190') >= 0;
+        var x1 = (isIncoming ? fromRect.left - 2 : fromRect.right + 2) - containerRect.left + container.scrollLeft;
+        var y1 = fromRect.top + fromRect.height / 2 - containerRect.top + container.scrollTop;
+        var x2 = (isIncoming ? toRect.right + 2 : toRect.left - 2) - containerRect.left + container.scrollLeft;
+        var y2 = toRect.top + toRect.height / 2 - containerRect.top + container.scrollTop;
+
+        // Curved path
+        var dx = Math.abs(x2 - x1);
+        var cp = Math.max(dx * 0.4, 40);
+        var d = 'M' + x1 + ',' + y1 + ' C' + (x1 + (isIncoming ? -cp : cp)) + ',' + y1 + ' ' + (x2 + (isIncoming ? cp : -cp)) + ',' + y2 + ' ' + x2 + ',' + y2;
+
+        // Draw the line
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('stroke', style.stroke);
+        path.setAttribute('stroke-width', style.strokeWidth);
+        path.setAttribute('fill', 'none');
+        if (style.dashArray) path.setAttribute('stroke-dasharray', style.dashArray);
+        path.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(path);
+
+        // Wider invisible hit area for hover
+        var hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        hitPath.setAttribute('d', d);
+        hitPath.setAttribute('stroke', 'transparent');
+        hitPath.setAttribute('stroke-width', '16');
+        hitPath.setAttribute('fill', 'none');
+        hitPath.setAttribute('pointer-events', 'auto');
+        hitPath.style.cursor = 'pointer';
+        svg.appendChild(hitPath);
+
+        // Endpoint dot on the target card
+        var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', x2);
+        dot.setAttribute('cy', y2);
+        dot.setAttribute('r', 4);
+        dot.setAttribute('fill', style.stroke);
+        svg.appendChild(dot);
+
+        // Info node at midpoint
+        var midX = (x1 + x2) / 2;
+        var midY = (y1 + y2) / 2;
+
+        var nodeGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        nodeGroup.setAttribute('pointer-events', 'auto');
+        nodeGroup.style.cursor = 'pointer';
+
+        // Node circle background
+        var nodeBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        nodeBg.setAttribute('cx', midX);
+        nodeBg.setAttribute('cy', midY);
+        nodeBg.setAttribute('r', 10);
+        nodeBg.setAttribute('fill', 'white');
+        nodeBg.setAttribute('stroke', style.stroke);
+        nodeBg.setAttribute('stroke-width', '1.5');
+        nodeGroup.appendChild(nodeBg);
+
+        // Node icon text
+        var nodeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        nodeText.setAttribute('x', midX);
+        nodeText.setAttribute('y', midY);
+        nodeText.setAttribute('text-anchor', 'middle');
+        nodeText.setAttribute('dominant-baseline', 'central');
+        nodeText.setAttribute('fill', style.stroke);
+        nodeText.setAttribute('font-size', '10');
+        nodeText.setAttribute('font-weight', '600');
+        nodeText.textContent = style.icon;
+        nodeGroup.appendChild(nodeText);
+
+        // Tooltip on hover — get team names directly from card attributes
+        var sourceName = card.getAttribute('data-team') || '?';
+        var targetName = targetCard.getAttribute('data-team') || '?';
+        var fromName = card.querySelector('.fcard-name') ? card.querySelector('.fcard-name').textContent.trim() : '';
+        var toName = targetCard.querySelector('.fcard-name') ? targetCard.querySelector('.fcard-name').textContent.trim() : '';
+
+        var tooltipText = style.label + ' dependency\n' +
+          (isIncoming ? toName + ' (' + targetName + ') \u2192 ' + fromName + ' (' + sourceName + ')' :
+                        fromName + ' (' + sourceName + ') \u2192 ' + toName + ' (' + targetName + ')');
+
+        var titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        titleEl.textContent = tooltipText;
+        nodeGroup.appendChild(titleEl);
+
+        // Hover: enlarge node
+        nodeGroup.addEventListener('mouseenter', function() { nodeBg.setAttribute('r', '13'); });
+        nodeGroup.addEventListener('mouseleave', function() { nodeBg.setAttribute('r', '10'); });
+
+        svg.appendChild(nodeGroup);
+      });
+    }
+
+    function findDepTarget(text) {
+      // Parse "← Atlas S1" or "→ Apex S5" or "← Ext: Platform ART"
+      if (text.includes('Ext:')) return null; // external, no target card
+      var parts = text.replace('\u2190','').replace('\u2192','').trim().split(' S');
+      if (parts.length < 2) return null;
+      var team = parts[0].trim();
+      var sprint = parseInt(parts[1]) - 1; // 0-indexed
+
+      // Find cards in that team's sprint cell
+      var cells = document.querySelectorAll('[data-team="' + team + '"][data-sprint="' + sprint + '"] .fcard');
+      return cells.length > 0 ? cells[0] : null;
+    }
+
+    function toggleDependencies() {
+      var svg = document.getElementById('dep-lines');
+      var btn = document.getElementById('dep-toggle-btn');
+      if (svg.style.display === 'none') {
+        svg.style.display = 'block';
+        btn.classList.add('active');
+        requestAnimationFrame(function() { drawDependencyLines(); });
+      } else {
+        svg.style.display = 'none';
+        btn.classList.remove('active');
+      }
+    }
+
+    /* ── PI Selector ─────────────────────────────────── */
+    function switchBoardPI(pi) {
+      // For prototype, show message for PIs without data
+      if (pi !== 'pi-25') {
+        alert('Board data for ' + pi.toUpperCase().replace('-',' ') + ' not available in this prototype. Showing PI-25.');
+        document.getElementById('pi-selector').value = 'pi-25';
+      }
+    }
+  </script>
+</body>
+</html>

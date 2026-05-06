@@ -12,5 +12,7 @@ EAP.renderBacklog = function() {
   var c = EAP.bkCols();
   var pgId = 'bk-main';
   var pageItems = EAP.pgSlice(d, pgId);
-  return '<div class="gpanel" style="flex:1;min-width:0;"><div class="gpanel-hd"><div class="gpanel-hd-left"><span class="gpanel-title">' + l + '</span><span class="gpanel-count">' + d.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div><div class="gpanel-scroll"><table class="dtbl"><thead><tr>' + c.h + '</tr></thead><tbody>' + pageItems.map(function(i) { return '<tr>' + c.r(i) + '</tr>'; }).join('') + '</tbody></table></div>' + EAP.pgFooter(d.length, pgId) + '</div>';
+  var head = '<div class="gpanel" style="flex:1;min-width:0;"><div class="gpanel-hd"><div class="gpanel-hd-left"><span class="gpanel-title">' + l + '</span><span class="gpanel-count">' + d.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div>';
+  if (!d.length) return head + '<div class="gpanel-scroll" style="display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div></div>';
+  return head + '<div class="gpanel-scroll"><table class="dtbl"><thead><tr>' + c.h + '</tr></thead><tbody>' + pageItems.map(function(i) { return '<tr data-item-id="' + i.id + '">' + c.r(i) + '</tr>'; }).join('') + '</tbody></table></div>' + EAP.pgFooter(d.length, pgId) + '</div>';
 };

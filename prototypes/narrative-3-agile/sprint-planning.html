@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprint Planning | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── Sticky header ───────────────────────────────── */
+    .sprint-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 32px 0;
+      flex-shrink: 0;
+    }
+
+    .sprint-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sprint-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      line-height: var(--line-height-tight);
+      margin: 0;
+    }
+
+    .sprint-context {
+      font-size: var(--font-size-sm);
+      color: #475569;
+      font-weight: var(--font-weight-normal);
+    }
+
+    /* ── Sprint goal input ───────────────────────────── */
+    .sprint-goal-wrap {
+      padding: 16px 32px 0;
+      flex-shrink: 0;
+    }
+
+    .sprint-goal-label {
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      color: #727a90;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .sprint-goal-input {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: var(--font-size-sm);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: var(--radius-field);
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      box-sizing: border-box;
+    }
+
+    .sprint-goal-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(14,78,105,0.1);
+    }
+
+    /* ── Split panel layout ──────────────────────────── */
+    .split-panels {
+      display: flex;
+      gap: 16px;
+      padding: 16px 32px 120px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .glass-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.52);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.6);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      flex-shrink: 0;
+    }
+
+    .panel-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+
+    .panel-count {
+      font-size: 12px;
+      font-weight: var(--font-weight-normal);
+      color: #727a90;
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+      min-height: 0;
+    }
+
+    .panel-body::-webkit-scrollbar { width: 4px; }
+    .panel-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+    .panel-footer {
+      padding: 12px 20px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* ── Story card ──────────────────────────────────── */
+    .story-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(0,0,0,0.06);
+      margin-bottom: 6px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      cursor: default;
+      position: relative;
+    }
+
+    .story-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+      background: rgba(255,255,255,0.85);
+    }
+
+    /* Drag dots */
+    .story-drag {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+      opacity: 0.25;
+      cursor: grab;
+      padding: 4px 2px;
+    }
+
+    .story-drag-row {
+      display: flex;
+      gap: 2px;
+    }
+
+    .story-drag-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #888;
+    }
+
+    .story-card:hover .story-drag { opacity: 0.5; }
+
+    .story-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .story-top-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .story-id {
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-link);
+      white-space: nowrap;
+    }
+
+    .story-feature {
+      font-size: 10px;
+      color: #727a90;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .story-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .story-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .story-pts {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: var(--radius-full);
+      background: #f1f2f4;
+      font-size: 10px;
+      font-weight: var(--font-weight-semibold);
+      color: #475569;
+    }
+
+    .story-ac {
+      font-size: 10px;
+      color: #3B6D11;
+      font-weight: 500;
+    }
+
+    .story-assignee {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #A4D1E3;
+      font-size: 8px;
+      font-weight: 700;
+      color: #003B54;
+      flex-shrink: 0;
+    }
+
+    /* Add / remove buttons */
+    .story-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: var(--radius-field);
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .btn-add {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn-add:hover {
+      background: var(--color-primary-hover);
+      transform: scale(1.04);
+    }
+
+    .btn-remove {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.15);
+      color: #475569;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .btn-remove:hover {
+      background: #FDEAEA;
+      border-color: rgba(163,45,45,0.25);
+      color: #A32D2D;
+    }
+
+    /* ── Not ready stories ───────────────────────────── */
+    .not-ready-divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 0 6px;
+    }
+
+    .not-ready-divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(0,0,0,0.08);
+    }
+
+    .not-ready-divider-label {
+      font-size: 10px;
+      font-weight: var(--font-weight-semibold);
+      color: #727a90;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .not-ready-story {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .not-ready-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: rgba(224,122,95,0.12);
+      color: #E07A5F;
+      font-weight: var(--font-weight-semibold);
+      white-space: nowrap;
+    }
+
+    .not-ready-reason {
+      font-size: 10px;
+      color: #E07A5F;
+      font-style: italic;
+    }
+
+    /* ── Capacity bar ────────────────────────────────── */
+    .capacity-section {
+      padding: 0 20px 8px;
+      flex-shrink: 0;
+    }
+
+    .capacity-labels {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .capacity-label {
+      font-size: 11px;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .capacity-track {
+      position: relative;
+      width: 100%;
+      height: 10px;
+      background: rgba(0,0,0,0.06);
+      border-radius: var(--radius-full);
+      overflow: visible;
+    }
+
+    .capacity-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s ease;
+      min-width: 0;
+    }
+
+    .capacity-fill.green { background: var(--color-success); }
+    .capacity-fill.amber { background: var(--color-warning); }
+    .capacity-fill.coral { background: #E07A5F; }
+
+    .capacity-marker {
+      position: absolute;
+      top: -4px;
+      width: 1px;
+      height: 18px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .capacity-marker-label {
+      position: absolute;
+      top: -16px;
+      transform: translateX(-50%);
+      font-size: 8px;
+      color: #727a90;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .capacity-warning {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: rgba(224,122,95,0.1);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(224,122,95,0.2);
+      font-size: 11px;
+      color: #A32D2D;
+      font-weight: 500;
+    }
+
+    .capacity-warning-icon {
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+
+    /* ── Lock Sprint button states ────────────────────── */
+    .btn-lock {
+      height: 36px;
+      padding: 0 20px;
+      border-radius: var(--radius-field);
+      font-size: 13px;
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-lock:disabled {
+      background: #c2c1be;
+      color: #fff;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn-lock:not(:disabled) {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn-lock:not(:disabled):hover {
+      background: var(--color-primary-hover);
+    }
+
+    .btn-lock-warn:not(:disabled) {
+      background: #E07A5F;
+    }
+
+    .btn-lock-warn:not(:disabled):hover {
+      background: #d4694f;
+    }
+
+    /* ── Empty state ─────────────────────────────────── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .empty-state-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .empty-state-icon svg {
+      width: 24px;
+      height: 24px;
+      color: #c2c1be;
+    }
+
+    .empty-state-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #727a90;
+      margin-bottom: 4px;
+    }
+
+    .empty-state-desc {
+      font-size: 11px;
+      color: #c2c1be;
+    }
+
+    /* ── Card slide animation ─────────────────────────── */
+    @keyframes slideInRight {
+      from { transform: translateX(-30px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOutLeft {
+      from { transform: translateX(0); opacity: 1; }
+      to   { transform: translateX(30px); opacity: 0; }
+    }
+
+    .story-card.slide-in {
+      animation: slideInRight 0.3s ease forwards;
+    }
+
+    .story-card.slide-out {
+      animation: slideOutLeft 0.25s ease forwards;
+    }
+
+    /* ── Lock success overlay ─────────────────────────── */
+    .lock-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .lock-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lock-modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px 40px;
+      text-align: center;
+      box-shadow: var(--shadow-xl);
+      max-width: 380px;
+    }
+
+    .lock-modal-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #EAF3DE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .lock-modal-icon svg { width: 28px; height: 28px; color: #3B6D11; }
+
+    .lock-modal-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .lock-modal-desc {
+      font-size: var(--font-size-sm);
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .lock-modal-btn {
+      height: 36px;
+      padding: 0 24px;
+      border-radius: var(--radius-field);
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .lock-modal-btn:hover { background: var(--color-primary-hover); }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav id="left-nav" aria-label="Primary"></nav>
+
+    <main class="content-viewport" style="display:flex; flex-direction:column;">
+      <!-- ── Sticky Header ────────────────────────────── -->
+      <div class="sprint-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button onclick="window.location.href='team-backlog.html'" style="background:none; border:none; cursor:pointer; padding:4px; display:flex;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="sprint-header-left">
+            <h1 class="sprint-title">Sprint Planning</h1>
+            <span class="sprint-context">Sprint 4 &middot; Jan 29 &ndash; Feb 11</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <a href="sprint-board.html" style="font-size:11px; font-weight:500; color:var(--color-link); text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+            View current Sprint
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <button id="header-lock-btn" class="btn-lock" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Lock Sprint
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Sprint Goal ─────────────────────────────── -->
+      <div class="sprint-goal-wrap">
+        <div class="sprint-goal-label">What does Sprint 4 achieve?</div>
+        <input class="sprint-goal-input" type="text" value="Complete reporting pipeline and begin SSO integration testing">
+      </div>
+
+      <!-- ── Split Panels ────────────────────────────── -->
+      <div class="split-panels">
+
+        <!-- LEFT — Ready Stories -->
+        <div class="glass-panel" id="ready-panel">
+          <div class="panel-header">
+            <span class="panel-title" id="ready-panel-title">Ready Stories &middot; 3 available</span>
+          </div>
+          <div class="panel-body" id="ready-panel-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- RIGHT — Sprint 4 -->
+        <div class="glass-panel" id="sprint-panel">
+          <div class="panel-header">
+            <span class="panel-title" id="sprint-panel-title">Sprint 4 &middot; 0/9 pts</span>
+          </div>
+          <div class="capacity-section" id="capacity-section">
+            <div class="capacity-labels">
+              <span class="capacity-label" id="capacity-label">0 of 9 points &middot; 9 remaining</span>
+            </div>
+            <div class="capacity-track">
+              <div class="capacity-fill green" id="capacity-fill" style="width:0%"></div>
+              <div class="capacity-marker" style="left:80%">
+                <span class="capacity-marker-label">80%</span>
+              </div>
+              <div class="capacity-marker" style="left:100%">
+                <span class="capacity-marker-label">100%</span>
+              </div>
+            </div>
+            <div class="capacity-warning" id="capacity-warning" style="display:none;">
+              <span class="capacity-warning-icon">&#9888;</span>
+              <span id="capacity-warning-text">Sprint is over-committed by 0 points</span>
+            </div>
+          </div>
+          <div class="panel-body" id="sprint-panel-body">
+            <!-- Starts empty, fills as stories are added -->
+            <div class="empty-state" id="sprint-empty">
+              <div class="empty-state-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <line x1="12" y1="8" x2="12" y2="16"/>
+                  <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+              </div>
+              <div class="empty-state-title">No stories added yet</div>
+              <div class="empty-state-desc">Add stories from the ready backlog on the left</div>
+            </div>
+          </div>
+          <div class="panel-footer" id="sprint-footer">
+            <button id="footer-lock-btn" class="btn-lock" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Lock Sprint
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Lock success overlay -->
+  <div class="lock-overlay" id="lock-overlay">
+    <div class="lock-modal">
+      <div class="lock-modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="lock-modal-title">Sprint 4 Locked</div>
+      <div class="lock-modal-desc" id="lock-modal-desc">3 stories committed, 12 points planned. The team can now begin work.</div>
+      <button class="lock-modal-btn" onclick="window.location.href='sprint-board.html'">Go to Sprint Board</button>
+    </div>
+  </div>
+
+  <!-- ── Nav ─────────────────────────────────────────── -->
+  <script src="../shared/nav.js"></script>
+  <script>renderNav('feature-list', {avatar:'../../assets/images/avatar-james.png', name:'Sarah Chen', links:{0:'planning.html', 3:'team-backlog.html', 4:'sprint-board.html'}});</script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('team-backlog');</script>
+
+  <!-- ── Sprint Planning Logic ───────────────────────── -->
+  <script>
+    /* ── Data ──────────────────────────────────────── */
+    var readyStories = [
+      {id:'STRY-504', title:'Dashboard integration', feature:'Real-time reporting pipeline', pts:5, acStatus:'2/2 \u2713', assignee:'JS'},
+      {id:'STRY-505', title:'Performance testing', feature:'Real-time reporting pipeline', pts:4, acStatus:'2/2 \u2713', assignee:'AL'},
+      {id:'STRY-407', title:'Load testing 500+ users', feature:'Customer onboarding API v2', pts:3, acStatus:'2/2 \u2713', assignee:'JS'},
+    ];
+
+    var notReadyStories = [
+      {id:'STRY-408', title:'Documentation & SDK examples', feature:'Customer onboarding API v2', pts:2, reason:'Missing acceptance criteria'},
+      {id:'STRY-509', title:'Error recovery flows', feature:'Real-time reporting pipeline', pts:3, reason:'No estimate'},
+    ];
+
+    var sprintStories = [];
+    var sprintCapacity = 9;
+
+    /* ── Render helpers ───────────────────────────── */
+    function dragDots() {
+      return '<div class="story-drag">' +
+        '<div class="story-drag-row"><span class="story-drag-dot"></span><span class="story-drag-dot"></span></div>' +
+        '<div class="story-drag-row"><span class="story-drag-dot"></span><span class="story-drag-dot"></span></div>' +
+        '<div class="story-drag-row"><span class="story-drag-dot"></span><span class="story-drag-dot"></span></div>' +
+      '</div>';
+    }
+
+    function storyCardHTML(story, mode) {
+      var actionBtn = '';
+      if (mode === 'ready') {
+        actionBtn = '<button class="story-action-btn btn-add" onclick="addToSprint(\'' + story.id + '\')">Add +</button>';
+      } else if (mode === 'sprint') {
+        actionBtn = '<button class="story-action-btn btn-remove" onclick="removeFromSprint(\'' + story.id + '\')" title="Remove">&times;</button>';
+      }
+
+      var meta = '<div class="story-meta">' +
+        '<span class="story-pts">' + story.pts + ' pts</span>';
+
+      if (story.acStatus) {
+        meta += '<span class="story-ac">' + story.acStatus + '</span>';
+      }
+
+      meta += '</div>';
+
+      return '<div class="story-card" id="card-' + story.id + '">' +
+        dragDots() +
+        '<div class="story-info">' +
+          '<div class="story-top-row">' +
+            '<span class="story-id">' + story.id + '</span>' +
+            '<span class="story-feature">' + story.feature + '</span>' +
+          '</div>' +
+          '<div class="story-title">' + story.title + '</div>' +
+          meta +
+        '</div>' +
+        '<span class="story-assignee">' + story.assignee + '</span>' +
+        actionBtn +
+      '</div>';
+    }
+
+    function notReadyCardHTML(story) {
+      return '<div class="story-card not-ready-story" id="card-' + story.id + '">' +
+        dragDots() +
+        '<div class="story-info">' +
+          '<div class="story-top-row">' +
+            '<span class="story-id">' + story.id + '</span>' +
+            '<span class="story-feature">' + story.feature + '</span>' +
+          '</div>' +
+          '<div class="story-title">' + story.title + '</div>' +
+          '<div class="story-meta">' +
+            '<span class="story-pts">' + story.pts + ' pts</span>' +
+            '<span class="not-ready-badge">Not ready</span>' +
+            '<span class="not-ready-reason">' + story.reason + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    /* ── Render panels ────────────────────────────── */
+    function renderReadyPanel() {
+      var body = document.getElementById('ready-panel-body');
+      var title = document.getElementById('ready-panel-title');
+      var html = '';
+
+      readyStories.forEach(function(s) {
+        html += storyCardHTML(s, 'ready');
+      });
+
+      // Not ready divider + stories
+      if (notReadyStories.length > 0) {
+        html += '<div class="not-ready-divider">' +
+          '<div class="not-ready-divider-line"></div>' +
+          '<span class="not-ready-divider-label">Not ready</span>' +
+          '<div class="not-ready-divider-line"></div>' +
+        '</div>';
+
+        notReadyStories.forEach(function(s) {
+          html += notReadyCardHTML(s);
+        });
+      }
+
+      body.innerHTML = html;
+      title.textContent = 'Ready Stories \u00B7 ' + readyStories.length + ' available';
+    }
+
+    function renderSprintPanel() {
+      var body = document.getElementById('sprint-panel-body');
+      var title = document.getElementById('sprint-panel-title');
+      var total = sprintStories.reduce(function(s, st) { return s + st.pts; }, 0);
+      var html = '';
+
+      if (sprintStories.length === 0) {
+        html = '<div class="empty-state" id="sprint-empty">' +
+          '<div class="empty-state-icon">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+              '<rect x="3" y="3" width="18" height="18" rx="2"/>' +
+              '<line x1="12" y1="8" x2="12" y2="16"/>' +
+              '<line x1="8" y1="12" x2="16" y2="12"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div class="empty-state-title">No stories added yet</div>' +
+          '<div class="empty-state-desc">Add stories from the ready backlog on the left</div>' +
+        '</div>';
+      } else {
+        sprintStories.forEach(function(s) {
+          html += storyCardHTML(s, 'sprint');
+        });
+      }
+
+      body.innerHTML = html;
+      title.textContent = 'Sprint 4 \u00B7 ' + total + '/' + sprintCapacity + ' pts';
+
+      // Animate newly added cards
+      if (sprintStories.length > 0) {
+        var cards = body.querySelectorAll('.story-card');
+        var lastCard = cards[cards.length - 1];
+        if (lastCard && !lastCard.classList.contains('slide-in')) {
+          lastCard.classList.add('slide-in');
+        }
+      }
+    }
+
+    function updateCapacity() {
+      var total = sprintStories.reduce(function(s, st) { return s + st.pts; }, 0);
+      var pct = Math.round((total / sprintCapacity) * 100);
+      var remaining = sprintCapacity - total;
+
+      // Fill bar
+      var fill = document.getElementById('capacity-fill');
+      fill.style.width = Math.min(pct, 120) + '%';
+      fill.className = 'capacity-fill';
+      if (pct > 100) {
+        fill.classList.add('coral');
+      } else if (pct >= 80) {
+        fill.classList.add('amber');
+      } else {
+        fill.classList.add('green');
+      }
+
+      // Label
+      var label = document.getElementById('capacity-label');
+      if (remaining >= 0) {
+        label.textContent = total + ' of ' + sprintCapacity + ' points \u00B7 ' + remaining + ' remaining';
+      } else {
+        label.textContent = total + ' of ' + sprintCapacity + ' points \u00B7 ' + Math.abs(remaining) + ' over';
+      }
+
+      // Over-capacity warning
+      var warning = document.getElementById('capacity-warning');
+      var warningText = document.getElementById('capacity-warning-text');
+      if (total > sprintCapacity) {
+        warning.style.display = 'flex';
+        warningText.textContent = 'Sprint is over-committed by ' + (total - sprintCapacity) + ' points';
+      } else {
+        warning.style.display = 'none';
+      }
+
+      // Lock buttons
+      var headerLock = document.getElementById('header-lock-btn');
+      var footerLock = document.getElementById('footer-lock-btn');
+      var hasStories = sprintStories.length > 0;
+      var isOver = total > sprintCapacity;
+
+      headerLock.disabled = !hasStories;
+      footerLock.disabled = !hasStories;
+
+      if (isOver && hasStories) {
+        headerLock.className = 'btn-lock btn-lock-warn';
+        footerLock.className = 'btn-lock btn-lock-warn';
+      } else {
+        headerLock.className = 'btn-lock';
+        if (!hasStories) {
+          headerLock.disabled = true;
+          footerLock.disabled = true;
+        }
+      }
+    }
+
+    function renderBothPanels() {
+      renderReadyPanel();
+      renderSprintPanel();
+      updateCapacity();
+    }
+
+    /* ── Actions ──────────────────────────────────── */
+    function addToSprint(id) {
+      var story = null;
+      var idx = -1;
+      for (var i = 0; i < readyStories.length; i++) {
+        if (readyStories[i].id === id) {
+          story = readyStories[i];
+          idx = i;
+          break;
+        }
+      }
+      if (!story) return;
+
+      // Animate card out of ready panel
+      var card = document.getElementById('card-' + id);
+      if (card) {
+        card.classList.add('slide-out');
+        setTimeout(function() {
+          readyStories.splice(idx, 1);
+          sprintStories.push(story);
+          renderBothPanels();
+        }, 250);
+      } else {
+        readyStories.splice(idx, 1);
+        sprintStories.push(story);
+        renderBothPanels();
+      }
+    }
+
+    function removeFromSprint(id) {
+      var story = null;
+      var idx = -1;
+      for (var i = 0; i < sprintStories.length; i++) {
+        if (sprintStories[i].id === id) {
+          story = sprintStories[i];
+          idx = i;
+          break;
+        }
+      }
+      if (!story) return;
+
+      var card = document.getElementById('card-' + id);
+      if (card) {
+        card.classList.add('slide-out');
+        setTimeout(function() {
+          sprintStories.splice(idx, 1);
+          readyStories.push(story);
+          renderBothPanels();
+        }, 250);
+      } else {
+        sprintStories.splice(idx, 1);
+        readyStories.push(story);
+        renderBothPanels();
+      }
+    }
+
+    /* ── Lock Sprint ─────────────────────────────── */
+    function lockSprint() {
+      var total = sprintStories.reduce(function(s, st) { return s + st.pts; }, 0);
+      var desc = document.getElementById('lock-modal-desc');
+      desc.textContent = sprintStories.length + ' stories committed, ' + total + ' points planned. The team can now begin work.';
+      document.getElementById('lock-overlay').classList.add('visible');
+    }
+
+    function closeLockOverlay() {
+      document.getElementById('lock-overlay').classList.remove('visible');
+    }
+
+    document.getElementById('header-lock-btn').addEventListener('click', function() {
+      if (!this.disabled) lockSprint();
+    });
+
+    document.getElementById('footer-lock-btn').addEventListener('click', function() {
+      if (!this.disabled) lockSprint();
+    });
+
+    /* ── Initial render ──────────────────────────── */
+    renderBothPanels();
+  </script>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Story Detail | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── Detail panels ───────────────────────────────── */
+    .detail-panel {
+      padding: 20px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .detail-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .detail-panel-header svg {
+      width: 15px;
+      height: 15px;
+      color: var(--text-tertiary);
+    }
+    .edit-btn {
+      margin-left: auto;
+      height: 24px;
+      padding: 0 10px;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-full);
+      background: transparent;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+    .edit-btn:hover {
+      background: var(--color-ghost-hover);
+    }
+
+    /* ── Acceptance Criteria items ────────────────────── */
+    .ac-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-lg);
+      cursor: default;
+      transition: background var(--transition-fast);
+    }
+    .ac-item:hover {
+      background: var(--color-ghost-hover);
+    }
+    .ac-item input {
+      display: none;
+    }
+    .ac-check {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+    .ac-item.checked .ac-check {
+      background: rgba(91,154,111,0.12);
+      color: #5B9A6F;
+    }
+    .ac-item:not(.checked) .ac-check {
+      background: var(--bg-tertiary);
+      color: var(--text-disabled);
+      border: 1px solid var(--border-default);
+    }
+    .ac-text {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .ac-item.checked .ac-text {
+      color: var(--text-secondary);
+    }
+
+    /* ── Key-value metadata ──────────────────────────── */
+    .kv {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 6px 0;
+    }
+    .kv-label {
+      font-size: 10px;
+      color: var(--text-disabled);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .kv-value {
+      font-size: 12px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* ── Comment thread ──────────────────────────────── */
+    .comment {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .comment-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .comment-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .comment-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .comment-time {
+      font-size: 10px;
+      color: var(--text-disabled);
+    }
+    .comment-body {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-left: 30px;
+    }
+
+    /* ── Pinned footer ───────────────────────────────── */
+    .action-footer {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 32px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+    }
+    .action-footer .footer-message {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    .btn-return {
+      height: 36px;
+      padding: 0 20px;
+      background: white;
+      border: 1px solid #CC0000;
+      border-radius: var(--radius-field);
+      font-size: 13px;
+      font-weight: 500;
+      color: #CC0000;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background var(--transition-fast);
+    }
+    .btn-return:hover {
+      background: rgba(204,0,0,0.04);
+    }
+    .btn-accept {
+      height: 36px;
+      padding: 0 24px;
+      background: #5B9A6F;
+      border: none;
+      border-radius: var(--radius-field);
+      font-size: 13px;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background var(--transition-fast);
+    }
+    .btn-accept:hover {
+      background: #4E8660;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+
+    <!-- ── Left nav ────────────────────────────────── -->
+    <nav id="left-nav" aria-label="Primary navigation"></nav>
+
+    <!-- ── Glass slab ──────────────────────────────── -->
+    <main class="content-viewport" style="display:flex; flex-direction:column;">
+
+      <!-- Sticky Header -->
+      <div style="padding:16px 32px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:rgba(255,255,255,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); z-index:10; border-bottom:1px solid rgba(0,0,0,0.04);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button id="back-btn" onclick="history.back()" style="background:none; border:none; cursor:pointer; padding:4px; display:flex;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div>
+            <div style="font-size:11px; color:var(--text-tertiary);">STRY-403 &middot; Sprint 2 &middot; <a href="feature-detail.html" style="color:var(--color-link); text-decoration:none;">F-01 Customer onboarding API v2</a></div>
+            <div style="font-size:18px; font-weight:500; color:var(--text-primary);">Webhook notification system</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; font-weight:500; padding:3px 10px; border-radius:var(--radius-full); background:rgba(42,110,220,0.1); color:var(--color-info);">In Review</span>
+          <span style="font-size:11px; font-weight:500; padding:3px 10px; border-radius:var(--radius-full); background:var(--bg-tertiary); color:var(--text-tertiary);">5 pts</span>
+          <span style="font-size:11px; color:var(--text-tertiary);">Assigned to: <strong>JS</strong></span>
+        </div>
+      </div>
+
+      <!-- Two-Column Body -->
+      <div style="display:flex; gap:20px; padding:20px 32px 0; flex:1; min-height:0;">
+
+        <!-- LEFT COLUMN: AC + Description + Comments -->
+        <div style="flex:3; display:flex; flex-direction:column; gap:16px; overflow-y:auto; padding-bottom:100px;">
+
+          <!-- 1. Acceptance Criteria — THE HERO -->
+          <div class="detail-panel" style="flex:none;">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              Acceptance Criteria
+              <span style="font-size:11px; color:#5B9A6F; margin-left:4px;">3/3 complete</span>
+              <div style="flex:1;"></div>
+              <button class="edit-btn">Edit</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <label class="ac-item checked">
+                <input type="checkbox" checked disabled/>
+                <span class="ac-check">&#10003;</span>
+                <span class="ac-text">Webhook fires within 5 seconds of onboarding milestone completion</span>
+              </label>
+              <label class="ac-item checked">
+                <input type="checkbox" checked disabled/>
+                <span class="ac-check">&#10003;</span>
+                <span class="ac-text">Webhook payload includes customer ID, milestone name, timestamp, and metadata</span>
+              </label>
+              <label class="ac-item checked">
+                <input type="checkbox" checked disabled/>
+                <span class="ac-check">&#10003;</span>
+                <span class="ac-text">Failed webhook deliveries retry 3 times with exponential backoff, and failures are logged to the notification audit table</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 2. User Story Description -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              User Story
+            </div>
+            <div style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
+              <strong>As a</strong> platform administrator,<br>
+              <strong>I want to</strong> receive webhook notifications when customers complete onboarding milestones,<br>
+              <strong>so that</strong> I can trigger downstream workflows (CRM update, welcome email, account provisioning) without polling the API.
+            </div>
+          </div>
+
+          <!-- 3. Developer Comments -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+              </svg>
+              Comments
+              <span style="font-size:10px; color:var(--text-disabled); margin-left:4px;">3</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <!-- Comment 1 -->
+              <div class="comment">
+                <div class="comment-header">
+                  <div class="comment-avatar" style="background:var(--color-primary);">JS</div>
+                  <span class="comment-name">James S.</span>
+                  <span class="comment-time">Jan 24 &middot; Developer</span>
+                </div>
+                <div class="comment-body">Webhook payload structure is documented in the PR. The retry mechanism uses the existing queue infrastructure. Ready for review.</div>
+              </div>
+              <!-- Comment 2 -->
+              <div class="comment">
+                <div class="comment-header">
+                  <div class="comment-avatar" style="background:#5B9A6F;">SC</div>
+                  <span class="comment-name">Sarah Chen</span>
+                  <span class="comment-time">Jan 25 &middot; PO</span>
+                </div>
+                <div class="comment-body">Tested all 3 AC manually. Webhook fires in ~2 seconds. Payload looks complete. Retry works after simulating failure. Moving to accept.</div>
+              </div>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:8px;">
+              <input placeholder="Add a comment..." style="flex:1; height:32px; padding:0 12px; border:1px solid var(--border-default); border-radius:var(--radius-field); font-size:12px; font-family:var(--font-sans); outline:none;"/>
+              <button style="height:32px; padding:0 12px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-field); font-size:11px; cursor:pointer; font-family:var(--font-sans);">Send</button>
+            </div>
+          </div>
+
+        </div><!-- /LEFT COLUMN -->
+
+        <!-- RIGHT COLUMN: Metadata + Related + Activity -->
+        <div style="flex:1; display:flex; flex-direction:column; gap:16px; overflow-y:auto; padding-bottom:100px;">
+
+          <!-- 1. Quick Metadata -->
+          <div class="detail-panel">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="kv"><span class="kv-label">Sprint</span><span class="kv-value">Sprint 2</span></div>
+              <div class="kv"><span class="kv-label">Assignee</span><span class="kv-value">James S. (JS)</span></div>
+              <div class="kv"><span class="kv-label">Points</span><span class="kv-value">5</span></div>
+              <div class="kv"><span class="kv-label">Feature</span><span class="kv-value" style="color:var(--color-link); cursor:pointer;"><a href="feature-detail.html" style="color:inherit; text-decoration:none;">F-01 Customer onboarding API v2</a></span></div>
+              <div class="kv"><span class="kv-label">Created</span><span class="kv-value">Jan 10, 2026</span></div>
+              <div class="kv"><span class="kv-label">Last updated</span><span class="kv-value">Jan 25, 2026</span></div>
+            </div>
+          </div>
+
+          <!-- 2. Related Stories in same Feature -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                <polyline points="2 17 12 22 22 17"/>
+                <polyline points="2 12 12 17 22 12"/>
+              </svg>
+              Related Stories
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <div style="padding:6px 10px; border-radius:var(--radius-lg); font-size:11px; display:flex; align-items:center; gap:6px; color:var(--text-secondary); cursor:pointer; transition:background var(--transition-fast);" onmouseover="this.style.background='var(--color-ghost-hover)'" onmouseout="this.style.background='transparent'" onclick="window.location.href='story-detail.html?id=STRY-401'">
+                <span style="color:#5B9A6F;">&#10003;</span> STRY-401 &middot; API endpoint scaffolding &middot; 5 pts
+              </div>
+              <div style="padding:6px 10px; border-radius:var(--radius-lg); font-size:11px; display:flex; align-items:center; gap:6px; color:var(--text-secondary); cursor:pointer; transition:background var(--transition-fast);" onmouseover="this.style.background='var(--color-ghost-hover)'" onmouseout="this.style.background='transparent'" onclick="window.location.href='story-detail.html?id=STRY-402'">
+                <span style="color:#5B9A6F;">&#10003;</span> STRY-402 &middot; Bulk provisioning logic &middot; 5 pts
+              </div>
+              <div style="padding:6px 10px; border-radius:var(--radius-lg); font-size:11px; display:flex; align-items:center; gap:6px; color:var(--color-link); cursor:pointer; background:rgba(42,110,220,0.04);">
+                &rarr; STRY-403 &middot; Webhook notification system &middot; 5 pts (this)
+              </div>
+              <div style="padding:6px 10px; border-radius:var(--radius-lg); font-size:11px; display:flex; align-items:center; gap:6px; color:var(--text-secondary); cursor:pointer; transition:background var(--transition-fast);" onmouseover="this.style.background='var(--color-ghost-hover)'" onmouseout="this.style.background='transparent'" onclick="window.location.href='story-detail.html?id=STRY-404'">
+                <span style="color:#E07A5F;">&#9888;</span> STRY-404 &middot; SSO provider integration &middot; 4 pts
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /RIGHT COLUMN -->
+
+      </div><!-- /Two-Column Body -->
+
+      <!-- Pinned Accept / Return Footer -->
+      <div class="action-footer" id="action-footer">
+        <div class="footer-message">
+          All 3 acceptance criteria verified. Ready to accept.
+        </div>
+        <button class="btn-return" onclick="returnStory()">Return</button>
+        <button class="btn-accept" onclick="acceptStory()">Accept</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ── Nav ─────────────────────────────────────────── -->
+  <script src="../shared/nav.js"></script>
+  <script>renderNav('feature-list', {avatar:'../../assets/images/avatar-james.png', name:'Sarah Chen', links:{0:'planning.html', 3:'team-backlog.html', 4:'sprint-board.html'}});</script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('team-backlog');</script>
+
+  <!-- ── Accept / Return logic ───────────────────────── -->
+  <script>
+    function acceptStory() {
+      var footer = document.getElementById('action-footer');
+      footer.innerHTML =
+        '<div style="flex:1; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:#5B9A6F;">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B9A6F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
+          'Story accepted and moved to Done' +
+        '</div>';
+    }
+
+    function returnStory() {
+      var footer = document.getElementById('action-footer');
+      footer.innerHTML =
+        '<div style="flex:1; display:flex; align-items:center; gap:8px;">' +
+          '<input id="return-reason" placeholder="Reason for returning..." style="flex:1; height:36px; padding:0 12px; border:1px solid var(--border-default); border-radius:var(--radius-field); font-size:12px; font-family:var(--font-sans); outline:none;"/>' +
+          '<button onclick="submitReturn()" style="height:36px; padding:0 20px; background:#CC0000; border:none; border-radius:var(--radius-field); font-size:13px; font-weight:500; color:white; cursor:pointer; font-family:var(--font-sans);">Confirm Return</button>' +
+        '</div>';
+      setTimeout(function() {
+        var input = document.getElementById('return-reason');
+        if (input) input.focus();
+      }, 50);
+    }
+
+    function submitReturn() {
+      var reason = document.getElementById('return-reason').value;
+      var footer = document.getElementById('action-footer');
+      footer.innerHTML =
+        '<div style="flex:1; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:#CC0000;">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>' +
+          'Story returned: ' + (reason || 'No reason given') +
+        '</div>';
+    }
+  </script>
+
+  <!-- ── Back button conditional routing ─────────────── -->
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var from = params.get('from');
+      var backBtn = document.getElementById('back-btn');
+      if (from && backBtn) {
+        backBtn.onclick = function(e) {
+          e.preventDefault();
+          window.location.href = from;
+        };
+      }
+    })();
+  </script>
+</body>
+</html>

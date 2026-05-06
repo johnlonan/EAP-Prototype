@@ -8,7 +8,10 @@ var CB = 'background:rgba(255,255,255,0.3);backdrop-filter:blur(10px);border:1px
 
 function colHd(isActive) {
   return 'padding:8px 12px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between;' +
-    (isActive ? 'background:var(--color-primary);color:#fff;' : 'background:rgba(14,78,105,0.12);color:#374151;');
+    (isActive
+      ? 'background:var(--color-primary);color:#fff;'
+      // inactive — same subtle mint→sea-blue gradient as .gpanel-hd / .pi-hd (modernity.css PHASE 4C)
+      : 'background:linear-gradient(135deg, rgba(140,215,180,0.10), rgba(140,195,220,0.10));color:#374151;box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);');
 }
 
 // ── Card renderer — shared across all board views ──────
@@ -103,6 +106,11 @@ EAP.renderWorkflowBoard = function() {
                 g.capIds ? g.capIds.map(function(id){ return data.all.filter(function(c){return c.id===id;})[0]; }).filter(Boolean) : [];
     all = all.concat(items);
   });
+  // Apply persona "mine only" filter (Epic/Cap have no team field, so team scope is a no-op)
+  all = EAP.applyMineFilter(all);
+  if (!all.length && EAP.hasClearableFilters()) {
+    return '<div style="flex:1;display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div>';
+  }
   var bk = {};
   EAP.workflowColumns.forEach(function(c) { bk[c] = []; });
   all.forEach(function(i) { var st = i.state === 'In Progress' ? 'Implementation' : i.state; if (bk[st]) bk[st].push(i); else bk.Backlog.push(i); });
@@ -121,9 +129,17 @@ EAP.renderWorkflowBoard = function() {
 
 // ── Feature PI kanban ──────────────────────────────────
 EAP.renderFeatureBoard = function() {
-  var bl = EAP.features.backlog();
-  var piCols = EAP.features.pis.map(function(pi) { return {id:pi.id, name:pi.name, active:pi.active, items: EAP.features.byPI(pi.id)}; });
+  var bl = EAP.applyScope(EAP.applyMineFilter(EAP.features.backlog()), 'Feature');
+  var piCols = EAP.features.pis.map(function(pi) {
+    return {id:pi.id, name:pi.name, active:pi.active,
+            items: EAP.applyScope(EAP.applyMineFilter(EAP.features.byPI(pi.id)), 'Feature')};
+  });
   var cols = [{id:'backlog', name:'Backlog', active:false, items:bl}].concat(piCols);
+
+  var totalItems = cols.reduce(function(a, c) { return a + c.items.length; }, 0);
+  if (totalItems === 0 && EAP.hasClearableFilters()) {
+    return '<div style="flex:1;display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div>';
+  }
 
   var h = '<div style="flex:1;overflow-x:auto;"><div style="display:flex;gap:8px;padding:4px 2px 16px;width:100%;">';
   cols.forEach(function(pi) {
@@ -141,44 +157,83 @@ EAP.renderFeatureBoard = function() {
 
 // ── Work Item grid (team × sprint) ─────────────────────
 EAP.renderWIGrid = function() {
+  var s = EAP.state;
   var sprints = EAP.workItems.sprints, blFlat = EAP.getBacklogFlat();
   var cols = [{id:'backlog', name:'Backlog', active:false, items:blFlat}].concat(sprints);
   var teams = ['Auth Team', 'Payments Team', 'Fraud Team', 'Mobile Exp Team', 'Accounts Team', 'Onboarding Team'];
 
+  // Team scope: when context is a single team, restrict the grid to that row.
+  if (s.context === 'team' && s.contextName) {
+    teams = teams.filter(function(t) { return t === s.contextName; });
+  }
+
+  // Compute total post-filter item count for empty-state decision.
+  // (Mine filter is applied per-cell via getBacklogFlat for backlog
+  // and via the team-scoped filter below for sprint cells.)
+  var totalItems = teams.reduce(function(a, team) {
+    return a + cols.reduce(function(b, sp) {
+      var its = (sp.items || []).filter(function(i) { return i.team === team; });
+      return b + EAP.applyMineFilter(its).length;
+    }, 0);
+  }, 0);
+  if (totalItems === 0 && EAP.hasClearableFilters()) {
+    return '<div style="flex:1;display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div>';
+  }
+
   var h = '<div style="flex:1;overflow:auto;">';
-  var isFirstTeam = true;
   teams.forEach(function(team) {
     var cap = EAP.teamCapacity[team] || {};
-    var totalItems = cols.reduce(function(a, sp) { return a + (sp.items || []).filter(function(i) { return i.team === team; }).length; }, 0);
+    var totalForTeam = cols.reduce(function(a, sp) {
+      var its = (sp.items || []).filter(function(i) { return i.team === team; });
+      return a + EAP.applyMineFilter(its).length;
+    }, 0);
     var tc = EAP.teamColors[team] || '#6B7280';
     h += '<div style="margin-bottom:16px;">' +
       '<div style="padding:8px 12px;background:rgba(14,78,105,0.08);border-left:3px solid ' + tc + ';color:#374151;border-radius:0 8px 8px 0;font-size:11px;font-weight:500;letter-spacing:0.02em;margin-bottom:6px;display:flex;align-items:center;gap:8px;">' +
       '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span>' +
       '<span>' + team + '</span>' +
-      '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;font-weight:400;">' + totalItems + ' items</span>' +
+      '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;font-weight:400;">' + totalForTeam + ' items</span>' +
       '</div>';
     h += '<div style="display:flex;gap:8px;width:100%;">';
     cols.forEach(function(sp) {
-      var items = (sp.items || []).filter(function(i) { return i.team === team; });
+      var items = EAP.applyMineFilter((sp.items || []).filter(function(i) { return i.team === team; }));
       var isA = !!sp.active;
       var capVal = sp.id === 'sp2' ? cap.sp2 : sp.id === 'sp3' ? cap.sp3 : sp.id === 'sp4' ? cap.sp4 : sp.id === 'sp5' ? cap.ip : null;
-      var capColor = capVal >= 100 ? '#DC2626' : capVal >= 85 ? '#D97706' : 'var(--color-primary)';
+      var hasCap = (capVal !== null && capVal !== undefined && sp.id !== 'backlog');
+      // Threshold bands — green < 85%, amber 85-100%, red > 100%
+      var capColor = capVal > 100 ? 'var(--dv-error)' : capVal >= 85 ? 'var(--dv-warning)' : 'var(--dv-success)';
 
-      h += '<div style="flex:1;min-width:140px;">';
-      h += '<div style="' + colHd(isA) + 'border-radius:8px 8px 0 0;padding:6px 10px;flex-direction:column;align-items:stretch;gap:4px;">';
-      h += '<div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:10px;font-weight:500;">' + sp.name + '</span><span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;">' + items.length + '</span></div>';
-      if (capVal !== null && capVal !== undefined) {
-        h += '<div style="display:flex;align-items:center;gap:4px;">';
-        if (isFirstTeam && sp.id !== 'backlog') h += '<span style="font-size:8px;color:' + (isA ? 'rgba(255,255,255,0.5)' : '#9CA3AF') + ';white-space:nowrap;">Cap</span>';
-        h += '<div style="flex:1;height:4px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;"><div style="height:100%;width:' + Math.min(capVal, 100) + '%;background:' + capColor + ';border-radius:2px;opacity:0.7;"></div></div><span style="font-size:9px;font-family:var(--font-mono);color:' + (isA ? 'rgba(255,255,255,0.7)' : capColor) + ';">' + capVal + '%</span></div>';
+      // Column container is positioning context for the floating capacity chip.
+      h += '<div style="flex:1;min-width:140px;position:relative;">';
+      // Single-row header — uniform 32px height across all columns (Backlog included).
+      h += '<div style="' + colHd(isA) + 'border-radius:8px 8px 0 0;height:32px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;">';
+      h += '<span style="font-size:11px;font-weight:500;">' + sp.name + '</span>';
+      h += '<span style="font-size:10px;font-family:var(--font-mono);opacity:0.5;">' + items.length + '</span></div>';
+      // Capacity chip — floating pill half-overlapping the header bottom edge.
+      // Wrapped in a `cap-chip-host` so the tooltip can sit OUTSIDE the chip's
+      // clip region. Backlog gets none (clean negative space).
+      if (hasCap) {
+        var fillPct = Math.min(capVal, 100);
+        h += '<div class="cap-chip-host" style="position:absolute;left:50%;top:21px;transform:translateX(-50%);z-index:3;">';
+        h += '<div class="cap-chip" style="position:relative;height:22px;width:80px;border-radius:11px;background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1.5px solid ' + capColor + ';box-shadow:0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.7);overflow:hidden;display:flex;align-items:center;padding:0 9px;gap:5px;">';
+        h += '<div style="position:absolute;inset:0;width:' + fillPct + '%;background:' + capColor + ';opacity:0.32;"></div>';
+        h += '<span style="position:relative;z-index:1;display:inline-flex;color:' + capColor + ';">' + EAP.icon('gauge', 13, 'stroke-width="2.2"') + '</span>';
+        h += '<span style="position:relative;z-index:1;font-size:11px;font-family:var(--font-mono);font-weight:600;color:var(--text-primary);">' + capVal + '%</span>';
+        h += '</div>';
+        h += '<div class="cap-chip-tip">Sprint capacity · ' + capVal + '%</div>';
+        h += '</div>';
       }
-      h += '</div>';
-      h += '<div style="' + CB + 'border-radius:0 0 8px 8px;padding:6px;min-height:50px;">';
-      items.forEach(function(wi) { h += renderCard(wi, {showTeam: false, ownerField: 'owner'}); });
+      // Body — top padding clears the floating chip on sprint columns.
+      h += '<div style="' + CB + 'border-radius:0 0 8px 8px;padding:' + (hasCap ? '20px 6px 6px' : '8px 6px 6px') + ';min-height:50px;">';
+      if (items.length === 0 && EAP.hasClearableFilters()) {
+        // Quiet per-cell hint so a filter-emptied cell reads as intentional, not broken.
+        h += '<div style="font-size:10px;color:var(--text-tertiary);text-align:center;padding:14px 4px;font-style:italic;opacity:0.7;">No matching items</div>';
+      } else {
+        items.forEach(function(wi) { h += renderCard(wi, {showTeam: false, ownerField: 'owner'}); });
+      }
       h += '</div></div>';
     });
     h += '</div></div>';
-    isFirstTeam = false;
   });
   return h + '</div>';
 };

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Backlog | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── Sticky header ───────────────────────────────── */
+    .backlog-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 20px 28px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.52) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .team-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .sprint-context {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      padding: 4px 12px;
+      background: rgba(0,0,0,0.04);
+      border-radius: var(--radius-full);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sprint-selector {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-field);
+      border: 1px solid rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.7);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%234d4c4a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .search-input {
+      height: 32px;
+      padding: 0 12px 0 32px;
+      border-radius: var(--radius-field);
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.6);
+      font-size: 12px;
+      color: var(--text-primary);
+      width: 200px;
+      font-family: var(--font-sans);
+      background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a8986' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 10px center;
+    }
+    .search-input::placeholder { color: var(--text-disabled); }
+
+    /* ── AI insight bar ──────────────────────────────── */
+    .ai-bar {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 16px;
+      margin: 0 28px 16px;
+      background: linear-gradient(135deg, #F0FAFA 0%, #E8F8F0 100%);
+      border: 1px solid #B3EDE8;
+      border-radius: var(--radius-field);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+    .ai-bar .sparkle { flex-shrink: 0; margin-top: 1px; }
+    .ai-bar strong { font-weight: 600; color: var(--text-primary); }
+
+    /* ── Sprint capacity summary ─────────────────────── */
+    .capacity-row {
+      display: flex;
+      gap: 6px;
+      padding: 0 28px 16px;
+      overflow-x: auto;
+    }
+    .capacity-chip {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: var(--radius-field);
+      border: 1px solid rgba(255,255,255,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .capacity-chip.active {
+      border-color: var(--color-primary);
+      background: rgba(255,255,255,0.7);
+    }
+    .capacity-chip-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .capacity-chip-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .capacity-chip-meta {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+    }
+    .capacity-chip-bar {
+      height: 4px;
+      background: var(--color-secondary);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .capacity-chip-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+    .capacity-chip-status {
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .capacity-chip-status.complete { color: var(--color-success); }
+    .capacity-chip-status.active-status { color: var(--color-info); }
+    .capacity-chip-status.planned { color: var(--text-disabled); }
+    .capacity-chip-status.over { color: #D97706; }
+
+    /* ── Filter row ──────────────────────────────────── */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 28px 12px;
+      flex-wrap: wrap;
+    }
+    .filter-select {
+      height: 28px;
+      padding: 0 24px 0 10px;
+      border-radius: var(--radius-field);
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.5);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%234d4c4a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+    .status-pill-filter {
+      height: 26px;
+      padding: 0 10px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.4);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all var(--transition-fast);
+    }
+    .status-pill-filter:hover {
+      background: rgba(255,255,255,0.7);
+      color: var(--text-primary);
+    }
+    .status-pill-filter.active {
+      background: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .toggle-label input { accent-color: var(--color-primary); }
+
+    /* ── Two-panel layout ────────────────────────────── */
+    .panels {
+      display: flex;
+      gap: 16px;
+      padding: 0 28px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .glass-panel {
+      background: rgba(255,255,255,0.52);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.6);
+      padding: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-left {
+      flex: 3;
+      min-width: 0;
+      overflow-y: auto;
+    }
+    .panel-left::-webkit-scrollbar { width: 4px; }
+    .panel-left::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+    .panel-right {
+      flex: 1;
+      min-width: 240px;
+      max-width: 320px;
+      overflow-y: auto;
+    }
+    .panel-right::-webkit-scrollbar { width: 4px; }
+    .panel-right::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+    /* ── Story table ─────────────────────────────────── */
+    .story-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .story-table th {
+      text-align: left;
+      padding: 8px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #727a90;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 2;
+    }
+    .story-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      vertical-align: middle;
+    }
+    .story-table tbody tr {
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    .story-table tbody tr:hover {
+      background: rgba(219,228,242,0.35);
+    }
+
+    /* Feature group header */
+    .feature-group-header td {
+      padding: 14px 8px 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: rgba(0,0,0,0.015);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .feature-group-name {
+      color: var(--color-link);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .feature-group-name:hover { text-decoration: underline; }
+    .feature-group-meta {
+      color: var(--text-disabled);
+      margin-left: 8px;
+      font-weight: 400;
+    }
+
+    /* Drag dots */
+    .drag-dots {
+      color: var(--text-disabled);
+      cursor: grab;
+      font-size: 14px;
+      letter-spacing: -2px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* Ready indicator */
+    .ready-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .ready-dot.green { background: rgba(91,154,111,0.12); color: #5B9A6F; }
+    .ready-dot.amber { background: rgba(217,119,6,0.12); color: #D97706; }
+    .ready-dot.red   { background: rgba(224,122,95,0.12); color: #E07A5F; }
+
+    /* Story link */
+    .story-link {
+      color: var(--color-link);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .story-link:hover { text-decoration: underline; }
+
+    .story-id {
+      font-size: 10px;
+      color: var(--text-disabled);
+      font-weight: 400;
+    }
+
+    /* Feature parent label */
+    .feature-parent {
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+    .feature-parent a {
+      color: var(--text-tertiary);
+      text-decoration: none;
+    }
+    .feature-parent a:hover { text-decoration: underline; color: var(--color-link); }
+
+    /* Points */
+    .points-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: var(--radius-full);
+      background: rgba(0,0,0,0.04);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Sprint label */
+    .sprint-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    /* Assignee avatar */
+    .assignee-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* Status pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-done        { background: #EAF3DE; color: #3B6D11; }
+    .status-in-progress { background: #e6f5fe; color: #019bf4; }
+    .status-not-started { background: rgba(0,0,0,0.04); color: var(--text-tertiary); }
+    .status-blocked     { background: #FDEAEA; color: #A32D2D; }
+
+    /* AC status */
+    .ac-status {
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .ac-status.complete { color: #5B9A6F; }
+    .ac-status.partial  { color: #D97706; }
+    .ac-status.missing  { color: #E07A5F; font-weight: 700; }
+
+    /* Blocked row special treatment */
+    .blocked-row td {
+      background: rgba(204,0,0,0.03) !important;
+    }
+    .blocked-row {
+      border-left: 4px solid #CC0000;
+    }
+    .blocked-reason {
+      font-size: 10px;
+      color: #CC0000;
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    /* Missing AC row tint */
+    .missing-ac-row td {
+      background: rgba(224,122,95,0.04) !important;
+    }
+
+    /* Tooltip */
+    .ready-dot { position: relative; }
+    .ready-tooltip {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 6px);
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 400;
+      padding: 5px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .ready-dot:hover .ready-tooltip { display: block; }
+
+    /* ── Sprint snapshot (right panel) ───────────────── */
+    .snapshot-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 2px;
+    }
+    .snapshot-dates {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .snapshot-days-left {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-info);
+      margin-left: 6px;
+    }
+    .snapshot-goal {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.025);
+      border-radius: var(--radius-lg);
+      margin: 12px 0;
+    }
+    .snapshot-goal-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #727a90;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    /* Capacity bar */
+    .cap-bar-wrap {
+      margin: 12px 0;
+    }
+    .cap-bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .cap-bar-label { color: var(--text-tertiary); }
+    .cap-bar-val { font-weight: 600; }
+    .cap-bar-val.ok { color: var(--color-success); }
+    .cap-bar-val.over { color: #D97706; }
+    .cap-bar-track {
+      height: 6px;
+      background: var(--color-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .cap-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .cap-bar-limit {
+      position: absolute;
+      top: -3px;
+      bottom: -3px;
+      width: 2px;
+      background: var(--text-primary);
+      border-radius: 1px;
+    }
+
+    /* Quick stats */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .quick-stat {
+      padding: 8px 10px;
+      border-radius: var(--radius-lg);
+      background: rgba(0,0,0,0.025);
+    }
+    .quick-stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .quick-stat-label {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* Sprint story list (compact) */
+    .sprint-story-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .sprint-story-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-top: 1px solid rgba(0,0,0,0.04);
+      font-size: 11px;
+    }
+    .sprint-story-item:first-child { border-top: none; }
+
+    /* Mini burndown */
+    .burndown-wrap {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .burndown-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #727a90;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .burndown-chart {
+      position: relative;
+      height: 60px;
+      background: rgba(0,0,0,0.02);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .burndown-ideal {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border-bottom: 1px dashed rgba(0,0,0,0.15);
+      /* Diagonal line using gradient */
+      background: linear-gradient(to bottom right, transparent calc(50% - 0.5px), rgba(0,0,0,0.12) 50%, transparent calc(50% + 0.5px));
+    }
+    .burndown-actual {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      bottom: 4px;
+      width: 60%;
+      /* Actual line - slightly above ideal */
+      background: linear-gradient(to bottom right, transparent calc(50% - 1px), var(--color-info) 50%, transparent calc(50% + 1px));
+      opacity: 0.7;
+    }
+    .burndown-legend {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+    .burndown-legend-dot {
+      display: inline-block;
+      width: 8px;
+      height: 2px;
+      border-radius: 1px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* ── Bottom spacer + gradient ─────────────────────── */
+    .bottom-spacer {
+      height: 120px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .bottom-gradient {
+      position: fixed;
+      bottom: 16px;
+      left: 64px;
+      right: 16px;
+      height: 80px;
+      background: linear-gradient(transparent, rgba(255,255,255,0.6));
+      border-radius: 0 0 20px 20px;
+      pointer-events: none;
+      z-index: 40;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav id="left-nav"></nav>
+    <main class="content-viewport" style="display:flex; flex-direction:column;">
+
+      <!-- ═══════════ 1. Sticky Header ═══════════ -->
+      <div class="backlog-header">
+        <div class="header-top">
+          <div class="header-left">
+            <h1 class="team-name">Team Orion</h1>
+            <span class="sprint-context">PI-25 &middot; Sprint 3 &middot; 3 days left</span>
+          </div>
+          <div class="header-actions">
+            <select class="sprint-selector" id="sprint-filter" onchange="filterBySprint(this.value)">
+              <option value="all">All Sprints</option>
+              <option value="1">Sprint 1</option>
+              <option value="2">Sprint 2</option>
+              <option value="3" selected>Sprint 3</option>
+              <option value="4">Sprint 4</option>
+              <option value="5">Sprint 5</option>
+            </select>
+            <input type="text" class="search-input" placeholder="Search stories..." id="story-search" oninput="filterStories()">
+            <button class="btn-filled" style="gap:6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Create Story
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 2. AI Insight Bar ═══════════ -->
+      <div class="ai-bar">
+        <svg class="sparkle" width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2.11 4.94C3.46 4.51 4.51 3.46 4.94 2.11L5.49 .37C5.65-.12 6.35-.12 6.51.37L7.06 2.12C7.49 3.46 8.54 4.51 9.89 4.94L11.63 5.49C12.12 5.65 12.12 6.35 11.63 6.51L9.88 7.06C8.54 7.49 7.49 8.54 7.06 9.88L6.51 11.63C6.35 12.12 5.65 12.12 5.49 11.63L4.94 9.89C4.51 8.54 3.46 7.49 2.12 7.06L.37 6.51C-.12 6.35-.12 5.65.37 5.49L2.11 4.94Z" fill="#00C7B1"/></svg>
+        <span><strong>5 Stories missing acceptance criteria</strong> &mdash; Sprint 4 starts in 3 days. <strong>STRY-404</strong> (SSO integration) is assigned to Sprint 3 but cannot enter without AC.</span>
+      </div>
+
+      <!-- ═══════════ 3. Sprint Capacity Summary ═══════════ -->
+      <div class="capacity-row">
+        <div class="capacity-chip">
+          <div class="capacity-chip-top">
+            <span class="capacity-chip-name">Sprint 1</span>
+            <span class="capacity-chip-meta">12/9 pts</span>
+          </div>
+          <div class="capacity-chip-bar"><div class="capacity-chip-fill" style="width:100%; background:var(--color-success);"></div></div>
+          <span class="capacity-chip-status complete">&#10003; Complete</span>
+        </div>
+        <div class="capacity-chip">
+          <div class="capacity-chip-top">
+            <span class="capacity-chip-name">Sprint 2</span>
+            <span class="capacity-chip-meta">11/9 pts</span>
+          </div>
+          <div class="capacity-chip-bar"><div class="capacity-chip-fill" style="width:100%; background:var(--color-success);"></div></div>
+          <span class="capacity-chip-status complete">&#10003; Complete</span>
+        </div>
+        <div class="capacity-chip active">
+          <div class="capacity-chip-top">
+            <span class="capacity-chip-name">Sprint 3</span>
+            <span class="capacity-chip-meta">10/9 pts</span>
+          </div>
+          <div class="capacity-chip-bar"><div class="capacity-chip-fill" style="width:100%; background:#D97706;"></div></div>
+          <span class="capacity-chip-status over">&#9679; Active &middot; 3 days left</span>
+        </div>
+        <div class="capacity-chip">
+          <div class="capacity-chip-top">
+            <span class="capacity-chip-name">Sprint 4</span>
+            <span class="capacity-chip-meta">0/9 pts</span>
+          </div>
+          <div class="capacity-chip-bar"><div class="capacity-chip-fill" style="width:0%; background:var(--color-secondary);"></div></div>
+          <span class="capacity-chip-status planned">Planned</span>
+        </div>
+        <div class="capacity-chip">
+          <div class="capacity-chip-top">
+            <span class="capacity-chip-name">Sprint 5</span>
+            <span class="capacity-chip-meta">0/9 pts</span>
+          </div>
+          <div class="capacity-chip-bar"><div class="capacity-chip-fill" style="width:0%; background:var(--color-secondary);"></div></div>
+          <span class="capacity-chip-status planned">Planned</span>
+        </div>
+      </div>
+
+      <!-- ═══════════ 4. Filters ═══════════ -->
+      <div class="filter-row">
+        <select class="filter-select" id="feature-filter" onchange="filterStories()">
+          <option value="all">All Features</option>
+          <option value="F-01">F-01 &middot; Customer onboarding API v2</option>
+          <option value="F-05">F-05 &middot; Real-time reporting pipeline</option>
+        </select>
+        <button class="status-pill-filter active" data-status="all" onclick="setStatusFilter('all', this)">All</button>
+        <button class="status-pill-filter" data-status="done" onclick="setStatusFilter('done', this)">Done</button>
+        <button class="status-pill-filter" data-status="in-progress" onclick="setStatusFilter('in-progress', this)">In Progress</button>
+        <button class="status-pill-filter" data-status="blocked" onclick="setStatusFilter('blocked', this)">Blocked</button>
+        <button class="status-pill-filter" data-status="not-started" onclick="setStatusFilter('not-started', this)">Not Started</button>
+        <label class="toggle-label">
+          <input type="checkbox" id="not-ready-toggle" onchange="filterStories()"> Show only Not Ready
+        </label>
+      </div>
+
+      <!-- ═══════════ 5. Two-panel layout ═══════════ -->
+      <div class="panels">
+
+        <!-- LEFT: Story Table -->
+        <div class="glass-panel panel-left">
+          <table class="story-table" id="story-table">
+            <thead>
+              <tr>
+                <th style="width:28px;"></th>
+                <th style="width:28px;">Ready</th>
+                <th>Story</th>
+                <th>Feature</th>
+                <th style="width:48px;">Pts</th>
+                <th style="width:64px;">Sprint</th>
+                <th style="width:40px;"></th>
+                <th style="width:86px;">Status</th>
+                <th style="width:100px;">AC Status</th>
+              </tr>
+            </thead>
+            <tbody id="story-tbody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RIGHT: Sprint Snapshot -->
+        <div class="glass-panel panel-right">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div class="snapshot-title">Sprint 3</div>
+              <div class="snapshot-dates">Mar 24 &ndash; Apr 7<span class="snapshot-days-left">3 days left</span></div>
+            </div>
+            <span class="pill pill-cyan" style="font-size:10px;">Active</span>
+          </div>
+
+          <div class="snapshot-goal">
+            <div class="snapshot-goal-label">Sprint Goal</div>
+            Complete webhook system and begin SSO integration
+          </div>
+
+          <!-- Capacity bar -->
+          <div class="cap-bar-wrap">
+            <div class="cap-bar-header">
+              <span class="cap-bar-label">Capacity</span>
+              <span class="cap-bar-val over">10 / 9 pts</span>
+            </div>
+            <div class="cap-bar-track">
+              <div class="cap-bar-fill" style="width:100%; background:#D97706;"></div>
+              <div class="cap-bar-limit" style="left:90%;"></div>
+            </div>
+            <div style="font-size:10px; color:#D97706; margin-top:3px;">1 pt over capacity</div>
+          </div>
+
+          <!-- Quick stats -->
+          <div class="quick-stats">
+            <div class="quick-stat">
+              <div class="quick-stat-val" style="color:#3B6D11;">0</div>
+              <div class="quick-stat-label">Done</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-val" style="color:#019bf4;">2</div>
+              <div class="quick-stat-label">In Progress</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-val" style="color:#A32D2D;">1</div>
+              <div class="quick-stat-label">Blocked</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-val" style="color:var(--text-tertiary);">2</div>
+              <div class="quick-stat-label">Not Started</div>
+            </div>
+          </div>
+
+          <!-- Stories in this sprint -->
+          <div style="margin-top:4px;">
+            <div style="font-size:10px; font-weight:600; color:#727a90; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Sprint 3 Stories</div>
+            <ul class="sprint-story-list">
+              <li class="sprint-story-item">
+                <div class="ready-dot green" style="width:14px; height:14px; font-size:7px;">&#10003;</div>
+                <span style="flex:1; color:var(--text-primary); font-weight:500;">Webhook notification system</span>
+                <span class="status-pill status-in-progress" style="font-size:9px;">In Progress</span>
+              </li>
+              <li class="sprint-story-item">
+                <div class="ready-dot red" style="width:14px; height:14px; font-size:7px;">&#10007;</div>
+                <span style="flex:1; color:var(--text-primary); font-weight:500;">SSO provider integration</span>
+                <span class="status-pill status-not-started" style="font-size:9px;">Not Started</span>
+              </li>
+              <li class="sprint-story-item">
+                <div class="ready-dot green" style="width:14px; height:14px; font-size:7px;">&#10003;</div>
+                <span style="flex:1; color:var(--text-primary); font-weight:500;">Data stream ingestion</span>
+                <span class="status-pill status-blocked" style="font-size:9px;">Blocked</span>
+              </li>
+              <li class="sprint-story-item">
+                <div class="ready-dot green" style="width:14px; height:14px; font-size:7px;">&#10003;</div>
+                <span style="flex:1; color:var(--text-primary); font-weight:500;">Real-time aggregation engine</span>
+                <span class="status-pill status-not-started" style="font-size:9px;">Not Started</span>
+              </li>
+              <li class="sprint-story-item">
+                <div class="ready-dot green" style="width:14px; height:14px; font-size:7px;">&#10003;</div>
+                <span style="flex:1; color:var(--text-primary); font-weight:500;">Rate limit error handling</span>
+                <span class="status-pill status-in-progress" style="font-size:9px;">In Progress</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Mini burndown -->
+          <div class="burndown-wrap">
+            <div class="burndown-label">Sprint Burndown</div>
+            <div class="burndown-chart">
+              <div class="burndown-ideal"></div>
+              <div class="burndown-actual"></div>
+            </div>
+            <div class="burndown-legend">
+              <span><span class="burndown-legend-dot" style="background:rgba(0,0,0,0.2);"></span>Ideal</span>
+              <span><span class="burndown-legend-dot" style="background:var(--color-info);"></span>Actual</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /panels -->
+
+      <!-- Bottom spacer -->
+      <div class="bottom-spacer"></div>
+
+    </main>
+  </div>
+
+  <!-- Bottom gradient overlay -->
+  <div class="bottom-gradient"></div>
+
+  <!-- ═══════════ Nav ═══════════ -->
+  <script src="../shared/nav.js"></script>
+  <script>renderNav('feature-list', {avatar:'../../assets/images/avatar-james.png', name:'Sarah Chen', links:{0:'planning.html', 3:'team-backlog.html', 4:'sprint-board.html'}});</script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('team-backlog');</script>
+
+  <!-- ═══════════ Data & Rendering ═══════════ -->
+  <script>
+    /* ── Story data ──────────────────────────────────── */
+    var stories = [
+      // Feature: Customer onboarding API v2 (F-01)
+      {id:'STRY-401', title:'API endpoint scaffolding', feature:'Customer onboarding API v2', featureId:'F-01', pts:5, sprint:1, assignee:'JS', status:'done', acTotal:3, acDone:3, ready:true},
+      {id:'STRY-402', title:'Bulk provisioning logic', feature:'Customer onboarding API v2', featureId:'F-01', pts:5, sprint:1, assignee:'KR', status:'done', acTotal:4, acDone:4, ready:true},
+      {id:'STRY-403', title:'Webhook notification system', feature:'Customer onboarding API v2', featureId:'F-01', pts:5, sprint:2, assignee:'JS', status:'in-progress', acTotal:3, acDone:3, ready:true},
+      {id:'STRY-404', title:'SSO provider integration', feature:'Customer onboarding API v2', featureId:'F-01', pts:4, sprint:3, assignee:'AL', status:'not-started', acTotal:0, acDone:0, ready:false},
+      {id:'STRY-406', title:'Rate limit error handling', feature:'Customer onboarding API v2', featureId:'F-01', pts:3, sprint:3, assignee:'JS', status:'in-progress', acTotal:2, acDone:2, ready:true},
+      {id:'STRY-407', title:'Load testing 500+ users', feature:'Customer onboarding API v2', featureId:'F-01', pts:3, sprint:5, assignee:'JS', status:'not-started', acTotal:2, acDone:0, ready:false},
+      {id:'STRY-408', title:'Documentation & SDK examples', feature:'Customer onboarding API v2', featureId:'F-01', pts:2, sprint:5, assignee:'KR', status:'not-started', acTotal:0, acDone:0, ready:false},
+
+      // Feature: Real-time reporting pipeline (F-05)
+      {id:'STRY-501', title:'Pipeline foundation setup', feature:'Real-time reporting pipeline', featureId:'F-05', pts:5, sprint:2, assignee:'AL', status:'done', acTotal:2, acDone:2, ready:true},
+      {id:'STRY-502', title:'Data stream ingestion', feature:'Real-time reporting pipeline', featureId:'F-05', pts:4, sprint:3, assignee:'AL', status:'blocked', acTotal:3, acDone:3, ready:true, blockedReason:'Waiting on Atlas audit trail dependency'},
+      {id:'STRY-503', title:'Real-time aggregation engine', feature:'Real-time reporting pipeline', featureId:'F-05', pts:3, sprint:3, assignee:'KR', status:'not-started', acTotal:2, acDone:2, ready:true},
+      {id:'STRY-504', title:'Dashboard integration', feature:'Real-time reporting pipeline', featureId:'F-05', pts:5, sprint:4, assignee:'JS', status:'not-started', acTotal:0, acDone:0, ready:false},
+      {id:'STRY-505', title:'Performance testing', feature:'Real-time reporting pipeline', featureId:'F-05', pts:4, sprint:4, assignee:'AL', status:'not-started', acTotal:2, acDone:0, ready:false},
+    ];
+
+    /* Assignee colors */
+    var assigneeColors = {
+      'JS': '#4676BF',
+      'KR': '#7C3AED',
+      'AL': '#E07A5F',
+      'SC': '#5B9A6F'
+    };
+
+    /* Current filters */
+    var currentStatusFilter = 'all';
+
+    /* ── Ready logic ─────────────────────────────────── */
+    function getReadyInfo(s) {
+      if (s.acTotal === 0) return { cls:'red', icon:'\u2717', tip:'Missing acceptance criteria' };
+      if (s.acDone < s.acTotal) return { cls:'amber', icon:'\u26A0', tip: s.acDone + '/' + s.acTotal + ' AC written' };
+      if (s.acTotal > 0 && s.acDone === s.acTotal && s.pts > 0) return { cls:'green', icon:'\u2713', tip:'Ready \u2014 all AC written, estimated' };
+      return { cls:'amber', icon:'\u26A0', tip:'Partially ready' };
+    }
+
+    /* ── Status label ────────────────────────────────── */
+    function statusLabel(status) {
+      var map = {
+        'done': {cls:'status-done', label:'Done'},
+        'in-progress': {cls:'status-in-progress', label:'In Progress'},
+        'not-started': {cls:'status-not-started', label:'Not Started'},
+        'blocked': {cls:'status-blocked', label:'Blocked'}
+      };
+      return map[status] || {cls:'status-not-started', label:status};
+    }
+
+    /* ── Render table ────────────────────────────────── */
+    function renderTable() {
+      var tbody = document.getElementById('story-tbody');
+      var sprintVal = document.getElementById('sprint-filter').value;
+      var featureVal = document.getElementById('feature-filter').value;
+      var searchVal = document.getElementById('story-search').value.toLowerCase();
+      var notReadyOnly = document.getElementById('not-ready-toggle').checked;
+
+      // Filter
+      var filtered = stories.filter(function(s) {
+        if (sprintVal !== 'all' && s.sprint !== parseInt(sprintVal)) return false;
+        if (featureVal !== 'all' && s.featureId !== featureVal) return false;
+        if (currentStatusFilter !== 'all' && s.status !== currentStatusFilter) return false;
+        if (notReadyOnly && s.ready) return false;
+        if (searchVal && s.title.toLowerCase().indexOf(searchVal) === -1 && s.id.toLowerCase().indexOf(searchVal) === -1) return false;
+        return true;
+      });
+
+      // Group by feature
+      var groups = {};
+      var featureOrder = [];
+      filtered.forEach(function(s) {
+        if (!groups[s.featureId]) {
+          groups[s.featureId] = { id:s.featureId, name:s.feature, stories:[] };
+          featureOrder.push(s.featureId);
+        }
+        groups[s.featureId].stories.push(s);
+      });
+
+      var html = '';
+      featureOrder.forEach(function(fid) {
+        var g = groups[fid];
+        // Compute group stats
+        var totalPts = 0, doneCount = 0;
+        g.stories.forEach(function(s) {
+          totalPts += s.pts;
+          if (s.status === 'done') doneCount++;
+        });
+        var pctComplete = g.stories.length > 0 ? Math.round((doneCount / g.stories.length) * 100) : 0;
+
+        // Feature group header
+        html += '<tr class="feature-group-header"><td colspan="9">';
+        html += '<a class="feature-group-name" href="feature-detail.html?id=' + fid + '">' + fid + ' &middot; ' + g.name + '</a>';
+        html += '<span class="feature-group-meta">' + g.stories.length + ' Stories &middot; ' + totalPts + ' pts &middot; ' + pctComplete + '% complete</span>';
+        html += '</td></tr>';
+
+        // Story rows
+        g.stories.forEach(function(s) {
+          var ready = getReadyInfo(s);
+          var st = statusLabel(s.status);
+          var rowClass = '';
+          if (s.status === 'blocked') rowClass += ' blocked-row';
+          if (s.acTotal === 0) rowClass += ' missing-ac-row';
+
+          html += '<tr class="' + rowClass.trim() + '">';
+
+          // Drag dots
+          html += '<td><span class="drag-dots">\u22EE\u22EE</span></td>';
+
+          // Ready indicator
+          html += '<td><div class="ready-dot ' + ready.cls + '">' + ready.icon + '<span class="ready-tooltip">' + ready.tip + '</span></div></td>';
+
+          // Story title
+          html += '<td><a class="story-link" href="story-detail.html?id=' + s.id + '">' + s.title + '</a>';
+          html += '<div class="story-id">' + s.id + '</div>';
+          if (s.blockedReason) html += '<div class="blocked-reason">' + s.blockedReason + '</div>';
+          html += '</td>';
+
+          // Feature parent
+          html += '<td><span class="feature-parent"><a href="feature-detail.html?id=' + s.featureId + '">' + s.featureId + '</a></span></td>';
+
+          // Points
+          html += '<td><span class="points-badge">' + s.pts + '</span></td>';
+
+          // Sprint
+          html += '<td><span class="sprint-label">Sprint ' + s.sprint + '</span></td>';
+
+          // Assignee
+          var bgColor = assigneeColors[s.assignee] || '#8a8986';
+          html += '<td><div class="assignee-avatar" style="background:' + bgColor + ';">' + s.assignee + '</div></td>';
+
+          // Status pill
+          html += '<td><span class="status-pill ' + st.cls + '">' + st.label + '</span></td>';
+
+          // AC status
+          var acClass, acText;
+          if (s.acTotal === 0) {
+            acClass = 'missing';
+            acText = '\u2717 Missing AC';
+          } else if (s.acDone === s.acTotal) {
+            acClass = 'complete';
+            acText = s.acDone + '/' + s.acTotal + ' \u2713';
+          } else {
+            acClass = 'partial';
+            acText = s.acDone + '/' + s.acTotal + ' \u26A0 Missing';
+          }
+          html += '<td><span class="ac-status ' + acClass + '">' + acText + '</span></td>';
+
+          html += '</tr>';
+        });
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    /* ── Filter helpers ──────────────────────────────── */
+    function filterBySprint(val) {
+      document.getElementById('sprint-filter').value = val;
+      filterStories();
+    }
+
+    function setStatusFilter(status, btn) {
+      currentStatusFilter = status;
+      document.querySelectorAll('.status-pill-filter').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      filterStories();
+    }
+
+    function filterStories() {
+      renderTable();
+    }
+
+    /* ── Init ────────────────────────────────────────── */
+    document.getElementById('sprint-filter').value = 'all';
+    renderTable();
+  </script>
+</body>
+</html>

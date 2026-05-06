@@ -38,11 +38,14 @@ function tlItems(level) {
       (sp.items || []).forEach(function(wi) { dl[wi.id] = { start: sd.start, end: sd.end }; items.push(wi); });
     });
   }
+  // Persona "owned/assigned to me" + team scope (when context is a team)
+  items = EAP.applyScope(EAP.applyMineFilter(items), level);
   return { items: items, dates: dl };
 }
 
 // ── Group items ───────────────────────────────────────
-function tlGroup(items, level) {
+// Default per-level grouping (preserves existing behaviour when groupBy='default').
+function tlGroupDefault(items, level) {
   if (level === 'Epic') {
     var g1=[], g2=[], ot=[];
     items.forEach(function(e) { if (e.goal==='g1') g1.push(e); else if (e.goal==='g2') g2.push(e); else ot.push(e); });
@@ -65,15 +68,87 @@ function tlGroup(items, level) {
   return Object.keys(bt).map(function(k){return{label:k,items:bt[k]};});
 }
 
-// ── Bar colour — using design tokens ─────────────────
+// Group by an arbitrary key resolver. Buckets in insertion order.
+function tlBucketBy(items, keyFn, labelFn) {
+  var buckets = {}, order = [];
+  items.forEach(function(it) {
+    var k = keyFn(it) || '__unassigned__';
+    if (!buckets[k]) { buckets[k] = []; order.push(k); }
+    buckets[k].push(it);
+  });
+  return order.map(function(k) {
+    return { label: k === '__unassigned__' ? 'Unassigned' : (labelFn ? labelFn(k) : k), items: buckets[k] };
+  });
+}
+
+// Public: pick the right grouping based on user selection + level.
+function tlGroup(items, level, groupBy) {
+  if (!groupBy || groupBy === 'default') return tlGroupDefault(items, level);
+
+  if (groupBy === 'goal') {
+    return tlBucketBy(items, function(i) { return i.goal || null; }, function(g) { return EAP.goalName(g) || g; });
+  }
+  if (groupBy === 'product') {
+    return tlBucketBy(items, function(i) { return EAP.resolveProduct(i, level); });
+  }
+  if (groupBy === 'owner') {
+    return tlBucketBy(items, function(i) { return i.owner || null; }, function(o) {
+      return (EAP.people && EAP.people[o] && EAP.people[o].name) || o;
+    });
+  }
+  if (groupBy === 'state') {
+    return tlBucketBy(items, function(i) { return i.state || null; });
+  }
+  if (groupBy === 'size') {
+    var groups = tlBucketBy(items, function(i) { return EAP.sizeBucketOf(i, level); });
+    // Preferred size order: XL → L → M → S → XS, then 'Unassigned'
+    var order = ['XL','L','M','S','XS','Unassigned'];
+    return groups.sort(function(a, b) {
+      var ai = order.indexOf(a.label), bi = order.indexOf(b.label);
+      return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+    });
+  }
+  if (groupBy === 'risk') {
+    var rgroups = tlBucketBy(items, function(i) { return EAP.riskBucketOf(i); });
+    // Risk urgency descending
+    var rOrder = ['Blocked','At Risk','Stale','Healthy'];
+    return rgroups.sort(function(a, b) {
+      return rOrder.indexOf(a.label) - rOrder.indexOf(b.label);
+    });
+  }
+  if (groupBy === 'art') {
+    return tlBucketBy(items, function(i) { return EAP.resolveART(i, level); });
+  }
+  if (groupBy === 'st') {
+    return tlBucketBy(items, function(i) { return EAP.resolveST(i, level); });
+  }
+  return tlGroupDefault(items, level);
+}
+
+// ── Bar colour — vibrant solid-fill palette.
+//    State-pill text colours read dull as solid bars on white. These are
+//    500/600-level hues — same hue family as the pills (semantic mapping
+//    preserved) but with the saturation tuned for a solid-fill medium.
 function tlCol(st) {
-  var m = { Done:'var(--dv-success)', Complete:'var(--dv-success)',
-    'In Progress':'var(--dv-info)', Implementation:'var(--dv-info)',
-    Blocked:'var(--dv-error)',
-    'In Review':'#8b5cf6', Analysis:'#8b5cf6', Review:'#8b5cf6',
-    Funnel:'var(--text-disabled)', Backlog:'var(--dv-warning)',
-    Draft:'var(--text-disabled)', Planned:'var(--text-disabled)' };
-  return m[st] || 'var(--text-disabled)';
+  var m = {
+    'Funnel':         '#0ea5e9',                  // sky-500
+    'Planned':        '#6366f1',                  // indigo-500
+    'Draft':          '#64748b',                  // slate-500
+    'Backlog':        '#f59e0b',                  // amber-500
+    'To Do':          '#475569',                  // slate-600 (darker than Draft)
+    'Review':         '#f43f5e',                  // rose-500
+    'Analysis':       '#8b5cf6',                  // violet-500
+    'In Review':      '#d946ef',                  // fuchsia-500
+    'Testing':        '#14b8a6',                  // teal-500
+    'Implementation': '#f97316',                  // orange-500
+    'In Progress':    '#3b82f6',                  // blue-500
+    'At Risk':        '#ef4444',                  // red-500 (warning)
+    'Blocked':        '#dc2626',                  // red-600
+    'Done':           '#22c55e',                  // green-500 (fresh)
+    'Complete':       '#22c55e',
+    'On Track':       '#10b981'                   // emerald-500
+  };
+  return m[st] || '#94a3b8';                      // slate-400 fallback
 }
 
 // ═══════════════════════════════════════════════════════
@@ -208,9 +283,23 @@ function tlToday(range, td) {
 EAP.renderTimeline = function() {
   var s = EAP.state, level = s.level;
   var range = tlRange(level), td = tlD(range.start, range.end);
-  var data = tlItems(level), groups = tlGroup(data.items, level), dates = data.dates;
+  var data = tlItems(level), groups = tlGroup(data.items, level, s.tlGroupBy), dates = data.dates;
   var showSp = tlShowSp(level);
   var rowH = 36, grpH = 30, leftW = 240;
+
+  // Filter-aware empty state — preserve header bands so the user still sees
+  // they're in Timeline view; replace only the body region.
+  if (!data.items.length) {
+    var hh = '<div class="tl-wrap">';
+    hh += '<div class="tl-hdr"><div class="tl-hdr-left" style="width:'+leftW+'px;"></div><div class="tl-hdr-right">';
+    hh += tlCalBand(range, td);
+    hh += tlPiBand(range, td);
+    if (showSp) hh += tlSpBand(range, td);
+    hh += '</div></div>';
+    hh += '<div class="tl-body" style="min-height:240px;display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div>';
+    hh += '</div>';
+    return hh;
+  }
 
   var leftHtml = '', rightHtml = '', y = 0;
   groups.forEach(function(g) {
@@ -227,7 +316,13 @@ EAP.renderTimeline = function() {
       rightHtml += '<div class="tl-row-bg" style="top:'+y+'px;height:'+rowH+'px;"></div>';
       // Bar is solid full-colour (white text readable). Progress shown as
       // a lighter strip on top of the filled portion.
-      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;background:'+col+';" title="'+item.name+' — '+item.state+(pct?' ('+pct+'%)':'')+'">';
+      // Build a richer hover tooltip (data-tip — instant, styled — replaces native title)
+      var tipParts = [item.name, item.state];
+      if (pct) tipParts.push(pct + '% complete');
+      if (item.owner) tipParts.push('Owner · ' + ((EAP.people && EAP.people[item.owner] && EAP.people[item.owner].name) || item.owner));
+      if (item.team) tipParts.push('Team · ' + item.team);
+      var tipText = tipParts.join('\n');
+      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;background:'+col+';" data-tip="'+tipText.replace(/"/g, '&quot;')+'">';
       if (pct > 0 && pct < 100) {
         rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;background:rgba(255,255,255,0.28);"></div>';
       }
@@ -248,7 +343,9 @@ EAP.renderTimeline = function() {
 
   // Milestones (stacked to avoid overlap)
   var ms = tlMs(range, td, level);
-  h += '<div class="tl-ms-area" style="height:' + Math.max(28, ms.height + 8) + 'px;"><div class="tl-ms-left" style="width:'+leftW+'px;"><span class="tl-ms-title">Milestones</span></div><div class="tl-ms-right">' + ms.html + '</div></div>';
+  // Inline SVG (bypasses EAP.icon for guaranteed render) — filled flag in primary colour.
+  var flagSvg = '<svg width="14" height="14" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;flex-shrink:0;color:var(--color-primary);"><path fill="currentColor" d="M5 3v18h2v-7h11.6L16 9.5 18.6 5H7V3z"/></svg>';
+  h += '<div class="tl-ms-area" style="height:' + Math.max(28, ms.height + 8) + 'px;"><div class="tl-ms-left" style="width:'+leftW+'px;"><span class="tl-ms-title">' + flagSvg + ' Milestones</span></div><div class="tl-ms-right">' + ms.html + '</div></div>';
 
   // Body
   h += '<div class="tl-body"><div class="tl-body-left" style="width:'+leftW+'px;height:'+totalH+'px;">'+leftHtml+'</div>';
@@ -264,12 +361,14 @@ EAP.renderTimeline = function() {
   h += '<div class="tl-legend" id="tl-legend" hidden>' +
     '<div class="tl-legend-title">Bar colour = work item state</div>' +
     '<ul class="tl-legend-list">' +
-    '<li><span class="tl-legend-sw" style="background:var(--dv-info);"></span>In Progress</li>' +
-    '<li><span class="tl-legend-sw" style="background:var(--dv-success);"></span>Done</li>' +
-    '<li><span class="tl-legend-sw" style="background:var(--dv-error);"></span>Blocked</li>' +
-    '<li><span class="tl-legend-sw" style="background:#8b5cf6;"></span>In Review / Analysis</li>' +
-    '<li><span class="tl-legend-sw" style="background:var(--dv-warning);"></span>Backlog (committed, not started)</li>' +
-    '<li><span class="tl-legend-sw" style="background:var(--text-disabled);"></span>Funnel / Draft / Planned</li>' +
+    '<li><span class="tl-legend-sw" style="background:#3b82f6;"></span>In Progress</li>' +
+    '<li><span class="tl-legend-sw" style="background:#22c55e;"></span>Done</li>' +
+    '<li><span class="tl-legend-sw" style="background:#dc2626;"></span>Blocked</li>' +
+    '<li><span class="tl-legend-sw" style="background:#d946ef;"></span>In Review</li>' +
+    '<li><span class="tl-legend-sw" style="background:#8b5cf6;"></span>Analysis</li>' +
+    '<li><span class="tl-legend-sw" style="background:#f59e0b;"></span>Backlog</li>' +
+    '<li><span class="tl-legend-sw" style="background:#0ea5e9;"></span>Funnel</li>' +
+    '<li><span class="tl-legend-sw" style="background:#6366f1;"></span>Planned</li>' +
     '</ul>' +
     '<div class="tl-legend-note">White strip on a bar = completion progress</div>' +
     '</div>';
@@ -304,8 +403,11 @@ EAP.tlDrawDeps = function() {
   // Allow pointer events on child elements but not the SVG background
   svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible;';
 
-  var colors = { conflict:'var(--dv-error)', risk:'var(--dv-warning)', satisfied:'var(--dv-success)' };
-  var hex =    { conflict:'#ef4444',          risk:'#f59e0b',           satisfied:'#22c55e' };
+  // SVG fill/stroke can't read CSS custom properties — must be literal hex.
+  // Values mirror --color-error / --color-warning / --color-success defined
+  // in app.css :root override (deeper red, true amber, fresh green).
+  var colors = { conflict:'var(--color-error)', risk:'var(--color-warning)', satisfied:'var(--color-success)' };
+  var hex =    { conflict:'#b91c1c',             risk:'#d97706',              satisfied:'#16a34a' };
 
   // Arrowhead markers (one per type)
   var defs = document.createElementNS(SVG_NS, 'defs');
@@ -478,15 +580,9 @@ EAP.showDepPopover = function(x, y, dep) {
     if (item.pi) return 'PI ' + item.pi.replace('pi','');
     return '';
   }
-  function stateColor(state) {
-    if (!state) return 'var(--text-disabled)';
-    if (state === 'Done' || state === 'Complete') return 'var(--dv-success)';
-    if (state === 'Blocked') return 'var(--dv-error)';
-    if (state === 'In Progress' || state === 'Implementation') return 'var(--dv-info)';
-    if (state === 'In Review' || state === 'Analysis') return '#8b5cf6';
-    if (state === 'Backlog') return 'var(--dv-warning)';
-    return 'var(--text-disabled)';
-  }
+  // Reuse the canonical bar-colour map from tlCol so this stays aligned
+  // with the state-pill palette across all views.
+  function stateColor(state) { return tlCol(state); }
 
   var from = findItem(dep.from);
   var to = findItem(dep.to);

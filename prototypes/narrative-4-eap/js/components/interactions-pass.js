@@ -1,0 +1,193 @@
+/* ═══════════════════════════════════════════════════════════════════
+   INTERACTIONS-PASS.JS — Phase 1 + Phase 2 helpers
+
+   Phase 1:
+   - EAP.toast(opts)             — toast notification queue
+   - EAP.handleInsightClick(...) — defined IMMEDIATELY at script load so
+                                    inline onclick="..." works no matter when
+                                    the script loads relative to the render.
+                                    Delegates to EAP.openDetail (battle-tested).
+   - Loadtime toast if persona auto-applies a filter on entry.
+
+   Phase 2:
+   - EAP.tooltip mounted on body, JS-positioned. Works regardless of
+     parent overflow:hidden. Triggered by hovering any [data-tip] element.
+
+   Reversal:
+   - Phase 1 — remove this <script> + interactions.css <link> from index.html
+   - Phase 2 — delete the tooltip block below + the PHASE 2 block in css
+   ═══════════════════════════════════════════════════════════════════ */
+
+var EAP = EAP || {};
+
+
+// ─────────────────────────────────────────────────────────────────────
+// PHASE 1 — Toast queue
+// ─────────────────────────────────────────────────────────────────────
+EAP.toast = function(opts) {
+  opts = opts || {};
+  var msg = opts.message || '';
+  var duration = opts.duration || 4000;
+  var actionLabel = opts.action && opts.action.label;
+  var actionFn = opts.action && opts.action.run;
+
+  var container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    (document.body || document.documentElement).appendChild(container);
+  }
+
+  // Single-toast policy — clear any existing toast before showing the new one
+  // so two messages never stack on top of each other (which read as "duplicate").
+  Array.prototype.slice.call(container.querySelectorAll('.toast')).forEach(function(t) {
+    t.parentNode.removeChild(t);
+  });
+
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  var iconHtml = (opts.icon && EAP.icon) ? '<span class="toast-icon">' + EAP.icon(opts.icon, 14) + '</span>' : '';
+  toast.innerHTML =
+    iconHtml +
+    '<span class="toast-msg">' + msg + '</span>' +
+    (actionLabel ? '<button class="toast-action">' + actionLabel + '</button>' : '');
+  container.appendChild(toast);
+
+  var dismissed = false, dismissTimer;
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    clearTimeout(dismissTimer);
+    toast.classList.add('dismissing');
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 220);
+  }
+  dismissTimer = setTimeout(dismiss, duration);
+
+  if (actionLabel && actionFn) {
+    var btn = toast.querySelector('.toast-action');
+    if (btn) btn.addEventListener('click', function() { try { actionFn(); } catch (e) {} dismiss(); });
+  }
+  return { dismiss: dismiss };
+};
+
+
+// ─────────────────────────────────────────────────────────────────────
+// PHASE 1 — Insight click handler
+// Defined at top level (not inside an IIFE / DOMContentLoaded guard) so
+// the inline onclick="..." in rendered HTML can call it immediately,
+// regardless of script load timing.
+// ─────────────────────────────────────────────────────────────────────
+EAP.handleInsightClick = function(ev, target, name) {
+  try {
+    // Don't hijack inner action links / snooze / dismiss buttons
+    if (ev && ev.target && ev.target.closest && ev.target.closest('button, a')) return;
+    // Delegate to the existing detail-panel mechanism (proven working).
+    if (EAP.openDetail) EAP.openDetail(target);
+    if (EAP.toast) EAP.toast({ icon: 'sparkle', message: 'Opened ' + name, duration: 2400 });
+  } catch (e) {
+    console.error('[insight-click] error:', e);
+  }
+};
+
+
+// ─────────────────────────────────────────────────────────────────────
+// PHASE 1 — Scroll-and-pulse helper (kept for direct use; not the
+// default insight-click path anymore — openDetail is more reliable).
+// ─────────────────────────────────────────────────────────────────────
+EAP.scrollAndPulse = function(targetId) {
+  if (!targetId) return null;
+  var el =
+    document.querySelector('[data-item-id="' + targetId + '"]') ||
+    document.querySelector('[data-feature-id="' + targetId + '"]') ||
+    document.getElementById('fcard-' + targetId) ||
+    document.getElementById('tl-bar-' + targetId);
+  if (!el) return null;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { el.scrollIntoView(); }
+  el.classList.remove('eap-pulse');
+  void el.offsetWidth;
+  el.classList.add('eap-pulse');
+  setTimeout(function() { el.classList.remove('eap-pulse'); }, 1500);
+  return el;
+};
+
+
+// ─────────────────────────────────────────────────────────────────────
+// PHASE 2 — Singleton JS tooltip mounted on document.body.
+// Works regardless of parent overflow / clipping. Triggered by any
+// [data-tip="..."] element on hover.
+// ─────────────────────────────────────────────────────────────────────
+(function() {
+  var tipEl = null;
+
+  function ensureTip() {
+    if (tipEl && tipEl.parentNode) return tipEl;
+    tipEl = document.createElement('div');
+    tipEl.className = 'eap-tip';
+    (document.body || document.documentElement).appendChild(tipEl);
+    return tipEl;
+  }
+
+  function show(target) {
+    var text = target.getAttribute('data-tip');
+    if (!text) return;
+    var tip = ensureTip();
+    tip.textContent = text;
+    var r = target.getBoundingClientRect();
+    var x = r.left + r.width / 2;
+    var y = r.top - 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+    requestAnimationFrame(function() { tip.classList.add('show'); });
+  }
+  function hide() { if (tipEl) tipEl.classList.remove('show'); }
+
+  document.addEventListener('mouseover', function(ev) {
+    var t = ev.target.closest && ev.target.closest('[data-tip]');
+    if (t) show(t);
+  });
+  document.addEventListener('mouseout', function(ev) {
+    var t = ev.target.closest && ev.target.closest('[data-tip]');
+    if (t) hide();
+  });
+  // Hide tip when scrolling so it doesn't follow stale positions
+  document.addEventListener('scroll', hide, true);
+})();
+
+
+// ─────────────────────────────────────────────────────────────────────
+// Insight click — capture-phase delegated listener registered IMMEDIATELY
+// at script load. Capture phase means it runs BEFORE bubble-phase
+// listeners on inner elements, so it cannot be blocked by any handler
+// further down the tree.
+// ─────────────────────────────────────────────────────────────────────
+document.addEventListener('click', function(ev) {
+  var card = ev.target.closest && ev.target.closest('[data-insight-target]');
+  if (!card) return;
+  if (ev.target.closest('button, a')) return;     // let inner action links / snooze do their own thing
+  var target = card.getAttribute('data-insight-target');
+  var name = card.getAttribute('data-insight-name') || target;
+  if (typeof EAP.openDetail === 'function') EAP.openDetail(target);
+  if (typeof EAP.toast === 'function') {
+    EAP.toast({ icon: 'sparkle', message: 'Opened ' + name, duration: 2400 });
+  }
+}, true);   // ← capture phase — fires first, regardless of inner listeners
+
+
+// ─────────────────────────────────────────────────────────────────────
+// PHASE 1 — Load-time filter toast (only fires once if a default filter
+// is auto-applied on entry).
+// ─────────────────────────────────────────────────────────────────────
+function loadTimeFilterToast() {
+  var s = EAP.state;
+  if (!s || !s.mineOnly) return;
+  var p = (EAP.personas && EAP.personas[s.persona]) || null;
+  if (!p) return;
+  EAP.toast({ icon: 'filter', message: 'Showing items owned by ' + p.name, duration: 3200 });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadTimeFilterToast);
+} else {
+  loadTimeFilterToast();
+}

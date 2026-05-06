@@ -9,6 +9,15 @@ EAP.renderList = function() {
   var ll = { Epic: 'Epics', Capability: 'Capabilities', Feature: 'Features', WorkItem: 'Work Items' }[s.level] || 'Items';
   var cols = EAP.lsCols();
 
+  // Filter-aware empty state — when the whole view is empty AND a clearable
+  // filter is active, replace everything with the filter empty-state.
+  var groupTotal = groups.reduce(function(a, g) { return a + ((g.items || []).length); }, 0);
+  var blTotal = ((s.level === 'WorkItem') ? EAP.getBacklogFlat() : EAP.getBacklogData());
+  blTotal = (blTotal && blTotal.length) || 0;
+  if (groupTotal === 0 && blTotal === 0 && EAP.hasClearableFilters()) {
+    return '<div class="gpanel" style="flex:1;min-width:0;display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div>';
+  }
+
   // Default: Epic/Capability open all (grouped by ST/ART, no "current"); Feature/WorkItem open active only
   var openAll = (s.level === 'Epic' || s.level === 'Capability');
   groups.forEach(function(g) { if (EAP.state.openAccordions[g.id] === undefined) EAP.state.openAccordions[g.id] = openAll || !!g.active; });
@@ -22,7 +31,7 @@ EAP.renderList = function() {
     var blPage = EAP.pgSlice(blD, blPgId);
     blHtml = '<div class="gpanel split-left"><div class="gpanel-hd"><div class="gpanel-hd-left"><span class="gpanel-title">Backlog</span><span class="gpanel-count">' + blD.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div>' +
       '<div class="gpanel-scroll"><table class="dtbl"><thead><tr>' + bc.h + '</tr></thead><tbody>' +
-      blPage.map(function(i) { return '<tr>' + bc.r(i) + '</tr>'; }).join('') +
+      blPage.map(function(i) { return '<tr data-item-id="' + i.id + '">' + bc.r(i) + '</tr>'; }).join('') +
       '</tbody></table></div>' + EAP.pgFooter(blD.length, blPgId) + '</div>' +
       '<div class="split-div"><div class="split-grip"><span></span><span></span><span></span><span></span><span></span></div></div>';
   }
@@ -54,7 +63,7 @@ EAP.renderList = function() {
     if (g.items && g.items.length) {
       var pageItems = EAP.pgSlice(EAP.wsjfSorted(g.items), pgId);
       acc += '<table class="dtbl"><thead><tr>' + cols.h + '</tr></thead><tbody>' +
-        pageItems.map(function(i) { return '<tr>' + cols.r(i) + '</tr>'; }).join('') + '</tbody></table>';
+        pageItems.map(function(i) { return '<tr data-item-id="' + i.id + '">' + cols.r(i) + '</tr>'; }).join('') + '</tbody></table>';
     } else {
       acc += '<div class="empty-state"><div class="empty-state-icon">' + EAP.icon('plus', 24) + '</div><div class="empty-state-text">No items assigned to this increment</div><div class="empty-state-cta">Drag items from the backlog or click <strong>New</strong> to create one</div></div>';
     }
@@ -69,7 +78,7 @@ EAP.renderList = function() {
     var bc2 = EAP.lsBlCols();
     var blPgId2 = 'ls-bl-stack';
     var blPage2 = EAP.pgSlice(blD2, blPgId2);
-    acc += '<div class="pi-acc" style="margin-top:4px;"><div class="gpanel-hd" style="border-radius:16px 16px 0 0;"><div class="gpanel-hd-left"><span class="gpanel-title">Backlog</span><span class="gpanel-count">' + blD2.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div><div style="padding:10px 14px 14px;overflow-x:auto;"><table class="dtbl"><thead><tr>' + bc2.h + '</tr></thead><tbody>' + blPage2.map(function(i) { return '<tr>' + bc2.r(i) + '</tr>'; }).join('') + '</tbody></table>' + EAP.pgFooter(blD2.length, blPgId2) + '</div></div>';
+    acc += '<div class="pi-acc" style="margin-top:4px;"><div class="gpanel-hd" style="border-radius:16px 16px 0 0;"><div class="gpanel-hd-left"><span class="gpanel-title">Backlog</span><span class="gpanel-count">' + blD2.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div><div style="padding:10px 14px 14px;overflow-x:auto;"><table class="dtbl"><thead><tr>' + bc2.h + '</tr></thead><tbody>' + blPage2.map(function(i) { return '<tr data-item-id="' + i.id + '">' + bc2.r(i) + '</tr>'; }).join('') + '</tbody></table>' + EAP.pgFooter(blD2.length, blPgId2) + '</div></div>';
   }
 
   acc += '</div>';

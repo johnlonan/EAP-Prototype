@@ -43,7 +43,7 @@ EAP._icons = {
   'compass':      '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
   'lock':         '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   // AI + UI icons
-  'sparkle':      '<path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 1-1.275-1.275L3 12l5.813-1.912a2 2 0 0 1 1.275-1.275L12 3z"/>',
+  'sparkle':      '<path fill="currentColor" stroke="none" d="M10 4L12.5 11.5L20 14L12.5 16.5L10 24L7.5 16.5L0 14L7.5 11.5ZM19 1L19.7 4.3L23 5L19.7 5.7L19 9L18.3 5.7L15 5L18.3 4.3Z"/>',
   'chevron-right':'<polyline points="9 18 15 12 9 6"/>',
   'chevron-up':   '<polyline points="18 15 12 9 6 15"/>',
   'clock':        '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',

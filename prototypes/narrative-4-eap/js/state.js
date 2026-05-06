@@ -29,6 +29,7 @@ EAP.state = {
 
   // Filters
   mineOnly: false,
+  mineOverrides: {},                  // per-tab manual overrides — beats persona defaults
 
   // View options
   splitView: true,
@@ -48,7 +49,11 @@ EAP.state = {
   pagination: {},
 
   // WSJF sort state (null = default order, 'desc' = sorted)
-  wsjfSort: null
+  wsjfSort: null,
+
+  // Grouping selectors per view ('default' = each level's natural grouping)
+  tlGroupBy: 'default',
+  hierGroupBy: 'goal'
 };
 
 // ── State transitions ──────────────────────────────────
@@ -92,11 +97,23 @@ EAP.setTab = function(tab) {
     s.openAccordions = {};
   }
 
+  // mineOnly: per-tab user override beats persona default
+  s.mineOverrides = s.mineOverrides || {};
+  if (s.mineOverrides[tab] !== undefined) {
+    s.mineOnly = s.mineOverrides[tab];
+  } else {
+    s.mineOnly = EAP.personaWantsMineOn(EAP.personas[s.persona], tab);
+  }
+
   EAP.render();
 };
 
 EAP.toggleMineOnly = function() {
-  EAP.state.mineOnly = !EAP.state.mineOnly;
+  var s = EAP.state;
+  s.mineOnly = !s.mineOnly;
+  s.mineOverrides = s.mineOverrides || {};
+  s.mineOverrides[s.tab] = s.mineOnly;       // remember manual override for this tab
+  s.pagination = {};                          // reset paging — total list size has changed
   EAP.render();
 };
 
@@ -137,7 +154,9 @@ EAP.personas = {
       tab: 'backlog',
       context: 'art', contextName: 'Digital Banking ART', contextId: 'art1',
       level: 'Feature'
-    }
+    },
+    // PM auto-filters across planning views — Task Board not relevant to her
+    mineOnTabs: ['backlog', 'planning', 'timeline', 'board']
   },
   james: {
     key: 'james',
@@ -149,8 +168,164 @@ EAP.personas = {
       tab: 'taskboard',
       context: 'team', contextName: 'Auth Team', contextId: 'team-auth',
       level: 'WorkItem'
+    },
+    // Dev only auto-filters in his daily view; planning views show team context
+    mineOnTabs: ['taskboard']
+  }
+};
+
+// Does the active persona want mineOnly auto-applied on this tab?
+EAP.personaWantsMineOn = function(persona, tab) {
+  if (!persona || !persona.mineOnTabs) return false;
+  return persona.mineOnTabs.indexOf(tab) !== -1;
+};
+
+// Build an id → parentId map from the hierarchy tree (lazy, cached).
+EAP._parentMap = null;
+EAP._buildParentMap = function() {
+  var m = {};
+  function walk(node, parentId) {
+    if (!node) return;
+    m[node.id] = parentId || null;
+    if (node.children) node.children.forEach(function(c) { walk(c, node.id); });
+  }
+  (EAP.hierarchy || []).forEach(function(root) { walk(root, null); });
+  return m;
+};
+EAP.parentIdOf = function(id) {
+  if (!EAP._parentMap) EAP._parentMap = EAP._buildParentMap();
+  return EAP._parentMap[id] || null;
+};
+
+// Walk up the hierarchy from a node id until an Epic is found, return its product.
+EAP._productViaHierarchy = function(id) {
+  var pid = EAP.parentIdOf(id);
+  var guard = 10;
+  while (pid && guard-- > 0) {
+    var ep = (EAP.epics && EAP.epics.all || []).filter(function(e) { return e.id === pid; })[0];
+    if (ep) return ep.product || null;
+    pid = EAP.parentIdOf(pid);
+  }
+  return null;
+};
+
+// Resolve the product for any item. Caps/Features walk hierarchy by id;
+// Work items don't share ids with the hierarchy tree, so they match by feature name first.
+EAP.resolveProduct = function(item, type) {
+  if (!item) return null;
+  if (type === 'Epic') return item.product || null;
+  if (type === 'Capability' || type === 'Feature') return EAP._productViaHierarchy(item.id);
+  if (type === 'WorkItem') {
+    var f = (EAP.allFeatures || []).filter(function(ff) { return ff.name === item.parent; })[0];
+    if (!f) return null;
+    return EAP._productViaHierarchy(f.id);
+  }
+  return null;
+};
+
+// Generic walker — find an attribute on the nearest Epic ancestor.
+EAP._epicAttrViaHierarchy = function(id, attr) {
+  var pid = EAP.parentIdOf(id);
+  var guard = 10;
+  while (pid && guard-- > 0) {
+    var ep = (EAP.epics && EAP.epics.all || []).filter(function(e) { return e.id === pid; })[0];
+    if (ep) return ep[attr] || null;
+    pid = EAP.parentIdOf(pid);
+  }
+  return null;
+};
+
+// Team → ART and ART → ST fallback maps. Used when the parent-chain
+// walk via hierarchy can't find the value (e.g. features added to
+// allFeatures but not in EAP.hierarchy).
+EAP._teamToArt = {
+  'Auth':              'Digital Banking ART',
+  'Payments':          'Digital Banking ART',
+  'Fraud':             'Digital Banking ART',
+  'Mobile':            'Digital Banking ART',
+  'Accounts':          'Digital Banking ART',
+  'Onboard':           'Digital Banking ART',
+  'Mortgages':         'Lending & Mortgages ART',
+  'Lending Risk':      'Lending & Mortgages ART',
+  // long-form team names
+  'Auth Team':         'Digital Banking ART',
+  'Payments Team':     'Digital Banking ART',
+  'Fraud Team':        'Digital Banking ART',
+  'Mobile Exp Team':   'Digital Banking ART',
+  'Accounts Team':     'Digital Banking ART',
+  'Onboarding Team':   'Digital Banking ART',
+  'Mortgages Team':    'Lending & Mortgages ART',
+  'Lending Risk Team': 'Lending & Mortgages ART'
+};
+EAP._artToSt = {
+  'Digital Banking ART':     'Digital & Payments ST',
+  'Lending & Mortgages ART': 'Lending & Mortgages ST'
+};
+
+// Resolve ART for any item. Epics/Caps/Features may have it directly;
+// otherwise walk hierarchy, otherwise fall back to team→ART map.
+EAP.resolveART = function(item, type) {
+  if (!item) return null;
+  if (item.art) return item.art;
+  if (type === 'Capability' || type === 'Feature') {
+    var a = EAP._epicAttrViaHierarchy(item.id, 'art');
+    if (a) return a;
+  }
+  if (type === 'WorkItem') {
+    var f = (EAP.allFeatures || []).filter(function(ff) { return ff.name === item.parent; })[0];
+    if (f) {
+      var fa = f.art || EAP._epicAttrViaHierarchy(f.id, 'art');
+      if (fa) return fa;
     }
   }
+  // Fallback: team → ART map
+  if (item.team && EAP._teamToArt[item.team]) return EAP._teamToArt[item.team];
+  return null;
+};
+
+// Resolve Solution Train. Only Epics have it directly; otherwise walk
+// hierarchy, otherwise derive from ART via ART→ST map.
+EAP.resolveST = function(item, type) {
+  if (!item) return null;
+  if (type === 'Epic') return item.st || null;
+  if (type === 'Capability' || type === 'Feature') {
+    var s = EAP._epicAttrViaHierarchy(item.id, 'st');
+    if (s) return s;
+  }
+  if (type === 'WorkItem') {
+    var f = (EAP.allFeatures || []).filter(function(ff) { return ff.name === item.parent; })[0];
+    if (f) {
+      var fs = EAP._epicAttrViaHierarchy(f.id, 'st');
+      if (fs) return fs;
+    }
+  }
+  // Fallback: derive ST from ART (which may itself fall back to team)
+  var art = EAP.resolveART(item, type);
+  if (art && EAP._artToSt[art]) return EAP._artToSt[art];
+  return null;
+};
+
+// Risk bucket — derived from existing flags on items. Order: Blocked > At Risk > Stale > Healthy.
+EAP.riskBucketOf = function(item) {
+  if (!item) return 'Healthy';
+  if (item.blocked || item.state === 'Blocked') return 'Blocked';
+  if (item.atRisk) return 'At Risk';
+  if (item.stalePIs && item.stalePIs >= 3) return 'Stale';
+  return 'Healthy';
+};
+
+// Size bucket — Epics/Caps/Features have `size`; Work Items derive from `pts`.
+EAP.sizeBucketOf = function(item, type) {
+  if (!item) return null;
+  if (item.size) return item.size;
+  if (type === 'WorkItem' && item.pts != null) {
+    if (item.pts >= 13) return 'XL';
+    if (item.pts >= 8)  return 'L';
+    if (item.pts >= 5)  return 'M';
+    if (item.pts >= 3)  return 'S';
+    return 'XS';
+  }
+  return null;
 };
 
 EAP.ME = 'Ananya';                  // updated by applyPersona() at boot
@@ -165,7 +340,10 @@ EAP.applyPersona = function(key) {
   EAP.state.contextName = p.defaults.contextName;
   EAP.state.contextId   = p.defaults.contextId;
   EAP.state.level       = p.defaults.level;
-  EAP.state.mineOnly    = true;     // personalised demo — filter on by default
+  // Fresh persona session — clear any prior tab-level overrides, then apply
+  // the persona's mineOnly default for the landing tab.
+  EAP.state.mineOverrides = {};
+  EAP.state.mineOnly      = EAP.personaWantsMineOn(p, EAP.state.tab);
   // Task Board: when persona is a team member, preselect them in the member chip
   EAP.state.trackMember = (key === 'james') ? 'James' : 'All';
   try { localStorage.setItem('eap.persona', key); } catch (e) {}
@@ -195,21 +373,73 @@ EAP.applyMineFilter = function(items) {
   return items.filter(EAP.isMine);
 };
 
+// Filter items by current team context (when s.context === 'team').
+// Tolerant of short ('Auth') vs long ('Auth Team') team names.
+EAP.applyTeamScope = function(items) {
+  var s = EAP.state;
+  if (s.context !== 'team' || !s.contextName) return items;
+  if (!Array.isArray(items)) return items;
+  var tn = s.contextName;
+  return items.filter(function(it) {
+    if (!it || !it.team) return false;
+    return it.team === tn || (it.team + ' Team') === tn;
+  });
+};
+
+// Universal scope filter — handles Portfolio / Solution Train / ART / Team.
+// Pass `levelType` ('Epic'|'Capability'|'Feature'|'WorkItem') so the right
+// resolver is used (some scopes need parent-chain walks for items that
+// don't have the scope field directly — e.g. work items don't have art).
+EAP.applyScope = function(items, levelType) {
+  var s = EAP.state;
+  if (!s || s.context === 'portfolio') return items;       // Portfolio = no filter
+  if (!Array.isArray(items)) return items;
+  var ctxName = s.contextName;
+  if (!ctxName) return items;
+
+  return items.filter(function(it) {
+    if (!it) return false;
+
+    if (s.context === 'team') {
+      // Team scope: STRICT. Un-teamed items genuinely don't belong to any
+      // team (e.g. uncommitted backlog features) — exclude them.
+      if (!it.team) return false;
+      return it.team === ctxName || (it.team + ' Team') === ctxName;
+    }
+
+    if (s.context === 'art') {
+      var art = EAP.resolveART ? EAP.resolveART(it, levelType) : (it.art || null);
+      // PERMISSIVE: if ART can't be determined (un-committed backlog items
+      // without team / art / hierarchy parent), they're visible at any ART —
+      // backlog hasn't been allocated yet. Otherwise must match exactly.
+      if (art === null) return true;
+      return art === ctxName;
+    }
+
+    if (s.context === 'solution-train') {
+      var st = EAP.resolveST ? EAP.resolveST(it, levelType) : (it.st || null);
+      if (st === null) return true;        // permissive — same rationale as ART
+      return st === ctxName;
+    }
+
+    return true;
+  });
+};
+
 // ── Data accessors based on current state ──────────────
 
 EAP.getBacklogData = function() {
   var s = EAP.state;
-  if (s.level === 'Epic')       return EAP.applyMineFilter(typeof EAP.epics.backlog === 'function' ? EAP.epics.backlog() : EAP.epics.backlog);
-  if (s.level === 'Capability') return EAP.applyMineFilter(typeof EAP.capabilities.backlog === 'function' ? EAP.capabilities.backlog() : EAP.capabilities.backlog);
-  if (s.level === 'Feature')    return EAP.applyMineFilter(typeof EAP.features.backlog === 'function' ? EAP.features.backlog() : EAP.features.backlog);
+  if (s.level === 'Epic')       return EAP.applyScope(EAP.applyMineFilter(typeof EAP.epics.backlog === 'function' ? EAP.epics.backlog() : EAP.epics.backlog), 'Epic');
+  if (s.level === 'Capability') return EAP.applyScope(EAP.applyMineFilter(typeof EAP.capabilities.backlog === 'function' ? EAP.capabilities.backlog() : EAP.capabilities.backlog), 'Capability');
+  if (s.level === 'Feature')    return EAP.applyScope(EAP.applyMineFilter(typeof EAP.features.backlog === 'function' ? EAP.features.backlog() : EAP.features.backlog), 'Feature');
   if (s.level === 'WorkItem') {
     // Workitem backlog is keyed object {Story, Defect, CaseTask}; filter each bucket.
     var bl = EAP.workItems.backlog;
-    if (!EAP.state.mineOnly) return bl;
     return {
-      Story: EAP.applyMineFilter(bl.Story || []),
-      Defect: EAP.applyMineFilter(bl.Defect || []),
-      CaseTask: EAP.applyMineFilter(bl.CaseTask || [])
+      Story:    EAP.applyScope(EAP.applyMineFilter(bl.Story    || []), 'WorkItem'),
+      Defect:   EAP.applyScope(EAP.applyMineFilter(bl.Defect   || []), 'WorkItem'),
+      CaseTask: EAP.applyScope(EAP.applyMineFilter(bl.CaseTask || []), 'WorkItem')
     };
   }
   return [];
@@ -254,14 +484,12 @@ EAP.getListGroups = function() {
   } else {
     return [];
   }
-  // Apply mineOnly filter to items inside each group
-  if (s.mineOnly) {
-    groups = groups.map(function(g) {
-      var copy = {}; for (var k in g) copy[k] = g[k];
-      copy.items = EAP.applyMineFilter(g.items || []);
-      return copy;
-    });
-  }
+  // Apply mineOnly + scope filter to items inside each group
+  groups = groups.map(function(g) {
+    var copy = {}; for (var k in g) copy[k] = g[k];
+    copy.items = EAP.applyScope(EAP.applyMineFilter(g.items || []), s.level);
+    return copy;
+  });
   return groups;
 };
 
@@ -294,22 +522,24 @@ EAP.getInsights = function() {
 // ── Helpers ────────────────────────────────────────────
 
 EAP.stateClass = function(state) {
+  // Each state value gets a unique class — no two values share styling.
   var map = {
     'Funnel':         'st-funnel',
+    'Planned':        'st-planned',
+    'Draft':          'st-draft',
     'Backlog':        'st-backlog',
-    'Review':         'st-analysis',
+    'To Do':          'st-todo',
+    'Review':         'st-review',
     'Analysis':       'st-analysis',
+    'In Review':      'st-in-review',
+    'Testing':        'st-testing',
     'Implementation': 'st-impl',
     'In Progress':    'st-progress',
+    'At Risk':        'st-at-risk',
     'Blocked':        'st-blocked',
     'Done':           'st-done',
     'Complete':       'st-done',
-    'Draft':          'st-backlog',
-    'Planned':        'st-funnel',
-    'To Do':          'st-backlog',
-    'In Review':      'st-analysis',
-    'Testing':        'st-analysis',
-    'At Risk':        'st-impl'
+    'On Track':       'st-on-track'
   };
   return map[state] || 'st-funnel';
 };

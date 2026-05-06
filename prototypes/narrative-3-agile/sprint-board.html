@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprint Board | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── Sticky header ───────────────────────────────── */
+    .sprint-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 20px 32px 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.52) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .header-row-1 {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .header-left { display: flex; flex-direction: column; gap: 4px; }
+
+    .header-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sprint-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .sprint-dates {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .sprint-countdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .countdown-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 600;
+      background: #FEF3E2;
+      border: 1px solid rgba(133,79,11,0.2);
+      color: #854F0B;
+    }
+
+    .sprint-goal {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 4px 0 0;
+    }
+
+    .sprint-goal strong {
+      font-weight: 600;
+      color: var(--text-tertiary);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Header right — burndown + avatars ───────────── */
+    .header-right {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+
+    .burndown-mini {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .burndown-chart {
+      width: 120px;
+      height: 40px;
+      position: relative;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .burndown-label {
+      font-size: 9px;
+      color: var(--text-disabled);
+      text-align: center;
+    }
+
+    .team-avatars {
+      display: flex;
+      align-items: center;
+      gap: -4px;
+    }
+
+    .team-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: white;
+      border: 2px solid white;
+      margin-left: -6px;
+      flex-shrink: 0;
+    }
+
+    .team-avatar:first-child { margin-left: 0; }
+    .team-avatar.av-js { background: #0E4E69; }
+    .team-avatar.av-kr { background: #7c3aed; }
+    .team-avatar.av-al { background: #854F0B; }
+
+    /* ── Sprint progress bar ─────────────────────────── */
+    .progress-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      padding-bottom: 12px;
+    }
+
+    .progress-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .progress-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: rgba(0,0,0,0.06);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: var(--color-success);
+      transition: width 0.6s ease;
+    }
+
+    .progress-pct {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-success);
+      white-space: nowrap;
+    }
+
+    /* ── Sprint health stats ─────────────────────────── */
+    .health-stats {
+      display: flex;
+      gap: 4px;
+      padding: 10px 32px 8px;
+      background: rgba(255,255,255,0.3);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-field);
+      background: rgba(255,255,255,0.5);
+      border: 1px solid rgba(0,0,0,0.04);
+      flex: 1;
+    }
+
+    .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .stat-dot.green { background: var(--color-success); }
+    .stat-dot.blue { background: var(--color-info); }
+    .stat-dot.red { background: #CC0000; }
+    .stat-dot.grey { background: var(--text-disabled); }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .stat-chip.stat-blocked {
+      background: rgba(204,0,0,0.04);
+      border-color: rgba(204,0,0,0.15);
+    }
+
+    .stat-chip.stat-blocked .stat-label { color: #CC0000; font-weight: 600; }
+    .stat-chip.stat-blocked .stat-value { color: #CC0000; }
+
+    /* ── Kanban board ────────────────────────────────── */
+    .kanban {
+      display: flex;
+      gap: 12px;
+      padding: 16px 32px 120px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .kanban-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 180px;
+    }
+
+    .kanban-col-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 2px solid rgba(0,0,0,0.06);
+      margin-bottom: 8px;
+    }
+
+    .kanban-col-count {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--bg-tertiary);
+      color: var(--text-tertiary);
+    }
+
+    .kanban-col-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+    }
+
+    .kanban-col-body::-webkit-scrollbar { width: 3px; }
+    .kanban-col-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 3px; }
+
+    /* ── Board cards ─────────────────────────────────── */
+    .board-card {
+      padding: 12px 14px;
+      background: white;
+      border-radius: var(--radius-field);
+      border: 1px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .board-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .board-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .board-card-id {
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    .board-card-pts {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .board-card-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .board-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .board-card-feature {
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    .board-card-assignee {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: white;
+      font-size: 8px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .board-card-assignee.av-js { background: #0E4E69; }
+    .board-card-assignee.av-kr { background: #7c3aed; }
+    .board-card-assignee.av-al { background: #854F0B; }
+
+    /* Days-in-column stale indicator */
+    .days-in-col {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      color: #854F0B;
+      background: #FEF3E2;
+      border: 1px solid rgba(133,79,11,0.15);
+      border-radius: var(--radius-full);
+      padding: 1px 6px;
+      margin-top: 6px;
+    }
+
+    /* ── Blocked treatment — SCREAMS ─────────────────── */
+    .board-card.blocked {
+      border: 2px solid #CC0000;
+      background: rgba(204,0,0,0.03);
+    }
+
+    .board-card.blocked:hover {
+      box-shadow: 0 4px 12px rgba(204,0,0,0.15);
+    }
+
+    .blocked-banner {
+      font-size: 10px;
+      font-weight: 600;
+      color: #CC0000;
+      padding: 4px 8px;
+      margin: -12px -14px 8px;
+      background: rgba(204,0,0,0.06);
+      border-radius: var(--radius-field) var(--radius-field) 0 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .blocked-icon { font-size: 8px; }
+
+    .blocked-reason {
+      font-size: 10px;
+      color: #CC0000;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* ── Done column — muted cards ───────────────────── */
+    .kanban-col.done .board-card { opacity: 0.55; }
+    .kanban-col.done .board-card:hover { opacity: 0.8; }
+
+    /* ── AI insight bar ──────────────────────────────── */
+    .ai-bar {
+      margin: 0 32px 0;
+      padding: 10px 14px;
+      background: rgba(248, 250, 252, 0.7);
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: var(--radius-field);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.55;
+    }
+
+    .ai-bar-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      margin-top: 1px;
+      color: var(--color-accent);
+    }
+
+    .ai-bar strong { color: var(--text-primary); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav id="left-nav" aria-label="Primary navigation"></nav>
+
+    <main class="content-viewport" style="display:flex; flex-direction:column;">
+
+      <!-- ── Sticky Header ──────────────────────────── -->
+      <div class="sprint-header">
+        <div class="header-row-1">
+          <div class="header-left">
+            <div class="header-title-row">
+              <button onclick="window.location.href='team-backlog.html'" style="background:none; border:none; cursor:pointer; padding:4px; display:flex; flex-shrink:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <h1 class="sprint-title">Sprint 3</h1>
+              <span class="sprint-dates">Jan 15 – Jan 28</span>
+              <span class="sprint-countdown">
+                Day 12 of 14 &middot;
+                <span class="countdown-badge">3 days left</span>
+              </span>
+            </div>
+            <p class="sprint-goal">
+              <strong>Sprint goal:</strong> Complete webhook system and begin SSO integration
+            </p>
+          </div>
+
+          <div class="header-right">
+            <!-- Burndown mini-chart -->
+            <div class="burndown-mini">
+              <div class="burndown-chart">
+                <!-- Ideal line (grey diagonal) -->
+                <div style="position:absolute; top:0; left:0; width:100%; height:100%; background:linear-gradient(to bottom right, transparent 49%, rgba(0,0,0,0.1) 49%, rgba(0,0,0,0.1) 51%, transparent 51%);"></div>
+                <!-- Actual line (blue) -->
+                <svg width="120" height="40" viewBox="0 0 120 40" style="position:absolute; top:0; left:0;">
+                  <polyline points="0,0 15,2 30,8 45,10 60,14 75,18 85,22 95,28 110,30" fill="none" stroke="var(--color-info)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="burndown-label">Burndown</span>
+            </div>
+
+            <!-- Team avatars -->
+            <a href="sprint-velocity.html" style="font-size:11px; color:var(--color-link); text-decoration:none; font-weight:500; white-space:nowrap;">Sprint Velocity</a>
+
+            <div class="team-avatars">
+              <div class="team-avatar av-js" title="James S.">JS</div>
+              <div class="team-avatar av-kr" title="Katie R.">KR</div>
+              <div class="team-avatar av-al" title="Alex L.">AL</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sprint progress bar — persistent -->
+        <div class="progress-section">
+          <span class="progress-label">16 / 22 pts</span>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:73%;"></div>
+          </div>
+          <span class="progress-pct">73%</span>
+        </div>
+      </div>
+
+      <!-- ── Sprint Health Stats ────────────────────── -->
+      <div class="health-stats">
+        <div class="stat-chip">
+          <span class="stat-dot green"></span>
+          <span class="stat-label">Done</span>
+          <span class="stat-value">3 stories &middot; 13 pts</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-dot blue"></span>
+          <span class="stat-label">In Progress</span>
+          <span class="stat-value">2 stories &middot; 6 pts</span>
+        </div>
+        <div class="stat-chip stat-blocked">
+          <span class="stat-dot red"></span>
+          <span class="stat-label">Blocked</span>
+          <span class="stat-value">1 story &middot; 4 pts</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-dot grey"></span>
+          <span class="stat-label">Not Started</span>
+          <span class="stat-value">1 story &middot; 3 pts</span>
+        </div>
+      </div>
+
+      <!-- ── AI Insight Bar ─────────────────────────── -->
+      <div style="padding:12px 32px 0;">
+        <div class="ai-bar">
+          <svg class="ai-bar-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/>
+            <path d="M18 2L18.5 4C18.8 5.2 19.8 6.2 21 6.5L23 7L21 7.5C19.8 7.8 18.8 8.8 18.5 10L18 12L17.5 10C17.2 8.8 16.2 7.8 15 7.5L13 7L15 6.5C16.2 6.2 17.2 5.2 17.5 4L18 2Z" fill="currentColor"/>
+          </svg>
+          <span>
+            <strong>STRY-502</strong> (Data stream ingestion) blocked for 5 days — exceeds 3-day threshold.
+            Escalation to Atlas PO recommended. This Story is on the critical path for <strong>F-05</strong> (Real-time reporting pipeline).
+          </span>
+        </div>
+      </div>
+
+      <!-- ── Kanban Board ───────────────────────────── -->
+      <div class="kanban">
+
+        <!-- Column: To Do -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            To Do
+            <span class="kanban-col-count">1</span>
+          </div>
+          <div class="kanban-col-body">
+            <div class="board-card" data-status="todo" onclick="window.location.href='story-detail.html?id=STRY-503'">
+              <div class="board-card-top">
+                <span class="board-card-id">STRY-503</span>
+                <span class="board-card-pts">3</span>
+              </div>
+              <div class="board-card-title">Real-time aggregation engine</div>
+              <div class="board-card-bottom">
+                <span class="board-card-feature">F-05</span>
+                <div class="board-card-assignee av-kr" title="Katie R.">KR</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: In Progress -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            In Progress
+            <span class="kanban-col-count">3</span>
+          </div>
+          <div class="kanban-col-body">
+
+            <!-- Blocked card — SCREAMS -->
+            <div class="board-card blocked" data-status="blocked" onclick="window.location.href='story-detail.html?id=STRY-502'">
+              <div class="blocked-banner">
+                <span class="blocked-icon">&#9679;</span> Blocked &middot; 5 days
+              </div>
+              <div class="board-card-top">
+                <span class="board-card-id">STRY-502</span>
+                <span class="board-card-pts">4</span>
+              </div>
+              <div class="board-card-title">Data stream ingestion</div>
+              <div class="board-card-bottom">
+                <span class="board-card-feature">F-05</span>
+                <div class="board-card-assignee av-al" title="Alex L.">AL</div>
+              </div>
+              <div class="blocked-reason">Waiting on Atlas audit trail dependency</div>
+            </div>
+
+            <!-- Normal in-progress cards -->
+            <div class="board-card" data-status="in-progress" onclick="window.location.href='story-detail.html?id=STRY-403'">
+              <div class="board-card-top">
+                <span class="board-card-id">STRY-403</span>
+                <span class="board-card-pts">5</span>
+              </div>
+              <div class="board-card-title">Webhook notification system</div>
+              <div class="board-card-bottom">
+                <span class="board-card-feature">F-01</span>
+                <div class="board-card-assignee av-js" title="James S.">JS</div>
+              </div>
+              <div class="days-in-col">&#9719; In progress 3 days</div>
+            </div>
+
+            <div class="board-card" data-status="in-progress" onclick="window.location.href='story-detail.html?id=STRY-406'">
+              <div class="board-card-top">
+                <span class="board-card-id">STRY-406</span>
+                <span class="board-card-pts">3</span>
+              </div>
+              <div class="board-card-title">Rate limit error handling</div>
+              <div class="board-card-bottom">
+                <span class="board-card-feature">F-01</span>
+                <div class="board-card-assignee av-js" title="James S.">JS</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Column: In Review -->
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            In Review
+            <span class="kanban-col-count">0</span>
+          </div>
+          <div class="kanban-col-body">
+            <!-- Empty state -->
+            <div style="padding:20px 14px; text-align:center; font-size:11px; color:var(--text-disabled);">
+              No stories in review
+            </div>
+          </div>
+        </div>
+
+        <!-- Column: Done -->
+        <div class="kanban-col done">
+          <div class="kanban-col-header">
+            Done
+            <span class="kanban-col-count">3</span>
+          </div>
+          <div class="kanban-col-body">
+
+            <div class="board-card" data-status="done" onclick="window.location.href='story-detail.html?id=STRY-401'">
+              <div class="board-card-top">
+                <span class="board-card-id">STRY-401</span>
+                <span class="board-card-pts">5</span>
+              </div>
+              <div class="board-card-title">API endpoint scaffolding</div>
+              <div class="board-card-bottom">
+                <span class="board-card-feature">F-01</span>
+                <div class="board-card-assignee av-js" title="James S.">JS</div>
+              </div>
+            </div>
+
+            <div class="board-card" data-status="done" onclick="window.location.href='story-detail.html?id=STRY-402'">
+              <div class="board-card-top">
+                <span class="board-card-id">STRY-402</span>
+                <span class="board-card-pts">5</span>
+              </div>
+              <div class="board-card-title">Bulk provisioning logic</div>
+              <div class="board-card-bottom">
+                <span class="board-card-feature">F-01</span>
+                <div class="board-card-assignee av-kr" title="Katie R.">KR</div>
+              </div>
+            </div>
+
+            <div class="board-card" data-status="done" onclick="window.location.href='story-detail.html?id=STRY-501'">
+              <div class="board-card-top">
+                <span class="board-card-id">STRY-501</span>
+                <span class="board-card-pts">5</span>
+              </div>
+              <div class="board-card-title">Pipeline foundation setup</div>
+              <div class="board-card-bottom">
+                <span class="board-card-feature">F-05</span>
+                <div class="board-card-assignee av-al" title="Alex L.">AL</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /.kanban -->
+
+    </main>
+  </div>
+
+  <!-- ── Nav ─────────────────────────────────────────── -->
+  <script src="../shared/nav.js"></script>
+  <script>
+    renderNav('board', {
+      avatar: '../../assets/images/avatar-james.png',
+      name: 'Sarah Chen',
+      links: {
+        0: 'planning.html',
+        3: 'team-backlog.html',
+        4: 'sprint-board.html'
+      }
+    });
+  </script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('sprint-board');</script>
+</body>
+</html>

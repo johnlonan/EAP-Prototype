@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Enterprise Agile Planning | Digital Banking ART</title>
   <script>
-    // Show the persona slide on a fresh visit (no URL param, no stored persona).
-    // Once a persona is chosen, this redirect is skipped.
+    // Always route through the persona slide unless the URL carries one.
+    // Internal nav appends ?p=<persona> so in-app navigation never bounces back.
     (function() {
       try {
         var qs = new URLSearchParams(window.location.search);
         if (qs.get('p')) return;
-        if (localStorage.getItem('eap.persona')) return;
         window.location.replace('start.html');
       } catch (e) {}
     })();
@@ -23,7 +22,9 @@
   <script src="../../assets/js/chart.min.js"></script>
   <script src="../../assets/js/interactions.js" defer></script>
   <div id="floating-bar" style="display:none;"></div>
-  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/app.css?v=8">
+  <link rel="stylesheet" href="css/modernity.css?v=11">
+  <link rel="stylesheet" href="css/interactions.css?v=7">
 </head>
 <body>
 <div class="page-shell">
@@ -36,31 +37,34 @@
 </div>
 
 <script src="../shared/nav.js"></script>
-<script src="js/data.js"></script>
-<script src="js/state.js"></script>
+<script src="js/data.js?v=8"></script>
+<script src="js/state.js?v=5"></script>
 <script src="js/components/icons.js"></script>
-<script src="js/components/helpers.js"></script>
+<script src="js/components/helpers.js?v=3"></script>
 <script src="js/components/detail-panel.js"></script>
 <script src="js/components/charts.js"></script>
 <script src="js/components/persona-switcher.js"></script>
 <script src="js/tabs/backlog.js"></script>
 <script src="js/tabs/list.js"></script>
-<script src="js/tabs/timeline.js"></script>
-<script src="js/tabs/board.js"></script>
-<script src="js/tabs/track.js"></script>
-<script src="js/tabs/hierarchy.js"></script>
-<script src="js/components/insights.js"></script>
-<script src="js/render.js"></script>
+<script src="js/tabs/timeline.js?v=6"></script>
+<script src="js/tabs/board.js?v=5"></script>
+<script src="js/tabs/track.js?v=4"></script>
+<script src="js/tabs/hierarchy.js?v=5"></script>
+<script src="js/components/insights.js?v=7"></script>
+<script src="js/render.js?v=3"></script>
 <script src="js/interactions.js"></script>
+<script src="js/components/interactions-pass.js?v=9"></script>
 <script>
   // Apply selected persona (URL ?p=, then localStorage, fallback ananya)
   if (EAP.bootPersona) EAP.bootPersona();
   // Render nav with the active persona's avatar + name
   var __p = (EAP.personas && EAP.personas[EAP.state.persona]) || (EAP.personas && EAP.personas.ananya) || {};
+  // Preserve persona on home-nav clicks so internal navigation doesn't bounce back to start
+  var __homeUrl = 'index.html?p=' + (EAP.state.persona || 'ananya');
   renderNav('board', {
     avatar: __p.avatar || '../../assets/images/avatar-miley-simmons.png',
     name:   __p.name   || 'Ananya Krishnan',
-    links:  { 0: 'index.html', 3: 'index.html', 4: 'index.html' }
+    links:  { 0: __homeUrl, 3: __homeUrl, 4: __homeUrl }
   });
   if (EAP.initPersonaSwitcher) EAP.initPersonaSwitcher();
   EAP.state.openAccordions['pi26'] = true;

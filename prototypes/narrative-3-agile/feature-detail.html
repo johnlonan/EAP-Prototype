@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Detail | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── Detail panels ───────────────────────────────── */
+    .detail-panel {
+      padding: 20px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .detail-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .detail-panel-header svg {
+      width: 15px;
+      height: 15px;
+      color: var(--text-tertiary);
+    }
+    .edit-btn {
+      margin-left: auto;
+      height: 24px;
+      padding: 0 10px;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-full);
+      background: transparent;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+    .edit-btn:hover {
+      background: var(--color-ghost-hover);
+    }
+
+    /* ── Definition of Done items ────────────────────── */
+    .dod-item {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: var(--radius-lg);
+      line-height: 1.5;
+    }
+    .dod-item.done {
+      color: #5B9A6F;
+      background: rgba(91,154,111,0.06);
+    }
+    .dod-item.pending {
+      color: var(--text-tertiary);
+      background: var(--bg-tertiary);
+    }
+
+    /* ── WSJF breakdown ─────────────────────────────── */
+    .wsjf-component {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .wsjf-comp-label {
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+    .wsjf-comp-bar {
+      height: 6px;
+      background: var(--color-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .wsjf-comp-bar > div {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .wsjf-comp-val {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ── Key-value metadata ──────────────────────────── */
+    .kv {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 6px 0;
+    }
+    .kv-label {
+      font-size: 10px;
+      color: var(--text-disabled);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .kv-value {
+      font-size: 12px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* ── Story rows ──────────────────────────────────── */
+    .story-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .story-row:hover {
+      background: var(--color-ghost-hover);
+    }
+    .story-row:last-child {
+      border-bottom: none;
+    }
+    .story-ac-indicator {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .story-ac-indicator.done {
+      background: rgba(91,154,111,0.12);
+      color: #5B9A6F;
+    }
+    .story-ac-indicator.missing {
+      background: rgba(224,122,95,0.12);
+      color: #E07A5F;
+    }
+    .story-content {
+      flex: 1;
+    }
+    .story-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .story-meta {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ── Comment thread ──────────────────────────────── */
+    .comment {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .comment-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .comment-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .comment-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .comment-time {
+      font-size: 10px;
+      color: var(--text-disabled);
+    }
+    .comment-body {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-left: 30px;
+    }
+
+    /* ── Bottom fade overlay ─────────────────────────── */
+    .bottom-fade {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(to top, rgba(255,255,255,0.5) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+
+    <!-- ── Left nav ────────────────────────────────── -->
+    <nav id="left-nav" aria-label="Primary navigation"></nav>
+
+    <!-- ── Glass slab ──────────────────────────────── -->
+    <main class="content-viewport" style="display:flex; flex-direction:column;">
+
+      <!-- Sticky Header -->
+      <div style="padding:16px 32px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:rgba(255,255,255,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); z-index:10; border-bottom:1px solid rgba(0,0,0,0.04);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button id="back-btn" onclick="history.back()" style="background:none; border:none; cursor:pointer; padding:4px; display:flex;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div>
+            <div style="font-size:11px; color:var(--text-tertiary);">F-01 · PI-25 · Orion</div>
+            <div style="font-size:18px; font-weight:500; color:var(--text-primary);">Customer onboarding API v2</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; font-weight:500; padding:3px 10px; border-radius:var(--radius-full); background:rgba(91,154,111,0.12); color:#5B9A6F;">On track</span>
+          <span style="font-size:11px; font-weight:500; padding:3px 10px; border-radius:var(--radius-full); background:var(--bg-tertiary); color:var(--text-tertiary);">Rank 1</span>
+          <span style="font-size:11px; font-weight:500; padding:3px 10px; border-radius:var(--radius-full); background:var(--bg-tertiary); color:var(--text-tertiary);">WSJF 19</span>
+        </div>
+      </div>
+
+      <!-- Handoff Readiness Indicator -->
+      <div style="padding:8px 32px; display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.3); border-bottom:1px solid rgba(0,0,0,0.03);">
+        <span style="font-size:10px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em;">Handoff readiness</span>
+        <span style="font-size:10px; padding:2px 6px; border-radius:var(--radius-full); background:rgba(91,154,111,0.12); color:#5B9A6F;">&#10003; Description</span>
+        <span style="font-size:10px; padding:2px 6px; border-radius:var(--radius-full); background:rgba(91,154,111,0.12); color:#5B9A6F;">&#10003; Business value</span>
+        <span style="font-size:10px; padding:2px 6px; border-radius:var(--radius-full); background:rgba(91,154,111,0.12); color:#5B9A6F;">&#10003; Definition of done</span>
+        <span style="font-size:10px; padding:2px 6px; border-radius:var(--radius-full); background:rgba(91,154,111,0.12); color:#5B9A6F;">&#10003; WSJF scored</span>
+        <span style="font-size:10px; padding:2px 6px; border-radius:var(--radius-full); background:rgba(91,154,111,0.12); color:#5B9A6F;">&#10003; Team assigned</span>
+        <div style="flex:1;"></div>
+        <span style="font-size:10px; font-weight:600; color:#5B9A6F;">5/5 Ready</span>
+      </div>
+
+      <!-- AI Insight -->
+      <div style="margin:0 32px 0; padding:10px 16px; background:#F0FAFA; border:1px solid #B3EDE8; border-radius:var(--radius-field); display:flex; align-items:flex-start; gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-top:1px;">
+          <path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="#68E353"/>
+          <path d="M18 2L18.5 4C18.8 5.2 19.8 6.2 21 6.5L23 7L21 7.5C19.8 7.8 18.8 8.8 18.5 10L18 12L17.5 10C17.2 8.8 16.2 7.8 15 7.5L13 7L15 6.5C16.2 6.2 17.2 5.2 17.5 4L18 2Z" fill="#68E353"/>
+        </svg>
+        <span style="font-size:11px; color:var(--text-secondary); line-height:1.5;">STRY-404 is missing acceptance criteria and is assigned to Sprint 3 (starts in 10 days). This Story will be blocked from Sprint entry unless AC is added.</span>
+      </div>
+
+      <!-- Two-Column Body -->
+      <div style="display:flex; gap:20px; padding:20px 32px 120px; flex:1; min-height:0; overflow-y:auto;">
+
+        <!-- LEFT COLUMN: Feature content -->
+        <div style="flex:3; display:flex; flex-direction:column; gap:16px;">
+
+          <!-- 1. Description -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              Description
+              <button class="edit-btn">Edit</button>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.7; margin:0;">
+              Build a comprehensive onboarding API that enables enterprise customers to self-serve account setup, user provisioning, and initial configuration. The API should support bulk operations, webhook notifications for onboarding milestones, and integrate with existing SSO providers. This replaces the current manual onboarding process that requires 3-5 days of implementation team involvement per customer.
+            </p>
+          </div>
+
+          <!-- 2. Business Value -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+              Business value
+              <button class="edit-btn">Edit</button>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.7; margin:0;">
+              Reduces customer onboarding time from 5 days to under 4 hours. Direct impact on customer acquisition velocity — sales team reports losing 12% of enterprise deals due to slow onboarding. Expected to recover $2.1M in annual revenue from faster time-to-value.
+            </p>
+            <div style="margin-top:12px; display:flex; gap:16px;">
+              <div style="padding:10px 16px; background:var(--bg-tertiary); border-radius:var(--radius-lg);">
+                <div style="font-size:10px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em;">Customer signals</div>
+                <div style="font-size:18px; font-weight:600; color:var(--text-primary); margin-top:2px;">12</div>
+                <div style="font-size:10px; color:var(--text-tertiary); margin-top:2px;">8 enterprise · 4 mid-market</div>
+              </div>
+              <div style="padding:10px 16px; background:var(--bg-tertiary); border-radius:var(--radius-lg);">
+                <div style="font-size:10px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em;">Revenue impact</div>
+                <div style="font-size:18px; font-weight:600; color:var(--text-primary); margin-top:2px;">$2.1M</div>
+                <div style="font-size:10px; color:var(--text-tertiary); margin-top:2px;">Annual projected</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Definition of Done -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+              </svg>
+              Definition of done
+              <button class="edit-btn">Edit</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="dod-item done">&#10003; Enterprise customers can self-serve full account setup via API</div>
+              <div class="dod-item done">&#10003; Bulk user provisioning supports 500+ users in a single request</div>
+              <div class="dod-item done">&#10003; Webhook notifications fire for all onboarding milestones</div>
+              <div class="dod-item pending">&#9675; SSO integration tested with Okta, Azure AD, and OneLogin</div>
+              <div class="dod-item pending">&#9675; Onboarding time measured at under 4 hours end-to-end</div>
+            </div>
+          </div>
+
+          <!-- 4. WSJF Breakdown -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+              WSJF Score: 19
+            </div>
+            <div style="display:flex; gap:12px;">
+              <div class="wsjf-component">
+                <div class="wsjf-comp-label">Business Value</div>
+                <div class="wsjf-comp-bar"><div style="width:80%; background:var(--color-info);"></div></div>
+                <div class="wsjf-comp-val">8/10</div>
+              </div>
+              <div class="wsjf-component">
+                <div class="wsjf-comp-label">Time Criticality</div>
+                <div class="wsjf-comp-bar"><div style="width:40%; background:#D97706;"></div></div>
+                <div class="wsjf-comp-val">4/10</div>
+              </div>
+              <div class="wsjf-component">
+                <div class="wsjf-comp-label">Risk Reduction</div>
+                <div class="wsjf-comp-bar"><div style="width:40%; background:#5B9A6F;"></div></div>
+                <div class="wsjf-comp-val">4/10</div>
+              </div>
+              <div class="wsjf-component">
+                <div class="wsjf-comp-label">Job Size</div>
+                <div class="wsjf-comp-bar"><div style="width:30%; background:var(--text-disabled);"></div></div>
+                <div class="wsjf-comp-val">3/10</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Key Details -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              Details
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px;">
+              <div class="kv"><span class="kv-label">Team</span><span class="kv-value">Orion</span></div>
+              <div class="kv"><span class="kv-label">PI</span><span class="kv-value">PI-25</span></div>
+              <div class="kv"><span class="kv-label">Capability</span><span class="kv-value" style="color:var(--color-link);">Platform modernisation</span></div>
+              <div class="kv"><span class="kv-label">Rank</span><span class="kv-value">1 of 14</span></div>
+              <div class="kv"><span class="kv-label">Sprint target</span><span class="kv-value">Sprint 1–3</span></div>
+              <div class="kv"><span class="kv-label">Progress</span><span class="kv-value">75%</span></div>
+              <div class="kv"><span class="kv-label">Last updated</span><span class="kv-value">Jan 22, 2026</span></div>
+              <div class="kv"><span class="kv-label">Owner</span><span class="kv-value">James (PM)</span></div>
+            </div>
+          </div>
+
+        </div><!-- /LEFT COLUMN -->
+
+        <!-- RIGHT COLUMN: Stories + Activity -->
+        <div style="flex:2; display:flex; flex-direction:column; gap:16px;">
+
+          <!-- 1. Child Stories -->
+          <div class="detail-panel" style="flex:1;">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                <polyline points="2 17 12 22 22 17"/>
+                <polyline points="2 12 12 17 22 12"/>
+              </svg>
+              Stories
+              <span style="font-size:11px; color:var(--text-tertiary); margin-left:4px;">4 Stories · 19 pts</span>
+              <div style="flex:1;"></div>
+              <button style="height:28px; padding:0 12px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-field); font-size:11px; font-weight:500; cursor:pointer; font-family:var(--font-sans); display:flex; align-items:center; gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Create Story
+              </button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0;">
+              <!-- Story 1 -->
+              <div class="story-row complete" onclick="window.location.href='story-detail.html'">
+                <div class="story-ac-indicator done" title="AC complete">&#10003;</div>
+                <div class="story-content">
+                  <div class="story-title">STRY-401 · API endpoint scaffolding</div>
+                  <div class="story-meta">5 pts · Sprint 1 · JS · <span style="color:#5B9A6F;">Done</span></div>
+                </div>
+              </div>
+              <!-- Story 2 -->
+              <div class="story-row complete" onclick="window.location.href='story-detail.html'">
+                <div class="story-ac-indicator done" title="AC complete">&#10003;</div>
+                <div class="story-content">
+                  <div class="story-title">STRY-402 · Bulk provisioning logic</div>
+                  <div class="story-meta">5 pts · Sprint 1 · KR · <span style="color:#5B9A6F;">Done</span></div>
+                </div>
+              </div>
+              <!-- Story 3 -->
+              <div class="story-row in-progress" onclick="window.location.href='story-detail.html'">
+                <div class="story-ac-indicator done" title="AC complete">&#10003;</div>
+                <div class="story-content">
+                  <div class="story-title">STRY-403 · Webhook notification system</div>
+                  <div class="story-meta">5 pts · Sprint 2 · JS · <span style="color:var(--color-info);">In progress</span></div>
+                </div>
+              </div>
+              <!-- Story 4 — missing AC -->
+              <div class="story-row not-ready" onclick="window.location.href='story-detail.html'">
+                <div class="story-ac-indicator missing" title="Missing acceptance criteria">&#9888;</div>
+                <div class="story-content">
+                  <div class="story-title">STRY-404 · SSO provider integration</div>
+                  <div class="story-meta">4 pts · Sprint 3 · AL · <span style="color:var(--text-disabled);">Not started</span></div>
+                  <div style="font-size:10px; color:#E07A5F; margin-top:2px;">Missing acceptance criteria — cannot enter Sprint</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Comment Thread -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+              </svg>
+              Discussion
+            </div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <!-- Comment 1 -->
+              <div class="comment">
+                <div class="comment-header">
+                  <div class="comment-avatar" style="background:var(--color-primary);">JM</div>
+                  <span class="comment-name">James</span>
+                  <span class="comment-time">Jan 20 · PM</span>
+                </div>
+                <div class="comment-body">Updated the definition of done to include SSO testing with all three providers. Sarah — the Okta integration is the priority based on customer demand.</div>
+              </div>
+              <!-- Comment 2 -->
+              <div class="comment">
+                <div class="comment-header">
+                  <div class="comment-avatar" style="background:#5B9A6F;">SC</div>
+                  <span class="comment-name">Sarah Chen</span>
+                  <span class="comment-time">Jan 21 · PO</span>
+                </div>
+                <div class="comment-body">Got it. I'll write AC for STRY-404 this week prioritising Okta. Quick question — do we need to support SAML and OIDC, or just OIDC?</div>
+              </div>
+              <!-- Comment 3 -->
+              <div class="comment">
+                <div class="comment-header">
+                  <div class="comment-avatar" style="background:var(--color-primary);">JM</div>
+                  <span class="comment-name">James</span>
+                  <span class="comment-time">Jan 21 · PM</span>
+                </div>
+                <div class="comment-body">Both. The enterprise customers on our signal list use a mix. Let me update the Feature description to be explicit about this.</div>
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:8px;">
+              <input placeholder="Add a comment..." style="flex:1; height:32px; padding:0 12px; border:1px solid var(--border-default); border-radius:var(--radius-field); font-size:12px; font-family:var(--font-sans); outline:none;"/>
+              <button style="height:32px; padding:0 12px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-field); font-size:11px; cursor:pointer; font-family:var(--font-sans);">Send</button>
+            </div>
+          </div>
+
+        </div><!-- /RIGHT COLUMN -->
+
+      </div><!-- /Two-Column Body -->
+
+      <!-- Bottom gradient overlay -->
+      <div class="bottom-fade"></div>
+
+    </main>
+  </div>
+
+  <!-- ── Nav ─────────────────────────────────────────── -->
+  <script src="../shared/nav.js"></script>
+  <script>renderNav('feature-list', {avatar:'../../assets/images/avatar-james.png', name:'James', links:{0:'planning.html', 3:'feature-backlog.html', 4:'pi-board.html'}});</script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('features');</script>
+
+  <!-- ── Back button conditional routing ─────────────── -->
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var from = params.get('from');
+      var backBtn = document.getElementById('back-btn');
+      if (from && backBtn) {
+        backBtn.onclick = function(e) {
+          e.preventDefault();
+          if (from === 'backlog') {
+            window.location.href = 'feature-backlog.html';
+          } else if (from === 'board') {
+            window.location.href = 'pi-board.html';
+          } else {
+            history.back();
+          }
+        };
+      }
+    })();
+  </script>
+</body>
+</html>

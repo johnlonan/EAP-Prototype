@@ -123,12 +123,12 @@ EAP.goals = [
 EAP.epics = {
   all: [
     // Assigned to STs
-    {id:'e1', num:'EPIC0010001', name:'Next-Gen Mobile Banking Platform', type:'Epic', state:'Implementation', pct:42, size:'XL', wsjf:18.4, art:'Digital Banking ART', st:'Digital & Payments ST', goal:'g1', owner:'Ananya', parent:'Become top digital bank in UK by 2027', product:'Digital Banking'},
+    {id:'e1', num:'EPIC0010001', name:'Next-Gen Mobile Banking Platform', type:'Epic', state:'Implementation', pct:42, size:'XL', wsjf:18.4, art:'Digital Banking ART', st:'Digital & Payments ST', goal:'g1', owner:'Ananya', parent:'Become top digital bank in UK by 2027', product:'Digital Banking', atRisk:true},
     {id:'e2', num:'EPIC0010002', name:'Customer Self-Service Expansion', type:'Epic', state:'Funnel', pct:0, size:'L', wsjf:14.1, art:'Digital Banking ART', st:'Digital & Payments ST', goal:'g2', owner:'Priya', parent:'Reduce operating costs by 18% by end of 2026', product:'Digital Banking'},
-    {id:'e3', num:'EPIC0010003', name:'Open Banking API Programme', type:'Epic', state:'Review', pct:0, size:'XL', wsjf:13.2, art:'Digital Banking ART', st:'Digital & Payments ST', goal:'g1', owner:'Raj', parent:'Become top digital bank in UK by 2027', product:'Digital Banking'},
-    {id:'e4', num:'EPIC0010004', name:'Payment Infrastructure Upgrade', type:'Epic', state:'Backlog', pct:0, size:'L', wsjf:9.8, art:'Lending & Mortgages ART', st:'Digital & Payments ST', goal:'g1', owner:'Kiran', parent:'Become top digital bank in UK by 2027', product:'Payments'},
-    {id:'e5', num:'EPIC0010005', name:'Mortgage Origination Platform', type:'Epic', state:'Funnel', pct:0, size:'XL', wsjf:11.5, art:'Lending & Mortgages ART', st:'Digital & Payments ST', goal:'g2', owner:'Raj', parent:'Reduce operating costs by 18% by end of 2026', product:'Lending'},
-    {id:'e6', num:'EPIC0010006', name:'Risk Assessment Automation', type:'Epic', state:'Funnel', pct:0, size:'M', wsjf:8.7, art:'Lending & Mortgages ART', st:'Digital & Payments ST', goal:'g2', owner:'Priya', parent:'Reduce operating costs by 18% by end of 2026', product:'Risk'},
+    {id:'e3', num:'EPIC0010003', name:'Open Banking API Programme', type:'Epic', state:'Review', pct:0, size:'XL', wsjf:13.2, art:'Digital Banking ART', st:'Digital & Payments ST', goal:'g1', owner:'Raj', parent:'Become top digital bank in UK by 2027', product:'Digital Banking', atRisk:true},
+    {id:'e4', num:'EPIC0010004', name:'Payment Infrastructure Upgrade', type:'Epic', state:'Backlog', pct:0, size:'L', wsjf:9.8, art:'Lending & Mortgages ART', st:'Lending & Mortgages ST', goal:'g1', owner:'Kiran', parent:'Become top digital bank in UK by 2027', product:'Payments'},
+    {id:'e5', num:'EPIC0010005', name:'Mortgage Origination Platform', type:'Epic', state:'Funnel', pct:0, size:'XL', wsjf:11.5, art:'Lending & Mortgages ART', st:'Lending & Mortgages ST', goal:'g2', owner:'Raj', parent:'Reduce operating costs by 18% by end of 2026', product:'Lending'},
+    {id:'e6', num:'EPIC0010006', name:'Risk Assessment Automation', type:'Epic', state:'Funnel', pct:0, size:'M', wsjf:8.7, art:'Lending & Mortgages ART', st:'Lending & Mortgages ST', goal:'g2', owner:'Priya', parent:'Reduce operating costs by 18% by end of 2026', product:'Risk'},
     // Backlog (no ST)
     {id:'ebl1', num:'EPIC0010007', name:'AI-Powered Customer Support', type:'Epic', state:'Funnel', pct:0, size:'M', wsjf:7.4, art:'', st:'', goal:'g2', owner:'Ananya', parent:'Reduce operating costs by 18% by end of 2026', product:''},
     {id:'ebl2', num:'EPIC0010008', name:'Core Infrastructure Modernisation', type:'Epic', state:'Funnel', pct:0, size:'L', wsjf:6.8, art:'', st:'', goal:'g2', owner:'Raj', parent:'Reduce operating costs by 18% by end of 2026', product:''},
@@ -153,7 +153,7 @@ EAP.capabilities = {
   all: [
     {id:'c1', num:'CAP0010001', name:'Seamless Authentication across channels', type:'Capability', state:'Implementation', pct:65, size:'L', wsjf:15.2, parent:'Next-Gen Mobile Banking', art:'Digital Banking ART', owner:'Ananya', goal:'g1'},
     {id:'c2', num:'CAP0010002', name:'Real-time Risk and Fraud detection', type:'Capability', state:'In Progress', pct:30, size:'XL', wsjf:13.9, parent:'Next-Gen Mobile Banking', art:'Digital Banking ART', owner:'Ananya', goal:'g1'},
-    {id:'c3', num:'CAP0010003', name:'Seamless Payments with retry flows', type:'Capability', state:'Blocked', pct:20, size:'L', wsjf:12.1, parent:'Next-Gen Mobile Banking', art:'Digital Banking ART', owner:'Ananya', goal:'g1'},
+    {id:'c3', num:'CAP0010003', name:'Seamless Payments with retry flows', type:'Capability', state:'Blocked', pct:20, size:'L', wsjf:12.1, parent:'Next-Gen Mobile Banking', art:'Digital Banking ART', owner:'Ananya', goal:'g1', blocked:true},
     {id:'c4', num:'CAP0010004', name:'Customer Account Visibility', type:'Capability', state:'Done', pct:100, size:'M', wsjf:9.8, parent:'Customer Self-Service', art:'Digital Banking ART', owner:'Priya', goal:'g2'},
     {id:'c5', num:'CAP0010005', name:'Self-Service Account Management', type:'Capability', state:'In Progress', pct:40, size:'M', wsjf:9.2, parent:'Customer Self-Service', art:'Digital Banking ART', owner:'Priya', goal:'g2'},
     {id:'c6', num:'CAP0010006', name:'Automated Onboarding with KYC', type:'Capability', state:'Funnel', pct:0, size:'L', wsjf:8.7, parent:'Mortgage Origination', art:'Lending & Mortgages ART', owner:'Raj', goal:'g2'},
@@ -184,7 +184,7 @@ EAP.allFeatures = [
   {id:'f4',  num:'FTR0010004', name:'Balance on Home Screen',              type:'Feature', state:'Done',           pct:100, size:'S', wsjf:8.1,  parent:'Account Vis.',     team:'Mobile',     pi:'pi26', pts:21, owner:'Ananya', goal:'g1'},
   {id:'f5',  num:'FTR0010005', name:'Account Statement Export PDF',        type:'Feature', state:'In Progress',    pct:40,  size:'M', wsjf:7.4,  parent:'Self-Service',     team:'Accounts',   pi:'pi26', pts:13, owner:'Priya', goal:'g2'},
   {id:'f6',  num:'FTR0010006', name:'Streamlined Onboarding Flow',         type:'Feature', state:'Funnel',         pct:0,   size:'L', wsjf:8.3,  parent:'Onboarding',       team:'Onboard',    pi:'pi26', pts:22, noTeamSprint3:true, owner:'Raj', goal:'g2'},
-  {id:'f7',  num:'FTR0010007', name:'Enhanced Biometric Auth Flow',        type:'Feature', state:'Backlog',        pct:0,   size:'M', wsjf:12.4, parent:'Seamless Auth',    team:'Auth',       pi:'pi26', pts:0, owner:'Ananya', goal:'g1'},
+  {id:'f7',  num:'FTR0010007', name:'Enhanced Biometric Auth Flow',        type:'Feature', state:'Backlog',        pct:0,   size:'M', wsjf:12.4, parent:'Seamless Auth',    team:'',           pi:null,   pts:0, owner:'Ananya', goal:'g1'},
   // ── PI 27 planned ──
   {id:'f8',  num:'FTR0010008', name:'Dark Mode Support',                   type:'Feature', state:'Funnel', pct:0, size:'M', wsjf:8.4, parent:'Account Vis.',     team:'Mobile',    pi:'pi27', pts:0, owner:'Priya', goal:'g1'},
   {id:'f9',  num:'FTR0010009', name:'Transaction Dispute Resolution',      type:'Feature', state:'Funnel', pct:0, size:'L', wsjf:7.9, parent:'Self-Service',     team:'Accounts',  pi:'pi27', pts:0, owner:'Priya', goal:'g2'},
@@ -194,11 +194,15 @@ EAP.allFeatures = [
   {id:'f17', num:'FTR0010035', name:'Adaptive MFA Enrollment',             type:'Feature', state:'Funnel',   pct:0,  size:'M', wsjf:9.4, parent:'Seamless Auth',    team:'Auth',      pi:'pi27', pts:0, owner:'Ananya', goal:'g1'},
   {id:'f18', num:'FTR0010036', name:'Device Trust Scoring',                type:'Feature', state:'Funnel',   pct:0,  size:'L', wsjf:8.3, parent:'Risk & Fraud',     team:'Fraud',     pi:'pi27', pts:0, owner:'Ananya', goal:'g1'},
   {id:'f19', num:'FTR0010037', name:'Mobile Tokenisation Phase 1',         type:'Feature', state:'Analysis', pct:5,  size:'L', wsjf:7.8, parent:'Payments',         team:'Payments',  pi:'pi27', pts:0, owner:'Ananya', goal:'g1'},
+  {id:'f20', num:'FTR0010044', name:'Mortgage Application Wizard',          type:'Feature', state:'Analysis', pct:5,  size:'L', wsjf:9.4, parent:'Automated Onboarding', team:'Mortgages',    pi:'pi27', pts:0, art:'Lending & Mortgages ART', owner:'Raj', goal:'g2'},
   // ── PI 28 planned ──
   {id:'f13', num:'FTR0010013', name:'Statement Date Range Filter',         type:'Feature', state:'Funnel', pct:0, size:'S', wsjf:6.5, parent:'Self-Service',     team:'Accounts',  pi:'pi28', pts:0, owner:'Priya', goal:'g2'},
   {id:'f14', num:'FTR0010014', name:'Biometric Auth for Returning Users',  type:'Feature', state:'Funnel', pct:0, size:'S', wsjf:9.1, parent:'Seamless Auth',    team:'Auth',      pi:'pi28', pts:0, owner:'Ananya', goal:'g1'},
   {id:'f15', num:'FTR0010015', name:'PSD3 Compliance Module',              type:'Feature', state:'Funnel', pct:0, size:'XL', wsjf:13.2, parent:'Open Banking',    team:'Accounts',  pi:'pi28', pts:0, owner:'Raj', goal:'g1'},
   {id:'f16', num:'FTR0010016', name:'Investment Portfolio View',            type:'Feature', state:'Funnel', pct:0, size:'M', wsjf:6.1, parent:'Account Vis.',      team:'Accounts',  pi:'pi28', pts:0, owner:'Priya', goal:'g1'},
+  // PI 28 — Lending & Mortgages ART
+  {id:'f21', num:'FTR0010045', name:'KYC Document Verification',            type:'Feature', state:'Funnel', pct:0, size:'M', wsjf:8.2, parent:'Automated Onboarding', team:'Mortgages',    pi:'pi28', pts:0, art:'Lending & Mortgages ART', owner:'Raj', goal:'g2'},
+  {id:'f22', num:'FTR0010046', name:'Credit Score Real-time Engine',        type:'Feature', state:'Funnel', pct:0, size:'XL', wsjf:11.4, parent:'Credit Risk Scoring', team:'Lending Risk', pi:'pi28', pts:0, art:'Lending & Mortgages ART', owner:'Priya', goal:'g2'},
   // ── Backlog (no PI) — 18 items for volume ──
   {id:'bl1',  num:'FTR0010017', name:'Instant Payment Notifications',       type:'Feature', state:'Funnel',   size:'S', wsjf:10.8, parent:'Payments',        team:'', pi:null, pts:8, owner:'Kiran', goal:'g1'},
   {id:'bl2',  num:'FTR0010018', name:'Transaction Dispute Resolution',      type:'Feature', state:'Backlog',  size:'M', wsjf:8.7,  parent:'Self-Service',    team:'', pi:null, pts:5, owner:'Priya', goal:'g2'},
@@ -224,7 +228,9 @@ EAP.allFeatures = [
   {id:'bl21', num:'FTR0010040', name:'Adaptive Session Lifetime',            type:'Feature', state:'Backlog',  size:'M', wsjf:5.9,  parent:'Seamless Auth',   team:'', pi:null, pts:8,  owner:'Ananya', goal:'g1'},
   {id:'bl22', num:'FTR0010041', name:'Cross-Device Login Continuity',        type:'Feature', state:'Funnel',   size:'L', wsjf:5.2,  parent:'Seamless Auth',   team:'', pi:null, pts:13, owner:'Ananya', goal:'g1'},
   {id:'bl23', num:'FTR0010042', name:'Mobile Wallet Phase 2',                type:'Feature', state:'Funnel',   size:'M', wsjf:4.7,  parent:'Payments',        team:'', pi:null, pts:8,  owner:'Ananya', goal:''},
-  {id:'bl24', num:'FTR0010043', name:'Continuous Authentication Pilot',      type:'Feature', state:'Funnel',   size:'M', wsjf:4.0,  parent:'Seamless Auth',   team:'', pi:null, pts:8,  owner:'Ananya', goal:'g1'}
+  {id:'bl24', num:'FTR0010043', name:'Continuous Authentication Pilot',      type:'Feature', state:'Funnel',   size:'M', wsjf:4.0,  parent:'Seamless Auth',   team:'', pi:null, pts:8,  owner:'Ananya', goal:'g1'},
+  // Backlog — Lending & Mortgages ART (un-committed Feature, art set explicitly so scope filter can resolve)
+  {id:'bl25', num:'FTR0010047', name:'Default Risk Predictor',               type:'Feature', state:'Funnel',   size:'L', wsjf:6.5,  parent:'Credit Risk Scoring', team:'', pi:null, pts:13, art:'Lending & Mortgages ART', owner:'Priya', goal:'g2'}
 ];
 
 // ── Feature accessors ──────────────────────────────────
@@ -435,7 +441,7 @@ EAP.wiDeps = [
 EAP.memberWorkload = {
   'Kiran':  { assigned:2, inProgress:1, done:1, blocked:0, avgCycle:2.1, wipLimit:2, sprintPts:5,  commitPts:7,  predictFinish:80 },
   'Sana':   { assigned:2, inProgress:1, done:0, blocked:0, avgCycle:1.8, wipLimit:2, sprintPts:6,  commitPts:8,  predictFinish:75 },
-  'James':  { assigned:5, inProgress:2, done:1, blocked:0, avgCycle:1.9, wipLimit:3, sprintPts:8,  commitPts:11, predictFinish:84 },
+  'James':  { assigned:10, inProgress:2, done:0, blocked:0, avgCycle:1.9, wipLimit:3, sprintPts:8,  commitPts:8, predictFinish:84 },
   'Vikram': { assigned:4, inProgress:2, done:1, blocked:1, avgCycle:2.8, wipLimit:2, sprintPts:16, commitPts:21, predictFinish:64 },
   'Mei':    { assigned:2, inProgress:1, done:0, blocked:1, avgCycle:3.1, wipLimit:2, sprintPts:11, commitPts:11, predictFinish:55 },
   'Marcus': { assigned:2, inProgress:1, done:0, blocked:0, avgCycle:2.4, wipLimit:2, sprintPts:8,  commitPts:13, predictFinish:71 },
@@ -462,16 +468,6 @@ EAP.teamHealth = {
 // Signal types: ai=true means AI-inferred (sparkle + teal + confidence + source).
 // ai=false or absent means rule-based (system fact, no sparkle, no confidence).
 EAP.insights = {
-  'art-Feature-backlog': {
-    signals: [
-      {level:'urgent', ai:true, confidence:'High', title:'47 customers flagged biometric issues this week', desc:'Up 3× from last month. Enhanced Biometric Auth Flow is ranked #1 by WSJF with no PI commitment.', action:'Plan into PI 26', meta:'Based on 47 support tickets, 12 NPS comments'},
-      {level:'urgent', ai:true, confidence:'High', title:'New customer theme: payment confirmation too slow', desc:'31 mentions in 7 days. No Feature in backlog matches this pattern.', action:'Create Feature', meta:'Analysing 31 support tickets across 3 channels'},
-      {level:'urgent', title:'2 Features backlogged for 3+ PIs', desc:'Loan Application Wizard and Investment Portfolio View have never been pulled. Backlog noise increasing.', action:'Prioritise or remove', meta:'Comparing backlog age across 18 items'},
-      {level:'watch', ai:true, confidence:'Moderate', title:'3 competitor banks launched biometric login this quarter', desc:'Accelerating Enhanced Biometric Auth Flow over lower-ranked items makes strategic sense.', action:'Reprioritise', meta:'Monitoring 12 competitor product releases'},
-      {level:'watch', ai:true, confidence:'Moderate', title:'PSD3 regulatory update published', desc:'Transaction Dispute Resolution may need scope change to comply by Q3 2026.', action:'Review scope', meta:'Regulatory feed — published 3 days ago'},
-      {level:'ok', title:'Mobile Exp has unallocated capacity in Sprint 3', desc:'No Features currently assigned. Opportunity to pull from backlog.', action:'', meta:'Capacity data from 6 teams'}
-    ]
-  },
   // ── BACKLOG — "What should we do next?" (no gauge, no teams) ──
   'art-WorkItem-backlog': {
     flowDist: { features:45, defects:30, enablers:15, maintenance:10 },
@@ -488,9 +484,9 @@ EAP.insights = {
     predict: {value:72, label:'Completion probability', trend:'down'},
     health: true,
     signals: [
-      {level:'urgent', title:'Payment Confirmation Flow blocked Day 2', desc:'Auth Team dependency unresolved. 8 days left in Sprint 2.', action:'Escalate now', meta:'2 downstream items at risk'},
+      {level:'urgent', title:'Payment Confirmation Flow blocked Day 2', desc:'Auth Team dependency unresolved. 8 days left in Sprint 2.', action:'Escalate now', meta:'2 downstream items at risk', target:'f3', targetName:'Payment Confirmation Flow'},
       {level:'urgent', title:'Fraud Team Sprint 4 at 110% capacity', desc:'3 items need moving or descoping before PI closes.', action:'Rebalance Sprint 4', meta:'Capacity across 4 sprints'},
-      {level:'urgent', ai:true, confidence:'High', title:'Streamlined Onboarding will miss PI 26', desc:'No team assigned Sprint 3. 0% chance of completion this PI.', action:'Assign team', meta:'Velocity analysis of 6 teams over 3 sprints'},
+      {level:'urgent', ai:true, confidence:'High', title:'Streamlined Onboarding will miss PI 26', desc:'No team assigned Sprint 3. 0% chance of completion this PI.', action:'Assign team', meta:'Velocity analysis of 6 teams over 3 sprints', target:'f6', targetName:'Streamlined Onboarding Flow'},
       {level:'watch', ai:true, confidence:'Moderate', title:'Auth Team is critical path', desc:'At 80% capacity — slip cascades to Payments and Fraud.', action:'Monitor closely', meta:'Dependency chain across 4 Features'},
       {level:'watch', title:'Unplanned work at 18%', desc:'ART target is under 10%. Planning quality risk.', action:'Review sprint planning', meta:'Committed vs actual scope'},
       {level:'ok', title:'Mobile Exp on track Sprints 1–3', desc:'No capacity or dependency issues detected.', action:''}
@@ -555,12 +551,12 @@ EAP.insights = {
   'team-WorkItem-taskboard': {
     signals: [
       // Cross-persona — only James sees these (Ananya's actions affecting his work)
-      {level:'ok', ai:true, confidence:'High', title:'Ananya signed off on blc1 — your blocked path is clear', desc:'Acceptance criteria for biometric fallback flow approved. ls6 unblocked for Sprint 2 close.', action:'Open story', meta:'Sign-off received 2h ago', forPersonas:['james']},
-      {level:'urgent', title:'Ananya assigned bld11 to your team', desc:'Fraud detection false-positive triage — needs disposition before Sprint 3 commit.', action:'Review with Ananya', meta:'Assigned today', forPersonas:['james']},
-      {level:'urgent', title:'1 Story blocked since sprint start', desc:'Auth API dependency unresolved. Past team avg resolution: 1.4 days.', action:'Escalate', meta:'Blocked duration vs team norm'},
-      {level:'urgent', ai:true, confidence:'High', title:'Sprint completion at risk: 55%', desc:'At current pace, 3 of 5 committed items will not finish.', action:'Flag standup', meta:'Predicting from team burn rate'},
-      {level:'watch', title:'WIP imbalance: 2 members at 0 items', desc:'Tomás and Yuki have capacity. 2 items aging in queue.', action:'Redistribute'},
-      {level:'ok', title:'Defect rate within team norm', desc:'No new defects this sprint.', action:''}
+      {level:'ok', ai:true, confidence:'High', title:'Ananya signed off acceptance criteria for fallback flow', desc:'AC for Fingerprint Login PIN fallback (blc1) approved — ls6 has the AC it needs to close Sprint 2.', action:'Open story', meta:'Sign-off received 2h ago', forPersonas:['james']},
+      {level:'urgent', title:'Ananya escalated bld13 to your team', desc:'Biometric library throws on iOS 17.5 lock-screen entry — needs disposition before Sprint 3 commit.', action:'Review with Ananya', meta:'Defect escalated today', forPersonas:['james']},
+      {level:'urgent', title:'Auth API delivery is upstream blocker for Payments', desc:'Payments Team\'s ls8 has been blocked since Day 2 awaiting Auth API. ls12 (session expiry, 45%) is the prerequisite.', action:'Prioritise ls12 close', meta:'Cross-team dependency'},
+      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2: 4 items in flight, 0 done at Day 3', desc:'Auth Team committed 14 pts across 4 items (ls6, ls12, bld6, ls27). All in-progress, none completed — burn rate slow.', action:'Flag standup', meta:'Predicting from team velocity'},
+      {level:'watch', ai:true, confidence:'Moderate', title:'James at WIP limit', desc:'2 of 3 in-progress (ls6 PIN fallback, ls27 biometric onboarding). One more pull risks context-switching.', action:'Hold new pulls', meta:'WIP analysis vs personal limit'},
+      {level:'ok', title:'No new defects raised in Sprint 2', desc:'Quality holding for Auth Team this sprint.', action:''}
     ]
   },
   // ── HIERARCHY — "Is strategy connecting to execution?" (structural, not execution) ──
@@ -581,10 +577,10 @@ EAP.insights = {
       // Cross-persona — only Ananya sees these (James activity rolling up)
       {level:'urgent', ai:true, confidence:'High', title:'James raised bld13 — affects Fingerprint Login Redesign', desc:'Biometric library throws on iOS 17.5 lock-screen entry. Needs PM disposition before Sprint 3 commit.', action:'Review impact', meta:'Defect raised today by Auth Team', forPersonas:['ananya']},
       {level:'watch',  ai:true, confidence:'High', title:'James advanced ls6 to 50% — f1 on track', desc:'PIN fallback handler in In Progress. Fingerprint Login Redesign burn rate matches plan for Sprint 2 close.', action:'Open feature', meta:'Auth Team velocity', forPersonas:['ananya']},
-      {level:'urgent', ai:true, confidence:'High', title:'47 customers flagged biometric issues', desc:'Up 3× from last month. Enhanced Biometric Auth ranked #1 by WSJF.', action:'Plan into PI 26', meta:'47 support tickets, 12 NPS comments'},
+      {level:'urgent', ai:true, confidence:'High', title:'47 customers flagged biometric issues', desc:'Up 3× from last month. Enhanced Biometric Auth ranks #1 by WSJF (12.4) in your backlog.', action:'Plan into PI 27', meta:'47 support tickets, 12 NPS comments', target:'f7', targetName:'Enhanced Biometric Auth Flow'},
       {level:'urgent', ai:true, confidence:'High', title:'New theme: payment confirmation too slow', desc:'31 mentions in 7 days. No Feature in backlog matches.', action:'Create Feature', meta:'31 tickets across 3 channels'},
       {level:'urgent', title:'2 Features backlogged for 3+ PIs', desc:'Loan Application Wizard and Investment Portfolio View never pulled.', action:'Prioritise or remove'},
-      {level:'watch', ai:true, confidence:'Moderate', title:'3 competitors launched biometric login', desc:'Accelerating Enhanced Biometric Auth makes strategic sense.', action:'Reprioritise', meta:'12 competitor releases monitored'},
+      {level:'watch', ai:true, confidence:'Moderate', title:'3 competitors launched biometric login', desc:'Accelerating Enhanced Biometric Auth makes strategic sense.', action:'Reprioritise', meta:'12 competitor releases monitored', target:'f7', targetName:'Enhanced Biometric Auth Flow'},
       {level:'ok', title:'Mobile Exp has unallocated Sprint 3 capacity', desc:'Opportunity to pull from backlog.', action:''}
     ]
   },
@@ -635,7 +631,7 @@ EAP.goalName = function(gid) {
 
   // Epic timeline ranges (span PIs relative to current)
   EAP.timelineEpics = {
-    e1:   { start: f(ad(piS(-1), 14)), end: f(piE(1)) },   // Next-Gen Mobile — PI 25–27
+    e1:   { start: f(piS(-1)),         end: f(piE(1)) },   // Next-Gen Mobile — PI 25–27
     e2:   { start: f(piS(1)),          end: f(piE(2)) },     // Customer Self-Service — PI 27–28
     e3:   { start: f(piS(0)),          end: f(piE(0)) },     // Open Banking API — PI 26
     e4:   { start: f(piS(1)),          end: f(piE(1)) },     // Payment Infrastructure — PI 27
@@ -645,33 +641,36 @@ EAP.goalName = function(gid) {
 
   // Capability timeline ranges
   EAP.timelineCaps = {
-    c1: { start: f(ad(piS(-1), 14)), end: f(piE(0)) },     // Seamless Auth — PI 25–26
+    c1: { start: f(piS(-1)),         end: f(piE(0)) },     // Seamless Auth — PI 25–26
     c2: { start: f(piS(0)),          end: f(piE(1)) },       // Risk & Fraud — PI 26–27
     c3: { start: f(piS(0)),          end: f(piE(0)) },       // Seamless Payments — PI 26
-    c4: { start: f(ad(piS(-1), 14)), end: f(spE(1)) },      // Account Visibility — done
+    c4: { start: f(piS(-2)),         end: f(piE(-1)) },     // Account Visibility — done PI 24–25
     c5: { start: f(piS(0)),          end: f(piE(1)) },       // Self-Service Mgmt — PI 26–27
     c6: { start: f(piS(2)),          end: f(piE(2)) },       // Automated Onboarding — PI 28
     c7: { start: f(piS(2)),          end: f(piE(3)) }        // Credit Risk Engine — PI 28–29
   };
 
-  // Feature timeline ranges
+  // Feature timeline ranges — Features always span their full PI (or PIs)
   EAP.timelineFeatures = {
-    f1:  { start: f(spS(1)),  end: f(spE(3)) },   // Fingerprint Login — Sprint 2–4
-    f2:  { start: f(spS(1)),  end: f(piE(0)) },    // Fraud Alerts — full PI 26
-    f3:  { start: f(spS(1)),  end: f(spE(3)) },    // Payment Confirm — Sprint 2–4
-    f4:  { start: f(spS(1)),  end: f(spE(1)) },    // Balance Home — done Sprint 2
-    f5:  { start: f(spS(1)),  end: f(spE(2)) },    // Statement Export — Sprint 2–3
-    f6:  { start: f(spS(2)),  end: f(piE(0)) },    // Onboarding — Sprint 3–IP
-    f7:  { start: f(spS(1)),  end: f(piE(0)) },    // Enhanced Biometric — PI 26 backlog
-    f8:  { start: f(piS(1)),  end: f(ad(piS(1), 41)) },  // Dark Mode — PI 27
+    f1:  { start: f(piS(0)),  end: f(piE(0)) },    // Fingerprint Login — PI 26
+    f2:  { start: f(piS(0)),  end: f(piE(0)) },    // Fraud Alerts — PI 26
+    f3:  { start: f(piS(0)),  end: f(piE(0)) },    // Payment Confirm — PI 26
+    f4:  { start: f(piS(0)),  end: f(piE(0)) },    // Balance Home — PI 26 (Done)
+    f5:  { start: f(piS(0)),  end: f(piE(0)) },    // Statement Export — PI 26
+    f6:  { start: f(piS(0)),  end: f(piE(0)) },    // Onboarding — PI 26
+    f7:  { start: f(piS(0)),  end: f(piE(0)) },    // Enhanced Biometric — PI 26
+    f8:  { start: f(piS(1)),  end: f(piE(1)) },    // Dark Mode — PI 27
     f9:  { start: f(piS(1)),  end: f(piE(1)) },    // Transaction Dispute — PI 27
-    f10: { start: f(piS(1)),  end: f(ad(piS(1), 41)) },  // Notification Pref — PI 27
+    f10: { start: f(piS(1)),  end: f(piE(1)) },    // Notification Pref — PI 27
     f11: { start: f(piS(1)),  end: f(piE(1)) },    // Cross-Border — PI 27
     f12: { start: f(piS(1)),  end: f(piE(1)) },    // Account Aggregation — PI 27
-    f13: { start: f(piS(2)),  end: f(ad(piS(2), 41)) },  // Statement Filter — PI 28
-    f14: { start: f(piS(2)),  end: f(ad(piS(2), 41)) },  // Biometric Return — PI 28
+    f13: { start: f(piS(2)),  end: f(piE(2)) },    // Statement Filter — PI 28
+    f14: { start: f(piS(2)),  end: f(piE(2)) },    // Biometric Return — PI 28
     f15: { start: f(piS(2)),  end: f(piE(2)) },    // PSD3 Compliance — PI 28
-    f16: { start: f(piS(2)),  end: f(ad(piS(2), 41)) }   // Investment Portfolio — PI 28
+    f16: { start: f(piS(2)),  end: f(piE(2)) },    // Investment Portfolio — PI 28
+    f20: { start: f(piS(1)),  end: f(piE(1)) },    // Mortgage Application Wizard — PI 27
+    f21: { start: f(piS(2)),  end: f(piE(2)) },    // KYC Document Verification — PI 28
+    f22: { start: f(piS(2)),  end: f(piE(2)) }     // Credit Score Real-time Engine — PI 28
   };
 
   // Milestones (dynamic dates, icon + semantic colour)

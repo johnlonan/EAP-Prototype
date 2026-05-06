@@ -24,6 +24,14 @@ EAP.typeCell = function(type) {
   if (!type) return '';
   var key = type.toLowerCase();
   var iconKey = key === 'case task' ? 'clipboard-check' : key;
+  // Hierarchy re-rooting introduces non-canonical types — map to existing icons.
+  if (iconKey === 'owner')   iconKey = 'user';
+  if (iconKey === 'state')   iconKey = 'flag';
+  if (iconKey === 'product') iconKey = 'feature';
+  if (iconKey === 'size')    iconKey = 'square';
+  if (iconKey === 'risk')    iconKey = 'alert-triangle';
+  if (iconKey === 'art')     iconKey = 'users';
+  if (iconKey === 'st')      iconKey = 'compass';
   var slug = key.replace(/\s+/g, '-');
   var iconHtml = EAP.icon ? EAP.icon(iconKey, 11) : '';
   return '<span class="type-pill type-pill-' + slug + '">' + iconHtml + ' ' + type + '</span>';
@@ -63,10 +71,12 @@ EAP.subtlePill = function(st) {
 };
 
 // ── Pagination ────────────────────────────────────────
-// State: EAP.state.pagination[groupId] = {page:0, perPage:10}
+// State: EAP.state.pagination[groupId] = {page:0, perPage:25}
+// Default 25 — covers typical demo backlogs (≤24 items) on a single page so
+// the filtered list reads as a clean subset of the unfiltered list.
 EAP.pgGet = function(gid) {
   if (!EAP.state.pagination) EAP.state.pagination = {};
-  if (!EAP.state.pagination[gid]) EAP.state.pagination[gid] = {page: 0, perPage: 10};
+  if (!EAP.state.pagination[gid]) EAP.state.pagination[gid] = {page: 0, perPage: 25};
   return EAP.state.pagination[gid];
 };
 
@@ -170,13 +180,14 @@ EAP.wsjfWire = function() {
   });
 };
 
-// WSJF tier — colour the value by priority band.
-// Range across N4 data is ~4–18; hard cutoffs read more legibly than
-// runtime quartile against a shifting visible set.
+// WSJF tier — fixed thresholds (Jira / ClickUp / SAFe convention):
+//   > 10  → high  (Do Now)
+//   3-10  → mid   (Plan)
+//   < 3   → low   (Later)
 EAP.wsjfTier = function(v) {
   if (v == null) return '';
-  if (v >= 12) return 'wsjf-high';
-  if (v >= 7)  return 'wsjf-mid';
+  if (v > 10) return 'wsjf-high';
+  if (v >= 3) return 'wsjf-mid';
   return 'wsjf-low';
 };
 
@@ -240,13 +251,30 @@ EAP.showWsjfPopover = function(anchor, item, sticky) {
       '<span class="wsjf-pop-val">' + c.v + '<span class="wsjf-pop-max">/10</span></span>' +
       '</div>';
   }).join('');
+  // Priority tier (Do Now / Plan / Later) — same thresholds as the WSJF
+  // pill in tables (helpers.js EAP.wsjfTier). Surfaces what the cell colour
+  // means in industry terms.
+  var tierClass = EAP.wsjfTier(br.total);     // wsjf-high / wsjf-mid / wsjf-low
+  var tierLabel = tierClass === 'wsjf-high' ? 'Do Now'
+                : tierClass === 'wsjf-mid'  ? 'Plan'
+                                            : 'Later';
+
   pop.innerHTML =
     '<div class="wsjf-pop-hd">' +
       '<span class="wsjf-pop-hd-lbl">WSJF Score</span>' +
       '<span class="wsjf-pop-hd-val">' + br.total + '</span>' +
+      '<span class="wsjf ' + tierClass + ' wsjf-pop-hd-tier">' + tierLabel + '</span>' +
     '</div>' +
     '<div class="wsjf-pop-formula">CoD ÷ Job Size = (BV + TC + RR) ÷ Size</div>' +
-    '<div class="wsjf-pop-rows">' + rows + '</div>';
+    '<div class="wsjf-pop-rows">' + rows + '</div>' +
+    '<div class="wsjf-pop-legend">' +
+      '<div class="wsjf-pop-legend-title">Priority bands</div>' +
+      '<div class="wsjf-pop-legend-rows">' +
+        '<div class="wsjf-pop-legend-row"><span class="wsjf wsjf-high">Do Now</span><span class="wsjf-pop-legend-rng">WSJF &gt; 10</span></div>' +
+        '<div class="wsjf-pop-legend-row"><span class="wsjf wsjf-mid">Plan</span><span class="wsjf-pop-legend-rng">3 – 10</span></div>' +
+        '<div class="wsjf-pop-legend-row"><span class="wsjf wsjf-low">Later</span><span class="wsjf-pop-legend-rng">&lt; 3</span></div>' +
+      '</div>' +
+    '</div>';
 
   document.body.appendChild(pop);
   var aR = anchor.getBoundingClientRect();
@@ -399,4 +427,94 @@ EAP.lsBlCols = function() {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>Primary Goal</th>',
     r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
+};
+
+// ── Filter-aware empty state ───────────────────────────
+// Builds plain-English descriptions of what's currently filtering the view.
+// Dedupes when mine-only and track-member point to the same person.
+EAP.activeFilterDescription = function() {
+  var s = EAP.state;
+  var p = (EAP.personas && EAP.personas[s.persona]) || null;
+  var personaName = p ? p.name : null;
+  var personaShort = personaName ? personaName.split(' ')[0] : null;
+  var phrases = [];
+
+  // Mine-only is the strongest signal — phrase it as "Owned by …"
+  if (s.mineOnly && personaName) {
+    phrases.push('Owned by ' + personaName);
+  } else if (s.mineOnly) {
+    phrases.push('Owned by you');
+  }
+
+  // Track member — only add if it's a *different* person from the persona
+  // (otherwise it's redundant with mine-only).
+  if (s.trackMember && s.trackMember !== 'All' && s.trackMember !== personaShort) {
+    phrases.push('Assigned to ' + s.trackMember);
+  }
+
+  // Track team — only add if not already implied by team context
+  if (s.trackTeam && s.trackTeam !== 'All' && s.trackTeam !== s.contextName) {
+    phrases.push(s.trackTeam);
+  }
+
+  // Team context — phrase as scope
+  if (s.context === 'team' && s.contextName) {
+    phrases.push('in ' + s.contextName);
+  }
+
+  return phrases.join(' · ');
+};
+
+EAP.hasClearableFilters = function() {
+  var s = EAP.state;
+  return !!(s.mineOnly
+    || (s.trackMember && s.trackMember !== 'All')
+    || (s.trackTeam && s.trackTeam !== 'All'));
+};
+
+// Inline SVG fallback when assets/images/empty-state.png isn't present.
+// Approximates the 3D window-with-alert-badge illustration.
+EAP._emptyStateSvg = '<svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">' +
+  '<defs>' +
+    '<linearGradient id="esBox" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#1f3947"/><stop offset="1" stop-color="#0e2735"/>' +
+    '</linearGradient>' +
+    '<linearGradient id="esBadge" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#f6f1e6"/><stop offset="1" stop-color="#e6dfce"/>' +
+    '</linearGradient>' +
+  '</defs>' +
+  '<rect x="12" y="14" width="60" height="46" rx="8" fill="#34d39a" opacity="0.85"/>' +
+  '<rect x="14" y="18" width="60" height="46" rx="8" fill="url(#esBox)"/>' +
+  '<rect x="14" y="18" width="60" height="10" rx="8" fill="rgba(255,255,255,0.06)"/>' +
+  '<circle cx="60" cy="64" r="20" fill="url(#esBadge)" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>' +
+  '<line x1="60" y1="55" x2="60" y2="68" stroke="#0e4e69" stroke-width="3" stroke-linecap="round"/>' +
+  '<circle cx="60" cy="74" r="2" fill="#0e4e69"/>' +
+'</svg>';
+
+// Renders an empty state with current filter description and a Clear button.
+// Click handler wired in render.js.
+EAP.emptyState = function(opts) {
+  opts = opts || {};
+  var detail = EAP.activeFilterDescription();
+  var clearable = EAP.hasClearableFilters();
+  var hasAny = detail.length > 0;
+
+  // Image: tries the saved illustration first; SVG fallback appears if missing.
+  var img = '<img class="empty-state-img" src="../../assets/images/empty-state.png" alt="" ' +
+    'onerror="this.parentNode.classList.add(\'empty-state-no-img\');this.remove();">';
+
+  var title = hasAny ? 'No items match the current view' : (opts.title || 'No items to show');
+  var explainer = hasAny
+    ? 'You’re currently filtering to <strong>' + detail + '</strong>.'
+    : (opts.detail || '');
+  var cta = clearable
+    ? '<button class="empty-state-clear" id="empty-state-clear">Clear filter' + (detail.indexOf(' · ') !== -1 ? 's' : '') + '</button>'
+    : '';
+
+  return '<div class="empty-state empty-state-filtered">' +
+    '<div class="empty-state-illus">' + img + '<div class="empty-state-illus-fallback">' + EAP._emptyStateSvg + '</div></div>' +
+    '<div class="empty-state-text">' + title + '</div>' +
+    (explainer ? '<div class="empty-state-cta">' + explainer + '</div>' : '') +
+    cta +
+    '</div>';
 };

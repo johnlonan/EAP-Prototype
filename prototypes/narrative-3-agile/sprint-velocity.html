@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprint Velocity | Alectri</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <style>
+    /* ── Page-specific overrides ─────────────────────── */
+    body {
+      background: linear-gradient(135deg, #E5EDF0 0%, #DCE8F0 50%, #E4EDF5 100%) !important;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    .velocity-header {
+      padding: 28px 32px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-left { display: flex; flex-direction: column; gap: 4px; }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .header-context {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .sprint-selector {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 12px;
+      height: 32px;
+      border-radius: var(--radius-field);
+      border: 1px solid rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.6);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23656462' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    /* ── Content area ───────────────────────────────── */
+    .velocity-content {
+      padding: 0 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Row 1: Stat cards ──────────────────────────── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 18px 20px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-card-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #727a90;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .stat-card-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .stat-card-sub {
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .stat-sub-amber { color: #D97706; }
+    .stat-sub-green { color: #00834f; }
+
+    /* ── Row 2: Two-column detail panels ────────────── */
+    .detail-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .detail-panel {
+      padding: 20px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+
+    .detail-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+    }
+
+    .detail-panel-header svg {
+      width: 15px;
+      height: 15px;
+      color: var(--text-tertiary);
+    }
+
+    .detail-panel-header .header-badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Incomplete story block */
+    .incomplete-block {
+      padding: 10px 14px;
+      border-left: 3px solid #D97706;
+      background: rgba(217,119,6,0.04);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    }
+
+    .incomplete-id {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .incomplete-meta {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .incomplete-reason {
+      font-size: 10px;
+      color: #D97706;
+      margin-top: 4px;
+    }
+
+    /* Feature progress rows */
+    .feature-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+
+    .feature-progress-row + .feature-progress-row {
+      border-top: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .feature-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .progress-track {
+      width: 80px;
+      height: 5px;
+      background: var(--color-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    .progress-pct {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      min-width: 30px;
+      text-align: right;
+    }
+
+    /* ── Row 3: Velocity trend ──────────────────────── */
+    .velocity-chart-area {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      height: 120px;
+      padding: 0 20px;
+    }
+
+    .vel-bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .vel-bar-labels {
+      display: flex;
+      gap: 8px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .vel-committed { color: rgba(42,110,220,0.6); }
+    .vel-delivered { color: #5B9A6F; }
+
+    .vel-bar {
+      width: 24px;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s ease;
+    }
+
+    .vel-bar.committed { background: rgba(42,110,220,0.25); }
+    .vel-bar.delivered { background: #5B9A6F; }
+
+    .vel-bar-label {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      padding: 0 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    /* ── AI insight ──────────────────────────────────── */
+    .velocity-insight {
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.7);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.55;
+    }
+
+    .velocity-insight .sparkle {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: var(--color-accent);
+      margin-top: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav id="left-nav" aria-label="Primary navigation"></nav>
+    <main class="content-viewport" style="display:flex; flex-direction:column;">
+
+      <!-- ── Header ─────────────────────────────────── -->
+      <div class="velocity-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button onclick="history.back()" style="background:none; border:none; cursor:pointer; padding:4px; display:flex;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="header-left">
+            <h1 class="page-title">Sprint Velocity</h1>
+            <span class="header-context">Team Orion &middot; PI 25.1</span>
+          </div>
+        </div>
+        <select class="sprint-selector" aria-label="Sprint selector">
+          <option value="1">Sprint 1</option>
+          <option value="2" selected>Sprint 2</option>
+          <option value="3">Sprint 3 (current)</option>
+        </select>
+      </div>
+
+      <!-- ── Content ────────────────────────────────── -->
+      <div class="velocity-content">
+
+        <!-- Row 1: Key metrics ────────────────────── -->
+        <div class="stat-row">
+
+          <div class="stat-card">
+            <span class="stat-card-label">Stories Committed</span>
+            <span class="stat-card-value">11</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-card-label">Stories Completed</span>
+            <span class="stat-card-value">10</span>
+            <span class="stat-card-sub stat-sub-amber">1 incomplete</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-card-label">Points Committed</span>
+            <span class="stat-card-value">22</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-card-label">Points Delivered</span>
+            <span class="stat-card-value">19</span>
+            <span class="stat-card-sub stat-sub-green">86% delivery rate</span>
+          </div>
+
+        </div><!-- /.stat-row -->
+
+        <!-- Row 2: Incomplete + Feature Rollup ────── -->
+        <div class="detail-row">
+
+          <!-- LEFT: Incomplete Stories -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Incomplete Stories
+              <span class="header-badge stat-sub-amber">1 story &middot; 3 pts</span>
+            </div>
+            <div class="incomplete-block" onclick="window.location.href='story-detail.html?id=STRY-404'" style="cursor:pointer;">
+              <div class="incomplete-id">STRY-404 &middot; SSO provider integration</div>
+              <div class="incomplete-meta"><a href="feature-detail.html" style="color:var(--color-link); text-decoration:none;">F-01</a> &middot; 3 pts &middot; Was not started &mdash; missing acceptance criteria at sprint start</div>
+              <div class="incomplete-reason">Reason: AC not written before sprint started. Moved to Sprint 3.</div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Feature Rollup -->
+          <div class="detail-panel">
+            <div class="detail-panel-header">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              Feature Progress This Sprint
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0;">
+              <div class="feature-progress-row">
+                <a href="feature-detail.html" class="feature-name" style="color:var(--color-link); text-decoration:none; cursor:pointer;">F-01 Customer onboarding API v2</a>
+                <div class="progress-track">
+                  <div class="progress-fill" style="width:75%; background:#5B9A6F;"></div>
+                </div>
+                <span class="progress-pct">75%</span>
+              </div>
+              <div class="feature-progress-row">
+                <a href="feature-detail.html" class="feature-name" style="color:var(--color-link); text-decoration:none; cursor:pointer;">F-05 Real-time reporting pipeline</a>
+                <div class="progress-track">
+                  <div class="progress-fill" style="width:20%; background:#D97706;"></div>
+                </div>
+                <span class="progress-pct">20%</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.detail-row -->
+
+        <!-- Row 3: Velocity Trend ─────────────────── -->
+        <div class="detail-panel">
+          <div class="detail-panel-header">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            Velocity Trend
+            <span class="header-badge" style="color:var(--text-tertiary); font-weight:400;">Last 4 sprints</span>
+          </div>
+
+          <div class="velocity-chart-area">
+            <!-- PI-24 S5 -->
+            <div class="vel-bar-group">
+              <div class="vel-bar-labels">
+                <span class="vel-committed">9</span>
+                <span class="vel-delivered">9</span>
+              </div>
+              <div style="display:flex; gap:4px; align-items:flex-end; height:100px;">
+                <div class="vel-bar committed" style="height:41%;"></div>
+                <div class="vel-bar delivered" style="height:41%;"></div>
+              </div>
+              <div class="vel-bar-label">PI-24 S5</div>
+            </div>
+
+            <!-- Sprint 1 -->
+            <div class="vel-bar-group">
+              <div class="vel-bar-labels">
+                <span class="vel-committed">12</span>
+                <span class="vel-delivered">12</span>
+              </div>
+              <div style="display:flex; gap:4px; align-items:flex-end; height:100px;">
+                <div class="vel-bar committed" style="height:55%;"></div>
+                <div class="vel-bar delivered" style="height:55%;"></div>
+              </div>
+              <div class="vel-bar-label">Sprint 1</div>
+            </div>
+
+            <!-- Sprint 2 (current view) -->
+            <div class="vel-bar-group current">
+              <div class="vel-bar-labels">
+                <span class="vel-committed">22</span>
+                <span class="vel-delivered">19</span>
+              </div>
+              <div style="display:flex; gap:4px; align-items:flex-end; height:100px;">
+                <div class="vel-bar committed" style="height:100%;"></div>
+                <div class="vel-bar delivered" style="height:86%;"></div>
+              </div>
+              <div class="vel-bar-label">Sprint 2</div>
+            </div>
+
+            <!-- Sprint 3 (future) -->
+            <div class="vel-bar-group">
+              <div class="vel-bar-labels">
+                <span class="vel-committed">&mdash;</span>
+                <span class="vel-delivered">&mdash;</span>
+              </div>
+              <div style="display:flex; gap:4px; align-items:flex-end; height:100px;">
+                <div class="vel-bar committed" style="height:0%;"></div>
+                <div class="vel-bar delivered" style="height:0%;"></div>
+              </div>
+              <div class="vel-bar-label">Sprint 3</div>
+            </div>
+          </div>
+
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-swatch" style="background:rgba(42,110,220,0.3);"></div>
+              Committed
+            </div>
+            <div class="legend-item">
+              <div class="legend-swatch" style="background:#5B9A6F;"></div>
+              Delivered
+            </div>
+          </div>
+        </div><!-- /.detail-panel velocity trend -->
+
+        <!-- AI Insight ────────────────────────────── -->
+        <div class="velocity-insight">
+          <svg class="sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z"/>
+            <path d="M18 2L18.5 4C18.8 5.2 19.8 6.2 21 6.5L23 7L21 7.5C19.8 7.8 18.8 8.8 18.5 10L18 12L17.5 10C17.2 8.8 16.2 7.8 15 7.5L13 7L15 6.5C16.2 6.2 17.2 5.2 17.5 4L18 2Z"/>
+          </svg>
+          <span>Velocity stable at 19 pts (Sprint 2) vs 12 pts (Sprint 1). The incomplete story (STRY-404) was due to missing AC &mdash; preventable. Recommend enforcing AC-complete gate before sprint starts.</span>
+        </div>
+
+        <!-- Bottom spacer -->
+        <div style="height:120px; flex-shrink:0;"></div>
+
+      </div><!-- /.velocity-content -->
+
+    </main><!-- /.content-viewport -->
+  </div><!-- /.page-shell -->
+
+  <!-- ── Nav ─────────────────────────────────────────── -->
+  <script src="../shared/nav.js"></script>
+  <script>
+    renderNav('feature-list', {
+      avatar: '../../assets/images/avatar-james.png',
+      name: 'Sarah Chen',
+      links: {
+        0: 'planning.html',
+        3: 'team-backlog.html',
+        4: 'sprint-board.html'
+      }
+    });
+  </script>
+  <script src="agile-nav.js"></script>
+  <script>setupAgileNav('sprint-board');</script>
+</body>
+</html>
