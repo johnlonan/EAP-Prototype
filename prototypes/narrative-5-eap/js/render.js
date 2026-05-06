@@ -58,6 +58,7 @@ EAP.renderFilterBar = function() {
   var s = EAP.state, levels = EAP.contextLevels[s.context] || [];
   var el = document.getElementById('filter-bar');
   if (!el) return;
+  if (EAP.closeFilterPopover) EAP.closeFilterPopover();
   var h = '';
 
   if (s.tab === 'hierarchy') {
@@ -119,11 +120,28 @@ EAP.renderFilterBar = function() {
         '<select class="fbar-select" id="pi-select"><option>PI 26 — Current</option><option>PI 25</option><option>PI 24</option></select>';
     }
 
+    var filterCount = (s.ownerFilter && s.ownerFilter.length > 0) ? s.ownerFilter.length : 0;
+    var filterActive = filterCount > 0 || s.mineOnly;
     h += '<div class="fbar-sep"></div>' +
-      '<button class="fbar-filter">' + EAP.icon('filter', 14) + ' Filter</button>';
-    if (s.tab !== 'taskboard') {
+      '<button class="fbar-filter-btn' + (filterActive ? ' active' : '') + '" id="filter-btn">' +
+        EAP.icon('filter', 13) +
+        (filterCount > 0 ? '<span class="fbar-filter-badge">' + filterCount + '</span>' : '') +
+      '</button>';
+    if (filterActive && s.ownerFilter && s.ownerFilter.length > 0) {
+      var ownerNames = s.ownerFilter.map(function(k) {
+        var p = EAP.people && EAP.people[k];
+        return p ? p.name.split(' ')[0] : k;
+      }).join(', ');
+      h += '<span class="fbar-owner-pill" id="owner-pill">' +
+        EAP.icon('user', 11) + ' Owner · ' + ownerNames +
+        ' <span class="cx" id="owner-pill-clear">' + EAP.icon('x', 10) + '</span>' +
+      '</span>';
+    } else if (filterActive && s.mineOnly && s.tab !== 'taskboard') {
       var mineLabel = (s.level === 'WorkItem') ? 'Assigned to me' : 'Owned by me';
-      h += '<span class="fbar-chip' + (s.mineOnly ? ' on' : '') + '" id="mine-toggle">' + EAP.icon('user', 12) + ' ' + mineLabel + (s.mineOnly ? ' <span class="cx">' + EAP.icon('x', 10) + '</span>' : '') + '</span>';
+      h += '<span class="fbar-owner-pill" id="owner-pill">' +
+        EAP.icon('user', 11) + ' ' + mineLabel +
+        ' <span class="cx" id="owner-pill-clear">' + EAP.icon('x', 10) + '</span>' +
+      '</span>';
     }
     h += '<div class="fbar-spacer"></div>';
   }
@@ -201,8 +219,17 @@ EAP.renderFilterBar = function() {
   // Wire events
   var ls = document.getElementById('level-select');
   if (ls) ls.addEventListener('change', function() { EAP.setLevel(this.value); });
-  var mt = document.getElementById('mine-toggle');
-  if (mt) mt.addEventListener('click', function() { EAP.toggleMineOnly(); });
+  var fb = document.getElementById('filter-btn');
+  if (fb) fb.addEventListener('click', function(e) { e.stopPropagation(); EAP.openFilterPopover(); });
+  var opc = document.getElementById('owner-pill-clear');
+  if (opc) opc.addEventListener('click', function(e) {
+    e.stopPropagation();
+    EAP.state.ownerFilter = [];
+    EAP.state.mineOnly = false;
+    EAP.state.mineOverrides = EAP.state.mineOverrides || {};
+    EAP.state.mineOverrides[EAP.state.tab] = false;
+    EAP.render();
+  });
   var sb = document.getElementById('split-toggle');
   if (sb) sb.addEventListener('click', function() { EAP.toggleSplit(); });
   document.getElementById('insights-toggle').addEventListener('click', function() { EAP.toggleInsights(); });
@@ -274,14 +301,16 @@ EAP.renderContent = function() {
     s.mineOnly = false;
     s.mineOverrides = s.mineOverrides || {};
     s.mineOverrides[s.tab] = false;
+    s.ownerFilter = [];
     s.trackMember = 'All';
+    s.trackMembers = [];
     s.trackTeam = 'All';
     EAP.render();
   });
 
   // Wire track member/team chips
   el.querySelectorAll('[data-track-member]').forEach(function(chip) {
-    chip.addEventListener('click', function() { EAP.state.trackMember = chip.dataset.trackMember; EAP.render(); });
+    chip.addEventListener('click', function() { EAP.toggleTrackMember(chip.dataset.trackMember); });
   });
   el.querySelectorAll('[data-track-team]').forEach(function(chip) {
     chip.addEventListener('click', function() { EAP.state.trackTeam = chip.dataset.trackTeam; EAP.render(); });
@@ -433,4 +462,171 @@ EAP.renderContent = function() {
       }
     });
   }
+};
+
+// ── Filter Popover ──────────────────────────────────────────────────
+
+EAP._fpop = null;
+EAP._fpopState = 'main'; // 'main' | 'owner'
+
+EAP.closeFilterPopover = function() {
+  if (EAP._fpop && EAP._fpop.parentNode) EAP._fpop.parentNode.removeChild(EAP._fpop);
+  EAP._fpop = null;
+  document.removeEventListener('click', EAP._fpopOutside);
+};
+
+EAP._fpopOutside = function(e) {
+  if (EAP._fpop && !EAP._fpop.contains(e.target)) EAP.closeFilterPopover();
+};
+
+EAP.openFilterPopover = function() {
+  if (EAP._fpop) { EAP.closeFilterPopover(); return; }
+  EAP._fpop = document.createElement('div');
+  EAP._fpop.className = 'fpop';
+  document.body.appendChild(EAP._fpop);
+  EAP._fpopShowMain();
+  var btn = document.getElementById('filter-btn');
+  if (btn) {
+    var r = btn.getBoundingClientRect();
+    EAP._fpop.style.top = (r.bottom + 6) + 'px';
+    EAP._fpop.style.left = r.left + 'px';
+  }
+  setTimeout(function() { document.addEventListener('click', EAP._fpopOutside); }, 0);
+};
+
+EAP._fpopShowMain = function() {
+  var s = EAP.state;
+  var isTaskboard = s.tab === 'taskboard';
+  var fields = [
+    { key: 'owner', label: 'Owner', icon: 'user', active: (s.ownerFilter && s.ownerFilter.length > 0) || s.mineOnly, flyout: true },
+    { key: 'state', label: 'State', icon: 'check-square', active: false, flyout: false },
+    { key: 'size',  label: 'Size',  icon: 'diamond',      active: false, flyout: false },
+    { key: 'type',  label: 'Type',  icon: 'feature',      active: false, flyout: false }
+  ];
+  if (isTaskboard) fields = fields.filter(function(f) { return f.key !== 'owner'; });
+
+  var h = '<div class="fpop-header">Filter</div>';
+  fields.forEach(function(f) {
+    var activeClass = f.active ? ' fpop-item-active' : '';
+    var dimClass = f.flyout ? '' : ' fpop-item-dim';
+    h += '<div class="fpop-item' + activeClass + dimClass + '" data-fpop-field="' + f.key + '">' +
+      '<span class="fpop-item-icon">' + EAP.icon(f.icon, 13) + '</span>' +
+      '<span class="fpop-item-label">' + f.label + '</span>' +
+      (f.flyout ? '<span class="fpop-item-chev">' + EAP.icon('chevron-right', 11) + '</span>' : '<span class="fpop-item-coming">soon</span>') +
+    '</div>';
+  });
+
+  if (EAP.hasClearableFilters()) {
+    h += '<div class="fpop-footer"><button class="fpop-clear-all" id="fpop-clear-all">Clear all filters</button></div>';
+  }
+
+  EAP._fpop.innerHTML = h;
+
+  EAP._fpop.querySelectorAll('[data-fpop-field]').forEach(function(row) {
+    row.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var field = row.dataset.fpopField;
+      if (field === 'owner') EAP._fpopShowOwner();
+    });
+  });
+
+  var ca = document.getElementById('fpop-clear-all');
+  if (ca) ca.addEventListener('click', function(e) {
+    e.stopPropagation();
+    EAP.state.ownerFilter = [];
+    EAP.state.mineOnly = false;
+    EAP.state.mineOverrides = EAP.state.mineOverrides || {};
+    EAP.state.mineOverrides[EAP.state.tab] = false;
+    EAP.closeFilterPopover();
+    EAP.render();
+  });
+};
+
+EAP._fpopShowOwner = function() {
+  var s = EAP.state;
+  var people = EAP.people || {};
+  var keys = Object.keys(people);
+  var search = '';
+
+  function renderOwnerFlyout(filter) {
+    var h = '<div class="fpop-flyout-header">' +
+      '<button class="fpop-back" id="fpop-back">' + EAP.icon('chevron-right', 12) + '</button>' +
+      '<span>Owner</span>' +
+    '</div>' +
+    '<div class="fpop-search-wrap"><span class="fpop-search-icon">' + EAP.icon('search', 12) + '</span>' +
+    '<input class="fpop-search" id="fpop-owner-search" placeholder="Search people…" value="' + filter + '"></div>';
+
+    var filtered = keys.filter(function(k) {
+      if (!filter) return true;
+      var p = people[k];
+      return p && p.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+    });
+
+    filtered.forEach(function(k) {
+      var p = people[k];
+      if (!p) return;
+      var isSelected = (s.ownerFilter && s.ownerFilter.indexOf(k) !== -1) ||
+                       (s.mineOnly && k === EAP.ME);
+      h += '<div class="fpop-flyout-item' + (isSelected ? ' selected' : '') + '" data-fpop-owner="' + k + '">' +
+        EAP.avatar(k, 20) +
+        '<span class="fpop-flyout-name">' + p.name + '</span>' +
+        '<span class="fpop-flyout-check">' + (isSelected ? EAP.icon('check', 13) : '') + '</span>' +
+      '</div>';
+    });
+
+    if (s.ownerFilter && s.ownerFilter.length > 0) {
+      h += '<div class="fpop-footer"><button class="fpop-clear-all" id="fpop-clear-owner">Clear owner filter</button></div>';
+    }
+
+    EAP._fpop.innerHTML = h;
+
+    document.getElementById('fpop-back').addEventListener('click', function(e) {
+      e.stopPropagation(); EAP._fpopShowMain();
+    });
+
+    var searchInput = document.getElementById('fpop-owner-search');
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.addEventListener('input', function(e) {
+        e.stopPropagation();
+        renderOwnerFlyout(searchInput.value);
+      });
+      searchInput.addEventListener('click', function(e) { e.stopPropagation(); });
+    }
+
+    EAP._fpop.querySelectorAll('[data-fpop-owner]').forEach(function(row) {
+      row.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var key = row.dataset.fpopOwner;
+        s.ownerFilter = s.ownerFilter || [];
+        var idx = s.ownerFilter.indexOf(key);
+        if (idx === -1) { s.ownerFilter.push(key); }
+        else { s.ownerFilter.splice(idx, 1); }
+        // If the selected person is EAP.ME, also toggle mineOnly
+        if (key === EAP.ME) {
+          s.mineOnly = s.ownerFilter.indexOf(key) !== -1;
+          s.mineOverrides = s.mineOverrides || {};
+          s.mineOverrides[s.tab] = s.mineOnly;
+          if (s.mineOnly) { s.ownerFilter = s.ownerFilter.filter(function(k) { return k !== EAP.ME; }); }
+        }
+        var currentSearch = document.getElementById('fpop-owner-search');
+        renderOwnerFlyout(currentSearch ? currentSearch.value : '');
+        EAP.renderFilterBar();
+        EAP.renderContent();
+      });
+    });
+
+    var co = document.getElementById('fpop-clear-owner');
+    if (co) co.addEventListener('click', function(e) {
+      e.stopPropagation();
+      s.ownerFilter = [];
+      s.mineOnly = false;
+      s.mineOverrides = s.mineOverrides || {};
+      s.mineOverrides[s.tab] = false;
+      EAP.closeFilterPopover();
+      EAP.render();
+    });
+  }
+
+  renderOwnerFlyout(search);
 };

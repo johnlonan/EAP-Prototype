@@ -283,14 +283,8 @@ EAP.drawGauge = function(tv) {
 
 // ── Toast ─────────────────────────────────────────────
 EAP.showToast = function(msg, type) {
-  var existing = document.querySelector('.eap-toast');
-  if (existing) existing.remove();
-  var t = document.createElement('div');
-  t.className = 'eap-toast eap-toast-' + (type || 'info');
-  t.innerHTML = EAP.icon(type === 'success' ? 'check-square' : 'info', 14) + ' ' + msg;
-  document.body.appendChild(t);
-  requestAnimationFrame(function() { t.classList.add('show'); });
-  setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 300); }, 3000);
+  var icon = type === 'success' ? 'check-square' : 'info';
+  EAP.toast({ icon: icon, message: msg, duration: 3000 });
 };
 
 // ── Wire actions ──────────────────────────────────────

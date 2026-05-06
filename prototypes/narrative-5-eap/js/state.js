@@ -30,6 +30,7 @@ EAP.state = {
   // Filters
   mineOnly: false,
   mineOverrides: {},                  // per-tab manual overrides — beats persona defaults
+  ownerFilter: [],                    // multi-select owner filter (keys from EAP.people)
 
   // View options
   splitView: true,
@@ -349,8 +350,24 @@ EAP.applyPersona = function(key) {
   EAP.state.mineOnly      = EAP.personaWantsMineOn(p, EAP.state.tab);
   // Task Board: when persona is a team member, preselect them in the member chip
   EAP.state.trackMember = (key === 'james') ? 'James' : 'All';
+  EAP.state.trackMembers = (key === 'james') ? ['James'] : [];
+  EAP.state.ownerFilter = [];
   try { localStorage.setItem('eap.persona', key); } catch (e) {}
   return true;
+};
+
+EAP.toggleTrackMember = function(key) {
+  var s = EAP.state;
+  s.trackMembers = s.trackMembers || [];
+  if (key === 'All') {
+    s.trackMembers = [];
+    s.trackMember = 'All';
+  } else {
+    var idx = s.trackMembers.indexOf(key);
+    if (idx === -1) { s.trackMembers = [key]; s.trackMember = key; }
+    else { s.trackMembers = []; s.trackMember = 'All'; }
+  }
+  EAP.render();
 };
 
 EAP.bootPersona = function() {
@@ -371,9 +388,16 @@ EAP.isMine = function(item) {
 };
 
 EAP.applyMineFilter = function(items) {
-  if (!EAP.state.mineOnly) return items;
   if (!Array.isArray(items)) return items;
-  return items.filter(EAP.isMine);
+  var result = items;
+  if (EAP.state.mineOnly) {
+    result = result.filter(EAP.isMine);
+  }
+  var of = EAP.state.ownerFilter;
+  if (of && of.length > 0) {
+    result = result.filter(function(item) { return of.indexOf(item.owner) !== -1; });
+  }
+  return result;
 };
 
 // Filter items by current team context (when s.context === 'team').

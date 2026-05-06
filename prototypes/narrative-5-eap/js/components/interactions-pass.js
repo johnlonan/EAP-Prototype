@@ -175,25 +175,6 @@ document.addEventListener('click', function(ev) {
 
 
 // ─────────────────────────────────────────────────────────────────────
-// PHASE 1 — Load-time filter toast (only fires once if a default filter
-// is auto-applied on entry).
-// ─────────────────────────────────────────────────────────────────────
-function loadTimeFilterToast() {
-  var s = EAP.state;
-  if (!s || !s.mineOnly) return;
-  var p = (EAP.personas && EAP.personas[s.persona]) || null;
-  if (!p) return;
-  EAP.toast({ icon: 'filter', message: 'Showing items owned by ' + p.name, duration: 3200 });
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadTimeFilterToast);
-} else {
-  loadTimeFilterToast();
-}
-
-
-// ─────────────────────────────────────────────────────────────────────
 // PHASE 5 — Counter animation
 // ─────────────────────────────────────────────────────────────────────
 EAP._countUp = function(target, duration, renderFn) {

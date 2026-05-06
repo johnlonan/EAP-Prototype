@@ -468,7 +468,9 @@ EAP.activeFilterDescription = function() {
 EAP.hasClearableFilters = function() {
   var s = EAP.state;
   return !!(s.mineOnly
+    || (s.ownerFilter && s.ownerFilter.length > 0)
     || (s.trackMember && s.trackMember !== 'All')
+    || (s.trackMembers && s.trackMembers.length > 0)
     || (s.trackTeam && s.trackTeam !== 'All'));
 };
 

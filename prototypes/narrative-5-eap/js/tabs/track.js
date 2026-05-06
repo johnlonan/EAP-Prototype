@@ -131,33 +131,33 @@ EAP.renderTrack = function() {
       '</div>' : '') +
     '</div>';
 
-  // ── Filter chips — team or member ──
-  var filterHtml = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;">';
+  // ── Filter chips — team or member (inside board content, new row) ──
+  var chipRowHtml = '<div class="track-chip-row">';
   if (isTeamCtx) {
     var members = (EAP.teamMembers && EAP.teamMembers[s.contextName]) || [];
     var activeMember = s.trackMember || 'All';
-    filterHtml += '<span class="track-chip' + (activeMember === 'All' ? ' active' : '') + '" data-track-member="All">' + EAP.icon('users', 14) + ' All</span>';
+    chipRowHtml += '<span class="track-chip' + (activeMember === 'All' ? ' active' : '') + '" data-track-member="All">' + EAP.icon('users', 14) + ' All</span>';
     members.forEach(function(m) {
       var p = EAP.people[m];
       if (!p) return;
-      filterHtml += '<span class="track-chip' + (activeMember === m ? ' active' : '') + '" data-track-member="' + m + '">' + EAP.avatar(m, 20) + ' ' + p.name + '</span>';
+      chipRowHtml += '<span class="track-chip' + (activeMember === m ? ' active' : '') + '" data-track-member="' + m + '">' + EAP.avatar(m, 20) + ' ' + p.name + '</span>';
     });
   } else {
     var teams = ['Auth Team', 'Payments Team', 'Fraud Team', 'Mobile Exp Team', 'Accounts Team', 'Onboarding Team'];
     var activeTeam = s.trackTeam || 'All';
-    filterHtml += '<span class="track-chip' + (activeTeam === 'All' ? ' active' : '') + '" data-track-team="All">' + EAP.icon('users', 14) + ' All Teams</span>';
+    chipRowHtml += '<span class="track-chip' + (activeTeam === 'All' ? ' active' : '') + '" data-track-team="All">' + EAP.icon('users', 14) + ' All Teams</span>';
     teams.forEach(function(t) {
       var tc = EAP.teamColors[t] || '#6B7280';
-      filterHtml += '<span class="track-chip' + (activeTeam === t ? ' active' : '') + '" data-track-team="' + t + '"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span> ' + t + '</span>';
+      chipRowHtml += '<span class="track-chip' + (activeTeam === t ? ' active' : '') + '" data-track-team="' + t + '"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span> ' + t + '</span>';
     });
   }
-  filterHtml += '</div>';
+  chipRowHtml += '</div>';
 
   // Filter-aware empty state — when chips/persona empty the board, surface
   // a clear-filter affordance instead of rendering empty workflow columns.
   if (!all.length && EAP.hasClearableFilters()) {
     return '<div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;">' +
-      filterHtml + contextHtml +
+      contextHtml + chipRowHtml +
       '<div style="flex:1;display:flex;align-items:center;justify-content:center;">' + EAP.emptyState() + '</div>' +
       '</div>';
   }
@@ -175,8 +175,7 @@ EAP.renderTrack = function() {
   var colW = 310;
   var trackW = EAP.trackColumns.length * colW + (EAP.trackColumns.length - 1) * 8;
   var h = '<div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;">' +
-    filterHtml +
-    contextHtml +
+    contextHtml + chipRowHtml +
     '<div style="flex:1;min-height:0;overflow:auto;">' +
     '<div style="display:inline-flex;gap:8px;padding:4px 2px 16px;width:' + trackW + 'px;">';
 
