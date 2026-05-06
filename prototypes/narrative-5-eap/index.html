@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Agile Planning | Digital Banking ART</title>
+  <script>
+    // Always route through the persona slide unless the URL carries one.
+    // Internal nav appends ?p=<persona> so in-app navigation never bounces back.
+    (function() {
+      try {
+        var qs = new URLSearchParams(window.location.search);
+        if (qs.get('p')) return;
+        window.location.replace('start.html');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/chart.min.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <div id="floating-bar" style="display:none;"></div>
+  <link rel="stylesheet" href="css/app.css?v=9">
+  <link rel="stylesheet" href="css/modernity.css?v=11">
+  <link rel="stylesheet" href="css/interactions.css?v=8">
+</head>
+<body>
+<div class="liquid-bg" aria-hidden="true"></div>
+<div class="page-shell">
+  <nav id="left-nav" aria-label="Primary navigation"></nav>
+  <main class="content-viewport" style="display:flex; flex-direction:column;">
+    <div id="chrome-bar" class="chrome"></div>
+    <div id="filter-bar" class="fbar"></div>
+    <div id="content-area" class="content-area"></div>
+  </main>
+</div>
+
+<script src="../shared/nav.js"></script>
+<script src="js/data.js?v=8"></script>
+<script src="js/state.js?v=5"></script>
+<script src="js/data-personas.js?v=2"></script>
+<script src="js/components/icons.js"></script>
+<script src="js/components/helpers.js?v=3"></script>
+<script src="js/components/detail-panel.js?v=2"></script>
+<script src="js/components/charts.js"></script>
+<script src="js/components/persona-switcher.js"></script>
+<script src="js/tabs/backlog.js"></script>
+<script src="js/tabs/list.js"></script>
+<script src="js/tabs/timeline.js?v=6"></script>
+<script src="js/tabs/board.js?v=5"></script>
+<script src="js/tabs/track.js?v=4"></script>
+<script src="js/tabs/hierarchy.js?v=5"></script>
+<script src="js/components/insights.js?v=7"></script>
+<script src="js/render.js?v=3"></script>
+<script src="js/interactions.js"></script>
+<script src="js/components/interactions-pass.js?v=10"></script>
+<script>
+  // Apply selected persona (URL ?p=, then localStorage, fallback ananya)
+  if (EAP.bootPersona) EAP.bootPersona();
+  // Persona-scoped data injections — only Ananya gets Otto's draft Feature
+  // (the bundle proposal materialised as a Funnel item).
+  if (EAP.state.persona === 'ananya' && EAP.injectAnanyaDraftFeature) {
+    EAP.injectAnanyaDraftFeature();
+  }
+  // Carry visit forward so existing screens know which demo session is active.
+  // Honour ?tab= from the IH tile click and snap to that tab on first render.
+  (function(){
+    try {
+      var qs = new URLSearchParams(window.location.search);
+      var v = qs.get('visit') || localStorage.getItem('eap.visit') || 'return';
+      EAP.state.visit = v;
+      // ?highlight= deep-link from the IH (e.g. customer-signals callout).
+      // Stored on state; consumed by EAP.handleHighlight after first render.
+      var hl = qs.get('highlight');
+      if (hl) EAP.state.highlight = hl;
+      var t = qs.get('tab');
+      if (t) {
+        var validTabs = (EAP.tabConfig || []).map(function(c){ return c.id; });
+        if (validTabs.indexOf(t) !== -1) {
+          // Match setTab's contract without triggering its render — the boot
+          // path calls EAP.render() once below.
+          EAP.state.tab = t;
+          EAP.state.wsjfSort = null;
+          EAP.state.pagination = {};
+          EAP.state.mineOverrides = EAP.state.mineOverrides || {};
+          if (EAP.state.mineOverrides[t] !== undefined) {
+            EAP.state.mineOnly = EAP.state.mineOverrides[t];
+          } else if (typeof EAP.personaWantsMineOn === 'function') {
+            EAP.state.mineOnly = EAP.personaWantsMineOn(EAP.personas[EAP.state.persona], t);
+          }
+          // Task Board needs ART/Team context + WorkItem level
+          if (t === 'taskboard') {
+            if (EAP.state.context !== 'art' && EAP.state.context !== 'team') {
+              EAP.state.context = 'art';
+              EAP.state.contextName = 'Digital Banking ART';
+              EAP.state.contextId = 'art1';
+            }
+            EAP.state.level = 'WorkItem';
+          }
+        }
+      }
+    } catch(e) {}
+  })();
+  // Render nav with the active persona's avatar + name
+  var __p = (EAP.personas && EAP.personas[EAP.state.persona]) || (EAP.personas && EAP.personas.ananya) || {};
+  // Preserve persona + visit on home-nav clicks so internal navigation doesn't bounce back to start
+  var __carry = '?p=' + (EAP.state.persona || 'ananya') + (EAP.state.visit ? '&visit=' + EAP.state.visit : '');
+  var __homeUrl = 'home.html' + __carry;
+  renderNav('board', {
+    avatar: __p.avatar || '../../assets/images/avatar-miley-simmons.png',
+    name:   __p.name   || 'Ananya Krishnan',
+    links:  { 0: __homeUrl, 3: 'index.html' + __carry + '&tab=backlog', 4: 'index.html' + __carry + '&tab=board' }
+  });
+  if (EAP.initPersonaSwitcher) EAP.initPersonaSwitcher();
+  EAP.state.openAccordions['pi26'] = true;
+  EAP.initInteractions();
+  EAP.render();
+
+  // ── Otto context banner (deep-link from IH Otto interactions) ──
+  // When landing from the home page via an Otto item, ?otto= carries the
+  // context message explaining why the user is here and what to look at.
+  (function() {
+    try {
+      var qs = new URLSearchParams(window.location.search);
+      var ottoMsg = qs.get('otto');
+      if (!ottoMsg) return;
+      var banner = document.createElement('div');
+      banner.id = 'otto-banner';
+      banner.innerHTML =
+        '<span class="otto-banner-sparkle">' + EAP.icon('otto', 14) + '</span>' +
+        '<span class="otto-banner-label">Otto</span>' +
+        '<span class="otto-banner-sep">·</span>' +
+        '<span class="otto-banner-msg">' + ottoMsg + '</span>' +
+        '<button class="otto-banner-close" aria-label="Dismiss">&#x2715;</button>';
+      var filterBar = document.getElementById('filter-bar');
+      var vp = document.querySelector('.content-viewport');
+      if (!vp) return;
+      if (filterBar) {
+        vp.insertBefore(banner, filterBar);
+      } else {
+        var gpanel = document.getElementById('gpanel');
+        if (gpanel) vp.insertBefore(banner, gpanel); else vp.appendChild(banner);
+      }
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() { banner.classList.add('show'); });
+      });
+      var timer = setTimeout(dismiss, 9000);
+      function dismiss() {
+        banner.classList.remove('show');
+        setTimeout(function() { if (banner.parentNode) banner.parentNode.removeChild(banner); }, 400);
+      }
+      banner.querySelector('.otto-banner-close').addEventListener('click', function() {
+        clearTimeout(timer); dismiss();
+      });
+    } catch(e) {}
+  })();
+
+  // ── Deep-link highlight ──────────────────────────────
+  // The IH (customer-signals callout) deep-links into Backlog with the
+  // bundled draft Feature targeted via ?highlight=fb1. After first render:
+  //  1. scroll the row into view
+  //  2. apply .is-highlighted (sticks until first interaction)
+  //  3. open the detail panel after a short pause so the row pulse reads
+  if (EAP.state.highlight) {
+    var __hlId = EAP.state.highlight;
+    requestAnimationFrame(function() {
+      var row = document.querySelector('tr[data-item-id="' + __hlId + '"]');
+      if (!row) return;
+      row.classList.add('is-highlighted');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Auto-open detail after the pulse establishes itself
+      setTimeout(function() {
+        if (EAP.openDetail) EAP.openDetail(__hlId);
+      }, 700);
+      // Stick until first interaction — clear on scroll, click, or keypress
+      var clear = function() {
+        row.classList.remove('is-highlighted');
+        document.removeEventListener('click',  clear, true);
+        document.removeEventListener('keydown',clear, true);
+        var sc = document.querySelector('.gpanel-scroll'); if (sc) sc.removeEventListener('scroll', clear, true);
+      };
+      document.addEventListener('click',  clear, true);
+      document.addEventListener('keydown',clear, true);
+      var sc = document.querySelector('.gpanel-scroll'); if (sc) sc.addEventListener('scroll', clear, true);
+    });
+  }
+</script>
+</body>
+</html>

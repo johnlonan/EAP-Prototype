@@ -1,0 +1,2530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAP — Intelligent Home</title>
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/dataviz.css">
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/chart.min.js"></script>
+
+<style>
+/* ── AI tokens (per CLAUDE.md, reserved for AI surfaces only) ── */
+:root {
+  --ai-accent: #00C7B1;
+  --ai-accent-deep: #009688;
+  --ai-bg: #F0FAFA;
+
+  /* ── Dataviz palette — brighter than the semantic status tokens.
+     Reserved for chart strokes/fills so visualisations feel modern,
+     not enterprise-2018. Pills/text still use --color-success etc. */
+  --viz-blue:   #2563EB;
+  --viz-cyan:   #06B6D4;
+  --viz-green:  #22C55E;
+  --viz-orange: #F97316;
+  --viz-red:    #EF4444;
+}
+
+/* ── Page shell — match the EAP prototype, gradient bg from app.css ── */
+html, body { height: 100%; margin: 0; padding: 0; }
+body {
+  background: #d6e9e6 !important;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+.liquid-bg {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse 65% 55% at 20% 22%, rgba(130, 210, 190, 0.88) 0%, transparent 100%),
+    radial-gradient(ellipse 55% 50% at 80% 26%, rgba(150, 200, 225, 0.78) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 55% at 50% 82%, rgba(170, 220, 195, 0.82) 0%, transparent 100%);
+  filter: blur(64px);
+  animation: liquid-bg 22s ease-in-out infinite alternate;
+  z-index: 1;
+  pointer-events: none;
+}
+@keyframes liquid-bg {
+  0%   { transform: scale(1.4) translate(0, 0); }
+  40%  { transform: scale(1.5) translate(4%, -5%); }
+  100% { transform: scale(1.4) translate(-3%, 4%); }
+}
+.page-shell { position: relative; z-index: 2; display: flex; height: 100vh; overflow: hidden; }
+
+/* viewport: matches shell.css spacing (margin-left:64px) so the IH doesn't
+   float further from the nav than the rest of the prototype. */
+.content-viewport {
+  flex: 1; min-width: 0;
+  margin: 16px 16px 16px 64px;
+  height: calc(100vh - 32px);
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.48) 100%);
+  backdrop-filter: blur(24px) saturate(1.08); -webkit-backdrop-filter: blur(24px) saturate(1.08);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.04),
+    0 10px 28px rgba(0,0,0,0.08),
+    0 36px 80px rgba(0,0,0,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.92),
+    inset 1px 0 0 rgba(255,255,255,0.55),
+    inset -1px 0 0 rgba(255,255,255,0.22),
+    inset 0 -1px 0 rgba(0,0,0,0.04);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  padding: 0 28px 28px;
+}
+.content-viewport::-webkit-scrollbar { width: 4px; }
+.content-viewport::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+/* ── Top bar: sticky · greeting / omnibar / date+weather ──
+   At rest: fully transparent, no line, no blur — sits seamlessly on the
+   viewport glass. JS toggles .is-scrolled once content actually starts
+   scrolling under the header; only then do the line and the strong
+   backdrop-blur fade in, dissolving the scrolled-under content. */
+.ih-top {
+  position: sticky; top: 0; z-index: 20;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 22px 0 14px;
+  margin-bottom: 16px;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: border-color 220ms ease, backdrop-filter 220ms ease;
+}
+.ih-top.is-scrolled {
+  border-bottom-color: rgba(14, 78, 105, 0.12);
+  backdrop-filter: blur(36px) saturate(1.4);
+  -webkit-backdrop-filter: blur(36px) saturate(1.4);
+}
+.ih-greet { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ih-greet h1 {
+  font-size: 22px; font-weight: 500; line-height: 1.2;
+  margin: 0; color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Centre column — omnibar input with chips revealed on hover/focus.
+   Chips are positioned absolutely below the input so toggling them on/off
+   doesn't reflow the sticky header (and therefore doesn't jiggle the hero
+   row beneath it). */
+.ih-centre {
+  position: relative;
+  width: 560px;
+  max-width: 100%;
+  justify-self: center;
+}
+.ih-centre .quick-chips {
+  position: absolute;
+  top: calc(100% + 8px); left: 0; right: 0;
+  opacity: 0; transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.ih-centre:hover .quick-chips,
+.ih-centre:focus-within .quick-chips {
+  opacity: 1; transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Right column — date + weather emoji */
+.ih-meta {
+  display: inline-flex; align-items: center; gap: 12px;
+  justify-content: flex-end;
+  font-size: 12px; color: var(--text-tertiary); font-weight: 500;
+}
+.ih-meta .meta-stack { display: flex; flex-direction: column; gap: 2px; align-items: flex-end; line-height: 1.25; }
+.ih-meta .meta-stack .date { color: var(--text-primary); font-weight: 500; }
+.ih-meta .weather-icon {
+  width: 36px; height: 36px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(255, 140, 50, 0.28));
+}
+.ih-meta .weather-icon svg { width: 100%; height: 100%; display: block; }
+
+/* Otto — ServiceNow's AI character (Sparkmoji shape).
+   Default colour: navy (--color-primary) for inline / dense usage.
+   Add .otto.alive for the teal active state with pulsing halo. */
+.otto {
+  width: 32px; height: 32px;
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+.otto > svg { width: 100%; height: 100%; display: block; }
+.otto.alive { color: var(--ai-accent-deep); }
+.otto.alive::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 199, 177, 0.32) 0%, transparent 70%);
+  animation: pulse-ai 2.4s ease-in-out infinite;
+  z-index: -1;
+}
+@keyframes pulse-ai { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.18); } }
+@keyframes card-enter { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+.hero-card { animation: card-enter 0.4s ease both; }
+.hero-card:nth-child(2) { animation-delay: 0.07s; }
+.hero-card:nth-child(3) { animation-delay: 0.14s; }
+
+/* ── HERO row ── three independent cards (snapshot · detail · brief) ──
+   Same chrome as stat cards, same grid rhythm. Each persona's renderer
+   outputs three <article class="hero-card"> elements. */
+.ih-top, .ih-hero-row, .ih-stats, .ih-grid { flex-shrink: 0; }
+
+.ih-hero-row {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.hero-card {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 18px 20px 16px;
+  display: flex; flex-direction: column;
+  gap: 12px;
+  position: relative;
+  min-height: 280px;
+}
+.hero-card-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.hero-card-title-block { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hero-card-eyebrow {
+  font-size: 10px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.08em; line-height: 1.4;
+  color: var(--text-tertiary);
+}
+.hero-card-title {
+  font-size: 16px; font-weight: 500;
+  color: var(--text-primary); margin: 0; line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+.hero-card-subtitle {
+  font-size: 11.5px; color: var(--text-tertiary);
+  line-height: 1.45; margin: 0;
+}
+.hero-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 6px; }
+.hero-title { font-size: 18px; font-weight: 500; color: var(--text-primary); margin: 0 0 4px; line-height: 1.25; }
+.hero-anchor { font-size: 11px; font-weight: 500; color: var(--text-tertiary); }
+.hero-anchor strong { color: var(--text-primary); font-weight: 600; }
+.hero-anchor-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: rgba(14, 78, 105, 0.08); color: var(--color-primary);
+  font-size: 11px; font-weight: 600;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+/* ── STAT row — 3 self-contained cards. Each card: title + subtitle, large
+   primary number with trend pill, comparison line, smooth area sparkline
+   with hover tooltip, and an optional AI callout. Whole card is clickable
+   and routes to its primary tab via data-tab. */
+.ih-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 18px 20px 16px;
+  display: flex; flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  position: relative;
+  min-height: 240px;
+}
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.88);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
+}
+.stat-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.stat-title-block { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.stat-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 0; line-height: 1.3; letter-spacing: -0.005em; }
+.stat-subtitle { font-size: 11px; color: var(--text-tertiary); line-height: 1.4; margin: 0; }
+.stat-arrow {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.05);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+}
+.stat-card:hover .stat-arrow { background: var(--color-primary); color: #fff; transform: rotate(-12deg); }
+.stat-arrow svg { width: 14px; height: 14px; }
+.stat-metric { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.stat-num-big {
+  font-size: 32px; font-weight: 700; color: var(--text-primary);
+  line-height: 1; font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.stat-num-suffix { font-size: 14px; color: var(--text-tertiary); font-weight: 500; vertical-align: middle; }
+.stat-trend-pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-trend-pill.up { background: rgba(22,163,74,0.10); color: var(--color-success); }
+.stat-trend-pill.down { background: rgba(220,38,38,0.10); color: var(--color-error); }
+.stat-trend-pill.flat { background: rgba(0,0,0,0.05); color: var(--text-tertiary); }
+.stat-comparison {
+  font-size: 11px; color: var(--text-secondary);
+  line-height: 1.45; margin: -4px 0 0;
+}
+.stat-comparison strong { color: var(--text-primary); font-weight: 600; }
+.stat-spark {
+  position: relative; height: 84px; margin: 4px -6px -2px;
+  flex-shrink: 0;
+  margin-top: auto;
+}
+.stat-spark canvas { display: block; }
+.stat-callout {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px;
+  background: var(--ai-bg);
+  border: 1px solid rgba(0, 199, 177, 0.20);
+  border-radius: 10px;
+  font-size: 11.5px; color: var(--text-secondary);
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.stat-callout:hover { background: rgba(0, 199, 177, 0.10); border-color: rgba(0, 199, 177, 0.35); }
+.stat-callout > svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--ai-accent-deep); }
+.stat-callout strong { color: var(--text-primary); font-weight: 600; }
+.stat-callout-arrow { margin-left: auto; opacity: 0.55; flex-shrink: 0; color: var(--ai-accent-deep); font-size: 14px; }
+.stat-callout:hover .stat-callout-arrow { opacity: 1; }
+
+/* External HTML tooltip — above canvas overlays */
+#donut-tip {
+  position: fixed; z-index: 200; pointer-events: none;
+  background: rgba(255,255,255,0.98);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 10px; padding: 10px 13px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  min-width: 160px; max-width: 230px;
+  opacity: 0; transition: opacity 140ms;
+  font-family: inherit;
+}
+.dtip-label { font-size: 10px; font-weight: 500; color: #6B7280; margin-bottom: 3px; }
+.dtip-body  { font-size: 13px; font-weight: 700; color: #111827; line-height: 1.3; }
+.dtip-foot  { font-size: 10px; color: #6B7280; margin-top: 5px; line-height: 1.35; }
+
+/* ── 3-column grid (asymmetric: 4 / 5 / 3) ── */
+.ih-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+.zone {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 16px 16px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  min-width: 0;
+  min-height: 540px;
+}
+.zone-eyebrow { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.4; padding-top: 2px; }
+.zone.focus .zone-eyebrow    { color: #b91c1c; }
+.zone.activity .zone-eyebrow { color: var(--ai-accent-deep); }
+.zone.next .zone-eyebrow     { color: var(--color-primary); }
+.zone-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 4px 0 0; line-height: 1.3; }
+.zone-sub   { font-size: 11px; font-weight: 400; color: var(--text-tertiary); margin: 2px 0 6px; line-height: 1.45; }
+
+/* ── Source icon (left of focus rows) ── */
+.src-icon {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 600;
+}
+.src-product  { background: rgba(14, 78, 105, 0.10);  color: var(--color-primary); }
+.src-outlook  { background: rgba(0, 120, 212, 0.12);   color: #006abf; }
+.src-teams    { background: rgba(98, 100, 167, 0.14);  color: #4b51a8; }
+.src-calendar { background: rgba(217, 119, 6, 0.10);   color: var(--color-warning); }
+.src-customer { background: rgba(184, 51, 230, 0.12);  color: #9f2dc7; }
+.src-ai       { background: var(--ai-bg);              color: var(--ai-accent-deep); }
+.src-ai-bundle{ background: linear-gradient(135deg, rgba(0,199,177,0.18), rgba(255, 199, 50, 0.18)); color: var(--ai-accent-deep); }
+.src-icon svg { width: 12px; height: 12px; }
+
+/* ── Focus rows ── */
+.focus-list { display: flex; flex-direction: column; gap: 4px; }
+.focus-row {
+  display: grid;
+  grid-template-columns: 22px 8px 1fr auto;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+.focus-row:hover { background: rgba(14, 78, 105, 0.04); transform: translateX(2px); }
+.severity-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 5px;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.6);
+}
+.severity-dot.critical { background: var(--color-error); }
+.severity-dot.high     { background: var(--color-warning); }
+.severity-dot.medium   { background: var(--color-info); }
+.severity-dot.low      { background: var(--text-tertiary); }
+.focus-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.focus-title {
+  font-size: 12px; font-weight: 500; color: var(--text-primary); line-height: 1.35;
+}
+.focus-desc {
+  font-size: 11px; font-weight: 400; color: var(--text-tertiary); line-height: 1.4;
+}
+.focus-stat { display: flex; align-items: center; gap: 4px; padding-top: 2px; }
+.stat-pill {
+  display: inline-flex; align-items: center;
+  font-size: 10.5px; font-weight: 600;
+  padding: 3px 8px; border-radius: 6px;
+  background: rgba(0,0,0,0.05); color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.stat-pill.warn { background: rgba(217,119,6,0.12); color: #8d4a00; }
+.stat-pill.crit { background: rgba(185,28,28,0.12); color: var(--color-error); }
+.stat-pill.ai   { background: var(--ai-bg);          color: var(--ai-accent-deep); }
+.stat-pill.neutral { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+.stat-ring-mini {
+  width: 32px; height: 32px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.stat-ring-mini svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.stat-ring-mini .ring-bg { fill: none; stroke: rgba(0,0,0,0.08); stroke-width: 3; }
+.stat-ring-mini .ring-fg { fill: none; stroke-width: 3; stroke-linecap: round; }
+
+/* Bundle expansion (Ananya only) */
+.bundle-row {
+  background: linear-gradient(135deg, rgba(0,199,177,0.06), rgba(0,199,177,0.02));
+  border: 1px solid rgba(0, 199, 177, 0.20);
+}
+.bundle-row:hover { background: linear-gradient(135deg, rgba(0,199,177,0.10), rgba(0,199,177,0.04)); }
+.bundle-detail {
+  margin-top: 6px; padding: 12px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(0,199,177,0.18);
+  border-radius: 8px;
+  display: none;
+  flex-direction: column; gap: 10px;
+}
+.bundle-detail.is-open { display: flex; }
+.bundle-sources { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.bundle-source-tile {
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 2px;
+  font-size: 11px;
+}
+.bundle-source-count { font-size: 18px; font-weight: 600; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+.bundle-source-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+.bundle-source-note { font-size: 10.5px; color: var(--text-secondary); line-height: 1.4; margin-top: 2px; }
+.bundle-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; padding-top: 4px; border-top: 1px dashed rgba(0,199,177,0.2); }
+.bundle-meta-row { display: flex; gap: 6px; align-items: center; }
+.bundle-meta-lbl { color: var(--text-tertiary); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+.bundle-meta-val { color: var(--text-primary); font-weight: 500; }
+.bundle-actions { display: flex; gap: 8px; padding-top: 4px; }
+.btn-bundle {
+  font-family: inherit;
+  padding: 6px 14px; font-size: 11.5px; font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer; border: 0;
+  transition: background 140ms ease;
+}
+.btn-bundle.primary { background: var(--ai-accent); color: #002822; }
+.btn-bundle.primary:hover { background: var(--ai-accent-deep); color: #fff; }
+.btn-bundle.secondary { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+.btn-bundle.secondary:hover { background: rgba(0,0,0,0.10); color: var(--text-primary); }
+
+/* ── Activity feed ── */
+.activity-list { display: flex; flex-direction: column; gap: 0; }
+.activity-row {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  align-items: flex-start;
+}
+.activity-row:last-child { border-bottom: 0; }
+.activity-row.act-clickable { cursor: pointer; grid-template-columns: 22px 1fr auto; transition: background 140ms ease; border-radius: 6px; }
+.activity-row.act-clickable:hover { background: rgba(0,0,0,0.03); }
+.act-arrow { font-size: 14px; color: var(--text-tertiary); align-self: center; transition: transform 140ms ease, color 140ms ease; }
+.activity-row.act-clickable:hover .act-arrow { transform: translateX(2px); color: var(--ai-accent-deep); }
+.activity-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.activity-title { font-size: 12px; font-weight: 500; color: var(--text-primary); line-height: 1.35; }
+.activity-time  { font-size: 10px; color: var(--text-tertiary); margin-bottom: 2px; font-weight: 500; }
+.activity-note  { font-size: 11px; color: var(--text-tertiary); line-height: 1.4; }
+
+/* ── Coming up timeline ── */
+.next-bignum {
+  display: flex; align-items: center; gap: 8px; padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.06); margin-bottom: 8px;
+}
+.next-num {
+  font-size: 44px; font-weight: 700; line-height: 0.9;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+.next-lbl { font-size: 11px; color: var(--text-tertiary); line-height: 1.4; flex: 1; }
+.next-lbl strong { color: var(--text-primary); font-weight: 600; }
+.readiness-block { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 6px; }
+.readiness-hd { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+.readiness-val { color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.readiness-track { height: 6px; background: rgba(0,0,0,0.06); border-radius: 4px; overflow: hidden; }
+.readiness-fill  { height: 100%; background: linear-gradient(90deg, var(--color-success) 0%, #4ade80 100%); border-radius: 4px; transition: width 700ms ease-out; }
+
+.timeline-list { display: flex; flex-direction: column; gap: 0; padding-top: 4px; }
+.timeline-row {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  cursor: pointer;
+  transition: padding-left 140ms;
+}
+.timeline-row:last-child { border-bottom: 0; }
+.timeline-row:hover { padding-left: 4px; }
+.timeline-line1 { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.timeline-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.timeline-date { font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; width: 56px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.timeline-event { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+.timeline-state {
+  font-size: 9.5px; font-weight: 600;
+  padding: 2px 7px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.timeline-state.done     { background: #F0FDF4; color: var(--color-success); }
+.timeline-state.pending  { background: #FFF7ED; color: var(--color-warning); }
+.timeline-state.upcoming { background: #F4F4F2; color: var(--text-tertiary); }
+.timeline-attendees { display: flex; align-items: center; gap: 0; padding-left: 64px; }
+.tt-avatar {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.95);
+  margin-left: -4px;
+  background-color: var(--bg-secondary);
+  background-size: cover;
+  background-position: center;
+}
+.tt-avatar:first-child { margin-left: 0; }
+.tt-overflow { font-size: 9.5px; font-weight: 600; color: var(--text-tertiary); margin-left: 6px; }
+
+/* ── Omnibar (lives inside the sticky header, centre column) ── */
+.bottom-omni {
+  width: 100%;
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 999px;
+  padding: 6px 6px 6px 18px;
+  border: 1px solid rgba(14, 78, 105, 0.14);
+}
+.bottom-omni .omni-orb { width: 22px; height: 22px; flex-shrink: 0; margin-right: 10px; }
+.bottom-omni input {
+  flex: 1; border: 0; outline: 0; background: transparent;
+  font-size: 14px; font-weight: 400; color: var(--text-primary);
+  font-family: inherit;
+}
+.bottom-omni input::placeholder { color: var(--text-tertiary); }
+.bottom-omni .omni-send {
+  width: 32px; height: 32px; border-radius: 50%; border: 0;
+  background: var(--color-primary); color: #fff;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 140ms ease;
+}
+.bottom-omni .omni-send:hover { background: #0a3a4f; }
+.bottom-omni .omni-send svg { width: 14px; height: 14px; }
+
+.quick-chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.quick-chip {
+  font-family: inherit; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.7); backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--text-secondary);
+  transition: background 140ms ease, color 140ms ease;
+}
+.quick-chip:hover { background: rgba(255,255,255,0.95); color: var(--text-primary); }
+.quick-chip svg { width: 12px; height: 12px; color: var(--ai-accent-deep); }
+
+/* ── Hero card variants ──
+   Each persona's hero is 3 cards: snapshot · detail · brief.
+   Ananya: portfolio donut · feature list · Otto's brief
+   The grid template + card content vary per persona. */
+
+/* All heroes use the same 3-column layout: snapshot · detail · brief.
+   Per-persona content varies; the grid rhythm is universal. */
+.hero-ananya, .hero-james, .hero-riya, .hero-dev, .hero-priya, .hero-marcus_cdo, .hero-kenji {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Snapshot card — title left-aligned (matches detail/brief), donut centered. */
+.hero-snapshot .hero-donut-wrap {
+  width: 100%; max-width: 280px;
+  height: 200px;
+  position: relative;
+}
+.hero-snapshot .hero-donut-wrap canvas {
+  width: 100% !important;
+  height: 200px !important;
+}
+.hero-snapshot .hero-donut-center {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 30px;
+  display: flex; flex-direction: column; align-items: center;
+  pointer-events: none;
+}
+.hero-snapshot .hero-donut-num {
+  font-size: 40px; font-weight: 700;
+  color: var(--text-primary); line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.hero-snapshot .hero-donut-lbl {
+  font-size: 10.5px; color: var(--text-tertiary);
+  margin-top: 4px; text-transform: uppercase;
+  letter-spacing: 0.06em; font-weight: 600;
+}
+/* Outer flex container — fills the space between header and legend,
+   centres the 200px donut vertically regardless of card height. */
+.hero-snapshot .hero-donut-outer {
+  flex: 1; min-height: 200px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Legend below the gauge — horizontal layout to keep card height tight.
+   Each legend item: dot + name on top row, value below. Wraps gracefully if
+   the card narrows. */
+.hero-snapshot .hero-snapshot-legend {
+  display: flex; flex-wrap: wrap;
+  gap: 10px 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+.hero-snapshot .legend-row {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 0;
+}
+.hero-snapshot .legend-row-hd {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10.5px; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.hero-snapshot .legend-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.hero-snapshot .legend-val {
+  font-size: 14px; font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Detail card — pills row at top, then list */
+.hero-detail .hero-anchors {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin: 0 0 4px;
+}
+.hero-anchor-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: rgba(14, 78, 105, 0.08); color: var(--color-primary);
+  font-size: 11px; font-weight: 600;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+.hero-anchor-pill.warn { background: rgba(217,119,6,0.10); color: var(--color-warning); }
+.hero-detail .feature-list { display: flex; flex-direction: column; gap: 0; }
+.hero-detail .feature-row {
+  display: grid; grid-template-columns: 84px minmax(0, 1fr) 44px;
+  gap: 12px; align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.hero-detail .feature-row:last-child { border-bottom: 0; }
+.hero-detail .feature-row .feature-health-pill { justify-self: start; }
+.hero-detail .feature-name { font-size: 12.5px; color: var(--text-primary); font-weight: 500; }
+.hero-detail .feature-pct  { font-size: 12px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
+.feature-health-pill { font-size: 9.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; }
+.feature-health-pill.ontrack { background: #F0FDF4; color: var(--color-success); }
+.feature-health-pill.atrisk  { background: #FFF7ED; color: var(--color-warning); }
+.feature-health-pill.offtrack{ background: #FEF2F2; color: var(--color-error); }
+.feature-health-pill.blocked { background: var(--color-error); color: #fff; }
+.feature-health-pill.done    { background: rgba(14,78,105,0.10); color: var(--color-primary); }
+
+/* Brief card — Otto's morning agenda. Strong visual hierarchy:
+   primary action at top (with CTA), then a "what Otto handled" list. */
+.hero-brief { gap: 14px; }
+.hero-brief .brief-primary {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(0,199,177,0.10) 0%, rgba(37,99,235,0.06) 100%);
+  border: 1px solid rgba(0,199,177,0.20);
+  border-radius: 12px;
+}
+.hero-brief .brief-primary-time {
+  font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ai-accent-deep);
+  display: flex; align-items: center; gap: 6px;
+}
+.hero-brief .brief-primary-time::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--ai-accent); border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(0,199,177,0.18);
+}
+.hero-brief .brief-primary-title {
+  font-size: 17px; font-weight: 500;
+  color: var(--text-primary); line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 2px 0 0;
+}
+.hero-brief .brief-primary-sub {
+  font-size: 12px; color: var(--text-secondary);
+  line-height: 1.45; margin: 2px 0 0;
+}
+.hero-brief .brief-primary-cta {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 8px;
+  font-family: inherit;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--ai-accent-deep);
+  background: transparent; border: 0;
+  padding: 0;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: gap 160ms ease;
+}
+.hero-brief .brief-primary-cta:hover { gap: 8px; }
+.hero-brief .brief-handled-hd {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin: 4px 0 4px;
+}
+.hero-brief .brief-handled-hd .otto-mini { width: 12px; height: 12px; color: var(--ai-accent-deep); flex-shrink: 0; }
+.hero-brief .brief-handled-list { display: flex; flex-direction: column; gap: 0; }
+.hero-brief .brief-handled-row {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px dashed rgba(0,0,0,0.06);
+  font-size: 11.5px; line-height: 1.45;
+  color: var(--text-secondary);
+}
+.hero-brief .brief-handled-row:last-child { border-bottom: 0; }
+.hero-brief .brief-handled-check {
+  color: var(--ai-accent-deep); font-weight: 600;
+  flex-shrink: 0; line-height: 1.45;
+}
+.hero-brief .brief-handled-row strong { color: var(--text-primary); font-weight: 600; }
+.hero-brief .brief-footer {
+  margin-top: auto; padding-top: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  font-size: 11px; color: var(--text-tertiary);
+}
+.hero-brief .brief-footer a {
+  color: var(--ai-accent-deep); font-weight: 600;
+  text-decoration: none;
+}
+.hero-brief .brief-footer a:hover { text-decoration: underline; }
+
+/* ── Otto brief loader (goo animation) ─────────────── */
+.brief-loading-zone {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+}
+.brief-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+.brief-loader.done { display: none; }
+.brief-loader-spinner {
+  width: 60px;
+  aspect-ratio: 1;
+  border: 7px solid transparent;
+  box-sizing: border-box;
+  background:
+    radial-gradient(farthest-side, #0e4e69 98%, #0000) 0    0   /15px 15px,
+    radial-gradient(farthest-side, #0e4e69 98%, #0000) 100% 0   /15px 15px,
+    radial-gradient(farthest-side, #0e4e69 98%, #0000) 100% 100%/15px 15px,
+    radial-gradient(farthest-side, #0e4e69 98%, #0000) 0    100%/15px 15px,
+    linear-gradient(#0e4e69 0 0) 50%/30px 30px,
+    rgba(255, 255, 255, 0.62);
+  background-repeat: no-repeat;
+  filter: blur(3px) contrast(12);
+  animation: brief-goo 0.8s infinite;
+}
+@keyframes brief-goo {
+  100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0, center; }
+}
+.brief-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  opacity: 0;
+  pointer-events: none;
+}
+.brief-content.loaded {
+  opacity: 1;
+  pointer-events: auto;
+  animation: brief-fade-up 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+@keyframes brief-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dep list — Riya's Card 2. Replaces the old 6-node ribbon (didn't scale).
+   Each row: route → blocker · status pill · age. Linear, scannable, scales. */
+.dep-list { display: flex; flex-direction: column; gap: 0; }
+.dep-list-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr) auto;
+  gap: 12px; align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: padding-left 140ms ease, background 140ms ease;
+}
+.dep-list-row:hover { padding-left: 4px; background: rgba(14,78,105,0.02); }
+.dep-list-row:last-child { border-bottom: 0; }
+.dep-list-route { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.dep-list-route strong { color: var(--text-primary); font-weight: 600; }
+.dep-list-meta { font-size: 11.5px; color: var(--text-tertiary); line-height: 1.4; min-width: 0; }
+.dep-list-side { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.dep-list-status {
+  font-size: 9.5px; font-weight: 600;
+  padding: 3px 8px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dep-list-status.blocked { background: #FEF2F2; color: var(--color-error); }
+.dep-list-status.atrisk  { background: #FFF7ED; color: var(--color-warning); }
+.dep-list-status.pending { background: #F3F4F6; color: var(--text-secondary); }
+.dep-list-age { font-size: 10.5px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; min-width: 28px; text-align: right; }
+
+/* Dependency flow connector */
+.dep-flow { display: flex; flex-direction: column; gap: 0; }
+.dep-flow-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer; transition: opacity 140ms;
+}
+.dep-flow-row:last-child { border-bottom: 0; }
+.dep-flow-row:hover { opacity: 0.75; }
+.dep-chip { flex-shrink: 0; }
+.dep-chip-pill {
+  display: inline-block; font-size: 8.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+}
+.dep-mid { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.dep-mid-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dep-arrow-track { display: flex; align-items: center; }
+.dep-line-seg { flex: 1; height: 2px; }
+.dep-status-node {
+  flex-shrink: 0; font-size: 8px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; padding: 2px 7px; border-radius: 3px; white-space: nowrap;
+  margin: 0 4px;
+}
+.dep-arrowhead { flex-shrink: 0; font-size: 9px; margin-left: 2px; }
+.dep-age-label { font-size: 9.5px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+
+/* Status colour themes applied to row */
+.dep-flow-row.blocked .dep-line-seg { background: var(--color-error); }
+.dep-flow-row.blocked .dep-status-node { background: rgba(239,68,68,0.10); color: var(--color-error); }
+.dep-flow-row.blocked .dep-arrowhead { color: var(--color-error); }
+.dep-flow-row.atrisk .dep-line-seg {
+  background: repeating-linear-gradient(90deg, #D97706 0, #D97706 5px, transparent 5px, transparent 9px);
+}
+.dep-flow-row.atrisk .dep-status-node { background: rgba(217,119,6,0.10); color: #D97706; }
+.dep-flow-row.atrisk .dep-arrowhead { color: #D97706; }
+.dep-flow-row.pending .dep-line-seg {
+  background: repeating-linear-gradient(90deg, #9CA3AF 0, #9CA3AF 3px, transparent 3px, transparent 7px);
+}
+.dep-flow-row.pending .dep-status-node { background: rgba(0,0,0,0.06); color: var(--text-tertiary); }
+.dep-flow-row.pending .dep-arrowhead { color: var(--text-tertiary); }
+
+/* James — my-stack list (used in Card 2) */
+.my-stack { display: flex; flex-direction: column; gap: 6px; }
+.my-item-row {
+  display: grid; grid-template-columns: 16px minmax(0, 1fr) 100px;
+  gap: 12px; align-items: center;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+}
+.my-item-state {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin: 0 4px;
+}
+.my-item-state.done    { background: var(--color-success); }
+.my-item-state.review  { background: #7857FF; }
+.my-item-state.progress{ background: var(--color-info); }
+.my-item-state.todo    { background: var(--text-tertiary); }
+.my-item-name { font-size: 11.5px; color: var(--text-primary); font-weight: 500; }
+.my-item-id   { font-size: 10px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.my-item-bar  { height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; overflow: hidden; }
+.my-item-bar-fill { height: 100%; background: var(--color-primary); border-radius: 2px; }
+.ai-agent-panel {
+  background: var(--ai-bg);
+  border: 1px solid rgba(0, 199, 177, 0.20);
+  border-radius: 10px;
+  padding: 12px; display: flex; flex-direction: column; gap: 8px;
+}
+.ai-agent-hd { display: flex; align-items: center; gap: 8px; }
+.ai-agent-orb { width: 24px; height: 24px; }
+.ai-agent-title { font-size: 11.5px; font-weight: 600; color: var(--text-primary); }
+.ai-agent-sub { font-size: 10.5px; color: var(--text-tertiary); }
+.ai-agent-tasks { display: flex; flex-direction: column; gap: 6px; }
+.ai-agent-task { display: flex; flex-direction: column; gap: 3px; padding: 6px 8px; background: rgba(255,255,255,0.7); border-radius: 6px; }
+.ai-agent-task-name { font-size: 11px; color: var(--text-primary); font-weight: 500; }
+.ai-agent-task-bar { height: 3px; background: rgba(0,0,0,0.06); border-radius: 2px; overflow: hidden; }
+.ai-agent-task-fill{ height: 100%; background: var(--ai-accent); border-radius: 2px; }
+
+/* Dev — sprint dot-strip used inside Card 2 */
+.dotstrip { display: flex; gap: 4px; margin: 8px 0 12px; }
+.dotstrip .dot { width: 16px; height: 16px; border-radius: 50%; }
+.dotstrip .dot.done   { background: var(--color-success); }
+.dotstrip .dot.active { background: var(--color-info); box-shadow: 0 0 0 3px rgba(6,105,255,0.18); }
+.dotstrip .dot.pending{ background: rgba(0,0,0,0.10); border: 1px dashed rgba(0,0,0,0.18); box-sizing: border-box; }
+.burn-row { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.burn-canvas { flex: 1; min-height: 140px; width: 100%; display: block; }
+.dep-meta-tile { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; }
+.dep-meta-num { font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dep-meta-lbl { font-size: 11px; color: var(--text-secondary); line-height: 1.35; }
+
+/* Priya — Outcome compass (multi-segment gauge + 3 progress bars) */
+.compass-wrap { width: 100%; height: 200px; position: relative; }
+.compass-wrap canvas { width: 100% !important; height: 200px !important; }
+.compass-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.compass-num { font-size: 26px; font-weight: 700; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+.compass-lbl { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; margin-top: 3px; }
+.outcome-bars { display: flex; flex-direction: column; gap: 16px; }
+.outcome-bar { display: flex; flex-direction: column; gap: 4px; }
+.outcome-bar-hd { display: flex; justify-content: space-between; font-size: 11.5px; }
+.outcome-bar-name { color: var(--text-primary); font-weight: 500; }
+.outcome-bar-val  { color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.outcome-bar-track {
+  position: relative;
+  height: 6px; background: rgba(0,0,0,0.06); border-radius: 4px; overflow: hidden;
+}
+.outcome-bar-fill { height: 100%; border-radius: 4px; transition: width 700ms ease-out; }
+.outcome-bar-target {
+  position: absolute; top: -2px; bottom: -2px; width: 2px; background: rgba(0,0,0,0.45); border-radius: 1px;
+}
+.outcome-bar-insight { font-size: 10.5px; color: var(--text-secondary); line-height: 1.4; padding-top: 2px; }
+.outcome-bar-action { color: var(--color-primary); font-weight: 500; cursor: pointer; }
+.outcome-bar-action:hover { text-decoration: underline; }
+
+/* Marcus — Two goal gauges side by side */
+.goal-card-mini {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.goal-card-mini .goal-name { font-size: 11px; color: var(--text-tertiary); font-weight: 500; margin-bottom: 4px; }
+.goal-card-mini .goal-canvas-wrap { width: 100%; height: 84px; position: relative; }
+.goal-card-mini .goal-canvas-wrap canvas { width: 100% !important; height: 84px !important; }
+.goal-card-mini .goal-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.goal-card-mini .goal-num { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+.goal-card-mini .goal-target { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+.pulse-card {
+  background: var(--ai-bg);
+  border: 1px solid rgba(0, 199, 177, 0.20);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pulse-card-hd { display: flex; align-items: center; gap: 8px; }
+.pulse-card-title { font-size: 11px; font-weight: 600; color: var(--text-primary); }
+.pulse-card-body { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
+.pulse-card-cta {
+  margin-top: 4px;
+  font-family: inherit;
+  background: var(--ai-accent); color: #002822;
+  border: 0; padding: 6px 12px; border-radius: 8px;
+  font-size: 11.5px; font-weight: 600; cursor: pointer;
+}
+
+/* Kenji — Q3 burn area chart with annotations + ART table */
+.burn-chart-wrap { position: relative; height: 200px; }
+.burn-chart-wrap canvas { width: 100% !important; height: 200px !important; }
+.burn-callout {
+  position: absolute;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid var(--color-warning);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 10.5px; font-weight: 500;
+  color: var(--text-primary);
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.art-table {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.art-row { display: flex; flex-direction: column; gap: 4px; }
+.art-row-hd { display: flex; justify-content: space-between; font-size: 11.5px; }
+.art-row-name { color: var(--text-primary); font-weight: 500; }
+.art-row-val  { color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+.art-row-track { position: relative; height: 5px; background: rgba(0,0,0,0.06); border-radius: 4px; overflow: hidden; }
+.art-row-fill  { height: 100%; border-radius: 4px; }
+.art-row-thresh { position: absolute; top: -2px; bottom: -2px; width: 1px; background: rgba(0,0,0,0.4); }
+
+/* ── Responsive ── */
+@media (max-width: 1400px) {
+  .hero-ananya, .hero-james, .hero-riya, .hero-dev, .hero-priya, .hero-marcus_cdo, .hero-kenji {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .hero-ananya .hero-brief, .hero-james .hero-brief, .hero-riya .hero-brief,
+  .hero-dev .hero-brief, .hero-priya .hero-brief, .hero-marcus_cdo .hero-brief,
+  .hero-kenji .hero-brief { grid-column: span 2; }
+}
+@media (max-width: 1100px) {
+  .ih-grid { grid-template-columns: 1fr 1fr; }
+  .zone.next { grid-column: span 2; min-height: auto; }
+  .ih-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 800px) {
+  .ih-grid { grid-template-columns: 1fr; }
+  .zone.next { grid-column: span 1; }
+  .ih-stats { grid-template-columns: 1fr; }
+  .hero-ananya, .hero-james, .hero-dev, .hero-priya, .hero-kenji, .hero-marcus_cdo, .hero-riya { grid-template-columns: 1fr; }
+  .hero-brief { grid-column: span 1 !important; }
+  .content-viewport { margin: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="liquid-bg" aria-hidden="true"></div>
+<div class="page-shell">
+
+  <aside id="left-nav"></aside>
+
+  <main class="content-viewport">
+
+    <!-- TOP — sticky: salutation · omnibar · date+weather -->
+    <div class="ih-top">
+      <div class="ih-greet">
+        <h1 id="greet">Good morning</h1>
+      </div>
+      <div class="ih-centre">
+        <div class="bottom-omni" id="bottom-omni">
+          <span class="otto omni-orb"><svg viewBox="0 0 118 118" fill="currentColor"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg></span>
+          <input id="omni-input" type="text" placeholder="Ask Otto anything…">
+          <button class="omni-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+        <div class="quick-chips" id="quick-chips"></div>
+      </div>
+      <div class="ih-meta" id="ih-meta"></div>
+    </div>
+
+    <!-- HERO row — 3 independent cards, set per-persona -->
+    <div class="ih-hero-row" id="hero"></div>
+
+    <!-- STAT row -->
+    <div class="ih-stats" id="stats"></div>
+
+    <!-- 3-zone grid -->
+    <div class="ih-grid">
+      <article class="zone focus" id="focus"></article>
+      <article class="zone activity" id="activity"></article>
+      <article class="zone next" id="next"></article>
+    </div>
+
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="../shared/nav.js"></script>
+<script src="js/data.js?v=8"></script>
+<script src="js/state.js?v=5"></script>
+<script src="js/data-personas.js?v=4"></script>
+<script src="js/components/persona-switcher.js?v=2"></script>
+
+<script>
+(function() {
+
+  // ── Source icon SVGs ────────────────────────────────
+  var SRC_ICONS = {
+    product:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>',
+    outlook:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>',
+    teams:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    customer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg>',
+    ai:       '<svg viewBox="0 0 118 118" fill="currentColor"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>',
+    'ai-bundle': '<svg viewBox="0 0 118 118" fill="currentColor"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>'
+  };
+
+  // ── URL & persona resolution ─────────────────────────
+  var qs = new URLSearchParams(window.location.search);
+  var personaKey = qs.get('p') || (function(){try{return localStorage.getItem('eap.persona');}catch(e){return null;}})() || 'ananya';
+  if (!EAP.personas[personaKey]) personaKey = 'ananya';
+  var persona = EAP.personas[personaKey];
+  var hc = (EAP.homeContent || {})[personaKey];
+
+  function tabUrl(tab) {
+    var u = 'index.html?p=' + encodeURIComponent(personaKey);
+    if (tab) u += '&tab=' + encodeURIComponent(tab);
+    return u;
+  }
+
+  // ── Otto's brief content per persona ──────────────────
+  // Each brief: subtitle, primary action (time + title + sub + CTA), and a
+  // list of Otto-handled items. Surfaced as Card 3 on the home page hero.
+  var BRIEFS = {
+    ananya: {
+      subtitle: 'Sun May 3 · what needs you today',
+      primaryTime: 'In 4 hours · 2:00 PM',
+      primaryTitle: 'Sprint review · 5 features',
+      primarySub: 'Talk track + at-risk slide drafted by Otto. Payment Confirmation + Onboarding flagged below 30%.',
+      primaryCta: 'Review draft', primaryTab: 'board', primaryOtto: 'Sprint review brief prepared · talk track ready · Payment Confirmation (20%) and Onboarding (0%) flagged below 30%',
+      handled: [
+        '<strong>22 customer signals</strong> bundled into 1 draft Feature',
+        'Reply drafted to <strong>James Hartwell</strong> on Mobile Wallet delay',
+        '<strong>5 messages</strong> linked to Payment Confirmation Flow'
+      ],
+      footer: '3 drafts pending review'
+    },
+    james: {
+      subtitle: 'Sun May 3 · 30 mins to stand-up',
+      primaryTime: 'In 30 mins · 10:00 AM',
+      primaryTitle: 'Daily stand-up · 5 mins',
+      primarySub: 'Otto pulled your status: 18/24 pts done, auth token defect still blocked, 3 PRs awaiting your review.',
+      primaryCta: 'Review status', primaryTab: 'taskboard', primaryOtto: 'Otto compiled your stand-up status · 18/24 pts done · auth token defect still blocked · 3 PRs summarised and ready to review',
+      handled: [
+        '<strong>3 PRs</strong> summarised · ready to review in 2 mins',
+        'Regression tests generated for <strong>biometric re-auth flow</strong>',
+        '<strong>3 stories</strong> drafted from retro notes · awaiting acceptance criteria'
+      ],
+      footer: '4 drafts · 1.5h saved this week'
+    },
+    riya: {
+      subtitle: 'Sun May 3 · PI 27 lock in 14 days',
+      primaryTime: 'In 1 hour · 11:00 AM',
+      primaryTitle: 'Pre-PI sync · 6 teams',
+      primarySub: 'Otto compiled team readiness: 2/6 capacity confirmed, 4 cross-ART deps unresolved, 3 PI 26 features at risk.',
+      primaryCta: 'Open sync brief', primaryTab: 'planning', primaryOtto: 'Otto compiled Pre-PI readiness · 2 of 6 capacity confirmed · 4 cross-ART deps unresolved · 3 PI 26 features at risk',
+      handled: [
+        'Chased <strong>4 team leads</strong> for capacity confirmation',
+        'Updated dependency map · <strong>1 dep resolved</strong>',
+        'Drafted SoS escalation for <strong>Onboarding velocity</strong>'
+      ],
+      footer: '6 drafts · 2.4h saved this week'
+    },
+    dev: {
+      subtitle: 'Sun May 3 · Sprint 2 closes Friday',
+      primaryTime: 'In 2 hours · 11:00 AM',
+      primaryTitle: 'Sprint replan · 3 stories at risk',
+      primarySub: 'Otto identified 3 stories below burn pace. Three replan options modelled with capacity impact.',
+      primaryCta: 'Review options', primaryTab: 'taskboard', primaryOtto: 'Otto modelled 3 replan options for Sprint 2 · Biometric login, Auth token defect and Payment build below burn pace — capacity impact mapped for each option',
+      handled: [
+        'Marked <strong>auth token defect</strong> ownerless · escalation drafted',
+        'Drafted retro agenda · <strong>top 3 themes</strong> from 5 stand-ups',
+        'Reply drafted to <strong>Vikram</strong> on auth-token blocker'
+      ],
+      footer: '5 drafts · 2h saved this week'
+    },
+    priya: {
+      subtitle: 'Sun May 3 · 6 weeks left in Q3',
+      primaryTime: 'EOD · today',
+      primaryTitle: 'Q3 OKR review · 3 epics need decision',
+      primarySub: 'Otto mapped 5 epics to OKRs: 2 unmapped flagged, WIP limit breached at 5/4, Goal 2 pace 12% vs 35% target.',
+      primaryCta: 'Open OKR brief', primaryTab: 'hierarchy', primaryOtto: 'Otto mapped 5 epics to OKRs · 2 unmapped flagged · WIP limit breached at 5/4 · Goal 2 pace at 12% vs 35% target',
+      handled: [
+        'Generated <strong>initiative-to-OKR map</strong> · 2 unmapped flagged',
+        'Drafted Q3 portfolio summary for <strong>Marcus</strong>',
+        '<strong>3 close-or-pause</strong> proposals for stalled epics'
+      ],
+      footer: '7 drafts · 3.1h saved this week'
+    },
+    marcus_cdo: {
+      subtitle: 'Sun May 3 · board in 7 days',
+      primaryTime: 'Today · 3:00 PM',
+      primaryTitle: 'Board report draft · 3 min read',
+      primarySub: 'Otto compiled 5 sections from product, exec inbox, #cdo-leadership. Goal 2 anomaly flagged: pace 22pts behind plan.',
+      primaryCta: 'Review draft', primaryTab: 'hierarchy', primaryOtto: 'Otto compiled your 5-section board report · outcomes + Q3 burn + escalations + decisions + risk — Goal 2 anomaly flagged: 22pts behind plan',
+      handled: [
+        '<strong>5-section report</strong> compiled · outcomes / burn / escalations / decisions / risk',
+        'Detected <strong>Goal 2 anomaly</strong> · Mortgage Origination contributing',
+        'Drafted reply to <strong>CFO</strong> re: Mobile Banking ROI'
+      ],
+      footer: '6 drafts · 4.2h saved this week'
+    },
+    kenji: {
+      subtitle: 'Sun May 3 · PI 27 lock in 7 days',
+      primaryTime: 'Today · 4:00 PM',
+      primaryTitle: 'Funding committee · 3 decisions',
+      primarySub: 'Otto modelled 3 scope-shed options for DB ART (118% projected). Q3 burn at 82% · forecast 79%.',
+      primaryCta: 'Open scope-shed', primaryTab: 'planning', primaryOtto: 'Otto modelled 3 scope-shed options for Digital Banking ART (118% projected) · Q3 burn at 82% vs 79% forecast',
+      handled: [
+        'Modelled <strong>3 scope-shed options</strong> for DB ART utilisation',
+        'Drafted <strong>variance memo</strong> · Q3 burn vs forecast',
+        'Compiled <strong>Funding queue</strong> · 2 finance · 1 sponsor'
+      ],
+      footer: '5 drafts · 3.8h saved this week'
+    }
+  };
+
+  function briefCard() {
+    var b = BRIEFS[personaKey] || BRIEFS.ananya;
+    var oa = b.primaryOtto ? ` data-otto="${b.primaryOtto.replace(/"/g, "&quot;")}"` : ``;
+    var rows = b.handled.map(function(h) {
+      return `<div class="brief-handled-row"><span class="brief-handled-check">✓</span><span>` + h + `</span></div>`;
+    }).join(``);
+    return (
+      `<article class="hero-card hero-brief">` +
+      `<div class="hero-card-hd"><div class="hero-card-title-block">` +
+      `<h3 class="hero-card-title">Otto’s brief</h3>` +
+      `<p class="hero-card-subtitle">` + b.subtitle + `</p>` +
+      `</div></div>` +
+      `<div class="brief-loading-zone">` +
+      `<div class="brief-loader"><div class="brief-loader-spinner"></div></div>` +
+      `<div class="brief-content">` +
+      `<div class="brief-primary">` +
+      `<div class="brief-primary-time">` + b.primaryTime + `</div>` +
+      `<div class="brief-primary-title">` + b.primaryTitle + `</div>` +
+      `<div class="brief-primary-sub">` + b.primarySub + `</div>` +
+      `<button class="brief-primary-cta" type="button" data-tab="` + b.primaryTab + `"` + oa + `>` + b.primaryCta + ` ›</button>` +
+      `</div>` +
+      `<div class="brief-handled-hd"><span class="otto-mini">` + OTTO_SVG + `</span><span>Otto handled · this morning</span></div>` +
+      `<div class="brief-handled-list">` + rows + `</div>` +
+      `<div class="brief-footer"><span>` + b.footer + `</span><a href="#" data-tab="` + b.primaryTab + `"` + oa + `>See all ›</a></div>` +
+      `</div>` +
+      `</div>` +
+      `</article>`
+    );
+  }
+
+  // ── Nav ──────────────────────────────────────────────
+  renderNav('home', {
+    avatar: persona.avatar,
+    name:   persona.name,
+    links: {
+      0: 'home.html?p=' + personaKey,
+      3: tabUrl('backlog'),
+      4: tabUrl('board')
+    }
+  });
+  // Avatar click in nav → opens persona switcher popover
+  // (persona-switcher.js uses EAP.state.persona to mark active row)
+  EAP.state = EAP.state || {};
+  EAP.state.persona = personaKey;
+  if (EAP.initPersonaSwitcher) EAP.initPersonaSwitcher();
+
+  // ── Sticky header: decorate (line + blur) only while scrolled ──
+  (function() {
+    var topbar  = document.querySelector('.ih-top');
+    var scroller = document.querySelector('.content-viewport');
+    if (!topbar || !scroller) return;
+    var update = function() {
+      topbar.classList.toggle('is-scrolled', scroller.scrollTop > 8);
+    };
+    scroller.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+
+  // ── Header: greeting (left) + date+weather (right) ───
+  (function() {
+    var d = new Date();
+    var dateStr = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    var hour = d.getHours();
+    var greet = hour < 12 ? 'Good morning' : (hour < 18 ? 'Good afternoon' : 'Good evening');
+    var firstName = (hc && hc.greeting) || persona.name.split(' ')[0];
+    document.getElementById('greet').textContent = greet + ', ' + firstName;
+    var SUN_SVG = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<defs>' +
+        '<radialGradient id="sun-core" cx="38%" cy="32%" r="70%">' +
+          '<stop offset="0%" stop-color="#FFF4C2"/>' +
+          '<stop offset="40%" stop-color="#FFD24A"/>' +
+          '<stop offset="80%" stop-color="#FF8E2B"/>' +
+          '<stop offset="100%" stop-color="#E55A1C"/>' +
+        '</radialGradient>' +
+        '<radialGradient id="sun-halo" cx="50%" cy="50%" r="50%">' +
+          '<stop offset="0%" stop-color="#FFD24A" stop-opacity="0.55"/>' +
+          '<stop offset="60%" stop-color="#FFB347" stop-opacity="0.18"/>' +
+          '<stop offset="100%" stop-color="#FFB347" stop-opacity="0"/>' +
+        '</radialGradient>' +
+        '<radialGradient id="sun-shine" cx="36%" cy="30%" r="35%">' +
+          '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85"/>' +
+          '<stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>' +
+        '</radialGradient>' +
+      '</defs>' +
+      '<circle cx="32" cy="32" r="30" fill="url(#sun-halo)"/>' +
+      '<circle cx="32" cy="32" r="18" fill="url(#sun-core)"/>' +
+      '<ellipse cx="26" cy="24" rx="9" ry="7" fill="url(#sun-shine)"/>' +
+    '</svg>';
+    document.getElementById('ih-meta').innerHTML =
+      '<span class="weather-icon">' + SUN_SVG + '</span>' +
+      '<div class="meta-stack">' +
+        '<span class="date">' + dateStr + '</span>' +
+        '<span>56°F London</span>' +
+      '</div>';
+  })();
+
+  var OTTO_SVG = '<svg viewBox="0 0 118 118" fill="currentColor"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
+  // ── Quick chips ──────────────────────────────────────
+  (function() {
+    var host = document.getElementById('quick-chips');
+    if (!hc || !hc.promptPills) return;
+    host.innerHTML = hc.promptPills.map(function(p) {
+      return '<button class="quick-chip" type="button"><svg viewBox="0 0 118 118" fill="currentColor"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>' + p.label + '</button>';
+    }).join('');
+  })();
+
+  // ── Omnibar placeholder rotation ─────────────────────
+  (function() {
+    if (!hc || !hc.omniPlaceholders || !hc.omniPlaceholders.length) return;
+    var el = document.getElementById('omni-input');
+    var i = 0;
+    el.placeholder = hc.omniPlaceholders[0];
+    setInterval(function() {
+      i = (i + 1) % hc.omniPlaceholders.length;
+      el.style.transition = 'opacity 0.3s';
+      el.style.opacity = '0.4';
+      setTimeout(function() { el.placeholder = hc.omniPlaceholders[i]; el.style.opacity = '1'; }, 220);
+    }, 4200);
+  })();
+
+  // ════════════════════════════════════════════════════════
+  // HERO RENDERERS — one per persona (form earns its shape)
+  // ════════════════════════════════════════════════════════
+  function renderHero() {
+    var el = document.getElementById('hero');
+    el.className = 'ih-hero-row hero-' + personaKey;
+    var fn = HERO_RENDERERS[personaKey];
+    if (fn) fn(el); else el.innerHTML = '<div class="zone-sub">No hero for ' + personaKey + '.</div>';
+    // Reveal Otto brief after simulated AI generation delay
+    setTimeout(function() {
+      var loader  = el.querySelector('.brief-loader');
+      var content = el.querySelector('.brief-content');
+      if (loader)  loader.classList.add('done');
+      if (content) content.classList.add('loaded');
+    }, 2000);
+    // Delegate clicks on any [data-tab] inside the hero (CTAs, footer links)
+    el.addEventListener('click', function(e) {
+      var t = e.target.closest('[data-tab]');
+      if (!t || !el.contains(t)) return;
+      var tab = t.getAttribute('data-tab');
+      var ot  = t.getAttribute('data-otto');
+      if (tab) {
+        e.preventDefault();
+        var url = tabUrl(tab);
+        if (ot) url += '&otto=' + encodeURIComponent(ot);
+        window.location.href = url;
+      }
+    });
+  }
+
+  var HERO_RENDERERS = {
+
+    ananya: function(el) {
+      el.innerHTML =
+        // Card 1 — Snapshot: gauge with breakdown legend
+        '<article class="hero-card hero-snapshot">' +
+          '<div class="hero-card-hd">' +
+            '<div class="hero-card-title-block">' +
+              '<div class="hero-card-eyebrow">Digital Banking ART · PI 26 · Sprint 2</div>' +
+              '<h3 class="hero-card-title">Feature portfolio</h3>' +
+              '<p class="hero-card-subtitle">5 features in PI · sprint review tomorrow 2pm</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="ananya-donut"></canvas><div class="hero-donut-center"><span class="hero-donut-num">5</span><span class="hero-donut-lbl">In PI</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#22C55E"></span>Done</span><span class="legend-val">1</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#2563EB"></span>In progress</span><span class="legend-val">1</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#F97316"></span>At risk</span><span class="legend-val">2</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#EF4444"></span>Blocked / off track</span><span class="legend-val">1</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 2 — Detail: pills row + feature list
+        '<article class="hero-card hero-detail">' +
+          '<div class="hero-card-hd">' +
+            '<div class="hero-card-title-block">' +
+              '<h3 class="hero-card-title">Feature health · PI 26</h3>' +
+              '<p class="hero-card-subtitle">Ranked by completion · 2 below 30%</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="hero-anchors">' +
+            '<span class="hero-anchor-pill">PI 27 in 35d</span>' +
+            '<span class="hero-anchor-pill warn">12 unranked</span>' +
+          '</div>' +
+          '<div class="feature-list">' +
+            '<div class="feature-row"><span class="feature-health-pill ontrack">On track</span><span class="feature-name">Fingerprint Login Redesign</span><span class="feature-pct">65%</span></div>' +
+            '<div class="feature-row"><span class="feature-health-pill atrisk">At risk</span><span class="feature-name">Real-time Fraud Alerts</span><span class="feature-pct">25%</span></div>' +
+            '<div class="feature-row"><span class="feature-health-pill blocked">Blocked</span><span class="feature-name">Payment Confirmation Flow</span><span class="feature-pct">20%</span></div>' +
+            '<div class="feature-row"><span class="feature-health-pill done">Done</span><span class="feature-name">Balance on Home Screen</span><span class="feature-pct">100%</span></div>' +
+            '<div class="feature-row"><span class="feature-health-pill offtrack">Off track</span><span class="feature-name">Streamlined Onboarding</span><span class="feature-pct">0%</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 3 — Otto's brief
+        briefCard();
+      multiSegmentDonut('ananya-donut', [
+        { value: 1, color: '#22C55E', label: 'Done',        body: '1 of 5 features complete',   foot: 'Balance on Home Screen · shipped' },
+        { value: 1, color: '#2563EB', label: 'In progress', body: '1 feature · 65% complete',    foot: 'Fingerprint Login · on track' },
+        { value: 2, color: '#F97316', label: 'At risk',     body: '2 features below pace',       foot: 'Fraud Alerts 25% · Onboarding 0%' },
+        { value: 1, color: '#EF4444', label: 'Blocked',     body: '1 feature · blocked 6 days',  foot: 'Payment Confirmation · dependency unresolved' }
+      ]);
+    },
+
+    james: function(el) {
+      el.innerHTML =
+        // Card 1 — sprint progress gauge
+        '<article class="hero-card hero-snapshot">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<div class="hero-card-eyebrow">Auth Team · Sprint 2 · Day 7 / 10</div>' +
+            '<h3 class="hero-card-title">My sprint progress</h3>' +
+            '<p class="hero-card-subtitle">Sprint closes Friday · 4 items in flight</p>' +
+          '</div></div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="james-donut"></canvas><div class="hero-donut-center"><span class="hero-donut-num">75%</span><span class="hero-donut-lbl">Done</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#22C55E"></span>Done</span><span class="legend-val">18 pts</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#2563EB"></span>In progress</span><span class="legend-val">5 pts</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:rgba(0,0,0,0.10)"></span>Remaining</span><span class="legend-val">1 pt</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 2 — my active items
+        '<article class="hero-card hero-detail">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<h3 class="hero-card-title">My active items</h3>' +
+            '<p class="hero-card-subtitle">4 in flight · ranked by progress</p>' +
+          '</div></div>' +
+          '<div class="my-stack">' +
+            '<div class="my-item-row" data-tab="board"><span class="my-item-state review"></span><div><div class="my-item-name">Auth token refresh defect</div><div class="my-item-id">3 pts · In Review</div></div><div class="my-item-bar"><div class="my-item-bar-fill" style="width:80%"></div></div></div>' +
+            '<div class="my-item-row" data-tab="board"><span class="my-item-state progress"></span><div><div class="my-item-name">Fallback to PIN on biometric scan</div><div class="my-item-id">3 pts · In Progress</div></div><div class="my-item-bar"><div class="my-item-bar-fill" style="width:50%"></div></div></div>' +
+            '<div class="my-item-row" data-tab="board"><span class="my-item-state progress"></span><div><div class="my-item-name">Auth session expiry handler</div><div class="my-item-id">3 pts · In Progress</div></div><div class="my-item-bar"><div class="my-item-bar-fill" style="width:45%"></div></div></div>' +
+            '<div class="my-item-row" data-tab="board"><span class="my-item-state progress"></span><div><div class="my-item-name">Biometric onboarding for new users</div><div class="my-item-id">5 pts · mid-sprint pull</div></div><div class="my-item-bar"><div class="my-item-bar-fill" style="width:25%"></div></div></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 3 — Otto's brief
+        briefCard();
+      multiSegmentDonut('james-donut', [
+        { value: 18, color: '#22C55E', label: 'Done',        body: '18 pts · 75% of sprint',     foot: '3 pts ahead of day-7 pace' },
+        { value: 5,  color: '#2563EB', label: 'In progress', body: '5 pts · 4 items in flight',  foot: 'Review open PRs before sprint close' },
+        { value: 1,  color: 'rgba(0,0,0,0.08)', label: 'Remaining', body: '1 pt remaining',      foot: 'Headroom to pull more if needed' }
+      ]);
+    },
+
+    riya: function(el) {
+      el.innerHTML =
+        // Card 1 — PI 27 readiness gauge + key meta
+        '<article class="hero-card hero-snapshot">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<div class="hero-card-eyebrow">Digital Banking ART · Sprint 2</div>' +
+            '<h3 class="hero-card-title">PI 27 readiness</h3>' +
+            '<p class="hero-card-subtitle">Lock in 14 days · target 80% by T-3</p>' +
+          '</div></div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="riya-donut"></canvas><div class="hero-donut-center"><span class="hero-donut-num">48%</span><span class="hero-donut-lbl">Composite</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#22C55E"></span>Capacity confirmed</span><span class="legend-val">2 / 6</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#F97316"></span>Cross-ART deps unresolved</span><span class="legend-val">4</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#EF4444"></span>PI 26 features at risk</span><span class="legend-val">3</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 2 — Unresolved cross-ART deps (replaces the ribbon — scales linearly)
+        '<article class="hero-card hero-detail" data-tab="hierarchy">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<h3 class="hero-card-title">Unresolved cross-ART deps</h3>' +
+            '<p class="hero-card-subtitle">4 blocking · ranked by age</p>' +
+          '</div></div>' +
+          '<div class="dep-flow">' +
+            '<div class="dep-flow-row blocked" data-tab="hierarchy">' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(99,102,241,0.12);color:#6366F1">AUTH</span></div>' +
+              '<div class="dep-mid">' +
+                '<div class="dep-mid-desc">SSO handoff · new-user biometrics</div>' +
+                '<div class="dep-arrow-track"><div class="dep-line-seg"></div><span class="dep-status-node">Blocked</span><div class="dep-line-seg"></div><span class="dep-arrowhead">▶</span></div>' +
+                '<div class="dep-age-label">unresolved for 12 days</div>' +
+              '</div>' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(8,145,178,0.12);color:#0891B2">ONBOARD</span></div>' +
+            '</div>' +
+            '<div class="dep-flow-row atrisk" data-tab="hierarchy">' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(37,99,235,0.12);color:#2563EB">PMTS</span></div>' +
+              '<div class="dep-mid">' +
+                '<div class="dep-mid-desc">Auth-token refresh API</div>' +
+                '<div class="dep-arrow-track"><div class="dep-line-seg"></div><span class="dep-status-node">At risk</span><div class="dep-line-seg"></div><span class="dep-arrowhead">▶</span></div>' +
+                '<div class="dep-age-label">unresolved for 8 days</div>' +
+              '</div>' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(5,150,105,0.12);color:#059669">ACCT</span></div>' +
+            '</div>' +
+            '<div class="dep-flow-row atrisk" data-tab="hierarchy">' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(139,92,246,0.12);color:#8B5CF6">MOB</span></div>' +
+              '<div class="dep-mid">' +
+                '<div class="dep-mid-desc">Wallet provisioning v2 schema</div>' +
+                '<div class="dep-arrow-track"><div class="dep-line-seg"></div><span class="dep-status-node">At risk</span><div class="dep-line-seg"></div><span class="dep-arrowhead">▶</span></div>' +
+                '<div class="dep-age-label">unresolved for 5 days</div>' +
+              '</div>' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(37,99,235,0.12);color:#2563EB">PMTS</span></div>' +
+            '</div>' +
+            '<div class="dep-flow-row pending" data-tab="hierarchy">' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(239,68,68,0.12);color:#EF4444">FRAUD</span></div>' +
+              '<div class="dep-mid">' +
+                '<div class="dep-mid-desc">Watchlist screening hooks</div>' +
+                '<div class="dep-arrow-track"><div class="dep-line-seg"></div><span class="dep-status-node">Pending</span><div class="dep-line-seg"></div><span class="dep-arrowhead">▶</span></div>' +
+                '<div class="dep-age-label">unresolved for 3 days</div>' +
+              '</div>' +
+              '<div class="dep-chip"><span class="dep-chip-pill" style="background:rgba(5,150,105,0.12);color:#059669">ACCT</span></div>' +
+            '</div>' +
+          '</div>' +
+        '</article>' +
+        // Card 3 — Otto's brief
+        briefCard();
+      multiSegmentDonut('riya-donut', [
+        { value: 48, color: '#2563EB', label: 'PI 27 readiness', body: '48% composite score',    foot: 'Target 80% · 32% gap · lock in 14 days' },
+        { value: 52, color: 'rgba(0,0,0,0.08)', label: '' }
+      ]);
+    },
+
+    dev: function(el) {
+      el.innerHTML =
+        // Card 1 — Sprint clock dial
+        '<article class="hero-card hero-snapshot">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<div class="hero-card-eyebrow">Payments Team · Sprint 2</div>' +
+            '<h3 class="hero-card-title">Sprint clock</h3>' +
+            '<p class="hero-card-subtitle">Day 7 of 10 · closes Friday</p>' +
+          '</div></div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="dev-donut"></canvas><div class="hero-donut-center"><span class="hero-donut-num">17%</span><span class="hero-donut-lbl">Pts done</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#22C55E"></span>Done</span><span class="legend-val">8 pts</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#2563EB"></span>In progress</span><span class="legend-val">14 pts</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:rgba(0,0,0,0.10)"></span>Remaining</span><span class="legend-val">24 pts</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 2 — Burn rate vs target
+        '<article class="hero-card hero-detail" data-tab="board">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<h3 class="hero-card-title">Burn pace · 3 stories at risk</h3>' +
+            '<p class="hero-card-subtitle">Should be 32 pts by Day 7 · currently 8</p>' +
+          '</div></div>' +
+          '<div class="burn-row">' +
+            '<canvas id="dev-burn" class="burn-canvas"></canvas>' +
+          '</div>' +
+          '<div class="dep-meta-tile" style="background:rgba(0,0,0,0.03);">' +
+            '<span class="dep-meta-num" style="color:var(--color-error)">−24 pts</span>' +
+            '<span class="dep-meta-lbl">Behind plan · 3 stories below burn pace</span>' +
+          '</div>' +
+        '</article>' +
+        // Card 3 — Otto's brief
+        briefCard();
+      multiSegmentDonut('dev-donut', [
+        { value: 8,  color: '#22C55E', label: 'Done',        body: '8 pts · 17% of sprint',      foot: 'Should be 32 by day 7 — 24 pts behind' },
+        { value: 14, color: '#2563EB', label: 'In progress', body: '14 pts in flight',            foot: '3 items active · all below burn pace' },
+        { value: 24, color: 'rgba(0,0,0,0.08)', label: 'Remaining', body: '24 pts unstarted',    foot: 'Sprint closes in 3 days · replan likely' }
+      ]);
+      burnChart('dev-burn');
+    },
+
+    priya: function(el) {
+      el.innerHTML =
+        // Card 1 — Composite pace gauge
+        '<article class="hero-card hero-snapshot">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<div class="hero-card-eyebrow">Portfolio · Q3 · 6 weeks remaining</div>' +
+            '<h3 class="hero-card-title">Outcome compass</h3>' +
+            '<p class="hero-card-subtitle">PI 27 in 28 days · OKR review in 14</p>' +
+          '</div></div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="priya-compass"></canvas><div class="hero-donut-center"><span class="hero-donut-num">27%</span><span class="hero-donut-lbl">Composite pace</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#22C55E"></span>Goal 1 — Top digital bank</span><span class="legend-val">42%</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#EF4444"></span>Goal 2 — Cost reduction</span><span class="legend-val">12%</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#F97316"></span>OKR coverage</span><span class="legend-val">60%</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 2 — Outcome bars with target markers
+        '<article class="hero-card hero-detail" data-tab="planning">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<h3 class="hero-card-title">Goal pace vs target</h3>' +
+            '<p class="hero-card-subtitle">3 strategic outcomes · target marker at end-of-Q3</p>' +
+          '</div></div>' +
+          '<div class="outcome-bars">' +
+            '<div class="outcome-bar"><div class="outcome-bar-hd"><span class="outcome-bar-name">Goal 1 — Top digital bank</span><span class="outcome-bar-val">42% / target 50%</span></div><div class="outcome-bar-track"><div class="outcome-bar-fill" style="width:42%; background:#22C55E"></div><div class="outcome-bar-target" style="left:50%"></div></div><div class="outcome-bar-insight">On pace · 8% gap · Q3 target achievable · <span class="outcome-bar-action">View roadmap</span></div></div>' +
+            '<div class="outcome-bar"><div class="outcome-bar-hd"><span class="outcome-bar-name">Goal 2 — Reduce cost 18%</span><span class="outcome-bar-val">12% / target 35%</span></div><div class="outcome-bar-track"><div class="outcome-bar-fill" style="width:12%; background:#EF4444"></div><div class="outcome-bar-target" style="left:35%"></div></div><div class="outcome-bar-insight">23% behind target · intervention needed before Q3 close · <span class="outcome-bar-action">Escalate</span></div></div>' +
+            '<div class="outcome-bar"><div class="outcome-bar-hd"><span class="outcome-bar-name">OKR coverage · mapped</span><span class="outcome-bar-val">3 of 5 · 60%</span></div><div class="outcome-bar-track"><div class="outcome-bar-fill" style="width:60%; background:#F97316"></div><div class="outcome-bar-target" style="left:100%"></div></div><div class="outcome-bar-insight">2 epics unmapped · assign before PI 27 lock · <span class="outcome-bar-action">Assign</span></div></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 3 — Otto's brief
+        briefCard();
+      compassDonut('priya-compass', [
+        { value: 42, color: '#22C55E', label: 'Goal 1 — Top digital bank', body: '42% · 8% gap to target',    foot: 'On track for Q3 end-of-quarter close' },
+        { value: 12, color: '#EF4444', label: 'Goal 2 — Reduce cost 18%',  body: '12% · 23% gap to target',   foot: 'At risk · board review in 7 days' },
+        { value: 60, color: '#F97316', label: 'OKR coverage',               body: '3 of 5 epics mapped',       foot: '2 unmapped · assign before PI 27 lock' }
+      ]);
+    },
+
+    marcus_cdo: function(el) {
+      el.innerHTML =
+        // Card 1 — Goal 1 gauge
+        '<article class="hero-card hero-snapshot" data-tab="planning">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<div class="hero-card-eyebrow">Enterprise outcomes · Q3</div>' +
+            '<h3 class="hero-card-title">Goal 1 — Top digital bank by 2027</h3>' +
+            '<p class="hero-card-subtitle">Composite of 12 KPIs · ↘ on watch</p>' +
+          '</div></div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="goal1-canvas"></canvas><div class="hero-donut-center"><span class="hero-donut-num">42%</span><span class="hero-donut-lbl">target 50%</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#22C55E"></span>Current</span><span class="legend-val">42%</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#F97316"></span>Gap to target</span><span class="legend-val">8%</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:rgba(0,0,0,0.10)"></span>Q3 remaining</span><span class="legend-val">50%</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 2 — Goal 2 gauge
+        '<article class="hero-card hero-snapshot" data-tab="planning">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<div class="hero-card-eyebrow">Enterprise outcomes · Q3</div>' +
+            '<h3 class="hero-card-title">Goal 2 — Reduce operating cost 18%</h3>' +
+            '<p class="hero-card-subtitle">Cost-out tracking · ↘ at risk · 22 pts behind</p>' +
+          '</div></div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="goal2-canvas"></canvas><div class="hero-donut-center"><span class="hero-donut-num">12%</span><span class="hero-donut-lbl" style="color:var(--color-error)">target 35%</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#EF4444"></span>Current</span><span class="legend-val">12%</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#F97316"></span>Gap to target</span><span class="legend-val">23%</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:rgba(0,0,0,0.10)"></span>Stretch (18% reduction)</span><span class="legend-val">88%</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 3 — Otto's brief
+        briefCard();
+      goalGauge('goal1-canvas', 42, 50, '#22C55E', { currentBody: '42% current pace', currentFoot: 'Target 50% · Q3 target reachable', gapBody: '8% gap to target', gapFoot: 'Closing steadily · on track' });
+      goalGauge('goal2-canvas', 12, 35, '#EF4444', { currentBody: '12% current pace', currentFoot: 'Target 35% · board review in 7 days', gapBody: '23% gap to target', gapFoot: 'Intervention required · escalate now' });
+    },
+
+    kenji: function(el) {
+      el.innerHTML =
+        // Card 1 — Q3 burn snapshot (gauge)
+        '<article class="hero-card hero-snapshot" data-tab="planning">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<div class="hero-card-eyebrow">Investment · Q3 · 6 weeks remaining</div>' +
+            '<h3 class="hero-card-title">Q3 budget burn</h3>' +
+            '<p class="hero-card-subtitle">PI 27 lock in 7 days · variance ↗ ahead of plan</p>' +
+          '</div></div>' +
+          '<div class="hero-donut-outer"><div class="hero-donut-wrap"><canvas id="kenji-donut"></canvas><div class="hero-donut-center"><span class="hero-donut-num">82%</span><span class="hero-donut-lbl">Committed</span></div></div></div>' +
+          '<div class="hero-snapshot-legend">' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#2563EB"></span>Committed</span><span class="legend-val">$8.2M</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:#F97316"></span>Variance vs forecast</span><span class="legend-val">+$1.2M</span></div>' +
+            '<div class="legend-row"><span class="legend-row-hd"><span class="legend-dot" style="background:rgba(0,0,0,0.10)"></span>Q3 remaining</span><span class="legend-val">$1.8M</span></div>' +
+          '</div>' +
+        '</article>' +
+        // Card 2 — Next-PI utilisation
+        '<article class="hero-card hero-detail" data-tab="planning">' +
+          '<div class="hero-card-hd"><div class="hero-card-title-block">' +
+            '<h3 class="hero-card-title">Next-PI utilisation</h3>' +
+            '<p class="hero-card-subtitle">2 ARTs · DB projected 118% · scope-shed required</p>' +
+          '</div></div>' +
+          '<div class="outcome-bars">' +
+            '<div class="outcome-bar"><div class="outcome-bar-hd"><span class="outcome-bar-name">Digital Banking ART</span><span class="outcome-bar-val">118% · over</span></div><div class="outcome-bar-track"><div class="outcome-bar-fill" style="width:84%; background:#EF4444"></div><div class="outcome-bar-target" style="left:71%"></div></div><div class="outcome-bar-insight">18% over capacity · scope-shed required before PI 27 · <span class="outcome-bar-action">Model options</span></div></div>' +
+            '<div class="outcome-bar"><div class="outcome-bar-hd"><span class="outcome-bar-name">Lending &amp; Mortgages ART</span><span class="outcome-bar-val">92% · ok</span></div><div class="outcome-bar-track"><div class="outcome-bar-fill" style="width:65%; background:#22C55E"></div><div class="outcome-bar-target" style="left:71%"></div></div><div class="outcome-bar-insight">Within threshold · 8% headroom · <span class="outcome-bar-action">Review scope</span></div></div>' +
+            '<div class="outcome-bar"><div class="outcome-bar-hd"><span class="outcome-bar-name">Identity ART</span><span class="outcome-bar-val">88% · ok</span></div><div class="outcome-bar-track"><div class="outcome-bar-fill" style="width:62%; background:#22C55E"></div><div class="outcome-bar-target" style="left:71%"></div></div><div class="outcome-bar-insight">On track · 12% headroom remaining · <span class="outcome-bar-action">View plan</span></div></div>' +
+          '</div>' +
+          '<div style="font-size:10px;color:var(--text-tertiary);padding-top:6px;border-top:1px dashed rgba(0,0,0,0.06);margin-top:auto;">Threshold mark = 100% util · target line at 71%</div>' +
+        '</article>' +
+        // Card 3 — Otto's brief
+        briefCard();
+      multiSegmentDonut('kenji-donut', [
+        { value: 82, color: '#2563EB', label: 'Committed',  body: '82% · $8.2M committed',        foot: '+3% ahead of forecast · DB ART over capacity' },
+        { value: 18, color: 'rgba(0,0,0,0.08)', label: 'Available', body: '18% · $1.8M remaining', foot: '3 funding decisions pending sign-off' }
+      ]);
+    }
+  };
+
+  // ════════════════════════════════════════════════════════
+  // STAT ROW — 3 cards per persona. Each card: title + subtitle, big number
+  // with trend pill, comparison line, smooth area sparkline, optional AI
+  // callout. Whole card routes to data.tab. Sparkline tooltip labels use
+  // data.sparkLabels (ordered same as data.spark).
+  // ════════════════════════════════════════════════════════
+  var STATS = {
+    ananya: [
+      {
+        title: 'Backlog ranked', subtitle: 'WSJF-ranked features ready for pull',
+        num: '13', suffix: '/ 25', trend: 'up', trendPct: '+5',
+        comparison: 'Compared to <strong>8 ranked</strong> two weeks ago',
+        spark: [6,8,9,8,12,13], sparkLabels: ['6w','5w','4w','3w','2w','Now'], color: 'primary',
+        callout: { text: '<strong>5 unranked</strong> tagged AI-ready', tab: 'backlog', otto: 'Otto identified 5 unranked features as AI-ready — backlog ranking can begin without manual scoring' },
+        tab: 'backlog'
+      },
+      {
+        title: 'Customer signals', subtitle: 'Inbound tickets across product surfaces',
+        num: '47', suffix: 'tickets / wk', trend: 'up', trendPct: '+3×',
+        comparison: 'Compared to <strong>15 / wk</strong> a month ago',
+        spark: [12,18,22,28,35,47], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6'], color: 'warning',
+        callout: { text: '<strong>22 signals</strong> bundled into 1 draft Feature', tab: 'backlog', highlight: 'fb1', otto: 'Otto bundled 22 customer signals into 1 draft Feature · Adaptive Biometric Re-enrolment · WSJF 12.4 — ready for your decision' },
+        tab: 'backlog'
+      },
+      {
+        title: 'Demo readiness', subtitle: '5 features in PI · sprint review tomorrow',
+        num: '3 / 5', trend: 'down', trendPct: '2 at risk',
+        comparison: '<strong>Payment Confirmation</strong> + <strong>Onboarding</strong> below 30%',
+        spark: [5,5,4,4,3,3], sparkLabels: ['T-5d','T-4d','T-3d','T-2d','T-1d','Today'], color: 'error',
+        threshold: 5, thresholdLabel: 'All features ready',
+        callout: { text: 'Otto drafted <strong>at-risk talk track</strong> for review', tab: 'board', otto: 'Talk track prepared for tomorrow\'s sprint review · Payment Confirmation flagged at 20%, Onboarding at 0% — review before presenting' },
+        tab: 'board'
+      }
+    ],
+    james: [
+      {
+        title: 'My sprint points', subtitle: 'Personal commitment for Sprint 2',
+        num: '18', suffix: '/ 24 pts', trend: 'up', trendPct: 'on pace',
+        comparison: 'Same as <strong>last sprint</strong> at this point',
+        spark: [3,7,11,14,18], sparkLabels: ['Day 1','Day 3','Day 5','Day 6','Day 7'], color: 'primary',
+        tab: 'board'
+      },
+      {
+        title: 'Reviews waiting on me', subtitle: 'PRs + ACs blocking other devs',
+        num: '4', trend: 'flat', trendPct: 'unchanged',
+        comparison: '<strong>3 PRs</strong> · <strong>1 acceptance criteria</strong> review',
+        spark: [2,3,3,4,4,4], sparkLabels: ['Mon','Tue','Wed','Thu','Fri','Today'], color: 'warning',
+        callout: { text: 'Otto summarised <strong>3 PRs</strong> · ready in 2 min', tab: 'board', otto: 'Otto summarised your 3 pending PRs · each summary is 2 min read — review and merge before sprint close' },
+        tab: 'board'
+      },
+      {
+        title: 'Personal velocity', subtitle: 'Story points completed per sprint',
+        num: '22', suffix: 'pts / sprint', trend: 'up', trendPct: '+2',
+        comparison: 'Compared to <strong>20 pts</strong> last sprint',
+        spark: [14,16,18,20,22], sparkLabels: ['S-4','S-3','S-2','S-1','Now'], color: 'success',
+        tab: 'board'
+      }
+    ],
+    riya: [
+      {
+        title: 'Capacity confirmed', subtitle: '6 teams · PI 27 in 14 days',
+        num: '2 / 6', trend: 'down', trendPct: '4 missing',
+        comparison: '<strong>Pmts</strong> + <strong>Fraud</strong> confirmed · others in review',
+        spark: [1,1,2,2,2], sparkLabels: ['T-10d','T-7d','T-5d','T-3d','Today'], color: 'error',
+        callout: { text: 'Otto chasing <strong>4 team leads</strong> for confirmation', tab: 'planning', otto: 'Otto sent automated chases to 4 team leads for capacity confirmation — Auth, Payments, Fraud and Onboarding still missing' },
+        tab: 'planning'
+      },
+      {
+        title: 'Open impediments', subtitle: 'ART-wide blockers across 6 teams',
+        num: '1', trend: 'flat', trendPct: 'no change',
+        comparison: '<strong>Pmts team</strong> · auth-token refresh defect',
+        spark: [2,2,1,1,1,1], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Wk5','Now'], color: 'warning',
+        tab: 'board'
+      },
+      {
+        title: 'PI 27 readiness', subtitle: 'Composite of capacity, scope, deps',
+        num: '48', suffix: '%', trend: 'up', trendPct: '+8 this wk',
+        comparison: 'Target <strong>80%</strong> by T-3 days',
+        spark: [22,28,34,40,48], sparkLabels: ['T-21d','T-17d','T-14d','T-7d','Today'], color: 'primary',
+        callout: { text: 'Otto identified <strong>4 cross-ART deps</strong> at risk', tab: 'hierarchy', otto: 'Otto flagged 4 cross-ART dependencies at risk for PI 27 — Auth, Payments, Fraud and Onboarding all have unresolved items' },
+        tab: 'planning'
+      }
+    ],
+    dev: [
+      {
+        title: 'Sprint points done', subtitle: 'Payments team · Sprint 2',
+        num: '8', suffix: '/ 46 pts', trend: 'down', trendPct: 'behind',
+        comparison: 'Should be at <strong>32 pts</strong> by Day 7',
+        spark: [0,2,4,6,7,8], sparkLabels: ['Day 1','Day 2','Day 3','Day 4','Day 6','Day 7'], color: 'error',
+        callout: { text: 'Otto flagged <strong>3 stories at risk</strong> for replan', tab: 'taskboard', otto: 'Otto flagged Biometric login, Auth token defect and Payment build as below burn pace — 3 replan options modelled with capacity impact' },
+        tab: 'board'
+      },
+      {
+        title: 'Open impediments', subtitle: 'Blockers slowing the team',
+        num: '2', trend: 'down', trendPct: '+1 today',
+        comparison: '<strong>Auth token defect</strong> has a dependency · <strong>Biometric session</strong> acceptance criteria unclear',
+        spark: [0,1,1,2,2,2], sparkLabels: ['Day 2','Day 3','Day 4','Day 5','Day 6','Today'], color: 'warning',
+        tab: 'board'
+      },
+      {
+        title: 'WIP by member', subtitle: 'In-progress items right now',
+        num: '3', suffix: 'in flight', trend: 'flat', trendPct: 'WIP limit 5',
+        comparison: '<strong>Vikram</strong> 2 · <strong>Mei</strong> 1 · headroom for 2 more',
+        spark: [2,3,3,3,3], sparkLabels: ['Day 3','Day 4','Day 5','Day 6','Today'], color: 'primary',
+        threshold: 5, thresholdLabel: 'WIP limit',
+        tab: 'board'
+      }
+    ],
+    priya: [
+      {
+        title: 'Q3 budget committed', subtitle: 'Portfolio spend vs Q3 plan',
+        num: '78', suffix: '%', trend: 'up', trendPct: '+6%',
+        comparison: 'Compared to <strong>72%</strong> last week',
+        spark: [55,62,68,72,78], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Now'], color: 'primary',
+        tab: 'planning'
+      },
+      {
+        title: 'Stalled epics (4w+)', subtitle: 'No movement in 4+ weeks',
+        num: '3', trend: 'flat', trendPct: 'unchanged',
+        comparison: '<strong>2 epics</strong> stalled 5w · <strong>1 epic</strong> stalled 4w',
+        spark: [1,2,2,3,3], sparkLabels: ['M-4','M-3','M-2','M-1','Now'], color: 'warning',
+        callout: { text: 'Otto drafted <strong>3 close-or-pause</strong> proposals', tab: 'backlog', otto: 'Otto drafted close-or-pause proposals for 3 stalled epics — Open Banking (5w), Payment Infra (5w), Mortgage Origination (4w)' },
+        tab: 'backlog'
+      },
+      {
+        title: 'WIP / limit', subtitle: 'Active epics vs portfolio cap',
+        num: '5 / 4', trend: 'down', trendPct: 'breached',
+        comparison: 'Limit <strong>4</strong> · 1 epic must close before next pull',
+        spark: [3,4,4,5,5], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Now'], color: 'error',
+        threshold: 4, thresholdLabel: 'Portfolio cap',
+        tab: 'planning'
+      }
+    ],
+    marcus_cdo: [
+      {
+        title: 'Composite goal pace', subtitle: 'Two enterprise OKRs · Q3 trajectory',
+        num: '27', suffix: '%', trend: 'down', trendPct: '−18 vs target',
+        comparison: 'Target <strong>45%</strong> by end of Q3',
+        spark: [12,16,20,23,27], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Now'], color: 'error',
+        callout: { text: 'Otto compiled <strong>5-section board report</strong>', tab: 'hierarchy', otto: 'Otto compiled your 5-section board report · outcomes + Q3 burn + escalations + decisions + risk — Goal 2 anomaly flagged, board in 7 days' },
+        tab: 'planning'
+      },
+      {
+        title: 'Escalations open', subtitle: 'Cross-functional decisions awaiting CDO',
+        num: '5', trend: 'down', trendPct: '+2 this wk',
+        comparison: '<strong>3 funding</strong> · <strong>2 vendor</strong> escalations',
+        spark: [2,3,3,5,5], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Now'], color: 'warning',
+        tab: 'board'
+      },
+      {
+        title: 'Investment pending', subtitle: 'Awaiting sponsor sign-off',
+        num: '1', suffix: 'item', trend: 'flat', trendPct: 'no change',
+        comparison: '<strong>Open Banking</strong> · $2.4M · sponsor decision',
+        spark: [1,2,2,1,1], sparkLabels: ['M-4','M-3','M-2','M-1','Now'], color: 'primary',
+        tab: 'planning'
+      }
+    ],
+    kenji: [
+      {
+        title: 'Q3 burn', subtitle: 'Portfolio spend vs forecast',
+        num: '82', suffix: '%', trend: 'up', trendPct: '+3% vs forecast',
+        comparison: 'Forecast <strong>79%</strong> · <strong>+$1.2M</strong> ahead',
+        spark: [28,42,56,68,82], sparkLabels: ['Wk1','Wk4','Wk7','Wk10','Now'], color: 'warning',
+        tab: 'planning'
+      },
+      {
+        title: 'Next-PI util · DB ART', subtitle: 'Capacity projection · 6 teams',
+        num: '118', suffix: '%', trend: 'down', trendPct: 'over',
+        comparison: 'Threshold <strong>100%</strong> · scope must shed 18%',
+        spark: [88,92,98,108,118], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Now'], color: 'error',
+        threshold: 100, thresholdLabel: 'Capacity limit',
+        callout: { text: 'Otto modelled <strong>3 scope-shed options</strong>', tab: 'planning', otto: 'Otto modelled 3 scope-shed options for Digital Banking ART (118% projected) — each option maps capacity impact and delivery risk' },
+        tab: 'planning'
+      },
+      {
+        title: 'Funding queue', subtitle: 'Decisions awaiting committee',
+        num: '3', suffix: 'items', trend: 'flat', trendPct: 'no change',
+        comparison: '<strong>2 finance</strong> · <strong>1 sponsor</strong> review',
+        spark: [1,2,2,3,3], sparkLabels: ['Wk1','Wk2','Wk3','Wk4','Now'], color: 'primary',
+        tab: 'backlog'
+      }
+    ]
+  };
+
+  // Inline arrow icon for the top-right of each card
+  var STAT_ARROW_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>';
+
+  function renderStats() {
+    var host = document.getElementById('stats');
+    var stats = STATS[personaKey] || [];
+    host.innerHTML = stats.map(function(s, i) {
+      var trendIcon = s.trend === 'up' ? '↗' : (s.trend === 'down' ? '↘' : '–');
+      var trendPill = s.trendPct
+        ? '<span class="stat-trend-pill ' + s.trend + '">' + trendIcon + ' ' + s.trendPct + '</span>'
+        : '';
+      var num = '<span class="stat-num-big">' + s.num + (s.suffix ? ' <span class="stat-num-suffix">' + s.suffix + '</span>' : '') + '</span>';
+      var calloutHl   = s.callout && s.callout.highlight ? ' data-highlight="' + s.callout.highlight + '"' : '';
+      var calloutOtto = s.callout && s.callout.otto      ? ' data-otto="'      + s.callout.otto.replace(/"/g, '&quot;') + '"' : '';
+      var callout = s.callout
+        ? '<div class="stat-callout" data-tab="' + s.callout.tab + '"' + calloutHl + calloutOtto + '>' + OTTO_SVG + '<span>' + s.callout.text + '</span><span class="stat-callout-arrow">›</span></div>'
+        : '';
+      return '<article class="stat-card" data-tab="' + s.tab + '">' +
+        '<div class="stat-hd">' +
+          '<div class="stat-title-block">' +
+            '<h3 class="stat-title">' + s.title + '</h3>' +
+            '<p class="stat-subtitle">' + s.subtitle + '</p>' +
+          '</div>' +
+          '<span class="stat-arrow" aria-hidden="true">' + STAT_ARROW_SVG + '</span>' +
+        '</div>' +
+        '<div class="stat-metric">' + num + trendPill + '</div>' +
+        (s.comparison ? '<div class="stat-comparison">' + s.comparison + '</div>' : '') +
+        callout +
+        '<div class="stat-spark"><canvas id="stat-' + i + '"></canvas></div>' +
+      '</article>';
+    }).join('');
+
+    // Sparklines
+    stats.forEach(function(s, i) {
+      var c = document.getElementById('stat-' + i);
+      if (!c || c.tagName !== 'CANVAS') return;
+      statSparkline(c, s.spark, s.color, s.sparkLabels, s.threshold, s.thresholdLabel);
+    });
+
+    // Click-through: callout takes precedence over card
+    host.querySelectorAll('.stat-card').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        var calloutEl = e.target.closest('.stat-callout');
+        var t  = calloutEl ? calloutEl.getAttribute('data-tab')       : el.getAttribute('data-tab');
+        var hl = calloutEl ? calloutEl.getAttribute('data-highlight') : null;
+        var ot = calloutEl ? calloutEl.getAttribute('data-otto')      : null;
+        if (!t) return;
+        var url = tabUrl(t);
+        if (hl) url += '&highlight=' + encodeURIComponent(hl);
+        if (ot) url += '&otto='      + encodeURIComponent(ot);
+        window.location.href = url;
+      });
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // FOCUS — ranked decisions with source icons
+  // ════════════════════════════════════════════════════════
+  function renderFocus() {
+    var card = document.getElementById('focus');
+    if (!hc) return;
+
+    var items = hc.focus.items.map(function(it) {
+      var srcIcon = SRC_ICONS[it.source] || SRC_ICONS.product;
+      var srcClass = 'src-' + (it.source || 'product');
+      var bundleAttr = (it.source === 'ai-bundle') ? ' data-is-bundle="1"' : '';
+      var bundleCls = (it.source === 'ai-bundle') ? ' bundle-row' : '';
+      var ottoAttr  = it.otto      ? ' data-otto="'      + it.otto.replace(/"/g, '&quot;')      + '"' : '';
+      var hlAttr    = it.highlight ? ' data-highlight="' + it.highlight + '"' : '';
+      return '<div class="focus-row' + bundleCls + '" data-tab="' + (it.tab || '') + '"' + bundleAttr + ottoAttr + hlAttr + '>' +
+        '<span class="src-icon ' + srcClass + '">' + srcIcon + '</span>' +
+        '<span class="severity-dot ' + it.severity + '"></span>' +
+        '<div class="focus-text"><div class="focus-title">' + it.title + '</div><div class="focus-desc">' + it.desc + '</div></div>' +
+        '<div class="focus-stat">' + renderStat(it.stat) + '</div>' +
+      '</div>';
+    }).join('');
+
+    var bundleDetailHtml = '';
+    if (personaKey === 'ananya' && EAP.bundleProposals && EAP.bundleProposals.ananya) {
+      var bp = EAP.bundleProposals.ananya;
+      bundleDetailHtml = '<div class="bundle-detail" id="bundle-detail">' +
+        '<div class="bundle-sources">' +
+          bp.sources.map(function(s) {
+            return '<div class="bundle-source-tile">' +
+              '<span class="bundle-source-count">' + s.count + '</span>' +
+              '<span class="bundle-source-label">' + s.label + '</span>' +
+              '<span class="bundle-source-note">' + s.note + '</span>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        '<div class="bundle-meta">' +
+          '<div class="bundle-meta-row"><span class="bundle-meta-lbl">WSJF</span><span class="bundle-meta-val">' + bp.proposed.wsjf + '</span></div>' +
+          '<div class="bundle-meta-row"><span class="bundle-meta-lbl">Size</span><span class="bundle-meta-val">' + bp.proposed.size + '</span></div>' +
+          '<div class="bundle-meta-row"><span class="bundle-meta-lbl">Ladders to</span><span class="bundle-meta-val">' + bp.proposed.ladders + '</span></div>' +
+          '<div class="bundle-meta-row"><span class="bundle-meta-lbl">Capacity fit</span><span class="bundle-meta-val">' + bp.proposed.capacityFit.team + ' · ' + bp.proposed.capacityFit.sprint + ' (' + bp.proposed.capacityFit.headroom + ')</span></div>' +
+        '</div>' +
+        '<div class="bundle-meta-row" style="font-size:10.5px;"><span class="bundle-meta-lbl">On accept</span><span style="color:var(--text-secondary);">' + bp.proposed.acceptCloseLoop + '</span></div>' +
+        '<div class="bundle-actions">' +
+          '<button class="btn-bundle primary" type="button">Accept · create Feature</button>' +
+          '<button class="btn-bundle secondary" type="button">Split signals</button>' +
+          '<button class="btn-bundle secondary" type="button">Dismiss</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    card.innerHTML =
+      '<div class="zone-eyebrow">FOCUS · 1</div>' +
+      '<h2 class="zone-title">' + hc.focus.title + '</h2>' +
+      '<div class="zone-sub">' + hc.focus.subtitle + '</div>' +
+      '<div class="focus-list">' + items + bundleDetailHtml + '</div>';
+
+    // Wire up clicks
+    card.querySelectorAll('.focus-row').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if (el.getAttribute('data-is-bundle')) {
+          var d = document.getElementById('bundle-detail');
+          if (d) d.classList.toggle('is-open');
+          return;
+        }
+        var t  = el.getAttribute('data-tab');
+        var ot = el.getAttribute('data-otto');
+        var hl = el.getAttribute('data-highlight');
+        if (t) {
+          var url = tabUrl(t);
+          if (hl) url += '&highlight=' + encodeURIComponent(hl);
+          if (ot) url += '&otto='      + encodeURIComponent(ot);
+          window.location.href = url;
+        }
+      });
+    });
+  }
+
+  function renderStat(stat) {
+    if (!stat) return '';
+    if (stat.kind === 'pct') {
+      var pct = Math.max(0, Math.min(100, stat.value));
+      var of = stat.of || 100;
+      var dispPct = stat.of && stat.of !== 100 ? Math.round(stat.value * 100 / stat.of) : pct;
+      var color = stat.value >= (stat.of || 100) ? '#b91c1c' : (dispPct >= 70 ? '#d97706' : '#0669FF');
+      var c = 2 * Math.PI * 12;
+      var dash = c * (Math.min(dispPct, 100) / 100);
+      return '<span class="stat-ring-mini">' +
+        '<svg viewBox="0 0 32 32"><circle class="ring-bg" cx="16" cy="16" r="12"/><circle class="ring-fg" cx="16" cy="16" r="12" stroke="' + color + '" stroke-dasharray="' + dash + ' ' + c + '"/></svg>' +
+        (stat.of && stat.of !== 100 ? stat.value : dispPct + '%') +
+      '</span>';
+    }
+    if (stat.kind === 'count') {
+      var label = stat.of ? stat.value + '<span style="opacity:0.55">/' + stat.of + '</span>' : stat.value + (stat.label ? ' <span style="opacity:0.55;font-weight:500">' + stat.label + '</span>' : '');
+      return '<span class="stat-pill">' + label + '</span>';
+    }
+    if (stat.kind === 'days') {
+      var cls = stat.value <= 3 ? 'crit' : (stat.value <= 7 ? 'warn' : '');
+      return '<span class="stat-pill ' + cls + '">' + stat.value + (stat.label ? ' ' + stat.label : 'd') + '</span>';
+    }
+    if (stat.kind === 'pill') {
+      return '<span class="stat-pill ' + (stat.tone || 'neutral') + '">' + stat.value + '</span>';
+    }
+    return '';
+  }
+
+  // ════════════════════════════════════════════════════════
+  // ACTIVITY FEED — Otto's timeline (centre column)
+  // ════════════════════════════════════════════════════════
+  function renderActivity() {
+    var card = document.getElementById('activity');
+    var items = (EAP.activityFeed || {})[personaKey] || [];
+    var rows = items.map(function(a) {
+      var srcIcon  = SRC_ICONS[a.source] || SRC_ICONS.ai;
+      var srcClass = 'src-' + (a.source || 'ai');
+      var tabAttr  = a.tab       ? ' data-tab="'       + a.tab + '"' : '';
+      var ottoAttr = a.otto      ? ' data-otto="'      + a.otto.replace(/"/g, '&quot;') + '"' : '';
+      var hlAttr   = a.highlight ? ' data-highlight="' + a.highlight + '"' : '';
+      var clickCls = a.tab ? ' act-clickable' : '';
+      return '<div class="activity-row' + clickCls + '"' + tabAttr + ottoAttr + hlAttr + '>' +
+        '<span class="src-icon ' + srcClass + '">' + srcIcon + '</span>' +
+        '<div class="activity-meta">' +
+          '<div class="activity-time">' + a.time + '</div>' +
+          '<div class="activity-title">' + a.title + '</div>' +
+          (a.meta ? '<div class="activity-note">' + a.meta + '</div>' : '') +
+        '</div>' +
+        (a.tab ? '<span class="act-arrow">›</span>' : '') +
+      '</div>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="zone-eyebrow">ACTIVITY · 2</div>' +
+      '<h2 class="zone-title">What Otto did for you</h2>' +
+      '<div class="zone-sub">Drafts, links and synthesis · pending your review</div>' +
+      '<div class="activity-list">' + rows + '</div>';
+
+    card.querySelectorAll('.activity-row[data-tab]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var t  = el.getAttribute('data-tab');
+        var ot = el.getAttribute('data-otto');
+        var hl = el.getAttribute('data-highlight');
+        if (t) {
+          var url = tabUrl(t);
+          if (hl) url += '&highlight=' + encodeURIComponent(hl);
+          if (ot) url += '&otto='      + encodeURIComponent(ot);
+          window.location.href = url;
+        }
+      });
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // COMING UP — countdown + readiness + timeline + attendees
+  // ════════════════════════════════════════════════════════
+  function renderNext() {
+    var card = document.getElementById('next');
+    if (!hc) return;
+    var n = hc.next;
+    var rPct = n.readiness ? Math.round((n.readiness.ready / n.readiness.total) * 100) : 0;
+
+    var rows = n.timeline.map(function(t) {
+      var stateLabel = ({done:'✓ Done', pending:'⚠ Pending', upcoming:'Upcoming'})[t.state] || t.state;
+      var attendees = (EAP.eventAttendees || {})[t.label] || [];
+      var attendeeHtml = '';
+      if (attendees.length) {
+        var visible = attendees.slice(0, 4);
+        var overflow = Math.max(0, attendees.length - 4);
+        attendeeHtml = '<div class="timeline-attendees">' +
+          visible.map(function(k) {
+            var p = (EAP.people || {})[k] || {};
+            var url = p.avatar || '';
+            return '<div class="tt-avatar" style="background-image:url(\'' + url + '\');"></div>';
+          }).join('') +
+          (overflow ? '<span class="tt-overflow">+' + overflow + '</span>' : '') +
+        '</div>';
+      }
+      return '<div class="timeline-row" data-tab="' + (n.tab || 'planning') + '">' +
+        '<div class="timeline-line1">' +
+          '<div class="timeline-left"><span class="timeline-date">' + t.date + '</span><span class="timeline-event">' + t.label + '</span></div>' +
+          '<span class="timeline-state ' + t.state + '">' + stateLabel + '</span>' +
+        '</div>' +
+        attendeeHtml +
+      '</div>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="zone-eyebrow">COMING UP · 3</div>' +
+      '<h2 class="zone-title">' + n.title + '</h2>' +
+      '<div class="zone-sub">Anchor: ' + n.anchor + '</div>' +
+      '<div class="next-bignum"><span class="next-num">' + n.daysUntil + '</span><span class="next-lbl">days until<br><strong>' + n.anchor + '</strong></span></div>' +
+      (n.readiness ? '<div class="readiness-block"><div class="readiness-hd"><span>' + n.readiness.label + '</span><span class="readiness-val">' + n.readiness.ready + ' / ' + n.readiness.total + '</span></div><div class="readiness-track"><div class="readiness-fill" style="width:' + rPct + '%"></div></div></div>' : '') +
+      '<div class="timeline-list">' + rows + '</div>';
+
+    card.querySelectorAll('.timeline-row').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var t = el.getAttribute('data-tab');
+        if (t) window.location.href = tabUrl(t);
+      });
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // CHART HELPERS — Chart.js everywhere
+  // ════════════════════════════════════════════════════════
+  function multiSegmentDonut(canvasId, segments) {
+    var ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: segments.map(function(s){ return s.label || ''; }),
+        datasets: [{
+          data: segments.map(function(s){ return s.value; }),
+          backgroundColor: segments.map(function(s){ return s.color; }),
+          borderWidth: 3, borderColor: 'rgba(255,255,255,0.85)',
+          borderRadius: 4, borderSkipped: false
+        }]
+      },
+      options: {
+        rotation: -90, circumference: 180,
+        cutout: '70%', maintainAspectRatio: false,
+        layout: { padding: 4 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: false,
+            external: function(context) {
+              var el = document.getElementById('donut-tip');
+              if (!el) { el = document.createElement('div'); el.id = 'donut-tip'; document.body.appendChild(el); }
+              var tooltip = context.tooltip;
+              if (tooltip.opacity === 0 || !tooltip.dataPoints || !tooltip.dataPoints.length) { el.style.opacity = '0'; return; }
+              var dp = tooltip.dataPoints[0];
+              var seg = segments[dp.dataIndex];
+              if (!seg || !seg.label) { el.style.opacity = '0'; return; }
+              el.innerHTML =
+                '<div class="dtip-label">' + seg.label + '</div>' +
+                '<div class="dtip-body">' + (seg.body || dp.formattedValue) + '</div>' +
+                (seg.foot ? '<div class="dtip-foot">' + seg.foot + '</div>' : '');
+              var rect = context.chart.canvas.getBoundingClientRect();
+              el.style.opacity = '1';
+              var x = rect.left + tooltip.caretX + 14;
+              var y = rect.top + tooltip.caretY - el.offsetHeight / 2;
+              el.style.left = Math.min(x, window.innerWidth - el.offsetWidth - 12) + 'px';
+              el.style.top  = Math.max(y, 8) + 'px';
+            }
+          }
+        },
+        animation: { duration: 800, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  function compassDonut(canvasId, segments) {
+    var ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    var labels = segments.map(function(s){ return s.label || ''; }).concat(['']);
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: segments.map(function(s){ return s.value; }).concat([300 - segments.reduce(function(a,s){return a+s.value;},0)]),
+          backgroundColor: segments.map(function(s){ return s.color; }).concat(['rgba(0,0,0,0.06)']),
+          borderWidth: 3, borderColor: 'rgba(255,255,255,0.85)',
+          borderRadius: 6, borderSkipped: false
+        }]
+      },
+      options: {
+        rotation: -90, circumference: 180,
+        cutout: '68%', maintainAspectRatio: false,
+        layout: { padding: 4 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: false,
+            external: function(context) {
+              var el = document.getElementById('donut-tip');
+              if (!el) { el = document.createElement('div'); el.id = 'donut-tip'; document.body.appendChild(el); }
+              var tooltip = context.tooltip;
+              if (tooltip.opacity === 0 || !tooltip.dataPoints || !tooltip.dataPoints.length) { el.style.opacity = '0'; return; }
+              var dp = tooltip.dataPoints[0];
+              var seg = segments[dp.dataIndex];
+              if (!seg || !seg.label) { el.style.opacity = '0'; return; }
+              el.innerHTML =
+                '<div class="dtip-label">' + seg.label + '</div>' +
+                '<div class="dtip-body">' + (seg.body || dp.formattedValue) + '</div>' +
+                (seg.foot ? '<div class="dtip-foot">' + seg.foot + '</div>' : '');
+              var rect = context.chart.canvas.getBoundingClientRect();
+              el.style.opacity = '1';
+              var x = rect.left + tooltip.caretX + 14;
+              var y = rect.top + tooltip.caretY - el.offsetHeight / 2;
+              el.style.left = Math.min(x, window.innerWidth - el.offsetWidth - 12) + 'px';
+              el.style.top  = Math.max(y, 8) + 'px';
+            }
+          }
+        },
+        animation: { duration: 800, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  function sprintDial(canvasId, current, total) {
+    var ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Done', 'Remaining'],
+        datasets: [{
+          data: [current, total - current],
+          backgroundColor: ['#0669FF', 'rgba(0,0,0,0.06)'],
+          borderWidth: 3, borderColor: 'rgba(255,255,255,0.9)',
+          borderRadius: 6, borderSkipped: false
+        }]
+      },
+      options: {
+        rotation: -90, circumference: 360,
+        cutout: '70%', maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(255,255,255,0.96)',
+            titleColor: '#111827', bodyColor: '#374151',
+            borderColor: 'rgba(0,0,0,0.08)', borderWidth: 1,
+            padding: { x: 10, y: 7 }, cornerRadius: 8,
+            displayColors: false,
+            titleFont: { size: 10, weight: '600', family: 'inherit' },
+            bodyFont: { size: 12, weight: '600', family: 'inherit' },
+            callbacks: {
+              title: function(items) { return items[0] ? items[0].label : ''; },
+              label: function(c) { return c.parsed + ' pts'; }
+            }
+          }
+        },
+        animation: { duration: 800 }
+      }
+    });
+  }
+
+  function goalGauge(canvasId, value, target, color, opts) {
+    opts = opts || {};
+    var ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Current', 'Gap to target', ''],
+        datasets: [{
+          data: [value, Math.max(0, target - value), Math.max(0, 100 - target)],
+          backgroundColor: [color, '#FFE6CC', 'rgba(0,0,0,0.06)'],
+          borderWidth: 2, borderColor: 'rgba(255,255,255,0.9)',
+          borderRadius: 4, borderSkipped: false
+        }]
+      },
+      options: {
+        rotation: -90, circumference: 180,
+        cutout: '70%', maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: false,
+            external: function(context) {
+              var el = document.getElementById('donut-tip');
+              if (!el) { el = document.createElement('div'); el.id = 'donut-tip'; document.body.appendChild(el); }
+              var tooltip = context.tooltip;
+              if (tooltip.opacity === 0 || !tooltip.dataPoints || !tooltip.dataPoints.length) { el.style.opacity = '0'; return; }
+              var dp = tooltip.dataPoints[0];
+              var d = dp.dataIndex;
+              var label = ['Current', 'Gap to target', ''][d];
+              if (!label) { el.style.opacity = '0'; return; }
+              var body = d === 0 ? (opts.currentBody || dp.formattedValue + '%') : (opts.gapBody || dp.formattedValue + '% gap');
+              var foot = d === 0 ? (opts.currentFoot || '') : (opts.gapFoot || '');
+              el.innerHTML =
+                '<div class="dtip-label">' + label + '</div>' +
+                '<div class="dtip-body">' + body + '</div>' +
+                (foot ? '<div class="dtip-foot">' + foot + '</div>' : '');
+              var rect = context.chart.canvas.getBoundingClientRect();
+              el.style.opacity = '1';
+              var x = rect.left + tooltip.caretX + 14;
+              var y = rect.top + tooltip.caretY - el.offsetHeight / 2;
+              el.style.left = Math.min(x, window.innerWidth - el.offsetWidth - 12) + 'px';
+              el.style.top  = Math.max(y, 8) + 'px';
+            }
+          }
+        },
+        animation: { duration: 700 }
+      }
+    });
+  }
+
+  function burnChart(canvasId) {
+    var ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    var idealData   = [46, 41, 37, 32, 28, 23, 18, 14, 9, 5, 0];
+    var actualData  = [46, 46, 45, 44, 44, 42, 40, 38, null, null, null];
+    var dayLabels   = ['D0','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10'];
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dayLabels,
+        datasets: [
+          {
+            label: 'Ideal',
+            data: idealData,
+            borderColor: 'rgba(0,0,0,0.20)',
+            borderWidth: 1.5,
+            borderDash: [5, 3],
+            pointRadius: 0,
+            fill: false,
+            tension: 0
+          },
+          {
+            label: 'Actual',
+            data: actualData,
+            borderColor: '#EF4444',
+            borderWidth: 2,
+            backgroundColor: 'rgba(239,68,68,0.07)',
+            fill: true,
+            tension: 0.2,
+            pointRadius: actualData.map(function(v, i) { return (v !== null && i === 7) ? 4 : 0; }),
+            pointBackgroundColor: '#EF4444',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 5
+          }
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: {
+            ticks: { color: 'rgba(0,0,0,0.40)', font: { size: 9 }, maxRotation: 0 },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true, max: 50,
+            ticks: { color: 'rgba(0,0,0,0.40)', font: { size: 9 }, stepSize: 10, callback: function(v) { return v + 'pt'; } },
+            grid: { color: 'rgba(0,0,0,0.04)' }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(255,255,255,0.96)',
+            titleColor: '#111827', bodyColor: '#374151',
+            borderColor: 'rgba(0,0,0,0.08)', borderWidth: 1,
+            padding: { x: 10, y: 7 }, cornerRadius: 8,
+            displayColors: false,
+            titleFont: { size: 10, weight: '600', family: 'inherit' },
+            bodyFont: { size: 11, family: 'inherit' },
+            filter: function(item) { return item.parsed.y !== null; },
+            callbacks: {
+              title: function(items) { return items[0] ? 'Sprint day ' + items[0].label.replace('D','') : ''; },
+              label: function(item) {
+                if (item.datasetIndex === 0) return 'Ideal: ' + item.parsed.y + ' pts left';
+                return 'Actual: ' + item.parsed.y + ' pts left';
+              }
+            }
+          }
+        },
+        animation: { duration: 700 }
+      }
+    });
+  }
+
+  // Smooth area sparkline with themed hover tooltip. Color keys map to
+  // semantic palettes; the last point is highlighted slightly to anchor
+  // "this is now". The Y axis is unbounded but we add a small padding
+  // band below the min so curves never sit on the floor.
+  function statSparkline(ctx, data, colorKey, labels, threshold, thresholdLabel) {
+    // Bright dataviz palette — viz-blue/green/orange/red (see :root tokens).
+    // Sparklines should feel optimistic, not muted enterprise.
+    var palette = {
+      primary: { stroke: '#2563EB', fill: 'rgba(37,99,235,0.18)' },
+      success: { stroke: '#22C55E', fill: 'rgba(34,197,94,0.20)' },
+      warning: { stroke: '#F97316', fill: 'rgba(249,115,22,0.20)' },
+      error:   { stroke: '#EF4444', fill: 'rgba(239,68,68,0.18)' },
+      cyan:    { stroke: '#06B6D4', fill: 'rgba(6,182,212,0.20)' }
+    };
+    var c = palette[colorKey] || palette.primary;
+    var min = Math.min.apply(null, data);
+    var max = Math.max.apply(null, data);
+    var pad = Math.max((max - min) * 0.25, 1);
+    var yMin = min - pad;
+    var yMax = (threshold !== null && threshold !== undefined) ? Math.max(max + pad, threshold + pad * 0.5) : max + pad;
+
+    // Soft vertical gradient for the area fill — denser near the line,
+    // fades toward the baseline. Looks more crafted than a flat tint.
+    var canvas = ctx.canvas || ctx;
+    var g = canvas.getContext('2d');
+    var grad = g.createLinearGradient(0, 0, 0, canvas.clientHeight || 56);
+    var rgba = c.fill.replace('rgba(', '').replace(')', '').split(',').map(function(n){return parseFloat(n);});
+    grad.addColorStop(0, 'rgba(' + rgba[0] + ',' + rgba[1] + ',' + rgba[2] + ',' + Math.min(rgba[3] * 1.4, 1) + ')');
+    grad.addColorStop(1, 'rgba(' + rgba[0] + ',' + rgba[1] + ',' + rgba[2] + ',0)');
+
+    var hasThreshold = threshold !== null && threshold !== undefined;
+    var sparkDatasets = [{
+      label: 'Actual',
+      data: data,
+      borderColor: c.stroke,
+      borderWidth: 2.25,
+      backgroundColor: grad,
+      fill: true,
+      tension: 0.42,
+      pointRadius: data.map(function(_, i){ return i === data.length - 1 ? 3 : 0; }),
+      pointBackgroundColor: c.stroke,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1.5,
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: c.stroke,
+      pointHoverBorderColor: '#fff',
+      pointHoverBorderWidth: 2
+    }];
+    if (hasThreshold) {
+      sparkDatasets.push({
+        label: thresholdLabel || 'Target',
+        data: data.map(function() { return threshold; }),
+        borderColor: 'rgba(0,0,0,0.28)',
+        borderWidth: 1.25,
+        borderDash: [4, 3],
+        pointRadius: 0,
+        fill: false,
+        tension: 0
+      });
+    }
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels || data.map(function(_, i){ return i + 1; }),
+        datasets: sparkDatasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { display: false },
+          y: { display: false, suggestedMin: yMin, suggestedMax: yMax }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(255,255,255,0.96)',
+            titleColor: '#111827',
+            bodyColor: '#374151',
+            borderColor: 'rgba(0,0,0,0.08)',
+            borderWidth: 1,
+            padding: { x: 10, y: 7 },
+            cornerRadius: 8,
+            displayColors: false,
+            titleFont: { size: 10, weight: '600', family: "inherit" },
+            bodyFont: { size: 12, weight: '600', family: "inherit" },
+            titleMarginBottom: 2,
+            callbacks: {
+              title: function(items) { return (items[0] && items[0].label) || ''; },
+              label: function(item) {
+                if (hasThreshold && item.datasetIndex === 1) return (thresholdLabel || 'Target') + ': ' + item.parsed.y;
+                if (hasThreshold) return 'Actual: ' + item.parsed.y;
+                return item.parsed.y;
+              }
+            }
+          }
+        },
+        animation: { duration: 800, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  function burnAreaChart(canvasId) {
+    var ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    var labels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13','W14'];
+    var actual   = [8,15,22,28,34,40,46,53,60,68,76,82,null,null];
+    var forecast = [7,14,21,28,35,42,49,56,63,70,77,84,91,98];
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          { label:'Forecast', data: forecast, borderColor:'rgba(0,0,0,0.30)', borderWidth: 1.5, borderDash:[4,4], fill: false, tension: 0.2, pointRadius: 0 },
+          { label:'Actual',   data: actual,   borderColor:'#0e4e69',           borderWidth: 2.5, backgroundColor:'rgba(14,78,105,0.18)', fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 0 }
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+          x: { ticks:{ color:'rgba(0,0,0,0.45)', font:{ size: 9 } }, grid:{ display:false } },
+          y: { beginAtZero:true, max: 100, ticks:{ color:'rgba(0,0,0,0.45)', font:{ size: 9 }, callback: function(v){ return v + '%'; } }, grid:{ color:'rgba(0,0,0,0.04)' } }
+        },
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        animation: { duration: 700 }
+      }
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // BOOT
+  // ════════════════════════════════════════════════════════
+  renderHero();
+  renderStats();
+  renderFocus();
+  renderActivity();
+  renderNext();
+
+})();
+</script>
+</body>
+</html>
