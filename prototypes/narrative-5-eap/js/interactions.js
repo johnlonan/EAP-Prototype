@@ -556,6 +556,70 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+// ── Global tooltip (position:fixed — escapes overflow:auto clipping) ──
+(function() {
+  var tip = null, arrow = null;
+
+  function ensure() {
+    if (tip) return;
+    tip = document.createElement('div');
+    tip.id = 'eap-tip';
+    document.body.appendChild(tip);
+    arrow = document.createElement('div');
+    arrow.id = 'eap-tip-arrow';
+    document.body.appendChild(arrow);
+  }
+
+  function show(el) {
+    ensure();
+    var text = el.getAttribute('data-tip');
+    if (!text) return;
+    tip.textContent = text;
+    tip.style.display = 'block';
+    arrow.style.display = 'block';
+
+    var r = el.getBoundingClientRect();
+    var tw = tip.offsetWidth;
+    var th = tip.offsetHeight;
+    var gap = 6;
+    var arrowH = 5;
+
+    var above = r.top - th - arrowH - gap >= 8;
+    var tipLeft = Math.max(8, Math.min(r.left + r.width / 2 - tw / 2, window.innerWidth - tw - 8));
+
+    if (above) {
+      tip.style.top  = (r.top - th - arrowH - gap) + 'px';
+      tip.style.left = tipLeft + 'px';
+      arrow.style.top  = (r.top - arrowH - gap) + 'px';
+      arrow.style.left = (r.left + r.width / 2 - arrowH) + 'px';
+      arrow.style.borderTopColor    = 'rgba(14,28,40,0.88)';
+      arrow.style.borderBottomColor = 'transparent';
+    } else {
+      tip.style.top  = (r.bottom + arrowH + gap) + 'px';
+      tip.style.left = tipLeft + 'px';
+      arrow.style.top  = (r.bottom + gap) + 'px';
+      arrow.style.left = (r.left + r.width / 2 - arrowH) + 'px';
+      arrow.style.borderBottomColor = 'rgba(14,28,40,0.88)';
+      arrow.style.borderTopColor    = 'transparent';
+    }
+  }
+
+  function hide() {
+    if (!tip) return;
+    tip.style.display = 'none';
+    arrow.style.display = 'none';
+  }
+
+  document.addEventListener('mouseover', function(e) {
+    var el = e.target.closest('[data-tip]');
+    if (el) show(el); else hide();
+  });
+  document.addEventListener('mouseout', function(e) {
+    var el = e.target.closest('[data-tip]');
+    if (el && !el.contains(e.relatedTarget)) hide();
+  });
+})();
+
 // ── Initialize all interactions ────────────────────────
 EAP.initInteractions = function() {
   EAP.initContextSelector();

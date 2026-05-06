@@ -19,18 +19,19 @@ function trackCard(item, opts) {
 
   var h = '<div class="' + cls + '"' + (item.id ? ' id="tcard-' + item.id + '"' : '') + '>';
 
-  // Blocked/at-risk banner
+  // Blocked/at-risk banners
   if (isBlocked) {
     h += '<div class="bcard-banner bcard-banner-red">' + EAP.icon('info', 12) + (item.blockReason || 'Blocked') + '</div>';
   } else if (isAtRisk) {
     h += '<div class="bcard-banner bcard-banner-amber">' + (item.openDefects ? item.openDefects + ' open defects' : 'At risk') + '</div>';
   }
 
-  // Type pill (WorkItem cards)
+  // Type pill + carry-over tag (WorkItem cards)
   var t = item.type;
   var isWI = t === 'Story' || t === 'Defect' || t === 'Case Task' || t === 'CaseTask';
   if (isWI) {
-    h += '<div class="bcard-tags">' + EAP.typeCell(t) + '</div>';
+    var carryTag = item.carriedOver ? '<span class="bcard-carry-tag">↑ Carry-over</span>' : '';
+    h += '<div class="bcard-tags">' + EAP.typeCell(t) + carryTag + '</div>';
   }
 
   // Title
@@ -85,11 +86,13 @@ EAP.renderTrack = function() {
   }
 
   // Then apply chip filters (member within team, or team within ART)
-  if (isTeamCtx && s.trackMember && s.trackMember !== 'All') {
-    all = all.filter(function(i) { return i.owner === s.trackMember; });
+  var selMembers = s.trackMembers || [];
+  if (isTeamCtx && selMembers.length > 0) {
+    all = all.filter(function(i) { return selMembers.indexOf(i.owner) !== -1; });
   }
-  if (!isTeamCtx && s.trackTeam && s.trackTeam !== 'All') {
-    all = all.filter(function(i) { return i.team === s.trackTeam; });
+  var selTeams = s.trackTeams || [];
+  if (!isTeamCtx && selTeams.length > 0) {
+    all = all.filter(function(i) { return selTeams.indexOf(i.team) !== -1; });
   }
 
   // ── Compute stats from filtered set ──
@@ -101,8 +104,21 @@ EAP.renderTrack = function() {
   var doneItems = all.filter(function(i) { return i.state === 'Done' || i.state === 'Complete'; });
   var donePts = doneItems.reduce(function(a, i) { return a + (i.pts || 0); }, 0);
   var pct = totalPts > 0 ? Math.round((donePts / totalPts) * 100) : 0;
-  var blockedItems = all.filter(function(i) { return i.blocked || i.state === 'Blocked'; });
-  var blockedCount = blockedItems.length;
+  var blockedCount = all.filter(function(i) { return i.blocked || i.state === 'Blocked'; }).length;
+  var carriedCount = all.filter(function(i) { return i.carriedOver; }).length;
+  var defectPts = all.filter(function(i) { return i.type === 'Defect'; }).reduce(function(a, i) { return a + (i.pts || 0); }, 0);
+  var bugPct = totalPts > 0 ? Math.round((defectPts / totalPts) * 100) : 0;
+
+  // Health signals grouped: blocked · carried · defects%
+  var healthParts = [];
+  if (blockedCount > 0) healthParts.push('<span class="track-ctx-blocked">' + blockedCount + ' blocked</span>');
+  if (carriedCount > 0) healthParts.push('<span class="track-ctx-carried">' + carriedCount + ' carried over</span>');
+  if (bugPct > 0) healthParts.push('<span class="track-ctx-defects"' + (bugPct > 25 ? ' style="color:var(--color-warning);"' : '') + '>' + bugPct + '% defects</span>');
+  var healthHtml = healthParts.length > 0
+    ? '<span class="track-ctx-vsep"></span><div class="track-ctx-group track-ctx-health">' +
+        healthParts.join('') +
+      '</div>'
+    : '';
 
   // ── Context header — micro-dashboard ──
   var contextHtml = '<div class="track-context">' +
@@ -124,31 +140,27 @@ EAP.renderTrack = function() {
       '<span class="track-ctx-sep">·</span>' +
       '<span class="track-ctx-progress"><span class="track-ctx-pbar"><span class="track-ctx-pfill" style="width:' + pct + '%"></span></span>' + donePts + ' of ' + totalPts + ' pts (' + pct + '%)</span>' +
     '</div>' +
-    (blockedCount > 0 ?
-      '<span class="track-ctx-vsep"></span>' +
-      '<div class="track-ctx-group">' +
-        '<span class="track-ctx-blocked">' + blockedCount + ' of ' + totalItems + ' items blocked</span>' +
-      '</div>' : '') +
+    healthHtml +
     '</div>';
 
   // ── Filter chips — team or member (inside board content, new row) ──
   var chipRowHtml = '<div class="track-chip-row">';
   if (isTeamCtx) {
     var members = (EAP.teamMembers && EAP.teamMembers[s.contextName]) || [];
-    var activeMember = s.trackMember || 'All';
-    chipRowHtml += '<span class="track-chip' + (activeMember === 'All' ? ' active' : '') + '" data-track-member="All">' + EAP.icon('users', 14) + ' All</span>';
+    var selMbrs = s.trackMembers || [];
+    chipRowHtml += '<span class="track-chip' + (selMbrs.length === 0 ? ' active' : '') + '" data-track-member="All">' + EAP.icon('users', 14) + ' All</span>';
     members.forEach(function(m) {
       var p = EAP.people[m];
       if (!p) return;
-      chipRowHtml += '<span class="track-chip' + (activeMember === m ? ' active' : '') + '" data-track-member="' + m + '">' + EAP.avatar(m, 20) + ' ' + p.name + '</span>';
+      chipRowHtml += '<span class="track-chip' + (selMbrs.indexOf(m) !== -1 ? ' active' : '') + '" data-track-member="' + m + '">' + EAP.avatar(m, 20) + ' ' + p.name + '</span>';
     });
   } else {
     var teams = ['Auth Team', 'Payments Team', 'Fraud Team', 'Mobile Exp Team', 'Accounts Team', 'Onboarding Team'];
-    var activeTeam = s.trackTeam || 'All';
-    chipRowHtml += '<span class="track-chip' + (activeTeam === 'All' ? ' active' : '') + '" data-track-team="All">' + EAP.icon('users', 14) + ' All Teams</span>';
+    var selTms = s.trackTeams || [];
+    chipRowHtml += '<span class="track-chip' + (selTms.length === 0 ? ' active' : '') + '" data-track-team="All">' + EAP.icon('users', 14) + ' All Teams</span>';
     teams.forEach(function(t) {
       var tc = EAP.teamColors[t] || '#6B7280';
-      chipRowHtml += '<span class="track-chip' + (activeTeam === t ? ' active' : '') + '" data-track-team="' + t + '"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span> ' + t + '</span>';
+      chipRowHtml += '<span class="track-chip' + (selTms.indexOf(t) !== -1 ? ' active' : '') + '" data-track-team="' + t + '"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + tc + ';flex-shrink:0;"></span> ' + t + '</span>';
     });
   }
   chipRowHtml += '</div>';
@@ -182,9 +194,21 @@ EAP.renderTrack = function() {
   EAP.trackColumns.forEach(function(col) {
     var items = bk[col] || [];
     h += '<div style="width:' + colW + 'px;flex-shrink:0;display:flex;flex-direction:column;">';
-    h += '<div style="padding:8px 10px;border-radius:10px 10px 0 0;background:linear-gradient(135deg, rgba(140,215,180,0.10), rgba(140,195,220,0.10));border-bottom:1px solid rgba(14,78,105,0.10);box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);display:flex;align-items:center;justify-content:space-between;">';
+    var wLimit = EAP.wipLimits ? (EAP.wipLimits[col] || 0) : 0;
+    var wOver = wLimit > 0 && items.length > wLimit;
+    var wTip = wLimit > 0
+      ? (wOver
+          ? 'WIP limit: ' + wLimit + ' · ' + items.length + ' in column · Over by ' + (items.length - wLimit)
+          : 'WIP limit: ' + wLimit + ' · ' + (wLimit - items.length) + ' slots available')
+      : '';
+    h += '<div class="track-col-hd"' + (!wOver && wTip ? ' data-tip="' + wTip + '"' : '') + '>';
     h += '<span style="font-size:10px;font-weight:500;color:#374151;text-transform:uppercase;letter-spacing:0.03em;">' + col + '</span>';
-    h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;">' + items.length + '</span></div>';
+    if (wOver) {
+      h += '<span class="track-wip-badge"' + (wTip ? ' data-tip="' + wTip + '"' : '') + '>Over limit</span>';
+    } else {
+      h += '<span style="font-size:10px;font-family:var(--font-mono);color:#6B7280;">' + items.length + '</span>';
+    }
+    h += '</div>';
     h += '<div style="' + TCB + '">';
     items.forEach(function(wi) { h += trackCard(wi, {showTeam: true, ownerField: 'owner'}); });
     h += '</div></div>';
