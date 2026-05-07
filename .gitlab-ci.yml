@@ -1,0 +1,15 @@
+# GitLab Pages — serves the prototype as a static site.
+# Once the pipeline runs, the site is available at:
+#   https://john-lonan.code.devsnc.com/EAP-Prototype/
+# (exact URL depends on how Pages is configured on this GitLab instance)
+
+pages:
+  stage: deploy
+  script:
+    - mkdir public
+    - cp -r assets prototypes data public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "Project-Workspace-Prototype"'
