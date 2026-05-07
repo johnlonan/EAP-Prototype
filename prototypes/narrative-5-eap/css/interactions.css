@@ -113,10 +113,10 @@
 
 .ins-sig[data-insight-target] {
   cursor: pointer;
-  transition: background 160ms ease;
+  transition: transform 120ms ease;
 }
 .ins-sig[data-insight-target]:hover {
-  background: rgba(0, 199, 177, 0.06) !important;
+  transform: translateX(2px);
 }
 
 

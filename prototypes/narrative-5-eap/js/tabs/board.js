@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════ */
 var EAP = EAP || {};
 
-var CB = 'background:rgba(255,255,255,0.3);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.4);border-top:none;border-radius:0 0 12px 12px;padding:8px;min-height:100px;flex:1;';
+var CB = EAP._colBodyStyle;
 
 function colHd(isActive) {
   return 'padding:8px 12px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between;' +
@@ -22,7 +22,7 @@ function renderCard(item, opts) {
   var isAtRisk = item.atRisk && !isBlocked;
   var isDone = item.state === 'Done' || item.state === 'Complete';
   var t = item.type;
-  var isWI = t === 'Story' || t === 'Defect' || t === 'Case Task' || t === 'CaseTask';
+  var isWI = EAP.isWorkItemType(t);
   var cls = 'bcard' + (compact ? ' bcard-compact' : '') + (isBlocked ? ' bcard-blocked' : '') + (isAtRisk ? ' bcard-atrisk' : '') + (isDone ? ' bcard-done' : '');
 
   var h = '<div class="' + cls + '"' + (item.id ? ' id="fcard-' + item.id + '"' : '') + '>';

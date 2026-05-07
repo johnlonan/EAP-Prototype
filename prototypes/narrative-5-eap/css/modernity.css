@@ -184,9 +184,11 @@ html, body { font-size: 13px; line-height: 1.5; }
 .ins-hdr-left svg { color: #00C7B1 !important; }
 
 /* Refined glass — bigger backdrop-filter blur for richer feel */
-.gpanel {
-  backdrop-filter: blur(22px) !important;
-  -webkit-backdrop-filter: blur(22px) !important;
+@supports (backdrop-filter: blur(1px)) {
+  .gpanel {
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+  }
 }
 
 /* AI-accent inner top edge on insights panel (extra dimensional cue) */
@@ -257,25 +259,35 @@ body { background: #d6e9e6 !important; }
    opacity (0.42 vs 0.52) lets the underlying colour bleed through more.
    Stronger inner top-edge highlight reads as light catching the glass. */
 .gpanel {
-  background: rgba(255, 255, 255, 0.42) !important;
-  backdrop-filter: blur(30px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
   border: 1px solid rgba(255, 255, 255, 0.72) !important;
   box-shadow:
     0 1px 2px rgba(0,0,0,0.04),
     0 24px 60px rgba(0,0,0,0.07),
     inset 0 1px 0 rgba(255,255,255,0.78) !important;
 }
+@supports (backdrop-filter: blur(1px)) {
+  .gpanel {
+    background: rgba(255, 255, 255, 0.42) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  }
+}
 
 .pi-acc {
-  background: rgba(255, 255, 255, 0.36) !important;
-  backdrop-filter: blur(24px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  background: rgba(255, 255, 255, 0.90) !important;
   border: 1px solid rgba(255, 255, 255, 0.65) !important;
   box-shadow:
     0 1px 2px rgba(0,0,0,0.03),
     0 16px 40px rgba(0,0,0,0.05),
     inset 0 1px 0 rgba(255,255,255,0.65) !important;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .pi-acc {
+    background: rgba(255, 255, 255, 0.36) !important;
+    backdrop-filter: blur(24px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  }
 }
 .pi-acc:hover {
   box-shadow:
@@ -286,14 +298,19 @@ body { background: #d6e9e6 !important; }
 
 /* Timeline glass slab — same treatment so the timeline panel matches. */
 .tl-wrap {
-  background: rgba(255, 255, 255, 0.42) !important;
-  backdrop-filter: blur(30px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
   border: 1px solid rgba(255, 255, 255, 0.72) !important;
   box-shadow:
     0 1px 2px rgba(0,0,0,0.04),
     0 24px 60px rgba(0,0,0,0.07),
     inset 0 1px 0 rgba(255,255,255,0.78) !important;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .tl-wrap {
+    background: rgba(255, 255, 255, 0.42) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  }
 }
 
 /* 4C — Header gradient — applied to every flat-tint header strip across

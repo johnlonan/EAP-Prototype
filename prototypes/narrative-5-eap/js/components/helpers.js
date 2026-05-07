@@ -3,6 +3,56 @@
    ═══════════════════════════════════════════════════════ */
 var EAP = EAP || {};
 
+// ── Shared work-item type check ───────────────────────
+EAP.isWorkItemType = function(type) {
+  return type === 'Story' || type === 'Defect' || type === 'Case Task' || type === 'CaseTask';
+};
+
+// ── Column body style — shared by Board and Track tabs ─
+EAP._colBodyStyle = 'background:rgba(255,255,255,0.3);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.4);border-top:none;border-radius:0 0 12px 12px;padding:8px;min-height:100px;flex:1;';
+
+// ── Clear owner/mine filter — shared by 3 event handlers ─
+EAP.clearOwnerFilter = function(closePopover) {
+  var s = EAP.state;
+  s.ownerFilter = [];
+  s.mineOnly = false;
+  s.mineOverrides = s.mineOverrides || {};
+  s.mineOverrides[s.tab] = false;
+  if (closePopover) EAP.closeFilterPopover();
+  EAP.render();
+};
+
+// ── Group-by option HTML — shared by Hierarchy and Timeline dropdowns ─
+// Generates <optgroup> blocks for the standard grouping dimensions.
+// currentVal: the currently selected value; redundantList: array of values
+// to suppress at the current scope; skipVal: one extra value to skip (used
+// by Timeline for the level's natural default dimension).
+EAP.renderGroupByOptions = function(currentVal, redundantList, skipVal) {
+  function opt(value, label) {
+    if (skipVal && skipVal === value) return '';
+    if (redundantList && redundantList.indexOf(value) !== -1) return '';
+    return '<option value="' + value + '"' + (currentVal === value ? ' selected' : '') + '>Group by: ' + label + '</option>';
+  }
+  return '<optgroup label="Strategy">' +
+    opt('goal', 'Goal') +
+    opt('product', 'Product') +
+    '<option disabled>Group by: Initiative · coming</option>' +
+    '<option disabled>Group by: Value Stream · coming</option>' +
+  '</optgroup>' +
+  '<optgroup label="Classification">' +
+    opt('size', 'Size') +
+  '</optgroup>' +
+  '<optgroup label="Org &amp; accountability">' +
+    opt('owner', 'Owner') +
+    opt('art', 'ART') +
+    opt('st', 'Solution Train') +
+  '</optgroup>' +
+  '<optgroup label="Status">' +
+    opt('state', 'State') +
+    opt('risk', 'Risk') +
+  '</optgroup>';
+};
+
 // Drag grip
 EAP._G = '<span class="dg">' + (EAP.icon ? EAP.icon.grip(12) : '') + '</span>';
 EAP._GT = '<td style="width:24px;padding:8px 4px">' + EAP._G + '</td>';
@@ -347,6 +397,31 @@ EAP.wsjfPopoverWire = function() {
   });
 };
 
+// ── Readiness indicator ────────────────────────────────
+// Derives whether a backlog item can be pulled into a sprint.
+// WorkItems: needs owner + pts + acceptance criteria. Features: needs team + pts.
+EAP.readinessOf = function(item) {
+  if (!item) return null;
+  var t = item.type;
+  if (EAP.isWorkItemType(t)) {
+    if (!item.owner) return { label: 'No owner',  level: 'not-ready' };
+    if (t === 'Story' && !(item.pts > 0)) return { label: 'Not sized', level: 'not-ready' };
+    if (item.noAC)   return { label: 'Needs AC',  level: 'needs-work' };
+    return { label: 'Ready', level: 'ready' };
+  }
+  // Feature
+  if (!item.team) return { label: 'No team',   level: 'not-ready' };
+  if (item.pi === null && !(item.pts > 0)) return { label: 'Not sized', level: 'not-ready' };
+  if (item.state === 'Funnel') return { label: 'In refinement', level: 'needs-work' };
+  return { label: 'Ready', level: 'ready' };
+};
+
+EAP.readinessBadge = function(item) {
+  var r = EAP.readinessOf(item);
+  if (!r) return '';
+  return '<span class="readiness-badge readiness-' + r.level + '">' + r.label + '</span>';
+};
+
 // ── Goal cell — truncated for table display ───────────
 EAP.goalCell = function(gid) {
   var name = EAP.goalName(gid);
@@ -375,13 +450,13 @@ EAP.bkCols = function() {
     r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.art || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
   if (s.level === 'WorkItem') return {
-    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>Team</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Story') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="sz">' + (i.pts || '') + '</span></td><td><span class="tm">' + (i.team || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>Team</th><th>Primary Goal</th><th>Readiness</th>',
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Story') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="sz">' + (i.pts || '') + '</span></td><td><span class="tm">' + (i.team || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td><td>' + EAP.readinessBadge(i) + '</td>'; }
   };
   // Feature
   return {
-    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
+    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>Primary Goal</th><th>Readiness</th>',
+    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '—') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td><td>' + EAP.readinessBadge(i) + '</td>'; }
   };
 };
 
@@ -404,28 +479,6 @@ EAP.lsCols = function() {
   return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>% Complete</th><th>Primary Goal</th>',
     r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
-  };
-};
-
-// ── List backlog columns — no % Complete (planning view) ──
-EAP.lsBlCols = function() {
-  var s = EAP.state;
-  if (s.level === 'Epic') return {
-    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ST</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.st || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
-  };
-  if (s.level === 'Capability') return {
-    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ART</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.art || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
-  };
-  if (s.level === 'WorkItem') return {
-    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>Team</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.typeCell(i.type || 'Story') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="sz">' + (i.pts || '') + '</span></td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
-  };
-  // Feature
-  return {
-    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td><span class="item-nm">' + i.name + '</span></td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.team || '') + '</span></td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
 };
 

@@ -7,7 +7,7 @@
 var EAP = EAP || {};
 
 // Column body style (shared constant)
-var TCB = 'background:rgba(255,255,255,0.3);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.4);border-top:none;border-radius:0 0 12px 12px;padding:8px;min-height:100px;flex:1;';
+var TCB = EAP._colBodyStyle;
 
 // ── Track card renderer (own copy — independent of Board) ──
 function trackCard(item, opts) {
@@ -28,7 +28,7 @@ function trackCard(item, opts) {
 
   // Type pill + carry-over tag (WorkItem cards)
   var t = item.type;
-  var isWI = t === 'Story' || t === 'Defect' || t === 'Case Task' || t === 'CaseTask';
+  var isWI = EAP.isWorkItemType(t);
   if (isWI) {
     var carryTag = item.carriedOver ? '<span class="bcard-carry-tag">↑ Carry-over</span>' : '';
     h += '<div class="bcard-tags">' + EAP.typeCell(t) + carryTag + '</div>';
@@ -116,7 +116,7 @@ EAP.renderTrack = function() {
   if (bugPct > 0) healthParts.push('<span class="track-ctx-defects"' + (bugPct > 25 ? ' style="color:var(--color-warning);"' : '') + '>' + bugPct + '% defects</span>');
   var healthHtml = healthParts.length > 0
     ? '<span class="track-ctx-vsep"></span><div class="track-ctx-group track-ctx-health">' +
-        healthParts.join('') +
+        healthParts.join('<span class="track-ctx-sep"></span>') +
       '</div>'
     : '';
 

@@ -20,13 +20,23 @@ EAP.renderList = function() {
 
   // Default: Epic/Capability open all (grouped by ST/ART, no "current"); Feature/WorkItem open active only
   var openAll = (s.level === 'Epic' || s.level === 'Capability');
-  groups.forEach(function(g) { if (EAP.state.openAccordions[g.id] === undefined) EAP.state.openAccordions[g.id] = openAll || !!g.active; });
+
+  // Rolling wave: groups 2+ positions after the active one are less defined.
+  // Compute activeIdx first so the open-state initialisation can use it.
+  var activeIdx = -1;
+  groups.forEach(function(g, i) { if (g.active) activeIdx = i; });
+  groups.forEach(function(g, gi) {
+    if (EAP.state.openAccordions[g.id] === undefined) {
+      var isWave = activeIdx >= 0 && gi >= activeIdx + 2;
+      EAP.state.openAccordions[g.id] = isWave ? false : (openAll || !!g.active);
+    }
+  });
 
   // Backlog panel (split view) — uses List backlog columns (no % Complete, no Type for non-WI)
   var blHtml = '';
   if (s.splitView) {
     var blD = EAP.wsjfSorted((s.level === 'WorkItem') ? EAP.getBacklogFlat() : EAP.getBacklogData());
-    var bc = EAP.lsBlCols();
+    var bc = EAP.bkCols();
     var blPgId = 'ls-bl-split';
     var blPage = EAP.pgSlice(blD, blPgId);
     blHtml = '<div class="gpanel split-left"><div class="gpanel-hd"><div class="gpanel-hd-left"><span class="gpanel-title">Backlog</span><span class="gpanel-count">' + blD.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div>' +
@@ -39,10 +49,11 @@ EAP.renderList = function() {
   // Accordions
   var acc = '<div class="' + (s.splitView ? 'split-right' : '') + '" style="' + (s.splitView ? '' : 'flex:1;min-width:0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 4px 24px;') + '">';
 
-  groups.forEach(function(g) {
+  groups.forEach(function(g, gi) {
     var isA = !!g.active, isO = !!EAP.state.openAccordions[g.id];
+    var rollingWave = activeIdx >= 0 && gi >= activeIdx + 2;
     var pgId = 'ls-' + g.id;
-    acc += '<div class="pi-acc"><div class="pi-hd' + (isA ? ' active' : '') + '" data-pi-toggle="' + g.id + '">';
+    acc += '<div class="pi-acc"><div class="pi-hd' + (isA ? ' active' : '') + (rollingWave ? ' pi-hd-wave' : '') + '" data-pi-toggle="' + g.id + '">';
     acc += '<div class="pi-tog' + (isO ? ' open' : '') + '" id="pi-tog-' + g.id + '">' + (isO ? '−' : '+') + '</div>';
     acc += '<span class="pi-nm">' + g.name + '</span>';
     if (g.dates) acc += '<span class="pi-dates">' + g.dates + '</span>';
@@ -52,6 +63,18 @@ EAP.renderList = function() {
       acc += '<span class="pi-mi"><span class="pi-ml">Capacity</span><span class="pi-mv">' + g.capPct + '%</span></span><span class="pi-ms">|</span>';
       acc += '<span class="pi-mi"><span class="pi-ml">Pts</span><span class="pi-mv">' + g.totalPts + '</span></span>';
       if (isA) acc += '<span class="pi-ms">|</span><span class="pi-mi"><span class="pi-ml">Done</span><span class="pi-mv">' + g.donePts + '</span></span>';
+      // Velocity annotation for WorkItem level
+      if (s.level === 'WorkItem' && EAP.velocityStats) {
+        var vs = EAP.velocityStats;
+        var velEntry = (EAP.velocityHistory || []).filter(function(v) { return v.id === g.id; })[0];
+        if (velEntry && velEntry.partial) {
+          // Active sprint: no annotation — done pts already shown
+        } else if (!isA && !rollingWave) {
+          acc += '<span class="pi-ms">|</span><span class="pi-mi"><span class="pi-ml">Target</span><span class="pi-mv">' + vs.low + '–' + vs.high + '</span></span>';
+        } else if (rollingWave) {
+          acc += '<span class="pi-ms">|</span><span class="pi-mi"><span class="pi-ml">Target</span><span class="pi-mv" style="color:var(--text-tertiary);">~' + vs.avg + '</span></span>';
+        }
+      }
     } else {
       acc += '<span class="pi-mi"><span class="pi-ml">' + ll + '</span><span class="pi-mv">' + g.items.length + '</span></span><span class="pi-ms">|</span><span class="pi-mi"><span class="pi-ml">Pts</span><span class="pi-mv">0</span></span>';
     }
@@ -75,7 +98,7 @@ EAP.renderList = function() {
   // Non-split: backlog section below accordions
   if (!s.splitView) {
     var blD2 = EAP.wsjfSorted((s.level === 'WorkItem') ? EAP.getBacklogFlat() : EAP.getBacklogData());
-    var bc2 = EAP.lsBlCols();
+    var bc2 = EAP.bkCols();
     var blPgId2 = 'ls-bl-stack';
     var blPage2 = EAP.pgSlice(blD2, blPgId2);
     acc += '<div class="pi-acc" style="margin-top:4px;"><div class="gpanel-hd" style="border-radius:16px 16px 0 0;"><div class="gpanel-hd-left"><span class="gpanel-title">Backlog</span><span class="gpanel-count">' + blD2.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div><div style="padding:10px 14px 14px;overflow-x:auto;"><table class="dtbl"><thead><tr>' + bc2.h + '</tr></thead><tbody>' + blPage2.map(function(i) { return '<tr data-item-id="' + i.id + '">' + bc2.r(i) + '</tr>'; }).join('') + '</tbody></table>' + EAP.pgFooter(blD2.length, blPgId2) + '</div></div>';

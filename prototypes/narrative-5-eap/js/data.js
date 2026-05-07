@@ -252,13 +252,13 @@ EAP.workItems = {
     Story: [
       {id:'blw1', num:'STRY61094301', name:'Report fraudulent transaction and recover funds',  state:'Draft', pts:3, owner:'Vikram', team:'Payments Team',  type:'Story', parent:'Real-time Fraud Alerts',         goal:'g1', rank:6},
       {id:'blw2', num:'STRY61094302', name:'Change password regularly for account security',    state:'Draft', pts:2, owner:'James',  team:'Auth Team',      type:'Story', parent:'Fingerprint Login Redesign',     goal:'g1', rank:11},
-      {id:'blw3', num:'STRY61094303', name:'Log out remotely to prevent unauthorised access',   state:'Draft', pts:2, owner:'Tomás',  team:'Mobile Exp Team',type:'Story', parent:'Enhanced Biometric Auth Flow',   goal:'g1', rank:13},
+      {id:'blw3', num:'STRY61094303', name:'Log out remotely to prevent unauthorised access',   state:'Draft', pts:2, owner:'Tomás',  team:'Mobile Exp Team',type:'Story', parent:'Enhanced Biometric Auth Flow',   goal:'g1', rank:13, noAC:true},
       {id:'blw4', num:'STRY61094304', name:'Set up PIN as additional protection layer',         state:'Draft', pts:3, owner:'Kiran',  team:'Auth Team',      type:'Story', parent:'Fingerprint Login Redesign',     goal:'g1', rank:8},
-      {id:'blw5', num:'STRY61094305', name:'View devices currently logged into account',        state:'Draft', pts:2, owner:'Yuki',   team:'Mobile Exp Team',type:'Story', parent:'Enhanced Biometric Auth Flow',   goal:'g1', rank:15},
+      {id:'blw5', num:'STRY61094305', name:'View devices currently logged into account',        state:'Draft', pts:2, owner:'Yuki',   team:'Mobile Exp Team',type:'Story', parent:'Enhanced Biometric Auth Flow',   goal:'g1', rank:15, noAC:true},
       {id:'blw6', num:'STRY61094306', name:'Report security vulnerabilities discovered',        state:'Draft', pts:3, owner:'Marcus', team:'Fraud Team',     type:'Story', parent:'Real-time Fraud Alerts',         goal:'g1', rank:2},
-      {id:'blw7', num:'STRY61094307', name:'Export transaction history as CSV',                  state:'Draft', pts:2, owner:'Lena',   team:'Accounts Team',  type:'Story', parent:'Account Statement Export PDF',   goal:'g2', rank:17},
-      {id:'blw8', num:'STRY61094308', name:'Enable face recognition for login',                 state:'Draft', pts:5, owner:'James',  team:'Auth Team',      type:'Story', parent:'Biometric Auth for Returning Users', goal:'g1', rank:19},
-      {id:'blw9', num:'STRY61094309', name:'Refactor token refresh module for clarity',          state:'Draft', pts:3, owner:'James',  team:'Auth Team',      type:'Story', parent:'Fingerprint Login Redesign',     goal:'g1', rank:23},
+      {id:'blw7', num:'STRY61094307', name:'Export transaction history as CSV',                  state:'Draft', pts:2, owner:'Lena',   team:'Accounts Team',  type:'Story', parent:'Account Statement Export PDF',   goal:'g2', rank:17, noAC:true},
+      {id:'blw8', num:'STRY61094308', name:'Enable face recognition for login',                 state:'Draft', pts:5, owner:'James',  team:'Auth Team',      type:'Story', parent:'Biometric Auth for Returning Users', goal:'g1', rank:19, noAC:true},
+      {id:'blw9', num:'STRY61094309', name:'Refactor token refresh module for clarity',          state:'Draft', pts:3, owner:'James',  team:'Auth Team',      type:'Story', parent:'Fingerprint Login Redesign',     goal:'g1', rank:23, noAC:true},
       {id:'blw10',num:'STRY61094310', name:'Add audit logs for all auth events',                 state:'Draft', pts:5, owner:'James',  team:'Auth Team',      type:'Story', parent:'Real-time Fraud Alerts',         goal:'g1', rank:24}
     ],
     Defect: [
@@ -289,10 +289,10 @@ EAP.workItems = {
         {id:'ls8',  num:'STRY61094203', name:'Integrate Auth API for payment confirmation flow',    type:'Story',     state:'In Progress', pct:10, pts:8, owner:'Mei',    team:'Payments Team', blocked:true, blockReason:'Auth API dependency Day 2', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls9',  num:'STRY61094204', name:'Payment amount validation rules and error states',    type:'Story',     state:'In Review',   pct:80, pts:3, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls10', num:'STRY61094205', name:'Fraud detection webhook integration and retry logic', type:'Story',     state:'In Progress', pct:30, pts:8, owner:'Marcus', team:'Fraud Team',    parent:'Real-time Fraud Alerts', goal:'g1'},
-        {id:'ls11', num:'STRY61094206', name:'Balance refresh on app resume and foreground event',  type:'Story',     state:'To Do',       pct:0,  pts:5, owner:'Tomás',  team:'Mobile Exp Team', parent:'Balance on Home Screen', goal:'g1'},
+        {id:'ls11', num:'STRY61094206', name:'Balance refresh on app resume and foreground event',  type:'Story',     state:'To Do',       pct:0,  pts:5, owner:'Tomás',  team:'Mobile Exp Team', parent:'Balance on Home Screen', goal:'g1', carriedOver:true},
         {id:'ls12', num:'STRY61094207', name:'Auth session expiry handler and token refresh',       type:'Story',     state:'In Progress', pct:45, pts:3, owner:'Sana',   team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1'},
         {id:'ls13', num:'STRY61094208', name:'Account statement data fetch from backend API',       type:'Story',     state:'To Do',       pct:0,  pts:3, owner:'Lena',   team:'Accounts Team', parent:'Account Statement Export PDF', goal:'g2'},
-        {id:'ls14', num:'STRY61094209', name:'KYC document upload step in onboarding flow',         type:'Story',     state:'To Do',       pct:0,  pts:4, owner:'Nina',   team:'Onboarding Team', parent:'Streamlined Onboarding Flow', goal:'g2'},
+        {id:'ls14', num:'STRY61094209', name:'KYC document upload step in onboarding flow',         type:'Story',     state:'To Do',       pct:0,  pts:4, owner:'Nina',   team:'Onboarding Team', parent:'Streamlined Onboarding Flow', goal:'g2', carriedOver:true},
         // Defects + Case Task in flight this sprint (realistic mix, not 100% Stories)
         {id:'bld5', num:'DEF0500642',   name:'Fraud alert duplicate firing on card-not-present transactions', type:'Defect',    state:'In Progress', pct:30, pts:2, owner:'Aisha',  team:'Fraud Team',     parent:'Real-time Fraud Alerts',     goal:'g1'},
         {id:'bld6', num:'DEF0500643',   name:'Auth token refresh fails silently after 24h session',           type:'Defect',    state:'In Progress', pct:60, pts:3, owner:'Sana',   team:'Auth Team',      parent:'Fingerprint Login Redesign', goal:'g1'},
@@ -731,7 +731,7 @@ EAP.teamColors = {
 
 // ── Team rosters (unique members per team) ─────────────
 EAP.teamMembers = {
-  'Auth Team':       ['Kiran', 'Sana'],
+  'Auth Team':       ['James', 'Kiran', 'Sana'],
   'Payments Team':   ['Vikram', 'Mei'],
   'Fraud Team':      ['Marcus', 'Aisha'],
   'Mobile Exp Team': ['Tomás', 'Yuki'],
@@ -748,3 +748,22 @@ EAP.teamCapacity = {
   'Accounts Team':   {sp2:65,sp3:62,sp4:60,ip:40},
   'Onboarding Team': {sp2:60,sp3:58,sp4:55,ip:40}
 };
+
+// ── Velocity history ───────────────────────────────────
+// 3 sprints from PI 25 + Sprint 1 completed + Sprint 2 active (partial).
+EAP.velocityHistory = [
+  { id:'prevsp3', name:'PI25 S3', pts:19 },
+  { id:'prevsp4', name:'PI25 S4', pts:22 },
+  { id:'prevsp5', name:'PI25 IP', pts:16 },
+  { id:'sp1',     name:'PI26 S1', pts:21 },
+  { id:'sp2',     name:'PI26 S2', pts:8, active:true, partial:true }
+];
+EAP.velocityStats = (function() {
+  var done = EAP.velocityHistory.filter(function(s) { return !s.partial; });
+  var vals = done.map(function(s) { return s.pts; });
+  var avg = Math.round(vals.reduce(function(a, b) { return a + b; }, 0) / vals.length);
+  return { avg: avg, high: Math.max.apply(null, vals), low: Math.min.apply(null, vals) };
+})();
+
+// ── WIP limits per task board column ──────────────────
+EAP.wipLimits = { 'In Progress': 6, 'In Review': 4, 'Testing': 3, 'Ready for Acceptance': 3 };

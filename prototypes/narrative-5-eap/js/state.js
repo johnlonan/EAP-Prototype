@@ -57,7 +57,11 @@ EAP.state = {
   hierGroupBy: 'goal',
 
   // Timeline zoom (1 = fit-to-width, 2 = 2×, 3 = 3×)
-  tlZoom: 1
+  tlZoom: 1,
+
+  // Task Board chip selections (multi-select arrays)
+  trackMembers: [],
+  trackTeams: []
 };
 
 // ── State transitions ──────────────────────────────────
@@ -351,6 +355,8 @@ EAP.applyPersona = function(key) {
   // Task Board: when persona is a team member, preselect them in the member chip
   EAP.state.trackMember = (key === 'james') ? 'James' : 'All';
   EAP.state.trackMembers = (key === 'james') ? ['James'] : [];
+  EAP.state.trackTeam = 'All';
+  EAP.state.trackTeams = [];
   EAP.state.ownerFilter = [];
   try { localStorage.setItem('eap.persona', key); } catch (e) {}
   return true;
@@ -364,8 +370,24 @@ EAP.toggleTrackMember = function(key) {
     s.trackMember = 'All';
   } else {
     var idx = s.trackMembers.indexOf(key);
-    if (idx === -1) { s.trackMembers = [key]; s.trackMember = key; }
-    else { s.trackMembers = []; s.trackMember = 'All'; }
+    if (idx === -1) { s.trackMembers.push(key); }
+    else { s.trackMembers.splice(idx, 1); }
+    s.trackMember = s.trackMembers.length > 0 ? s.trackMembers[0] : 'All';
+  }
+  EAP.render();
+};
+
+EAP.toggleTrackTeam = function(key) {
+  var s = EAP.state;
+  s.trackTeams = s.trackTeams || [];
+  if (key === 'All') {
+    s.trackTeams = [];
+    s.trackTeam = 'All';
+  } else {
+    var idx = s.trackTeams.indexOf(key);
+    if (idx === -1) { s.trackTeams.push(key); }
+    else { s.trackTeams.splice(idx, 1); }
+    s.trackTeam = s.trackTeams.length > 0 ? s.trackTeams[0] : 'All';
   }
   EAP.render();
 };

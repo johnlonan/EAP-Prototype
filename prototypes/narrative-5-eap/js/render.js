@@ -61,39 +61,15 @@ EAP.renderFilterBar = function() {
   if (EAP.closeFilterPopover) EAP.closeFilterPopover();
   var h = '';
 
+  // Scope-redundant grouping dimensions — shared by Hierarchy and Timeline dropdowns.
+  var redundantByScope = { 'team': ['team','art','st'], 'art': ['art','st'], 'solution-train': ['st'] }[s.context] || [];
+
   if (s.tab === 'hierarchy') {
     s.hierHide = s.hierHide || {};
     var hgv = s.hierGroupBy || 'goal';
     var hgActive = (hgv !== 'goal') ? ' fbar-select-on' : '';
-    // Hide scope-redundant groupings (same logic as Timeline dropdown)
-    var hRedundantByScope = {
-      'team':           ['team', 'art', 'st'],
-      'art':            ['art', 'st'],
-      'solution-train': ['st']
-    }[s.context] || [];
-    function hOpt(value, label) {
-      if (hRedundantByScope.indexOf(value) !== -1) return '';
-      return '<option value="' + value + '"' + (hgv === value ? ' selected' : '') + '>Group by: ' + label + '</option>';
-    }
     h += '<select class="fbar-select' + hgActive + '" id="hier-group-select" data-prefix="' + EAP.icon('layout-list', 12) + '">' +
-      hOpt('goal', 'Goal') +
-      '<optgroup label="Strategy">' +
-        hOpt('product', 'Product') +
-        '<option disabled>Group by: Initiative · coming</option>' +
-        '<option disabled>Group by: Value Stream · coming</option>' +
-      '</optgroup>' +
-      '<optgroup label="Classification">' +
-        hOpt('size', 'Size') +
-      '</optgroup>' +
-      '<optgroup label="Org &amp; accountability">' +
-        hOpt('owner', 'Owner') +
-        hOpt('art', 'ART') +
-        hOpt('st', 'Solution Train') +
-      '</optgroup>' +
-      '<optgroup label="Status">' +
-        hOpt('state', 'State') +
-        hOpt('risk', 'Risk') +
-      '</optgroup>' +
+      EAP.renderGroupByOptions(hgv, redundantByScope, null) +
       '</select>' +
       '<div class="fbar-sep"></div><span class="fbar-label">PI</span>' +
       '<select class="fbar-select" id="hier-pi-sel"><option value="All">All PIs</option><option value="PI 26">PI 26 — Current</option><option value="PI 27">PI 27</option></select>' +
@@ -120,39 +96,37 @@ EAP.renderFilterBar = function() {
         '<select class="fbar-select" id="pi-select"><option>PI 26 — Current</option><option>PI 25</option><option>PI 24</option></select>';
     }
 
-    var filterCount = (s.ownerFilter && s.ownerFilter.length > 0) ? s.ownerFilter.length : 0;
-    var filterActive = filterCount > 0 || s.mineOnly;
+    var ownerActive = (s.ownerFilter && s.ownerFilter.length > 0) || (s.mineOnly && s.tab !== 'taskboard');
+    var filterCount = ownerActive ? 1 : 0;  // count of active categories, not individual values
+    var filterActive = ownerActive;
     h += '<div class="fbar-sep"></div>' +
-      '<button class="fbar-filter-btn' + (filterActive ? ' active' : '') + '" id="filter-btn">' +
+      '<button class="fbar-filter-btn' + (filterActive ? ' active' : '') + '" id="filter-btn" title="Filter by owner">' +
         EAP.icon('filter', 13) +
-        (filterCount > 0 ? '<span class="fbar-filter-badge">' + filterCount + '</span>' : '') +
       '</button>';
-    if (filterActive && s.ownerFilter && s.ownerFilter.length > 0) {
-      var ownerNames = s.ownerFilter.map(function(k) {
-        var p = EAP.people && EAP.people[k];
-        return p ? p.name.split(' ')[0] : k;
-      }).join(', ');
+    if (filterActive) {
+      var displayOwners = (s.ownerFilter || []).slice();
+      if (s.mineOnly && s.tab !== 'taskboard' && displayOwners.indexOf(EAP.ME) === -1) {
+        displayOwners = displayOwners.concat([EAP.ME]);
+      }
+      var pillPrefix, pillLabel;
+      if (displayOwners.length === 1) {
+        var ok = displayOwners[0];
+        var op = EAP.people && EAP.people[ok];
+        pillPrefix = EAP.avatar(ok, 18);
+        pillLabel = 'Owner · ' + (op ? op.name.split(' ')[0] : ok);
+      } else {
+        pillPrefix = EAP.icon('users', 11);
+        pillLabel = 'Owner: ' + displayOwners.length;
+      }
       h += '<span class="fbar-owner-pill" id="owner-pill">' +
-        EAP.icon('user', 11) + ' Owner · ' + ownerNames +
-        ' <span class="cx" id="owner-pill-clear">' + EAP.icon('x', 10) + '</span>' +
-      '</span>';
-    } else if (filterActive && s.mineOnly && s.tab !== 'taskboard') {
-      var mineLabel = (s.level === 'WorkItem') ? 'Assigned to me' : 'Owned by me';
-      h += '<span class="fbar-owner-pill" id="owner-pill">' +
-        EAP.icon('user', 11) + ' ' + mineLabel +
+        pillPrefix + ' ' + pillLabel +
         ' <span class="cx" id="owner-pill-clear">' + EAP.icon('x', 10) + '</span>' +
       '</span>';
     }
     h += '<div class="fbar-spacer"></div>';
   }
 
-  // Group-by dropdown — Timeline only. Sectioned by lens (Strategy /
-   // Classification / Org & accountability / Status). Default option +
-   // ART/Solution Train hidden when redundant with the level's natural default.
-   // ALL options carry the "Group by:" prefix so the selected state always
-   // shows the dimension name with its label (matches the Dependencies dropdown).
-   // Hide scope-redundant options: at narrower scopes, dimensions you've already
-   // filtered to don't make sense as a grouping.
+  // Group-by dropdown — Timeline only.
   if (s.tab === 'timeline') {
     var defMap = {
       Epic:       { label: 'Goal',  redundant: 'goal' },
@@ -163,38 +137,10 @@ EAP.renderFilterBar = function() {
     var def = defMap[s.level] || { label: 'Default', redundant: null };
     var gv = s.tlGroupBy || 'default';
     var gActive = (gv !== 'default') ? ' fbar-select-on' : '';
-    // Scope-redundant: at e.g. Team scope, grouping by Team is pointless
-    var redundantByScope = {
-      'team':           ['team', 'art', 'st'],
-      'art':            ['art', 'st'],
-      'solution-train': ['st']
-    }[s.context] || [];
-    h += '<select class="fbar-select' + gActive + '" id="tl-group-select" data-prefix="' + EAP.icon('layout-list', 12) + '">';
-    h += '<option value="default"' + (gv === 'default' ? ' selected' : '') + '>Group by: ' + def.label + '</option>';
-    function tlOpt(value, label) {
-      if (def.redundant === value) return '';
-      if (redundantByScope.indexOf(value) !== -1) return '';
-      return '<option value="' + value + '"' + (gv === value ? ' selected' : '') + '>Group by: ' + label + '</option>';
-    }
-    h += '<optgroup label="Strategy">';
-    h += tlOpt('goal',    'Goal');
-    h += tlOpt('product', 'Product');
-    h += '<option disabled>Group by: Initiative · coming</option>';
-    h += '<option disabled>Group by: Value Stream · coming</option>';
-    h += '</optgroup>';
-    h += '<optgroup label="Classification">';
-    h += tlOpt('size',    'Size');
-    h += '</optgroup>';
-    h += '<optgroup label="Org &amp; accountability">';
-    h += tlOpt('owner',   'Owner');
-    h += tlOpt('art',     'ART');
-    h += tlOpt('st',      'Solution Train');
-    h += '</optgroup>';
-    h += '<optgroup label="Status">';
-    h += tlOpt('state',   'State');
-    h += tlOpt('risk',    'Risk');
-    h += '</optgroup>';
-    h += '</select>';
+    h += '<select class="fbar-select' + gActive + '" id="tl-group-select" data-prefix="' + EAP.icon('layout-list', 12) + '">' +
+      '<option value="default"' + (gv === 'default' ? ' selected' : '') + '>Group by: ' + def.label + '</option>' +
+      EAP.renderGroupByOptions(gv, redundantByScope, def.redundant) +
+      '</select>';
   }
 
   // Right-side toggles — all with icons
@@ -224,11 +170,7 @@ EAP.renderFilterBar = function() {
   var opc = document.getElementById('owner-pill-clear');
   if (opc) opc.addEventListener('click', function(e) {
     e.stopPropagation();
-    EAP.state.ownerFilter = [];
-    EAP.state.mineOnly = false;
-    EAP.state.mineOverrides = EAP.state.mineOverrides || {};
-    EAP.state.mineOverrides[EAP.state.tab] = false;
-    EAP.render();
+    EAP.clearOwnerFilter(false);
   });
   var sb = document.getElementById('split-toggle');
   if (sb) sb.addEventListener('click', function() { EAP.toggleSplit(); });
@@ -305,6 +247,7 @@ EAP.renderContent = function() {
     s.trackMember = 'All';
     s.trackMembers = [];
     s.trackTeam = 'All';
+    s.trackTeams = [];
     EAP.render();
   });
 
@@ -313,7 +256,7 @@ EAP.renderContent = function() {
     chip.addEventListener('click', function() { EAP.toggleTrackMember(chip.dataset.trackMember); });
   });
   el.querySelectorAll('[data-track-team]').forEach(function(chip) {
-    chip.addEventListener('click', function() { EAP.state.trackTeam = chip.dataset.trackTeam; EAP.render(); });
+    chip.addEventListener('click', function() { EAP.toggleTrackTeam(chip.dataset.trackTeam); });
   });
 
   // Wire hierarchy expand/collapse buttons
@@ -512,6 +455,7 @@ EAP._fpopShowMain = function() {
     h += '<div class="fpop-item' + activeClass + dimClass + '" data-fpop-field="' + f.key + '">' +
       '<span class="fpop-item-icon">' + EAP.icon(f.icon, 13) + '</span>' +
       '<span class="fpop-item-label">' + f.label + '</span>' +
+      (f.active ? '<span class="fpop-item-dot"></span>' : '') +
       (f.flyout ? '<span class="fpop-item-chev">' + EAP.icon('chevron-right', 11) + '</span>' : '<span class="fpop-item-coming">soon</span>') +
     '</div>';
   });
@@ -533,12 +477,7 @@ EAP._fpopShowMain = function() {
   var ca = document.getElementById('fpop-clear-all');
   if (ca) ca.addEventListener('click', function(e) {
     e.stopPropagation();
-    EAP.state.ownerFilter = [];
-    EAP.state.mineOnly = false;
-    EAP.state.mineOverrides = EAP.state.mineOverrides || {};
-    EAP.state.mineOverrides[EAP.state.tab] = false;
-    EAP.closeFilterPopover();
-    EAP.render();
+    EAP.clearOwnerFilter(true);
   });
 };
 
@@ -599,16 +538,15 @@ EAP._fpopShowOwner = function() {
         e.stopPropagation();
         var key = row.dataset.fpopOwner;
         s.ownerFilter = s.ownerFilter || [];
+        // If mineOnly was auto-applied for this person, clear it before toggling ownerFilter
+        if (key === EAP.ME && s.mineOnly) {
+          s.mineOnly = false;
+          s.mineOverrides = s.mineOverrides || {};
+          s.mineOverrides[s.tab] = false;
+        }
         var idx = s.ownerFilter.indexOf(key);
         if (idx === -1) { s.ownerFilter.push(key); }
         else { s.ownerFilter.splice(idx, 1); }
-        // If the selected person is EAP.ME, also toggle mineOnly
-        if (key === EAP.ME) {
-          s.mineOnly = s.ownerFilter.indexOf(key) !== -1;
-          s.mineOverrides = s.mineOverrides || {};
-          s.mineOverrides[s.tab] = s.mineOnly;
-          if (s.mineOnly) { s.ownerFilter = s.ownerFilter.filter(function(k) { return k !== EAP.ME; }); }
-        }
         var currentSearch = document.getElementById('fpop-owner-search');
         renderOwnerFlyout(currentSearch ? currentSearch.value : '');
         EAP.renderFilterBar();
@@ -619,12 +557,7 @@ EAP._fpopShowOwner = function() {
     var co = document.getElementById('fpop-clear-owner');
     if (co) co.addEventListener('click', function(e) {
       e.stopPropagation();
-      s.ownerFilter = [];
-      s.mineOnly = false;
-      s.mineOverrides = s.mineOverrides || {};
-      s.mineOverrides[s.tab] = false;
-      EAP.closeFilterPopover();
-      EAP.render();
+      EAP.clearOwnerFilter(true);
     });
   }
 
