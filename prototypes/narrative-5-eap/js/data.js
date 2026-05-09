@@ -485,7 +485,7 @@ EAP.insights = {
     health: true,
     signals: [
       {level:'urgent', title:'Payment Confirmation Flow blocked Day 2', desc:'Auth Team dependency unresolved. 8 days left in Sprint 2.', action:'Escalate now', meta:'2 downstream items at risk', target:'f3', targetName:'Payment Confirmation Flow'},
-      {level:'urgent', title:'Fraud Team Sprint 4 at 110% capacity', desc:'3 items need moving or descoping before PI closes.', action:'Rebalance Sprint 4', meta:'Capacity across 4 sprints'},
+      {level:'urgent', title:'Fraud Team Sprint 4 at 110% capacity', desc:'3 items need moving or descoping before PI closes.', action:'Rebalance Sprint 4', meta:'Capacity across 4 sprints', miniChart:{type:'bars', values:[85,92,97,110], labels:['Sp 1','Sp 2','Sp 3','Sp 4'], colors:['#00834F','#00834F','#f59e0b','#e2161c'], refLine:100, unit:'%', tooltips:['Sprint 1: 85% — within limit','Sprint 2: 92% — approaching limit','Sprint 3: 97% — at limit','Sprint 4: 110% — over capacity · 3 items to move']}},
       {level:'urgent', ai:true, confidence:'High', title:'Streamlined Onboarding will miss PI 26', desc:'No team assigned Sprint 3. 0% chance of completion this PI.', action:'Assign team', meta:'Velocity analysis of 6 teams over 3 sprints', target:'f6', targetName:'Streamlined Onboarding Flow'},
       {level:'watch', ai:true, confidence:'Moderate', title:'Auth Team is critical path', desc:'At 80% capacity — slip cascades to Payments and Fraud.', action:'Monitor closely', meta:'Dependency chain across 4 Features'},
       {level:'watch', title:'Unplanned work at 18%', desc:'ART target is under 10%. Planning quality risk.', action:'Review sprint planning', meta:'Committed vs actual scope'},
@@ -497,7 +497,7 @@ EAP.insights = {
     health: true,
     signals: [
       {level:'urgent', title:'14 Stories blocked across 4 teams', desc:'Auth API, Payments gateway and 2 Fraud dependencies unresolved.', action:'View all blockers', meta:'32 items across 6 teams'},
-      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2 will complete 71% ± 9% of commitments', desc:'Auth and Payments teams below burn target on Day 3.', action:'Review with teams', meta:'Predicting from 3-sprint velocity'},
+      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2 forecast: 62–80% completion range', desc:'Median 71%. Auth and Payments teams below burn target on Day 3.', action:'Review with teams', meta:'Monte Carlo · 3-sprint velocity history', miniChart:{type:'forecast', median:71, lo:62, hi:80}},
       {level:'watch', title:'Unplanned work at 18% of Sprint 2', desc:'ART target is under 10%.', action:'Review sprint planning'},
       {level:'ok', title:'Defect rate within normal range', desc:'Quality holding despite new Feature work.', action:''}
     ]
@@ -520,6 +520,17 @@ EAP.insights = {
   },
   // ── BOARD — "How is work flowing?" (flow metrics) ──
   'art-Feature-board': {
+    panelChart: {
+      type: 'cfd',
+      label: 'Cumulative Flow · 14 days',
+      series: [
+        { label: 'Done',        color: '#00834F', data: [1,2,3,4,5,5,6,7,8,8,9,10,10,11] },
+        { label: 'Testing',     color: '#2a6edc', data: [1,1,1,2,2,2,2,2,2,3,2,2,2,2]    },
+        { label: 'In Review',   color: '#f59e0b', data: [2,2,2,1,2,3,2,2,2,2,3,2,2,2]    },
+        { label: 'In Progress', color: '#0e4e69', data: [4,4,3,4,3,3,4,4,4,3,3,4,4,3]    },
+        { label: 'Ready',       color: '#c2c1be', data: [5,5,5,4,4,4,3,3,2,2,2,1,1,1]    }
+      ]
+    },
     signals: [
       {level:'urgent', ai:true, confidence:'High', title:'Fraud Alerts will not complete this PI', desc:'At 25% after 2 of 5 sprints. 3 open defects blocking. Probability: 18% ± 6%.', action:'Escalate to Fraud Team', meta:'Team velocity + defect trend'},
       {level:'urgent', ai:true, confidence:'High', title:'3 Features below 30% with 6 weeks left', desc:'Payment Confirmation (20%), Fraud Alerts (25%), Onboarding (0%). Slip probability: 84% ± 5%.', action:'Descope or add capacity', meta:'Progress vs remaining PI capacity'},
@@ -530,7 +541,7 @@ EAP.insights = {
   'art-WorkItem-board': {
     signals: [
       {level:'urgent', title:'Payment Confirmation blocked Day 2', desc:'Auth API dependency. Blocks 2 others in same sprint. Cascade risk.', action:'Escalate now', meta:'Blocked since sprint start'},
-      {level:'urgent', ai:true, confidence:'Moderate', title:'Flow bottleneck detected', desc:'14 In Progress, only 3 Done. Avg cycle time up 40% this sprint.', action:'Check review process', meta:'Flow metrics vs last 3 sprints'},
+      {level:'urgent', ai:true, confidence:'Moderate', title:'Flow bottleneck detected', desc:'14 In Progress, only 3 Done. Avg cycle time up 40% this sprint.', action:'Check review process', meta:'Flow metrics vs last 3 sprints', miniChart:{type:'bars', values:[3,14,4,2], labels:['Done','In Prog','Review','Test'], colors:['#00834F','#0e4e69','#f59e0b','#2a6edc']}},
       {level:'watch', title:'Fraud Team Sprint 4 at 110% capacity', desc:'Items need moving before sprint start.', action:'Rebalance'},
       {level:'watch', title:'Accounts Team 20% below velocity', desc:'3 Stories not yet started on Day 3.', action:'Flag in standup'},
       {level:'ok', title:'Auth Team velocity consistent', desc:'On track with last 3 sprints.', action:''}
@@ -539,16 +550,43 @@ EAP.insights = {
   // ── TASK BOARD — "How is the team executing?" (deep metrics) ──
   'art-WorkItem-taskboard': {
     health: true,
+    panelChart: {
+      type: 'burndown',
+      label: 'Sprint Burndown',
+      totalPts: 24,
+      // Day 5 = Mon week 2. Slow burn from review bottleneck — 3pts behind ideal.
+      actual:   [24, 23, 21, 18, 16, 14, null, null, null, null],
+      forecast: [null, null, null, null, null, 14, 10, 6, 2, 0],
+      days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri']
+    },
     signals: [
       {level:'urgent', title:'Auth API integration aging 8 days', desc:'Team P85 cycle time is 5 days. 60% above norm. Blocking 2 downstream items.', action:'Escalate', meta:'Work item age vs team baseline'},
       {level:'urgent', ai:true, confidence:'High', title:'Vikram has 3 concurrent items (WIP limit: 2)', desc:'Context-switching risk. One item blocked, one in review.', action:'Redistribute work', meta:'WIP analysis across 12 team members'},
-      {level:'urgent', title:'Review queue depth: 4 items', desc:'Items in In Review + Testing exceeding 2× completion rate. Bottleneck forming.', action:'Prioritise reviews', meta:'Queue depth vs throughput'},
-      {level:'watch', ai:true, confidence:'Moderate', title:'Avg cycle time up 40% this sprint', desc:'3.2 days in In Review vs 0.8 day target. Review process slowing delivery.', action:'Check review process', meta:'Cycle time per column analysis'},
-      {level:'watch', title:'5 items not started on Day 3', desc:'Sprint 2 has 9 items, 5 still in Draft/Ready.', action:'Flag standup'},
+      {level:'urgent', title:'WIP limit exceeded: 9 items in progress', desc:'In Progress has 9 items against a WIP limit of 6. 3 over limit — throughput stalling. 0 items in testing or done this sprint.', action:'Reduce WIP', meta:'Queue depth vs throughput',
+        miniChart:{type:'hbars', items:[
+          {label:'In Prog', value:9,  color:'#0e4e69', tip:'In Progress: 9 items — WIP limit exceeded by 3'},
+          {label:'Review',  value:1,  color:'#f59e0b', tip:'In Review: 1 item — below WIP limit of 4'},
+          {label:'Testing', value:0,  color:'#2a6edc', tip:'Testing: 0 items — nothing flowing through'},
+          {label:'Done',    value:0,  color:'#00834F', tip:'Done: 0 items — no throughput yet this sprint'}
+        ], wipLimit:6}
+      },
+      {level:'watch', ai:true, confidence:'Moderate', title:'Avg cycle time up 40% this sprint', desc:'3.2 days in In Review vs 2.0 day target. Review process slowing delivery.', action:'Check review process', meta:'Cycle time per column analysis',
+        miniChart:{type:'sparkline', values:[2.1,1.9,2.0,2.5,3.2], labels:['Sprint −3','Sprint −2','Sprint −1','Last sprint','This sprint'], color:'#f59e0b', unit:'d', refLine:2.0}
+      },
+      {level:'watch', title:'5 items not started on Day 5', desc:'Sprint 2 has 9 items, 5 still in Draft/Ready.', action:'Flag standup'},
       {level:'ok', title:'Auth Team delivering within velocity range', desc:'2 items done, 2 in progress, on track.', action:''}
     ]
   },
   'team-WorkItem-taskboard': {
+    panelChart: {
+      type: 'burndown',
+      label: 'Sprint Burndown',
+      totalPts: 14,
+      // Day 3 = Thu week 1. No items completed yet — flat line tells the story.
+      actual:   [14, 14, 14, 14, null, null, null, null, null, null],
+      forecast: [null, null, null, 14, 10, 7, 4, 2, 0, null],
+      days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri']
+    },
     signals: [
       // Cross-persona — only James sees these (Ananya's actions affecting his work)
       {level:'ok', ai:true, confidence:'High', title:'Ananya signed off acceptance criteria for fallback flow', desc:'AC for Fingerprint Login PIN fallback (blc1) approved — ls6 has the AC it needs to close Sprint 2.', action:'Open story', meta:'Sign-off received 2h ago', forPersonas:['james']},
@@ -727,6 +765,17 @@ EAP.teamColors = {
   'Onboarding Team': '#db2777',
   'Auth': '#2a6edc', 'Payments': '#00834f', 'Fraud': '#8d6e00',
   'Mobile': '#7c3aed', 'Accounts': '#4f46e5', 'Onboard': '#db2777'
+};
+
+EAP.teamBgColors = {
+  'Auth Team':       'rgba(42,110,220,0.10)',
+  'Payments Team':   'rgba(0,131,79,0.10)',
+  'Fraud Team':      'rgba(141,110,0,0.10)',
+  'Mobile Exp Team': 'rgba(124,58,237,0.10)',
+  'Accounts Team':   'rgba(79,70,229,0.10)',
+  'Onboarding Team': 'rgba(219,39,119,0.10)',
+  'Auth': 'rgba(42,110,220,0.10)', 'Payments': 'rgba(0,131,79,0.10)', 'Fraud': 'rgba(141,110,0,0.10)',
+  'Mobile': 'rgba(124,58,237,0.10)', 'Accounts': 'rgba(79,70,229,0.10)', 'Onboard': 'rgba(219,39,119,0.10)'
 };
 
 // ── Team rosters (unique members per team) ─────────────

@@ -68,6 +68,19 @@ EAP.renderInsights = function() {
     var iLo = d.predict && d.predict.interval ? Math.max(0, heroVal - d.predict.interval) : heroVal;
     var iHi = d.predict && d.predict.interval ? Math.min(100, heroVal + d.predict.interval) : heroVal;
     var bandW = iHi - iLo;
+    // Actual hex values needed for rgba zones — CSS vars can't be mixed with opacity inline
+    var solidHex = heroVal >= 80 ? '#00834F' : heroVal >= 60 ? '#f59e0b' : '#e2161c';
+    var midHex   = heroVal >= 80 ? 'rgba(0,131,79,0.38)'   : heroVal >= 60 ? 'rgba(245,158,11,0.38)'   : 'rgba(226,22,28,0.38)';
+    var upperHex = heroVal >= 80 ? 'rgba(0,131,79,0.13)'   : heroVal >= 60 ? 'rgba(245,158,11,0.13)'   : 'rgba(226,22,28,0.13)';
+    // Three-zone gradient: solid floor → probable → possible upside → transparent
+    var barBg = bandW > 0
+      ? 'linear-gradient(to right,' +
+          solidHex + ' 0%,' + solidHex + ' ' + iLo + '%,' +
+          midHex   + ' ' + iLo + '%,' + midHex + ' ' + heroVal + '%,' +
+          upperHex + ' ' + heroVal + '%,' + upperHex + ' ' + iHi + '%,' +
+          'transparent ' + iHi + '%)'
+      : solidHex;
+
     h += '<div class="ins-hero ins-hero-verdict">' +
       '<div class="ins-hero-v-top">' +
         '<div class="ins-hero-v-left">' +
@@ -81,17 +94,20 @@ EAP.renderInsights = function() {
       '</div>' +
       '<div class="ins-pbar-wrap">' +
         '<div class="ins-pbar-track">' +
-          '<div class="ins-pbar-fill" style="width:' + heroVal + '%;background:' + heroColor + ';"></div>' +
-          (bandW > 0 ? '<div class="ins-pbar-band" style="left:' + iLo + '%;width:' + bandW + '%;"></div>' : '') +
+          '<div class="ins-pbar-fill" style="width:100%;background:' + barBg + ';"></div>' +
           '<div class="ins-pbar-thresh"></div>' +
         '</div>' +
-        '<div class="ins-pbar-scale">' +
-          '<span class="ins-pbar-s-lo">0</span>' +
-          '<span class="ins-pbar-s-mid">80%</span>' +
-          '<span class="ins-pbar-s-hi">100%</span>' +
-        '</div>' +
+        (bandW > 0
+          ? '<div class="ins-pbar-range-row">' +
+              '<span class="ins-pbar-rr-lo" style="left:' + iLo + '%">' + iLo + '%</span>' +
+              '<span class="ins-pbar-rr-hi" style="left:' + iHi + '%">' + iHi + '%</span>' +
+            '</div>'
+          : '<div class="ins-pbar-scale">' +
+              '<span class="ins-pbar-s-lo">0</span>' +
+              '<span class="ins-pbar-s-hi">100%</span>' +
+            '</div>'
+        ) +
       '</div>' +
-      (bandW > 0 ? '<div class="ins-pbar-range">' + iLo + '% – ' + iHi + '% · ±' + d.predict.interval + '% range</div>' : '') +
     '</div>';
   }
 
@@ -109,9 +125,6 @@ EAP.renderInsights = function() {
       h += '<span class="ins-flow-item"><span class="ins-flow-dot" style="background:' + seg.color + ';"></span>' + seg.label + ' ' + seg.pct + '%</span>';
     });
     h += '</div>';
-    if (fd.defects > 20) {
-      h += '<div class="ins-flow-note">Defects ' + fd.defects + '% · target ≤20%</div>';
-    }
     h += '</div>';
   }
 
@@ -133,6 +146,28 @@ EAP.renderInsights = function() {
   // ── Team health heatmap grid — Planning/Board/Task Board at ART ──
   if (d.health && s.context === 'art') {
     h += '<div class="ins-health"><div class="ins-sec-lbl">Team Health</div><svg id="healthHeatmapSvg" class="ins-heat-svg"></svg></div>';
+  }
+
+  // ── Panel chart — contextual viz (burndown / CFD) ──
+  if (d.panelChart) {
+    var pc = d.panelChart;
+    h += '<div class="ins-panel-chart"><div class="ins-sec-lbl">' + pc.label + '</div>';
+    if (pc.type === 'burndown') {
+      h += '<svg id="panelBurndownSvg" class="ins-panel-chart-svg" height="106"></svg>';
+      h += '<div class="ins-burndown-legend">' +
+        '<span><span class="ins-bl-line ins-bl-actual"></span>Actual</span>' +
+        '<span><span class="ins-bl-line ins-bl-ideal"></span>Ideal</span>' +
+        '<span><span class="ins-bl-line ins-bl-forecast"></span>Forecast</span>' +
+        '</div>';
+    } else if (pc.type === 'cfd') {
+      h += '<svg id="panelCfdSvg" class="ins-panel-chart-svg" height="108"></svg>';
+      h += '<div class="ins-panel-chart-legend">';
+      pc.series.slice().reverse().forEach(function(sr) {
+        h += '<span class="ins-panel-chart-leg-item"><span class="ins-panel-chart-leg-dot" style="background:' + sr.color + '"></span>' + sr.label + '</span>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
   }
 
   // ── Inline sprint metrics — Task Board WorkItem only ──
@@ -247,6 +282,11 @@ EAP.renderInsights = function() {
   if (d.flowDist) setTimeout(function() { EAP.drawFlowDist(d.flowDist); }, 60);
   if (d.health && s.context === 'art') setTimeout(function() { EAP.drawHealthHeatmap(); }, 70);
   if (s.tab === 'planning' && s.context === 'team' && EAP.velocityHistory) setTimeout(function() { EAP.drawVelocityD3(); }, 80);
+  if (d.panelChart) {
+    var _pc = d.panelChart;
+    if (_pc.type === 'burndown') setTimeout(function() { EAP.drawPanelBurndown(_pc); }, 90);
+    else if (_pc.type === 'cfd')  setTimeout(function() { EAP.drawPanelCfd(_pc); }, 90);
+  }
 
   // Cursor affordance — click handling is wired via document capture
   // listener in interactions-pass.js (single source of truth for clicks).
@@ -254,9 +294,182 @@ EAP.renderInsights = function() {
     card.style.cursor = 'pointer';
   });
 
+  // Wire hover tooltips for all inline SVG mini-chart elements
+  el.querySelectorAll('[data-hover]').forEach(function(node) {
+    node.addEventListener('mouseenter', function(e) { showTip(e.currentTarget.getAttribute('data-hover'), e); });
+    node.addEventListener('mousemove', moveTip);
+    node.addEventListener('mouseleave', hideTip);
+  });
+
   if (typeof EAP.phase5Animate === 'function') EAP.phase5Animate();
   if (typeof EAP.phase6Animate === 'function') EAP.phase6Animate();
 };
+
+// ── Mini-chart (inline SVG, hover via data-hover) ─────
+function renderMiniChart(mc) {
+  var VW = 200;
+
+  // ── sparkline — cycle time trend ──────────────────────
+  if (mc.type === 'sparkline') {
+    var VH = 54, vals = mc.values, n = vals.length;
+    var minV = Math.min.apply(null, vals), maxV = Math.max.apply(null, vals);
+    if (mc.refLine !== undefined) { minV = Math.min(minV, mc.refLine); maxV = Math.max(maxV, mc.refLine); }
+    var pad = (maxV - minV) * 0.15 || 0.2;
+    minV -= pad; maxV += pad;
+    var rng = maxV - minV;
+    var pL = 4, pR = 4, pT = 16, pB = 8;
+    var cW = VW - pL - pR, cH = VH - pT - pB;
+    var xStep = cW / (n - 1);
+    var toY = function(v) { return pT + (1 - (v - minV) / rng) * cH; };
+    var pts = vals.map(function(v, i) { return [pL + i * xStep, toY(v)]; });
+    var col = mc.color || '#0e4e69';
+
+    var s = '<svg viewBox="0 0 ' + VW + ' ' + VH + '" width="100%" height="' + VH + '">';
+
+    // Ref line (target)
+    if (mc.refLine !== undefined) {
+      var rY = toY(mc.refLine);
+      s += '<line x1="' + pL + '" y1="' + rY + '" x2="' + (VW-pR) + '" y2="' + rY + '" stroke="rgba(0,0,0,0.14)" stroke-width="1" stroke-dasharray="3,2"/>';
+      s += '<text x="' + (VW-pR-1) + '" y="' + (rY - 3) + '" font-size="7" fill="rgba(0,0,0,0.5)" text-anchor="end" font-family="var(--font-sans)">target ' + mc.refLine + (mc.unit||'') + '</text>';
+    }
+    // Area fill
+    var pathD = 'M' + pts.map(function(p) { return p[0]+','+p[1]; }).join('L');
+    s += '<path d="' + pathD + 'L'+(pL+cW)+','+(pT+cH)+'L'+pL+','+(pT+cH)+'Z" fill="'+col+'" opacity="0.07"/>';
+    s += '<path d="' + pathD + '" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linejoin="round"/>';
+    // Dots — all hoverable, only first + last get value labels
+    pts.forEach(function(p, i) {
+      var isLast = i === n - 1, isFirst = i === 0;
+      var spLbl = mc.labels ? mc.labels[i] : 'Sprint ' + (i - n + 1);
+      var delta = mc.refLine !== undefined ? (vals[i] - mc.refLine) : null;
+      var tipDelta = delta !== null ? (delta > 0 ? ' · +' + delta.toFixed(1) + ' above target' : ' · on target') : '';
+      var tip = spLbl + ': ' + vals[i] + (mc.unit||'') + tipDelta;
+      if (isLast) {
+        // Highlighted current dot — white fill, coloured stroke
+        s += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="white" stroke="'+col+'" stroke-width="2" data-hover="'+tip+'" style="cursor:default"/>';
+        s += '<text x="'+(p[0]-2)+'" y="'+(p[1]-7)+'" font-size="9" fill="'+col+'" text-anchor="end" font-family="var(--font-mono)" font-weight="700">'+vals[i]+(mc.unit||'')+'</text>';
+      } else if (isFirst) {
+        s += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.5" fill="'+col+'" opacity="0.4" data-hover="'+tip+'" style="cursor:default"/>';
+        s += '<text x="'+(p[0]+2)+'" y="'+(p[1]-5)+'" font-size="7.5" fill="'+col+'" opacity="0.75" text-anchor="start" font-family="var(--font-mono)">'+vals[i]+(mc.unit||'')+'</text>';
+      } else {
+        s += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.5" fill="'+col+'" opacity="0.5" data-hover="'+tip+'" style="cursor:default"/>';
+      }
+    });
+    s += '</svg>';
+    return s;
+  }
+
+  // ── hbars — horizontal bars (queue/bottleneck data) ───
+  if (mc.type === 'hbars') {
+    var items = mc.items;
+    var rowH = 12, rowGap = 5, labelW = 40, countW = 18, padV = 4;
+    var VH2 = items.length * (rowH + rowGap) - rowGap + padV * 2 + (mc.wipLimit !== undefined ? 10 : 0);
+    var barMaxW = VW - labelW - countW - 6;
+    var maxVal = Math.max.apply(null, items.map(function(it) { return it.value; }));
+
+    var s = '<svg viewBox="0 0 ' + VW + ' ' + VH2 + '" width="100%" height="' + VH2 + '">';
+    var offsetY = mc.wipLimit !== undefined ? 10 : 0; // space for WIP label at top
+
+    // WIP limit vertical line
+    if (mc.wipLimit !== undefined) {
+      var limX = labelW + 4 + (mc.wipLimit / maxVal) * barMaxW;
+      s += '<line x1="'+limX+'" y1="0" x2="'+limX+'" y2="'+VH2+'" stroke="rgba(226,22,28,0.25)" stroke-width="1" stroke-dasharray="3,2"/>';
+      s += '<text x="'+(limX+2)+'" y="8" font-size="7" fill="rgba(226,22,28,0.55)" font-family="var(--font-sans)">WIP limit: '+mc.wipLimit+'</text>';
+    }
+
+    items.forEach(function(it, i) {
+      var y = padV + offsetY + i * (rowH + rowGap);
+      var bW = Math.max(3, (it.value / maxVal) * barMaxW);
+      var tip = it.tip || (it.label + ': ' + it.value + ' items');
+      // Row label
+      s += '<text x="0" y="'+(y+rowH-2)+'" font-size="8.5" fill="rgba(0,0,0,0.42)" font-family="var(--font-sans)">'+it.label+'</text>';
+      // Bar
+      s += '<rect x="'+(labelW+4)+'" y="'+y+'" width="'+bW+'" height="'+rowH+'" fill="'+it.color+'" rx="2" data-hover="'+tip+'" style="cursor:default"/>';
+      // Count label — placed right of bar
+      s += '<text x="'+(labelW+4+bW+4)+'" y="'+(y+rowH-2)+'" font-size="8.5" fill="rgba(0,0,0,0.55)" font-family="var(--font-mono)" font-weight="600">'+it.value+'</text>';
+    });
+    s += '</svg>';
+    return s;
+  }
+
+  // ── bars — vertical bars (capacity over sprints) ──────
+  if (mc.type === 'bars') {
+    var VH3 = 58, bVals = mc.values;
+    var bMaxV = Math.max.apply(null, bVals);
+    if (mc.refLine) bMaxV = Math.max(bMaxV, mc.refLine * 1.1);
+    var n3 = bVals.length, gap3 = 4;
+    var bW3 = Math.floor((VW - gap3 * (n3 + 1)) / n3);
+    var pB3 = 14, pT3 = 6, cH3 = VH3 - pB3 - pT3;
+
+    var s = '<svg viewBox="0 0 ' + VW + ' ' + VH3 + '" width="100%" height="' + VH3 + '">';
+
+    // Ref line — drawn first so bars render on top
+    if (mc.refLine !== undefined) {
+      var rY3 = pT3 + (1 - mc.refLine / bMaxV) * cH3;
+      s += '<line x1="0" y1="'+rY3+'" x2="'+VW+'" y2="'+rY3+'" stroke="rgba(0,0,0,0.2)" stroke-width="1" stroke-dasharray="3,2"/>';
+      // Label anchored left, sitting BELOW the line so it clears bar value labels above
+      s += '<text x="2" y="'+(rY3+9)+'" font-size="7" fill="rgba(0,0,0,0.3)" font-family="var(--font-sans)">'+mc.refLine+(mc.unit||'')+'</text>';
+    }
+
+    bVals.forEach(function(v, i) {
+      var bx3 = gap3 + i * (bW3 + gap3);
+      var bH3 = Math.max(3, (v / bMaxV) * cH3);
+      var by3 = pT3 + cH3 - bH3;
+      var col = mc.colors ? mc.colors[i] : '#0e4e69';
+      var tip = mc.tooltips ? mc.tooltips[i] : ((mc.labels ? mc.labels[i] : 'Item '+(i+1))+': '+v+(mc.unit||''));
+      s += '<rect x="'+bx3+'" y="'+by3+'" width="'+bW3+'" height="'+bH3+'" fill="'+col+'" rx="2" data-hover="'+tip+'" style="cursor:default"/>';
+      // Value label: inside bar at top if bar is tall enough, else above bar
+      if (bH3 > 14) {
+        s += '<text x="'+(bx3+bW3/2)+'" y="'+(by3+11)+'" font-size="8" fill="rgba(255,255,255,0.88)" text-anchor="middle" font-family="var(--font-mono)" font-weight="600">'+v+(mc.unit||'')+'</text>';
+      } else {
+        s += '<text x="'+(bx3+bW3/2)+'" y="'+(by3-2)+'" font-size="8" fill="rgba(0,0,0,0.45)" text-anchor="middle" font-family="var(--font-mono)">'+v+(mc.unit||'')+'</text>';
+      }
+      if (mc.labels) {
+        s += '<text x="'+(bx3+bW3/2)+'" y="'+(VH3-2)+'" font-size="7.5" fill="rgba(0,0,0,0.32)" text-anchor="middle" font-family="var(--font-sans)">'+mc.labels[i]+'</text>';
+      }
+    });
+    s += '</svg>';
+    return s;
+  }
+
+  // ── forecast — three-node layout, equal thirds ────────
+  // Nodes at fixed equal-thirds positions — never crowd regardless of data values.
+  // 71% median is already the hero number above the card; this chart communicates
+  // the range and relative confidence, not the exact position on a 0-100 scale.
+  if (mc.type === 'forecast') {
+    var VH4 = 52;
+    var fCol = mc.median >= 80 ? '#00834F' : mc.median >= 60 ? '#f59e0b' : '#e2161c';
+    var mutedFill = 'rgba(0,0,0,0.22)';
+    var xLo4 = 24, xMed4 = 100, xHi4 = 176;
+    var lineY4 = 30;
+
+    var s = '<svg viewBox="0 0 200 ' + VH4 + '" width="100%" height="' + VH4 + '">';
+
+    // Connecting line between endpoints — communicates "range"
+    s += '<line x1="'+xLo4+'" y1="'+lineY4+'" x2="'+xHi4+'" y2="'+lineY4+'" stroke="rgba(0,0,0,0.1)" stroke-width="1.5"/>';
+
+    // Value labels — above nodes; median is typographic hero
+    s += '<text x="'+xLo4+'" y="17" font-size="9" fill="'+mutedFill+'" text-anchor="middle" font-family="var(--font-mono)">'+mc.lo+'%</text>';
+    s += '<text x="'+xMed4+'" y="15" font-size="13" fill="'+fCol+'" text-anchor="middle" font-family="var(--font-mono)" font-weight="700">'+mc.median+'%</text>';
+    s += '<text x="'+xHi4+'" y="17" font-size="9" fill="'+mutedFill+'" text-anchor="middle" font-family="var(--font-mono)">'+mc.hi+'%</text>';
+
+    // Endpoint dots — small, muted
+    s += '<circle cx="'+xLo4+'" cy="'+lineY4+'" r="3.5" fill="rgba(0,0,0,0.18)" data-hover="Low estimate: '+mc.lo+'% completion" style="cursor:default"/>';
+    s += '<circle cx="'+xHi4+'" cy="'+lineY4+'" r="3.5" fill="rgba(0,0,0,0.18)" data-hover="High estimate: '+mc.hi+'% completion" style="cursor:default"/>';
+    // Median dot — white ring + coloured fill
+    s += '<circle cx="'+xMed4+'" cy="'+lineY4+'" r="8" fill="white"/>';
+    s += '<circle cx="'+xMed4+'" cy="'+lineY4+'" r="5.5" fill="'+fCol+'" data-hover="Median forecast: '+mc.median+'% — most likely outcome" style="cursor:default"/>';
+
+    // Descriptor labels — below nodes
+    s += '<text x="'+xLo4+'" y="'+(lineY4+14)+'" font-size="7.5" fill="'+mutedFill+'" text-anchor="middle" font-family="var(--font-sans)">Low</text>';
+    s += '<text x="'+xMed4+'" y="'+(lineY4+14)+'" font-size="7.5" fill="'+fCol+'" text-anchor="middle" font-family="var(--font-sans)" font-weight="600">Median</text>';
+    s += '<text x="'+xHi4+'" y="'+(lineY4+14)+'" font-size="7.5" fill="'+mutedFill+'" text-anchor="middle" font-family="var(--font-sans)">High</text>';
+
+    s += '</svg>';
+    return s;
+  }
+
+  return '';
+}
 
 // ── Signal card ───────────────────────────────────────
 function renderSignal(s, id) {
@@ -274,6 +487,7 @@ function renderSignal(s, id) {
     '</div>';
   h += '<div class="ins-sig-title">' + s.title + '</div>';
   h += '<div class="ins-sig-desc">' + s.desc + '</div>';
+  if (s.miniChart) h += '<div class="ins-sig-mini">' + renderMiniChart(s.miniChart) + '</div>';
   if (s.action) h += '<a class="ins-sig-action" data-ins-action="' + s.action + '">' + s.action + EAP.icon('chevron-right', 11) + '</a>';
   if (isAi && s.meta) {
     h += '<div class="ins-sig-why">' + EAP.icon('sparkle', 9) + '<span>' + s.meta + '</span>' +
@@ -734,4 +948,255 @@ EAP.toggleConfidence = function() {
   EAP.renderInsights();
   EAP.wireInsightActions();
   EAP.showToast(EAP._insightFilter === 'high' ? 'High-confidence signals only' : 'Showing all signals', 'info');
+};
+
+// ── Panel burndown chart ──────────────────────────────
+EAP.drawPanelBurndown = function(pc) {
+  if (typeof d3 === 'undefined') return;
+  var svgEl = document.getElementById('panelBurndownSvg');
+  if (!svgEl) return;
+  var W = svgEl.parentElement.clientWidth || 220;
+  var H = 106;
+  var m = { top: 16, right: 26, bottom: 22, left: 6 };
+  var iW = W - m.left - m.right;
+  var iH = H - m.top - m.bottom;
+  var n = pc.days.length;
+  var pri = '#0e4e69', warn = '#f59e0b', idealCol = 'rgba(0,0,0,0.18)';
+
+  var actualPts = pc.actual.map(function(v, i) { return v !== null ? { i: i, v: v } : null; }).filter(Boolean);
+  var fcPts     = pc.forecast.map(function(v, i) { return v !== null ? { i: i, v: v } : null; }).filter(Boolean);
+  var lastActual = actualPts[actualPts.length - 1];
+
+  // Y domain: pad bottom by 10% of totalPts for breathing room; top = totalPts + small pad
+  var yMin = -Math.ceil(pc.totalPts * 0.06);
+  var yMax = pc.totalPts + Math.ceil(pc.totalPts * 0.04);
+  var xScale = d3.scaleLinear().domain([0, n - 1]).range([0, iW]);
+  var yScale = d3.scaleLinear().domain([yMin, yMax]).range([iH, 0]);
+
+  // Precompute ideal pts per day
+  var idealAt = function(i) { return Math.round(pc.totalPts - (pc.totalPts / (n - 1)) * i); };
+
+  var svg = d3.select(svgEl).attr('width', W).attr('height', H);
+  svg.selectAll('*').remove();
+  var g = svg.append('g').attr('transform', 'translate(' + m.left + ',' + m.top + ')');
+
+  // ── Subtle grid lines at 0, 50%, 100% ──
+  [0, pc.totalPts / 2, pc.totalPts].forEach(function(val) {
+    g.append('line').attr('x1', 0).attr('x2', iW)
+      .attr('y1', yScale(val)).attr('y2', yScale(val))
+      .attr('stroke', 'rgba(0,0,0,0.05)').attr('stroke-width', 1);
+  });
+
+  // ── Ideal line ──
+  var idealLine = d3.line()
+    .x(function(d) { return xScale(d); })
+    .y(function(d) { return yScale(idealAt(d)); });
+  g.append('path').datum(d3.range(n)).attr('fill', 'none')
+    .attr('stroke', idealCol).attr('stroke-width', 1.5)
+    .attr('stroke-dasharray', '5,3').attr('d', idealLine);
+
+  // ── Forecast dashed line ──
+  var line = d3.line().x(function(d) { return xScale(d.i); }).y(function(d) { return yScale(d.v); });
+  if (fcPts.length && lastActual) {
+    g.append('path').datum([lastActual].concat(fcPts))
+      .attr('fill', 'none').attr('stroke', warn).attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '5,3').attr('d', line);
+  }
+
+  // ── Actual line with enter animation ──
+  var lp = g.append('path').datum(actualPts).attr('fill', 'none')
+    .attr('stroke', pri).attr('stroke-width', 2.5).attr('stroke-linejoin', 'round').attr('d', line);
+  var tl = lp.node().getTotalLength();
+  lp.attr('stroke-dasharray', tl + ' ' + tl).attr('stroke-dashoffset', tl)
+    .transition().duration(650).ease(d3.easeQuadOut).attr('stroke-dashoffset', 0);
+
+  // ── Today marker — prominent ──
+  if (lastActual) {
+    var todayX = xScale(lastActual.i), todayY = yScale(lastActual.v);
+    var idealNow = idealAt(lastActual.i);
+    var delta = lastActual.v - idealNow;
+
+    // Vertical dotted line to x-axis
+    g.append('line').attr('x1', todayX).attr('x2', todayX)
+      .attr('y1', todayY).attr('y2', iH)
+      .attr('stroke', pri).attr('stroke-width', 1)
+      .attr('stroke-dasharray', '3,3').attr('opacity', 0.25);
+
+    // Dot
+    g.append('circle').attr('cx', todayX).attr('cy', todayY)
+      .attr('r', 4.5).attr('fill', '#fff').attr('stroke', pri).attr('stroke-width', 2.5);
+
+    // "NOW" label above dot
+    g.append('text').attr('x', todayX).attr('y', todayY - 8)
+      .attr('text-anchor', 'middle')
+      .style('font-size', '7.5px').style('font-weight', '600')
+      .style('fill', pri).style('font-family', 'var(--font-sans)')
+      .text('NOW');
+
+    // Pts remaining + delta annotation — right margin
+    var deltaStr = delta > 0 ? '+' + delta + ' behind' : delta < 0 ? Math.abs(delta) + ' ahead' : 'on track';
+    var deltaCol = delta > 0 ? warn : '#00834F';
+    svg.append('text')
+      .attr('x', m.left + iW + 4).attr('y', m.top + todayY + 3)
+      .style('font-size', '9.5px').style('font-weight', '700')
+      .style('fill', pri).style('font-family', 'var(--font-sans)')
+      .text(lastActual.v);
+    if (delta !== 0) {
+      svg.append('text')
+        .attr('x', m.left + iW + 4).attr('y', m.top + todayY + 13)
+        .style('font-size', '7px').style('font-weight', '500')
+        .style('fill', deltaCol).style('font-family', 'var(--font-sans)')
+        .text(deltaStr);
+    }
+  }
+
+  // ── Week separator + axis labels ──
+  var sepIdx = 4.5;
+  g.append('line').attr('x1', xScale(sepIdx)).attr('x2', xScale(sepIdx))
+    .attr('y1', 0).attr('y2', iH + 4)
+    .attr('stroke', 'rgba(0,0,0,0.08)').attr('stroke-width', 1);
+
+  [['Wk 1', 2], ['Wk 2', 7]].forEach(function(pair) {
+    g.append('text').attr('x', xScale(pair[1])).attr('y', iH + 14)
+      .attr('text-anchor', 'middle')
+      .style('font-size', '8px').style('fill', 'rgba(0,0,0,0.28)')
+      .style('font-family', 'var(--font-sans)').text(pair[0]);
+  });
+
+  // ── Hover overlay — vertical crosshair + tooltip ──
+  var hoverLine = g.append('line').attr('y1', 0).attr('y2', iH)
+    .attr('stroke', 'rgba(0,0,0,0.15)').attr('stroke-width', 1)
+    .attr('pointer-events', 'none').style('display', 'none');
+  var hoverDot = g.append('circle').attr('r', 3.5)
+    .attr('fill', pri).attr('pointer-events', 'none').style('display', 'none');
+
+  g.append('rect').attr('width', iW).attr('height', iH)
+    .attr('fill', 'none').attr('pointer-events', 'all')
+    .style('cursor', 'crosshair')
+    .on('mousemove', function(event) {
+      var mx = d3.pointer(event)[0];
+      var idx = Math.round(xScale.invert(mx));
+      idx = Math.max(0, Math.min(n - 1, idx));
+      var cx = xScale(idx);
+      var actVal = pc.actual[idx], fcVal = pc.forecast[idx];
+      var displayVal = actVal !== null ? actVal : (fcVal !== null ? fcVal : null);
+      hoverLine.attr('x1', cx).attr('x2', cx).style('display', null);
+      if (displayVal !== null) {
+        hoverDot.attr('cx', cx).attr('cy', yScale(displayVal)).style('display', null);
+        hoverDot.attr('fill', actVal !== null ? pri : warn);
+      }
+      var ideal = idealAt(idx);
+      var lines = [pc.days[idx]];
+      if (actVal !== null)   lines.push('Actual: ' + actVal + ' pts');
+      if (fcVal !== null)    lines.push('Forecast: ' + fcVal + ' pts');
+      lines.push('Ideal: ' + ideal + ' pts');
+      if (displayVal !== null && displayVal !== ideal) {
+        var d2 = displayVal - ideal;
+        lines.push(d2 > 0 ? '<span style="color:#f59e0b">+' + d2 + ' pts behind</span>' : '<span style="color:#00834F">' + Math.abs(d2) + ' pts ahead</span>');
+      }
+      showTip(lines.join('<br>'), event);
+    })
+    .on('mouseleave', function() {
+      hoverLine.style('display', 'none');
+      hoverDot.style('display', 'none');
+      hideTip();
+    });
+};
+
+// ── Panel CFD chart ───────────────────────────────────
+EAP.drawPanelCfd = function(pc) {
+  if (typeof d3 === 'undefined') return;
+  var svgEl = document.getElementById('panelCfdSvg');
+  if (!svgEl) return;
+  var W = svgEl.parentElement.clientWidth || 220;
+  var H = 108;
+  var m = { top: 8, right: 6, bottom: 18, left: 6 };
+  var iW = W - m.left - m.right;
+  var iH = H - m.top - m.bottom;
+  var nDays = pc.series[0].data.length;
+  // "Today" is the last data point
+  var todayIdx = nDays - 1;
+
+  var svg = d3.select(svgEl).attr('width', W).attr('height', H);
+  svg.selectAll('*').remove();
+  var g = svg.append('g').attr('transform', 'translate(' + m.left + ',' + m.top + ')');
+
+  // Build stacked data — precompute upper bounds per series
+  var stackBases = [];
+  var runningBase = d3.range(nDays).map(function() { return 0; });
+  var stackedSeries = pc.series.map(function(sr) {
+    var base = runningBase.slice();
+    var upper = base.map(function(b, i) { return b + sr.data[i]; });
+    stackBases.push(base.slice());
+    runningBase = upper;
+    return { sr: sr, base: base, upper: upper };
+  });
+
+  var totals = d3.range(nDays).map(function(i) {
+    return d3.sum(pc.series, function(sr) { return sr.data[i]; });
+  });
+  var yMax = d3.max(totals) + 1;
+  var xScale = d3.scaleLinear().domain([0, nDays - 1]).range([0, iW]);
+  var yScale = d3.scaleLinear().domain([0, yMax]).range([iH, 0]);
+
+  // ── Stacked areas — slightly reduced opacity for band clarity ──
+  stackedSeries.forEach(function(ss) {
+    var areaData = d3.range(nDays).map(function(i) {
+      return { i: i, lo: ss.base[i], hi: ss.upper[i] };
+    });
+    var area = d3.area()
+      .x(function(d) { return xScale(d.i); })
+      .y0(function(d) { return yScale(d.lo); })
+      .y1(function(d) { return yScale(d.hi); })
+      .curve(d3.curveMonotoneX);
+    g.append('path').datum(areaData).attr('d', area)
+      .attr('fill', ss.sr.color).attr('opacity', 0.75);
+  });
+
+  // ── Today marker — subtle vertical line ──
+  g.append('line')
+    .attr('x1', xScale(todayIdx)).attr('x2', xScale(todayIdx))
+    .attr('y1', 0).attr('y2', iH)
+    .attr('stroke', 'rgba(255,255,255,0.5)').attr('stroke-width', 1.5)
+    .attr('stroke-dasharray', '3,2');
+  g.append('text')
+    .attr('x', xScale(todayIdx) - 2).attr('y', 6)
+    .attr('text-anchor', 'end')
+    .style('font-size', '7.5px').style('font-weight', '600')
+    .style('fill', 'rgba(255,255,255,0.65)').style('font-family', 'var(--font-sans)')
+    .text('TODAY');
+
+  // ── X axis labels ──
+  [0, nDays - 1].forEach(function(i) {
+    g.append('text').attr('x', i === 0 ? 0 : iW).attr('y', iH + 12)
+      .attr('text-anchor', i === 0 ? 'start' : 'end')
+      .style('font-size', '7.5px').style('fill', 'rgba(0,0,0,0.28)')
+      .style('font-family', 'var(--font-sans)').text('Day ' + (i + 1));
+  });
+
+  // ── Hover overlay — vertical crosshair + stacked tooltip ──
+  var hoverLine = g.append('line').attr('y1', 0).attr('y2', iH)
+    .attr('stroke', 'rgba(255,255,255,0.55)').attr('stroke-width', 1.5)
+    .attr('pointer-events', 'none').style('display', 'none');
+
+  g.append('rect').attr('width', iW).attr('height', iH)
+    .attr('fill', 'none').attr('pointer-events', 'all')
+    .style('cursor', 'crosshair')
+    .on('mousemove', function(event) {
+      var mx = d3.pointer(event)[0];
+      var idx = Math.round(xScale.invert(mx));
+      idx = Math.max(0, Math.min(nDays - 1, idx));
+      hoverLine.attr('x1', xScale(idx)).attr('x2', xScale(idx)).style('display', null);
+      var total = d3.sum(pc.series, function(sr) { return sr.data[idx]; });
+      var lines = ['Day ' + (idx + 1)];
+      pc.series.slice().reverse().forEach(function(sr) {
+        lines.push('<span style="color:' + sr.color + '">■</span> ' + sr.label + ': ' + sr.data[idx]);
+      });
+      lines.push('Total: ' + total + ' items');
+      showTip(lines.join('<br>'), event);
+    })
+    .on('mouseleave', function() {
+      hoverLine.style('display', 'none');
+      hideTip();
+    });
 };

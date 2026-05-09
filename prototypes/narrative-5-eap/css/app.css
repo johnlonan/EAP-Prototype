@@ -303,6 +303,9 @@ body { background: #d6e9e6 !important; }
 .dg svg { display: block; }
 .item-nm { font-weight: 500; color: var(--text-primary); line-height: 1.4; white-space: normal; cursor: pointer; transition: color 100ms ease; min-width: 180px; display: inline-block; }
 .item-nm:hover { color: var(--color-primary); text-decoration: underline; }
+.item-sublbl { display: block; font-size: 10px; font-weight: 400; color: var(--text-tertiary); line-height: 1.3; margin-top: 2px; }
+.item-sublbl-blocked { color: var(--color-error); font-weight: 500; }
+.item-sublbl-risk { color: var(--color-warning); font-weight: 500; }
 
 /* Record number — hyperlink style */
 .record-num { font-family: var(--font-mono); font-size: 11px; color: #0e4e69; cursor: pointer; text-decoration: none; font-variant-numeric: tabular-nums; }
@@ -429,6 +432,8 @@ body { background: #d6e9e6 !important; }
 .wsjf-rank.active { color: var(--color-primary); background: rgba(14,78,105,0.12); }
 .wsjf-rank svg { display: block; }
 .tm  { font-size: 11px; font-weight: 400; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; }
+.tm-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 400; color: var(--text-tertiary); white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+.tm-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .par { font-size: 11px; font-weight: 400; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; }
 
 /* Pagination footer */
@@ -547,6 +552,10 @@ body { background: #d6e9e6 !important; }
 .ins-pbar-s-mid { position: absolute; left: 80%; transform: translateX(-50%); font-size: 8.5px; color: rgba(0,0,0,0.38); font-variant-numeric: tabular-nums; }
 .ins-pbar-s-hi { position: absolute; right: 0; font-size: 8.5px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
 .ins-pbar-range { font-size: 9.5px; color: var(--text-tertiary); text-align: center; margin-top: 2px; }
+.ins-pbar-zone { position: absolute; top: 0; height: 100%; }
+.ins-pbar-range-row { position: relative; height: 16px; margin-top: 2px; }
+.ins-pbar-rr-lo { position: absolute; font-size: 8px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; transform: translateX(-50%); white-space: nowrap; }
+.ins-pbar-rr-hi { position: absolute; font-size: 8px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; transform: translateX(-50%); white-space: nowrap; }
 /* ── Flow distribution benchmark note ── */
 .ins-flow-note { font-size: 9.5px; color: var(--color-error); margin-top: 5px; opacity: 0.8; font-weight: 500; }
 
@@ -1177,3 +1186,22 @@ body { background: #d6e9e6 !important; }
 .ins-flow-svg { display: block; width: 100%; height: 20px; }
 .ins-vel-svg  { display: block; width: 100%; height: 100%; }
 .ins-heat-svg { display: block; width: 100%; }
+.ins-panel-chart-svg { display: block; width: 100%; }
+
+/* ── Panel chart block ─────────────────────────────── */
+.ins-panel-chart { padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.ins-panel-chart-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ins-panel-chart-leg-item { display: flex; align-items: center; gap: 3px; font-size: 9px; color: var(--text-tertiary); }
+.ins-panel-chart-leg-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Burndown legend ───────────────────────────────── */
+.ins-burndown-legend { display: flex; gap: 10px; margin-top: 6px; }
+.ins-burndown-legend > span { font-size: 9px; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px; }
+.ins-bl-line { display: inline-block; width: 16px; height: 2px; flex-shrink: 0; border-radius: 1px; }
+.ins-bl-actual   { background: #0e4e69; }
+.ins-bl-ideal    { background: repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0, rgba(0,0,0,0.22) 4px, transparent 4px, transparent 7px); }
+.ins-bl-forecast { background: repeating-linear-gradient(90deg, #f59e0b 0, #f59e0b 4px, transparent 4px, transparent 7px); }
+
+/* ── Signal mini-charts ────────────────────────────── */
+.ins-sig-mini { margin: 7px 0 3px; line-height: 0; }
+.ins-sig-mini svg { display: block; width: 100%; }
