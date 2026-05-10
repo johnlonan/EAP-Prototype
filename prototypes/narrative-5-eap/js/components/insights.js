@@ -487,6 +487,8 @@ function renderSignal(s, id) {
     '</div>';
   h += '<div class="ins-sig-title">' + s.title + '</div>';
   h += '<div class="ins-sig-desc">' + s.desc + '</div>';
+  if (s.why) h += '<div class="ins-sig-why-blk"><div class="ins-sig-why-blk-lbl">Why</div><div class="ins-sig-why-blk-txt">' + s.why + '</div></div>';
+  if (s.recommended) h += '<div class="ins-sig-rec-blk"><div class="ins-sig-rec-blk-lbl">Recommended action</div><div class="ins-sig-rec-blk-txt">' + s.recommended + '</div></div>';
   if (s.miniChart) h += '<div class="ins-sig-mini">' + renderMiniChart(s.miniChart) + '</div>';
   if (s.action) h += '<a class="ins-sig-action" data-ins-action="' + s.action + '">' + s.action + EAP.icon('chevron-right', 11) + '</a>';
   if (isAi && s.meta) {
@@ -848,6 +850,56 @@ EAP.drawVelocityD3 = function() {
         (nr.partial ? ' <span style="opacity:0.5">(in progress)</span>' : ''), event);
     })
     .on('mouseout', function() { hL.attr('opacity', 0); hD.attr('opacity', 0); hideTip(); });
+
+  // ── Hover callout — appears on mouseenter of the current sprint dot ──
+  var existingCallout = container.querySelector('.ins-chart-callout');
+  if (existingCallout) existingCallout.remove();
+
+  var calloutStatusColor = isOnTrack ? 'var(--dv-success)' : 'var(--dv-warning)';
+  var calloutStatus  = isOnTrack ? 'On track' : 'Below avg';
+  var calloutHeadline = isOnTrack ? partial.pts + ' pts' : '+' + gap + ' pts needed';
+  var calloutSub     = isOnTrack ? 'Above ' + vs.avg + 'pt avg' : 'Sprint in progress';
+
+  var calloutEl = document.createElement('div');
+  calloutEl.className = 'ins-chart-callout';
+  calloutEl.style.opacity = '0';
+  calloutEl.style.pointerEvents = 'none';
+  calloutEl.innerHTML =
+    '<div class="ins-chart-callout-status">' +
+      '<span class="ins-chart-callout-dot" style="background:' + calloutStatusColor + '"></span>' +
+      '<span style="color:' + calloutStatusColor + '">' + calloutStatus + '</span>' +
+    '</div>' +
+    '<div class="ins-chart-callout-headline">' + calloutHeadline + '</div>' +
+    '<div class="ins-chart-callout-sub">' + calloutSub + '</div>' +
+    '<a class="ins-sig-action" style="font-size:10px;margin-top:4px;" onclick="EAP.showToast(\'AI analysis — coming soon\', \'info\')">' +
+      EAP.icon('sparkle', 9) + ' Explore' + EAP.icon('chevron-right', 9) +
+    '</a>';
+  container.appendChild(calloutEl);
+
+  // Wire to the partial sprint dot — show on mouseenter of that dot circle
+  var svgEl = container.querySelector('#velocitySvg');
+  if (svgEl) {
+    var partDots = svgEl.querySelectorAll('circle');
+    var partDot = partDots[partDots.length - 1];
+    if (partDot) {
+      partDot.style.cursor = 'default';
+      partDot.addEventListener('mouseenter', function() {
+        calloutEl.style.opacity = '1';
+        calloutEl.style.transition = 'opacity 160ms ease';
+        calloutEl.style.pointerEvents = 'auto';
+      });
+      partDot.addEventListener('mouseleave', function(e) {
+        if (calloutEl.contains(e.relatedTarget)) return;
+        calloutEl.style.opacity = '0';
+        calloutEl.style.pointerEvents = 'none';
+      });
+      calloutEl.addEventListener('mouseleave', function(e) {
+        if (partDot.contains(e.relatedTarget)) return;
+        calloutEl.style.opacity = '0';
+        calloutEl.style.pointerEvents = 'none';
+      });
+    }
+  }
 };
 
 // ── Team health heatmap — D3 SVG grid ─────────────────

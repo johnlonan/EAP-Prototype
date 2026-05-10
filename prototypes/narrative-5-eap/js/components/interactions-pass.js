@@ -112,47 +112,8 @@ EAP.scrollAndPulse = function(targetId) {
 };
 
 
-// ─────────────────────────────────────────────────────────────────────
-// PHASE 2 — Singleton JS tooltip mounted on document.body.
-// Works regardless of parent overflow / clipping. Triggered by any
-// [data-tip="..."] element on hover.
-// ─────────────────────────────────────────────────────────────────────
-(function() {
-  var tipEl = null;
-
-  function ensureTip() {
-    if (tipEl && tipEl.parentNode) return tipEl;
-    tipEl = document.createElement('div');
-    tipEl.className = 'eap-tip';
-    (document.body || document.documentElement).appendChild(tipEl);
-    return tipEl;
-  }
-
-  function show(target) {
-    var text = target.getAttribute('data-tip');
-    if (!text) return;
-    var tip = ensureTip();
-    tip.textContent = text;
-    var r = target.getBoundingClientRect();
-    var x = r.left + r.width / 2;
-    var y = r.top - 8;
-    tip.style.left = x + 'px';
-    tip.style.top = y + 'px';
-    requestAnimationFrame(function() { tip.classList.add('show'); });
-  }
-  function hide() { if (tipEl) tipEl.classList.remove('show'); }
-
-  document.addEventListener('mouseover', function(ev) {
-    var t = ev.target.closest && ev.target.closest('[data-tip]');
-    if (t) show(t);
-  });
-  document.addEventListener('mouseout', function(ev) {
-    var t = ev.target.closest && ev.target.closest('[data-tip]');
-    if (t) hide();
-  });
-  // Hide tip when scrolling so it doesn't follow stale positions
-  document.addEventListener('scroll', hide, true);
-})();
+// PHASE 2 tooltip removed — superseded by the positioned #eap-tip / #eap-tip-arrow
+// system in interactions.js which handles viewport bounds and arrow direction.
 
 
 // ─────────────────────────────────────────────────────────────────────

@@ -129,6 +129,14 @@ html, body { font-size: 13px; line-height: 1.5; }
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 0 rgba(0,0,0,0.04);
 }
+.bcard-blocked:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1.5px var(--color-error), 0 4px 14px rgba(185,28,28,0.22);
+}
+.bcard-atrisk:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1.5px var(--color-warning), 0 4px 14px rgba(217,119,6,0.18);
+}
 
 /* Common interactive surfaces — modernized easing + duration */
 .tab-item,

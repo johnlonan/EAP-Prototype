@@ -368,6 +368,111 @@ EAP.renderContent = function() {
       if (msRight) msRight.scrollLeft = scroller.scrollLeft;
     });
 
+    // Rich bar popover — glass card with hover-bridge so footer is clickable
+    var tlPop = document.getElementById('tl-pop');
+    if (!tlPop) {
+      tlPop = document.createElement('div');
+      tlPop.id = 'tl-pop';
+      document.body.appendChild(tlPop);
+    }
+    var tlHideTimer = null;
+    var MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function tlFmtD(ds) { if (!ds) return ''; var d = new Date(ds + 'T00:00:00'); return MO[d.getMonth()] + ' ' + d.getDate(); }
+    var tlPiLabel = { pi26:'PI 26', pi27:'PI 27', pi28:'PI 28', pi29:'PI 29' };
+
+    function tlShowPop(bar) {
+      clearTimeout(tlHideTimer);
+      var name      = bar.getAttribute('data-tl-name') || '';
+      var state     = bar.getAttribute('data-tl-state') || '';
+      var pct       = parseInt(bar.getAttribute('data-tl-pct') || '0', 10);
+      var pts       = parseInt(bar.getAttribute('data-tl-pts') || '0', 10);
+      var ownerName = bar.getAttribute('data-tl-owner') || '';
+      var ownerKey  = bar.getAttribute('data-tl-owner-key') || '';
+      var team      = bar.getAttribute('data-tl-team') || '';
+      var parent    = bar.getAttribute('data-tl-parent') || '';
+      var blocked   = bar.getAttribute('data-tl-blocked') === 'true';
+      var atRisk    = bar.getAttribute('data-tl-atrisk') === 'true';
+      var startDate = bar.getAttribute('data-tl-start') || '';
+      var endDate   = bar.getAttribute('data-tl-end') || '';
+      var sprint    = bar.getAttribute('data-tl-sprint') || '';
+      var pi        = bar.getAttribute('data-tl-pi') || '';
+      var itemId    = bar.getAttribute('data-item-id') || '';
+
+      var fillCol = (typeof tlCol === 'function') ? tlCol(state) : '#94a3b8';
+
+      var html = '<div class="tl-pop-body">';
+      html += '<div class="tl-pop-title">' + name + '</div>';
+      html += '<div class="tl-pop-badges">';
+      if (state && EAP.pill) html += EAP.pill(state);
+      if (blocked) html += '<span class="tl-pop-badge tl-pop-badge-blocked">Blocked</span>';
+      else if (atRisk) html += '<span class="tl-pop-badge tl-pop-badge-risk">At risk</span>';
+      html += '</div>';
+
+      if (pct > 0) {
+        html += '<div class="tl-pop-prog">';
+        html += '<div class="tl-pop-pbar"><div class="tl-pop-pbar-fill" style="width:' + pct + '%;background:' + fillCol + ';"></div></div>';
+        html += '<span class="tl-pop-pct-lbl">' + pct + '%</span>';
+        html += '</div>';
+      }
+
+      html += '<hr class="tl-pop-divider">';
+
+      if (startDate) {
+        var ctx = sprint || (pi ? tlPiLabel[pi] || pi : '');
+        html += '<div class="tl-pop-dates">' + tlFmtD(startDate) + ' – ' + tlFmtD(endDate);
+        if (ctx) html += '<span class="tl-pop-ctx"> · ' + ctx + '</span>';
+        html += '</div>';
+      }
+      if (parent) html += '<div class="tl-pop-row"><span class="tl-pop-lbl">Parent</span><span class="tl-pop-val tl-pop-muted">' + parent + '</span></div>';
+      if (pts > 0) html += '<div class="tl-pop-row"><span class="tl-pop-lbl">Pts</span><span class="tl-pop-val">' + pts + '</span></div>';
+      if (ownerName) {
+        var av = (ownerKey && EAP.avatar) ? EAP.avatar(ownerKey, 20) : '';
+        html += '<div class="tl-pop-row"><span class="tl-pop-lbl">Owner</span><span class="tl-pop-val tl-pop-owner">' + av + ownerName + '</span></div>';
+      }
+      if (team) html += '<div class="tl-pop-row"><span class="tl-pop-lbl">Team</span><span class="tl-pop-val">' + team + '</span></div>';
+      html += '</div>';
+      html += '<div class="tl-pop-footer" data-tl-open="' + itemId + '">Open detail' + EAP.icon('chevron-right', 12) + '</div>';
+
+      tlPop.innerHTML = html;
+      tlPop.style.display = 'block';
+      requestAnimationFrame(function() { tlPop.classList.add('tl-pop-visible'); });
+
+      var r  = bar.getBoundingClientRect();
+      var pw = tlPop.offsetWidth, ph = tlPop.offsetHeight;
+      var vw = window.innerWidth;
+      var lx = Math.max(8, Math.min(r.left + r.width / 2 - pw / 2, vw - pw - 8));
+      var ty = r.top - ph - 10;
+      if (ty < 8) ty = r.bottom + 8;
+      tlPop.style.left = lx + 'px';
+      tlPop.style.top  = ty + 'px';
+    }
+
+    function tlHidePop(delay) {
+      clearTimeout(tlHideTimer);
+      tlHideTimer = setTimeout(function() {
+        tlPop.classList.remove('tl-pop-visible');
+        setTimeout(function() { if (!tlPop.classList.contains('tl-pop-visible')) tlPop.style.display = 'none'; }, 140);
+      }, delay || 0);
+    }
+
+    document.querySelectorAll('.tl-bar[data-tl-name]').forEach(function(bar) {
+      bar.addEventListener('mouseenter', function() { tlShowPop(bar); });
+      bar.addEventListener('mouseleave', function() { tlHidePop(160); });
+    });
+
+    // Hover bridge: pointer can move from bar into popover without it closing
+    tlPop.addEventListener('mouseenter', function() { clearTimeout(tlHideTimer); });
+    tlPop.addEventListener('mouseleave', function() { tlHidePop(100); });
+
+    // "Open detail" footer click
+    tlPop.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-tl-open]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-tl-open');
+      tlHidePop(0);
+      if (id && EAP.openDetail) EAP.openDetail(id);
+    });
+
     // Auto-scroll to today on render (no animation — instant position)
     tlScrollToToday(false);
   }

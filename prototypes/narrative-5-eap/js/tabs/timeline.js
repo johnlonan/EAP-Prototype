@@ -35,7 +35,7 @@ function tlItems(level) {
   } else {
     dl = {}; EAP.workItems.sprints.forEach(function(sp) {
       var sd = EAP.sprintDates[sp.id]; if (!sd) return;
-      (sp.items || []).forEach(function(wi) { dl[wi.id] = { start: sd.start, end: sd.end }; items.push(wi); });
+      (sp.items || []).forEach(function(wi) { dl[wi.id] = { start: sd.start, end: sd.end, sprintName: sd.name }; items.push(wi); });
     });
   }
   // Persona "owned/assigned to me" + team scope (when context is a team)
@@ -314,17 +314,25 @@ EAP.renderTimeline = function() {
       var left = tlPct(range,td,is), width = Math.max(0.5, tlPct(range,td,ie) - left);
       var col = tlCol(item.state), pct = item.pct || 0;
       var tc = (EAP._typeColors[(item.type||level)] || 'var(--text-tertiary)');
-      leftHtml += '<div class="tl-row-lbl" data-item-row="'+item.id+'" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm" title="'+item.name+'">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
+      leftHtml += '<div class="tl-row-lbl" data-item-row="'+item.id+'" style="top:'+y+'px;height:'+rowH+'px;"><span style="color:'+tc+';display:inline-flex;flex-shrink:0;">'+EAP.icon((item.type||level).toLowerCase(),12)+'</span><span class="tl-row-nm">'+item.name+'</span>'+(item.owner?EAP.avatar(item.owner,18):'')+'</div>';
       rightHtml += '<div class="tl-row-bg" style="top:'+y+'px;height:'+rowH+'px;"></div>';
-      // Bar is solid full-colour (white text readable). Progress shown as
-      // a lighter strip on top of the filled portion.
-      // Build a richer hover tooltip (data-tip — instant, styled — replaces native title)
-      var tipParts = [item.name, item.state];
-      if (pct) tipParts.push(pct + '% complete');
-      if (item.owner) tipParts.push('Owner · ' + ((EAP.people && EAP.people[item.owner] && EAP.people[item.owner].name) || item.owner));
-      if (item.team) tipParts.push('Team · ' + item.team);
-      var tipText = tipParts.join('\n');
-      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;background:'+col+';" data-tip="'+tipText.replace(/"/g, '&quot;')+'">';
+      var ownerName = item.owner ? ((EAP.people && EAP.people[item.owner] && EAP.people[item.owner].name) || item.owner) : '';
+      rightHtml += '<div class="tl-bar" id="tl-bar-'+item.id+'" data-item-id="'+item.id+'" style="top:'+(y+9)+'px;left:'+left+'%;width:'+width+'%;height:'+(rowH-18)+'px;background:'+col+';" ' +
+        'data-tl-name="'+item.name.replace(/"/g,'&quot;')+'" ' +
+        'data-tl-state="'+(item.state||'')+'" ' +
+        'data-tl-pct="'+(pct||0)+'" ' +
+        'data-tl-pts="'+(item.pts||0)+'" ' +
+        (ownerName ? 'data-tl-owner="'+ownerName.replace(/"/g,'&quot;')+'" ' : '') +
+        (item.owner ? 'data-tl-owner-key="'+item.owner+'" ' : '') +
+        (item.team ? 'data-tl-team="'+item.team+'" ' : '') +
+        (item.parent ? 'data-tl-parent="'+String(item.parent).replace(/"/g,'&quot;')+'" ' : '') +
+        (item.blocked ? 'data-tl-blocked="true" ' : '') +
+        (item.atRisk ? 'data-tl-atrisk="true" ' : '') +
+        'data-tl-start="'+(dd.start||'')+'" ' +
+        'data-tl-end="'+(dd.end||'')+'" ' +
+        (dd.sprintName ? 'data-tl-sprint="'+dd.sprintName.replace(/"/g,'&quot;')+'" ' : '') +
+        (item.pi ? 'data-tl-pi="'+item.pi+'" ' : '') +
+        '>';
       if (pct > 0 && pct < 100) {
         rightHtml += '<div class="tl-bar-fill" style="width:'+pct+'%;background:rgba(255,255,255,0.28);"></div>';
       }
@@ -352,7 +360,7 @@ EAP.renderTimeline = function() {
 
   // Body (right panel scaled to zoom width)
   h += '<div class="tl-body"><div class="tl-body-left" style="width:'+leftW+'px;height:'+totalH+'px;">'+leftHtml+'</div>';
-  h += '<div class="tl-body-rscroll"><div class="tl-body-right" style="width:'+zoomW+';height:'+totalH+'px;">'+tlGrid(range,td,showSp)+tlToday(range,td)+rightHtml+'</div></div></div>';
+  h += '<div class="tl-body-rscroll" style="height:'+totalH+'px;"><div class="tl-body-right" style="width:'+zoomW+';height:'+totalH+'px;">'+tlGrid(range,td,showSp)+tlToday(range,td)+rightHtml+'</div></div></div>';
 
   // Zoom controls + legend + Today
   h += '<div class="tl-fab-wrap">';

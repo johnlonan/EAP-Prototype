@@ -125,18 +125,128 @@ function renderNav(activePage, options) {
 
   // ── Shared floating omnibar (skip on home — has its own omnibar) ──
   if (!document.getElementById('floating-bar') && activePage !== 'home') {
+    // ── Inject animation keyframes once ──────────────────
+    if (!document.getElementById('otto-bar-styles')) {
+      const s = document.createElement('style');
+      s.id = 'otto-bar-styles';
+      s.textContent = `
+        /* ── Rotating gradient border ────────────────── */
+        @property --otto-angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
+        @keyframes otto-spin {
+          to { --otto-angle: 360deg; }
+        }
+
+        /* Default state: spinning conic gradient border */
+        #floating-bar {
+          position: relative;
+          border: 1.5px solid transparent !important;
+          background:
+            linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)) padding-box,
+            conic-gradient(from var(--otto-angle),
+              rgba(0,199,177,0.85)  0deg,
+              rgba(14,78,105,0.70) 100deg,
+              rgba(0,0,0,0.06)     190deg,
+              rgba(0,0,0,0.06)     275deg,
+              rgba(0,199,177,0.85) 360deg
+            ) border-box !important;
+          animation: otto-spin 3.5s linear infinite;
+          transition: width 400ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 200ms ease, transform 220ms cubic-bezier(0.22,1,0.36,1) !important;
+        }
+
+        /* Hover: spin pauses → snaps to clean static teal border */
+        #floating-bar.is-hovered {
+          animation-play-state: paused;
+          background:
+            linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)) padding-box,
+            linear-gradient(135deg, rgba(0,199,177,0.75) 0%, rgba(14,78,105,0.60) 100%) border-box !important;
+          box-shadow: 0 5px 20px rgba(0,0,0,0.10), 0 0 0 3px rgba(0,199,177,0.15) !important;
+        }
+
+        /* Expanded: solid white, teal focus ring, spin off */
+        #floating-bar.is-expanded {
+          animation-play-state: paused !important;
+          background: rgba(255,255,255,0.96) !important;
+          border: 1px solid rgba(14,78,105,0.22) !important;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 3px rgba(14,78,105,0.08) !important;
+          cursor: default !important;
+        }
+
+        /* ── Label transitions ────────────────────────── */
+        @keyframes otto-label-out {
+          0%   { opacity:1; transform:translateX(0)   scale(1); }
+          100% { opacity:0; transform:translateX(8px) scale(0.88); }
+        }
+        @keyframes otto-label-in {
+          0%   { opacity:0; transform:translateX(-8px) scale(0.88); }
+          100% { opacity:1; transform:translateX(0)    scale(1); }
+        }
+
+        /* ── Post-load delight (runs after expansion + delay) ── */
+        /* Mic attention bounce — on already-visible element, no opacity change */
+        @keyframes otto-mic-attention {
+          0%   { transform: scale(1); }
+          35%  { transform: scale(1.18); }
+          65%  { transform: scale(0.90); }
+          82%  { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        @keyframes otto-shimmer {
+          0%   { background-position:-500px 0; opacity:0.8; }
+          60%  { opacity:1; }
+          100% { background-position:500px 0; opacity:0; }
+        }
+
+        /* Shimmer overlay on expand */
+        #floating-bar .otto-shimmer-layer {
+          position:absolute; inset:0; border-radius:999px; pointer-events:none;
+          background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.65) 50%,transparent 70%);
+          background-size:500px 100%;
+          animation:otto-shimmer 580ms cubic-bezier(0.22,1,0.36,1) forwards;
+        }
+      `;
+      document.head.appendChild(s);
+    }
+
     const bar = document.createElement('div');
     bar.id = 'floating-bar';
-    bar.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%); display:inline-flex; align-items:center; padding:6px 8px; background:var(--background-tertiary, #EDECE9); border-radius:45px; box-shadow:0 8px 10px -6px rgba(0,0,0,0.10), 0 20px 25px -5px rgba(0,0,0,0.10); outline:1px solid var(--background-tertiary, #EDECE9); outline-offset:-1px; width:480px; z-index:200; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); overflow:hidden;';
+
+    const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+    const EASE   = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    const OTTO_PATH = 'M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z';
+
+    bar.style.cssText = `
+      position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+      display:inline-flex; align-items:center; padding:4px;
+      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      border-radius:999px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      width:auto; z-index:200; overflow:hidden; cursor:pointer;
+      width:auto;
+    `;
+
     bar.innerHTML = `
-      <div style="flex:1; background:white; border-radius:32px; box-shadow:0 0 8px rgba(0,0,0,0.05); display:inline-flex; align-items:center; padding:6px 6px 6px 24px; gap:24px; overflow:hidden;">
-        <input id="floating-input" type="text" placeholder="Ask about PI Planning readiness..." style="flex:1; border:none; outline:none; font-size:16px; font-weight:300; color:#1a1a1a; background:transparent; cursor:text; line-height:24px; font-family:inherit;"/>
-        <button id="mic-btn" style="width:40px; height:40px; border-radius:9999px; background:var(--accent, #68E353); border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transition: all 0.2s ease;">
-          <svg id="mic-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <div id="otto-anchor" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex-shrink:0;">
+        <svg id="otto-mark-svg" width="15" height="15" viewBox="0 0 118 118" fill="none" style="display:block;flex-shrink:0;transition:transform 300ms ${SPRING},opacity 300ms ease;">
+          <path d="${OTTO_PATH}" fill="#0e4e69"/>
+        </svg>
+      </div>
+      <div id="floating-trigger" style="display:inline-flex;align-items:center;padding:0 14px 0 2px;white-space:nowrap;">
+        <span id="ask-label" style="font-size:12px;font-weight:500;color:#1a1918;font-family:inherit;letter-spacing:0;transition:color 200ms ease;">Ask Otto</span>
+      </div>
+      <div id="floating-content" style="display:none;align-items:center;flex:1;overflow:hidden;">
+        <input id="floating-input" type="text" placeholder=""
+          style="flex:1;min-width:0;border:none;outline:none;font-size:13px;font-weight:400;color:#111827;background:transparent;line-height:20px;font-family:inherit;padding:6px 8px 6px 6px;"/>
+        <button id="mic-btn"
+          style="width:30px;height:30px;border-radius:9999px;background:#0e4e69;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 140ms ease,transform 160ms ${SPRING};">
+          <svg id="mic-icon" width="13" height="13" viewBox="0 0 16 16" fill="none">
             <rect x="5" y="1" width="6" height="9" rx="3" fill="white"/>
             <path d="M2 8C2 11.314 4.686 14 8 14M14 8C14 11.314 11.314 14 8 14M8 14V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
-          <svg id="plane-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:none;">
+          <svg id="plane-icon" width="13" height="13" viewBox="0 0 16 16" fill="none" style="display:none;">
             <path d="M14 8L5 8M14 8L2 3L5 8M14 8L2 13L5 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
@@ -144,19 +254,107 @@ function renderNav(activePage, options) {
     `;
     document.body.appendChild(bar);
 
-    // Mic/plane toggle on input
+    const trigger      = document.getElementById('floating-trigger');
+    const askLabel     = document.getElementById('ask-label');
+    const content      = document.getElementById('floating-content');
     const floatingInput = document.getElementById('floating-input');
-    const micIcon = document.getElementById('mic-icon');
-    const planeIcon = document.getElementById('plane-icon');
+    const micBtn       = document.getElementById('mic-btn');
+    const micIcon      = document.getElementById('mic-icon');
+    const planeIcon    = document.getElementById('plane-icon');
+    let expanded = false;
+    let delightTimer = null;
+
+    const PLACEHOLDER = 'Ask about PI Planning readiness…';
+
+    function spawnShimmer() {
+      const l = document.createElement('div');
+      l.className = 'otto-shimmer-layer';
+      bar.appendChild(l);
+      setTimeout(() => { if (l.parentNode) l.remove(); }, 620);
+    }
+
+    function typewriter() {
+      floatingInput.placeholder = '';
+      let i = 0;
+      const t = setInterval(() => {
+        floatingInput.placeholder = PLACEHOLDER.slice(0, ++i);
+        if (i >= PLACEHOLDER.length) clearInterval(t);
+      }, 16);
+    }
+
+    // ── Expand ───────────────────────────────────────────
+    function expand() {
+      if (expanded) return;
+      expanded = true;
+      bar.classList.remove('is-hovered');
+
+      bar.classList.add('is-expanded');
+      bar.style.width = '420px';
+      trigger.style.display = 'none';
+      content.style.display = 'inline-flex';
+      floatingInput.placeholder = PLACEHOLDER; // full text present immediately
+      floatingInput.focus();
+      spawnShimmer();
+
+      // Delight: typewriter replays the placeholder after expansion + 1s
+      delightTimer = setTimeout(() => {
+        typewriter();
+      }, 1400);
+    }
+
+    // ── Collapse ─────────────────────────────────────────
+    function collapse() {
+      if (!expanded) return;
+      expanded = false;
+      if (delightTimer) { clearTimeout(delightTimer); delightTimer = null; }
+
+      // Immediate — no fade, no setTimeout
+      content.style.display = 'none';
+      floatingInput.style.animation = '';
+      micBtn.style.animation = '';
+      micBtn.style.transform = '';
+      micIcon.style.display = 'block';
+      planeIcon.style.display = 'none';
+      floatingInput.placeholder = '';
+
+      bar.classList.remove('is-expanded');
+      bar.style.width = 'auto';
+
+      trigger.style.display = 'inline-flex';
+      askLabel.style.animation = 'otto-label-in 280ms ' + SPRING + ' forwards';
+    }
+
+    // ── Hover: spin pauses, static teal border snaps in ──
+    bar.addEventListener('mouseenter', () => {
+      if (expanded) return;
+      bar.classList.add('is-hovered');
+      bar.style.boxShadow = '0 5px 20px rgba(0,0,0,0.10), 0 0 0 3px rgba(0,199,177,0.15)';
+      bar.style.transform = 'translateX(-50%) translateY(-2px)';
+      askLabel.style.color = '#0e4e69';
+    });
+
+    bar.addEventListener('mouseleave', () => {
+      if (expanded) return;
+      bar.classList.remove('is-hovered');
+      bar.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)';
+      bar.style.transform = 'translateX(-50%) translateY(0)';
+      askLabel.style.color = '#1a1918';
+    });
+
+    bar.addEventListener('click', (e) => { if (!expanded) expand(); });
+
+    floatingInput.addEventListener('blur', () => {
+      if (floatingInput.value.trim() === '') collapse();
+    });
 
     floatingInput.addEventListener('input', () => {
-      if (floatingInput.value.trim().length > 0) {
-        micIcon.style.display = 'none';
-        planeIcon.style.display = 'block';
-      } else {
-        micIcon.style.display = 'block';
-        planeIcon.style.display = 'none';
-      }
+      const hasText = floatingInput.value.trim().length > 0;
+      micIcon.style.display   = hasText ? 'none'  : 'block';
+      planeIcon.style.display = hasText ? 'block' : 'none';
     });
+
+    micBtn.addEventListener('mouseenter', () => { micBtn.style.background = '#0a3a4f'; micBtn.style.transform = 'scale(1.08)'; });
+    micBtn.addEventListener('mouseleave', () => { micBtn.style.background = '#0e4e69'; micBtn.style.transform = 'scale(1)'; });
+    micBtn.addEventListener('click', (e) => { e.stopPropagation(); });
   }
 }

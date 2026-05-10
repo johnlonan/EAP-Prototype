@@ -419,7 +419,16 @@ EAP.readinessOf = function(item) {
 EAP.readinessBadge = function(item) {
   var r = EAP.readinessOf(item);
   if (!r) return '';
-  return '<span class="readiness-badge readiness-' + r.level + '">' + r.label + '</span>';
+  var tips = {
+    'Ready':         'All criteria met — sized, assigned, and acceptance criteria written.',
+    'Needs AC':      'Acceptance criteria are missing. Write AC before pulling into a sprint.',
+    'No owner':      'No team member assigned. Assign before planning.',
+    'Not sized':     'No point estimate. Size this item before sprint planning.',
+    'In refinement': 'Feature is in Funnel — needs product refinement before sprint commitment.',
+    'No team':       'No team assigned. Allocate to a team before sprint planning.'
+  };
+  var tip = tips[r.label] || '';
+  return '<span class="readiness-badge readiness-' + r.level + '"' + (tip ? ' data-tip="' + tip + '"' : '') + '>' + r.label + '</span>';
 };
 
 // ── Goal cell — truncated for table display ───────────
@@ -447,8 +456,6 @@ EAP.itemNameCell = function(i) {
   } else if (i.atRisk) {
     var riskTxt = 'At risk' + (i.openDefects ? ' · ' + i.openDefects + ' open defect' + (i.openDefects > 1 ? 's' : '') : '');
     h += '<span class="item-sublbl item-sublbl-risk">' + riskTxt + '</span>';
-  } else if (i.parent && EAP.isWorkItemType(i.type)) {
-    h += '<span class="item-sublbl">' + i.parent + '</span>';
   }
   return h;
 };
