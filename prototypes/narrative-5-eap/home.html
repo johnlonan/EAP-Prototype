@@ -103,18 +103,26 @@ body {
   margin-bottom: 16px;
   background: transparent;
   border-bottom: 1px solid transparent;
-  transition: border-color 220ms ease, backdrop-filter 220ms ease;
+  transition: border-color 220ms ease, background 220ms ease;
 }
 .ih-top.is-scrolled {
   border-bottom-color: rgba(14, 78, 105, 0.12);
   background: rgba(255,255,255,0.85);
 }
 @supports (backdrop-filter: blur(1px)) {
-  .ih-top.is-scrolled {
-    background: transparent;
+  .ih-top::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     backdrop-filter: blur(36px) saturate(1.4);
     -webkit-backdrop-filter: blur(36px) saturate(1.4);
+    opacity: 0;
+    transition: opacity 220ms ease;
+    pointer-events: none;
   }
+  .ih-top.is-scrolled::before { opacity: 1; }
+  .ih-top.is-scrolled { background: transparent; }
 }
 .ih-greet { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ih-greet h1 {
