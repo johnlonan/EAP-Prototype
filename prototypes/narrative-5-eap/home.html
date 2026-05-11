@@ -1554,8 +1554,8 @@ body {
     name:   persona.name,
     links: {
       0: 'home.html?p=' + personaKey,
-      3: tabUrl('backlog'),
-      4: tabUrl('board')
+      3: tabUrl(persona.tab),
+      4: tabUrl(persona.tab)
     }
   });
   // Avatar click in nav → opens persona switcher popover
