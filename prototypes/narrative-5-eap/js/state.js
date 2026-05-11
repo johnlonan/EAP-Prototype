@@ -43,6 +43,9 @@ EAP.state = {
   // Accordion open states
   openAccordions: {},
 
+  // Sprint goal strip open states (WorkItem/Planning only)
+  openGoals: {},
+
   // Hierarchy expand states
   openHierarchy: {},
 

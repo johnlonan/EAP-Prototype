@@ -143,6 +143,56 @@ EAP.renderInsights = function() {
       '</div>';
   }
 
+  // ── Monte Carlo delivery forecast — Planning tab (team + art) ──
+  if (s.tab === 'planning' && EAP.mcForecast) {
+    var _mcDelta = function(days, endDays) {
+      var d = days - endDays;
+      return d <= 0
+        ? '<span class="ins-mc-delta ins-mc-delta-ok">on time</span>'
+        : '<span class="ins-mc-delta ins-mc-delta-late">+' + d + 'd</span>';
+    };
+    h += '<div class="ins-mc-forecast">';
+    h += '<div class="ins-sec-lbl">' + EAP.icon('sparkle', 10) + ' Delivery Forecast</div>';
+    if (s.context !== 'art') {
+      var _sp = EAP.mcForecast.sprint;
+      var _tm = EAP.mcForecast.team;
+      h +=
+        '<div class="ins-mc-section">' +
+          '<div class="ins-mc-scope-lbl">Sprint 2 completion · ends ' + _sp.end + '</div>' +
+          '<div class="ins-mc-dates">' +
+            '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-85">85%</span><span class="ins-mc-tier">Conservative</span><span class="ins-mc-date ins-mc-date-primary">' + _sp.p85 + '</span>' + _mcDelta(_sp.p85days, _sp.endDays) + '</div>' +
+            '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-70">70%</span><span class="ins-mc-tier">Probable</span><span class="ins-mc-date ins-mc-date-warn">' + _sp.p70 + '</span>' + _mcDelta(_sp.p70days, _sp.endDays) + '</div>' +
+            '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-50">50%</span><span class="ins-mc-tier ins-mc-tier-muted">Optimistic</span><span class="ins-mc-date ins-mc-date-muted">' + _sp.p50 + '</span>' + _mcDelta(_sp.p50days, _sp.endDays) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ins-mc-divider"></div>' +
+        '<div class="ins-mc-section">' +
+          '<div class="ins-mc-scope-lbl">Backlog horizon · ' + _tm.items + ' items beyond Sprint 2</div>' +
+          '<svg id="mcTimelineSvg" class="ins-mc-svg"></svg>' +
+          '<div class="ins-mc-dates">' +
+            '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-85">85%</span><span class="ins-mc-tier">Conservative</span><span class="ins-mc-date ins-mc-date-primary">' + _tm.p85 + '</span></div>' +
+            '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-70">70%</span><span class="ins-mc-tier">Probable</span><span class="ins-mc-date ins-mc-date-warn">' + _tm.p70 + '</span></div>' +
+            '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-50">50%</span><span class="ins-mc-tier ins-mc-tier-muted">Optimistic</span><span class="ins-mc-date ins-mc-date-muted">' + _tm.p50 + '</span></div>' +
+          '</div>' +
+        '</div>';
+      h += '<div class="ins-mc-meta">' + EAP.icon('sparkle', 9) + ' Monte Carlo · 10,000 simulations · ' + _tm.basis + '</div>';
+    } else {
+      var _art = EAP.mcForecast.art;
+      var _artLate = _art.p85days - _art.piEndDays;
+      h +=
+        '<div class="ins-mc-scope-lbl">PI feature delivery · ' + _art.features + ' features in scope</div>' +
+        '<svg id="mcTimelineSvg" class="ins-mc-svg"></svg>' +
+        '<div class="ins-mc-dates">' +
+          '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-85">85%</span><span class="ins-mc-tier">Conservative</span><span class="ins-mc-date ins-mc-date-primary">' + _art.p85 + '</span></div>' +
+          '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-70">70%</span><span class="ins-mc-tier">Probable</span><span class="ins-mc-date ins-mc-date-warn">' + _art.p70 + '</span></div>' +
+          '<div class="ins-mc-row"><span class="ins-mc-conf ins-mc-conf-50">50%</span><span class="ins-mc-tier ins-mc-tier-muted">Optimistic</span><span class="ins-mc-date ins-mc-date-muted">' + _art.p50 + '</span></div>' +
+        '</div>' +
+        '<div class="ins-mc-pi-note">' + EAP.icon('alert-triangle', 10) + ' PI ends ' + _art.piEnd + ' — conservative forecast (85%) misses PI end by ' + _artLate + ' days</div>';
+      h += '<div class="ins-mc-meta">' + EAP.icon('sparkle', 9) + ' Monte Carlo · 10,000 simulations · ' + _art.basis + '</div>';
+    }
+    h += '</div>';
+  }
+
   // ── Team health heatmap grid — Planning/Board/Task Board at ART ──
   if (d.health && s.context === 'art') {
     h += '<div class="ins-health"><div class="ins-sec-lbl">Team Health</div><svg id="healthHeatmapSvg" class="ins-heat-svg"></svg></div>';
@@ -218,10 +268,12 @@ EAP.renderInsights = function() {
         '</div>';
 
       var pInterval = mw.blocked > 0 ? 10 : (wipOver ? 9 : 7);
+      var pLo = Math.max(0, pFinish - pInterval);
+      var pHi = Math.min(100, pFinish + pInterval);
       h += '<div class="ins-member-predict">' +
         '<span class="ins-sec-lbl">' + EAP.icon('sparkle', 10) + ' Completion forecast</span>' +
         '<div class="ins-member-pbar"><div class="ins-member-pfill" style="width:' + pFinish + '%;background:' + pColor + ';"></div></div>' +
-        '<span class="ins-member-ppct" style="color:' + pColor + ';">' + pFinish + '% ± ' + pInterval + '% likely to finish sprint commitments</span>' +
+        '<span class="ins-member-ppct" style="color:' + pColor + ';">' + pLo + '–' + pHi + '% probability of completing sprint commitments</span>' +
         '</div></div>';
     }
   }
@@ -239,6 +291,62 @@ EAP.renderInsights = function() {
       h += '<div class="ins-feat-row"><span class="ins-feat-name">' + name + '</span><div class="ins-feat-bar"><div class="ins-feat-ghost" style="width:' + planned + '%;"></div><div class="ins-feat-fill" style="width:' + (f.pct || 0) + '%;background:' + col + ';"></div></div><span class="ins-feat-val">' + (f.pct || 0) + '%</span></div>';
     });
     h += '</div>';
+  }
+
+  // ── Dev (SM) — capacity poll card ──
+  if (s.tab === 'planning' && s.context === 'team' && s.level === 'WorkItem' && s.persona === 'dev') {
+    var _devP  = EAP.personas.dev;
+    var _riya  = EAP.personas.riya;
+    h += '<div class="ins-cap-poll" id="ins-cap-poll">' +
+      '<div class="ins-sec-lbl ins-sec-lbl-split">PI 27 Capacity Poll' +
+        '<span class="ins-cap-due">' + EAP.icon('clock', 10) + 'Due Friday</span>' +
+      '</div>' +
+      '<div class="ins-cap-from">' +
+        EAP.avatar('Riya', 20) +
+        '<span>From <strong>Riya Menon</strong> · Release Train Engineer</span>' +
+      '</div>' +
+      '<div class="ins-cap-fields">' +
+        '<div class="ins-cap-field">' +
+          '<label class="ins-cap-lbl">Team velocity estimate</label>' +
+          '<div class="ins-cap-row"><input class="ins-cap-input" type="number" value="41" id="ins-cap-vel"><span class="ins-cap-unit">pts</span></div>' +
+          '<div class="ins-cap-hint">Avg last 4 sprints · adjust for scope change</div>' +
+        '</div>' +
+        '<div class="ins-cap-field">' +
+          '<label class="ins-cap-lbl">Available capacity</label>' +
+          '<div class="ins-cap-row"><input class="ins-cap-input" type="number" value="85" id="ins-cap-pct"><span class="ins-cap-unit">%</span></div>' +
+          '<div class="ins-cap-hint">Adjust for leave, PI events, unplanned work</div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="ins-cap-submit" onclick="EAP.submitCapacity()">' + EAP.icon('check-square', 12) + 'Submit to Riya</button>' +
+    '</div>';
+  }
+
+  // ── James (dev) — sprint planning card ──
+  if (s.tab === 'planning' && s.context === 'team' && s.level === 'WorkItem' && s.persona === 'james') {
+    var _sp3 = (EAP.workItems && EAP.workItems.sprints || []).filter(function(sp) { return sp.id === 'sp3'; })[0];
+    var _myItems = _sp3 ? _sp3.items.filter(function(i) { return i.owner === 'James'; }) : [];
+    var _myPts   = _myItems.reduce(function(a, i) { return a + (i.pts || 0); }, 0);
+    h += '<div class="ins-sprint-plan" id="ins-sprint-plan">' +
+      '<div class="ins-sec-lbl ins-sec-lbl-split">Sprint Planning' +
+        '<span class="ins-splan-when">' + EAP.icon('calendar', 10) + 'Tuesday</span>' +
+      '</div>' +
+      '<div class="ins-splan-sprint">Sprint 3</div>' +
+      (_sp3 && _sp3.goal
+        ? '<div class="ins-splan-goal">' + EAP.iconFilled('flag', 10) + '<span>' + _sp3.goal + '</span></div>'
+        : '') +
+      '<div class="ins-splan-items">' +
+        _myItems.map(function(i) {
+          return '<div class="ins-splan-item">' +
+            '<span class="ins-splan-name">' + i.name + '</span>' +
+            '<span class="ins-splan-pts">' + i.pts + 'pt</span>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="ins-splan-footer">' +
+        '<span class="ins-splan-total"><strong>' + _myPts + ' pts</strong> committed</span>' +
+        '<button class="ins-splan-confirm" onclick="EAP.confirmSprint()">' + EAP.icon('check-square', 12) + 'Confirm my sprint</button>' +
+      '</div>' +
+    '</div>';
   }
 
   // ── Signals ──
@@ -282,6 +390,7 @@ EAP.renderInsights = function() {
   if (d.flowDist) setTimeout(function() { EAP.drawFlowDist(d.flowDist); }, 60);
   if (d.health && s.context === 'art') setTimeout(function() { EAP.drawHealthHeatmap(); }, 70);
   if (s.tab === 'planning' && s.context === 'team' && EAP.velocityHistory) setTimeout(function() { EAP.drawVelocityD3(); }, 80);
+  if (s.tab === 'planning' && EAP.mcForecast) setTimeout(function() { EAP.drawMCTimeline(); }, 85);
   if (d.panelChart) {
     var _pc = d.panelChart;
     if (_pc.type === 'burndown') setTimeout(function() { EAP.drawPanelBurndown(_pc); }, 90);
@@ -487,9 +596,9 @@ function renderSignal(s, id) {
     '</div>';
   h += '<div class="ins-sig-title">' + s.title + '</div>';
   h += '<div class="ins-sig-desc">' + s.desc + '</div>';
+  if (s.miniChart) h += '<div class="ins-sig-mini">' + renderMiniChart(s.miniChart) + '</div>';
   if (s.why) h += '<div class="ins-sig-why-blk"><div class="ins-sig-why-blk-lbl">Why</div><div class="ins-sig-why-blk-txt">' + s.why + '</div></div>';
   if (s.recommended) h += '<div class="ins-sig-rec-blk"><div class="ins-sig-rec-blk-lbl">Recommended action</div><div class="ins-sig-rec-blk-txt">' + s.recommended + '</div></div>';
-  if (s.miniChart) h += '<div class="ins-sig-mini">' + renderMiniChart(s.miniChart) + '</div>';
   if (s.action) h += '<a class="ins-sig-action" data-ins-action="' + s.action + '">' + s.action + EAP.icon('chevron-right', 11) + '</a>';
   if (isAi && s.meta) {
     h += '<div class="ins-sig-why">' + EAP.icon('sparkle', 9) + '<span>' + s.meta + '</span>' +
@@ -509,6 +618,73 @@ function renderSignal(s, id) {
   h += '</div>';
   return h;
 }
+
+// ── Monte Carlo timeline strip ────────────────────────
+EAP.drawMCTimeline = function() {
+  if (typeof d3 === 'undefined') return;
+  var svgEl = document.getElementById('mcTimelineSvg');
+  if (!svgEl) return;
+  var s = EAP.state;
+  var mc = s.context === 'art' ? EAP.mcForecast.art : EAP.mcForecast.team;
+  var isArt = s.context === 'art';
+  var W = Math.max(1, svgEl.parentElement.clientWidth - 28);
+  var H = 42, padL = 10, padR = 10, lineY = 28;
+  var maxDays = mc.p85days + 5;
+  var xScale = d3.scaleLinear().domain([0, maxDays]).range([padL, W - padR]);
+
+  var svg = d3.select(svgEl).attr('width', W).attr('height', H);
+  svg.selectAll('*').remove();
+
+  // Background track
+  svg.append('line')
+    .attr('x1', padL).attr('x2', W - padR)
+    .attr('y1', lineY).attr('y2', lineY)
+    .attr('stroke', 'rgba(0,0,0,0.07)').attr('stroke-width', 3).attr('stroke-linecap', 'round');
+
+  // Confidence range band (50th → 85th)
+  svg.append('line')
+    .attr('x1', xScale(mc.p50days)).attr('x2', xScale(mc.p85days))
+    .attr('y1', lineY).attr('y2', lineY)
+    .attr('stroke', 'rgba(14,78,105,0.16)').attr('stroke-width', 7).attr('stroke-linecap', 'round');
+
+  // PI end deadline (ART only)
+  if (isArt && mc.piEndDays) {
+    var piX = xScale(mc.piEndDays);
+    svg.append('line')
+      .attr('x1', piX).attr('x2', piX)
+      .attr('y1', 4).attr('y2', H - 2)
+      .attr('stroke', 'rgba(141,110,0,0.4)').attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '3,2');
+    svg.append('text')
+      .attr('x', piX - 3).attr('y', 10)
+      .attr('text-anchor', 'end')
+      .style('font-size', '7px').style('font-weight', '500')
+      .style('fill', 'rgba(141,110,0,0.65)').style('font-family', 'var(--font-sans)')
+      .text('PI end');
+  }
+
+  // Today marker
+  svg.append('circle').attr('cx', padL).attr('cy', lineY).attr('r', 3).attr('fill', 'rgba(0,0,0,0.18)');
+  svg.append('text').attr('x', padL).attr('y', H)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '7px').style('fill', 'rgba(0,0,0,0.22)').style('font-family', 'var(--font-sans)')
+    .text('Today');
+
+  // Percentile dots
+  var markers = [
+    { days: mc.p50days, color: 'rgba(0,0,0,0.22)', r: 4,   tip: '50th pct — optimistic: ' + mc.p50 },
+    { days: mc.p70days, color: '#8d6e00',           r: 4.5, tip: '70th pct — probable: ' + mc.p70 },
+    { days: mc.p85days, color: '#0e4e69',           r: 5.5, tip: '85th pct — conservative: ' + mc.p85 }
+  ];
+  markers.forEach(function(m) {
+    var cx = xScale(m.days);
+    svg.append('circle').attr('cx', cx).attr('cy', lineY).attr('r', m.r + 2.5).attr('fill', 'white');
+    svg.append('circle').attr('cx', cx).attr('cy', lineY).attr('r', m.r).attr('fill', m.color)
+      .style('cursor', 'default')
+      .on('mouseover', function(event) { showTip(m.tip, event); })
+      .on('mousemove', moveTip).on('mouseout', hideTip);
+  });
+};
 
 // ── Gauge ─────────────────────────────────────────────
 EAP.drawGauge = function(tv) {
@@ -553,6 +729,42 @@ EAP.drawGauge = function(tv) {
 EAP.showToast = function(msg, type) {
   var icon = type === 'success' ? 'check-square' : 'info';
   EAP.toast({ icon: icon, message: msg, duration: 3000 });
+};
+
+// ── Dev SM — submit capacity poll ─────────────────────
+EAP.submitCapacity = function() {
+  var vel = document.getElementById('ins-cap-vel');
+  var pct = document.getElementById('ins-cap-pct');
+  var velVal = vel ? vel.value : '41';
+  var pctVal = pct ? pct.value : '85';
+  var card = document.getElementById('ins-cap-poll');
+  if (card) {
+    card.innerHTML =
+      '<div class="ins-cap-done">' +
+        EAP.icon('check-square', 14) +
+        '<div><strong>Capacity submitted to Riya</strong>' +
+          '<div class="ins-cap-done-meta">' + velVal + ' pts · ' + pctVal + '% available · PI 27</div>' +
+        '</div>' +
+      '</div>';
+  }
+  EAP.showToast('Capacity input sent to Riya Menon · ' + velVal + ' pts, ' + pctVal + '% available', 'success');
+};
+
+// ── James — confirm sprint commitment ─────────────────
+EAP.confirmSprint = function() {
+  var _sp3 = (EAP.workItems && EAP.workItems.sprints || []).filter(function(sp) { return sp.id === 'sp3'; })[0];
+  var _myPts = _sp3 ? _sp3.items.filter(function(i) { return i.owner === 'James'; }).reduce(function(a, i) { return a + (i.pts || 0); }, 0) : 0;
+  var card = document.getElementById('ins-sprint-plan');
+  if (card) {
+    card.innerHTML =
+      '<div class="ins-splan-done">' +
+        EAP.icon('check-square', 14) +
+        '<div><strong>Sprint 3 commitment confirmed</strong>' +
+          '<div class="ins-cap-done-meta">' + _myPts + ' pts · Auth Team</div>' +
+        '</div>' +
+      '</div>';
+  }
+  EAP.showToast('Sprint 3 commitment confirmed · ' + _myPts + ' pts', 'success');
 };
 
 // ── Wire actions ──────────────────────────────────────

@@ -69,10 +69,105 @@ function trackCard(item, opts) {
   return h;
 }
 
+// ── Quality badge helper ──────────────────────────────
+function qualityBadge(q) {
+  var map = {
+    'Excellent': { color: '#16A34A', bg: 'rgba(22,163,74,0.08)' },
+    'Good':      { color: '#2563EB', bg: 'rgba(37,99,235,0.08)' },
+    'Average':   { color: '#D97706', bg: 'rgba(217,119,6,0.08)' },
+    'Poor':      { color: '#DC2626', bg: 'rgba(220,38,38,0.08)' }
+  };
+  var s = map[q] || map['Average'];
+  return '<span style="font-size:11px;font-weight:500;color:' + s.color + ';background:' + s.bg + ';padding:2px 7px;border-radius:10px;">' + q + '</span>';
+}
+
+// ── Team view renderer ────────────────────────────────
+function renderTeamView(teamName, isTeamCtx) {
+  var rows = [];
+  var maxSp = 0;
+
+  if (isTeamCtx) {
+    rows = (EAP.teamProductivity || {})[teamName] || [];
+    maxSp = rows.reduce(function(m, r) { return Math.max(m, r.spCompleted); }, 0) || 1;
+  } else {
+    // ART context — aggregate one row per team
+    var teams = ['Auth Team', 'Payments Team', 'Fraud Team', 'Mobile Exp Team', 'Accounts Team', 'Onboarding Team'];
+    teams.forEach(function(t) {
+      var members = (EAP.teamProductivity || {})[t] || [];
+      if (!members.length) return;
+      var total = members.reduce(function(a, r) { return a + r.totalTasks; }, 0);
+      var done  = members.reduce(function(a, r) { return a + r.completed; }, 0);
+      var pend  = members.reduce(function(a, r) { return a + r.pending; }, 0);
+      var util  = members.reduce(function(a, r) { return a + r.utilHrs; }, 0);
+      var sp    = members.reduce(function(a, r) { return a + r.spCompleted; }, 0);
+      var pct   = total > 0 ? Math.round((done / total) * 100) : 0;
+      var q = pct >= 80 ? 'Excellent' : pct >= 70 ? 'Good' : pct >= 55 ? 'Average' : 'Poor';
+      rows.push({ member: t, role: members.length + ' members', totalTasks: total, completed: done,
+                  utilHrs: util, completionPct: pct, pending: pend, quality: q, spCompleted: sp });
+    });
+    maxSp = rows.reduce(function(m, r) { return Math.max(m, r.spCompleted); }, 0) || 1;
+  }
+
+  if (!rows.length) {
+    return '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">No productivity data for this team.</div>';
+  }
+
+  // SP bar chart — compact horizontal bars above the table
+  var chartHtml = '<div class="tteam-chart">' +
+    '<div class="tteam-chart-title">Story points completed · ' + (isTeamCtx ? 'by member' : 'by team') + '</div>' +
+    '<div class="tteam-bars">';
+  rows.forEach(function(r) {
+    var pct = Math.round((r.spCompleted / maxSp) * 100);
+    var label = isTeamCtx ? r.member : r.member.replace(' Team', '');
+    chartHtml +=
+      '<div class="tteam-bar-row">' +
+        '<span class="tteam-bar-label">' + label + '</span>' +
+        '<div class="tteam-bar-track">' +
+          '<div class="tteam-bar-fill" style="width:' + pct + '%"></div>' +
+        '</div>' +
+        '<span class="tteam-bar-val">' + r.spCompleted + '</span>' +
+      '</div>';
+  });
+  chartHtml += '</div></div>';
+
+  // Table
+  var tableHtml = '<div class="tteam-table-wrap">' +
+    '<table class="tteam-table">' +
+    '<thead><tr>' +
+      '<th>' + (isTeamCtx ? 'Member' : 'Team') + '</th>' +
+      '<th>' + (isTeamCtx ? 'Role' : 'Size') + '</th>' +
+      '<th>Tasks</th>' +
+      '<th>Util hrs</th>' +
+      '<th>Completion</th>' +
+      '<th>Pending</th>' +
+      '<th>Quality</th>' +
+    '</tr></thead>' +
+    '<tbody>';
+  rows.forEach(function(r) {
+    var pctColor = r.completionPct >= 80 ? '#16A34A' : r.completionPct >= 65 ? '#D97706' : '#DC2626';
+    tableHtml +=
+      '<tr>' +
+        '<td class="tteam-td-name">' +
+          (isTeamCtx ? EAP.avatar(r.member, 24) + '<span>' + r.member + '</span>' : '<span>' + r.member + '</span>') +
+        '</td>' +
+        '<td class="tteam-td-role">' + r.role + '</td>' +
+        '<td class="tteam-td-num">' + r.completed + '<span class="tteam-td-total"> / ' + r.totalTasks + '</span></td>' +
+        '<td class="tteam-td-num">' + r.utilHrs + ' hrs</td>' +
+        '<td class="tteam-td-pct" style="color:' + pctColor + '">' + r.completionPct + '%</td>' +
+        '<td class="tteam-td-num">' + r.pending + '</td>' +
+        '<td>' + qualityBadge(r.quality) + '</td>' +
+      '</tr>';
+  });
+  tableHtml += '</tbody></table></div>';
+
+  return '<div class="tteam-view">' + chartHtml + tableHtml + '</div>';
+}
+
 // ── Main render ───────────────────────────────────────
 EAP.renderTrack = function() {
   var s = EAP.state;
   var isTeamCtx = (s.context === 'team');
+  var trackView = s.trackView || 'board';
 
   // ── Gather + filter items first (stats depend on filtered set) ──
   var all = [];
@@ -120,6 +215,13 @@ EAP.renderTrack = function() {
       '</div>'
     : '';
 
+  // ── View toggle — Board | Team ──
+  var toggleHtml =
+    '<div class="track-view-toggle">' +
+      '<button class="track-view-btn' + (trackView === 'board' ? ' active' : '') + '" data-track-view="board">Board</button>' +
+      '<button class="track-view-btn' + (trackView === 'team' ? ' active' : '') + '" data-track-view="team">Team</button>' +
+    '</div>';
+
   // ── Context header — micro-dashboard ──
   var contextHtml = '<div class="track-context">' +
     '<div class="track-ctx-group">' +
@@ -141,7 +243,18 @@ EAP.renderTrack = function() {
       '<span class="track-ctx-progress"><span class="track-ctx-pbar"><span class="track-ctx-pfill" style="width:' + pct + '%"></span></span>' + donePts + ' of ' + totalPts + ' pts (' + pct + '%)</span>' +
     '</div>' +
     healthHtml +
+    toggleHtml +
     '</div>';
+
+  // ── Team view branch ──────────────────────────────────
+  if (trackView === 'team') {
+    return '<div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;">' +
+      contextHtml +
+      '<div style="flex:1;min-height:0;overflow:auto;padding:4px 2px 16px;">' +
+        renderTeamView(s.contextName, isTeamCtx) +
+      '</div>' +
+    '</div>';
+  }
 
   // ── Filter chips — team or member (inside board content, new row) ──
   var chipRowHtml = '<div class="track-chip-row">';

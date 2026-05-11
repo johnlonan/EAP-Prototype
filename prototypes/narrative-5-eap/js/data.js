@@ -178,13 +178,89 @@ EAP.capabilities = {
 // ═══════════════════════════════════════════════════════
 EAP.allFeatures = [
   // ── PI 26 committed (7 from spec + 1 complete) ──
-  {id:'f1',  num:'FTR0010001', name:'Fingerprint Login Redesign',         type:'Feature', state:'In Progress',    pct:65,  size:'M', wsjf:11.2, parent:'Seamless Auth',    team:'Auth',       pi:'pi26', pts:18, owner:'Ananya', goal:'g1'},
-  {id:'f2',  num:'FTR0010002', name:'Real-time Fraud Alerts',              type:'Feature', state:'In Progress',    pct:25,  size:'L', wsjf:9.8,  parent:'Risk & Fraud',     team:'Fraud',      pi:'pi26', pts:29, atRisk:true, openDefects:3, owner:'Ananya', goal:'g1'},
-  {id:'f3',  num:'FTR0010003', name:'Payment Confirmation Flow',           type:'Feature', state:'Blocked',        pct:20,  size:'L', wsjf:12.1, parent:'Payments',         team:'Payments',   pi:'pi26', pts:24, blocked:true, blockReason:'Auth API dependency Day 2', owner:'Ananya', goal:'g1'},
+  {id:'f1',  num:'FTR0010001', name:'Fingerprint Login Redesign',         type:'Feature', state:'In Progress',    pct:65,  size:'M', wsjf:11.2, parent:'Seamless Auth',    team:'Auth',       pi:'pi26', pts:18, owner:'Ananya', goal:'g1',
+   signalsSummary: 'AI clustered 48 signals across 3 sources — biometric login friction is the #1 NPS detractor in App Store reviews this quarter',
+   signals: {
+    outlook:  { total: 5, items: [
+      { sender: 'David Park',  role: 'VP Mobile', subject: 'Mobile NPS — biometric login feedback',  snippet: 'Login biometric failure rate is our #1 detractor. App Store reviews are calling it out specifically — we need a redesign before the Q3 roadshow.',           time: '4w ago' },
+      { sender: 'Lisa Chen',   role: 'CISO',       subject: 'Re: biometric login — security posture', snippet: 'Support the redesign. Current implementation has edge cases in the auth flow that create retry loops. Fix the UX and the security gap in the same build.', time: '4w ago' },
+      { sender: 'Ravi Menon',  role: 'CEO',         subject: 'Q3 banking app reviews — action needed', snippet: 'Competitor NPS up 8pts this quarter. Our biometric login is cited in 12% of 1-star reviews. This needs to be a PI 26 priority.',                           time: '5w ago' }
+    ] },
+    teams:    { total: 9, items: [
+      { sender: '#mobile-nps-taskforce', role: 'Channel · 14 mentions', snippet: 'Fingerprint login drop-off raised in app feedback consistently. UX research complete — Auth Team confirmed root cause in the OS permission flow.',                   time: '3w ago' },
+      { sender: '@kiran.p',             role: 'Eng · Auth Team',       snippet: 'iOS permission prompts on re-launch are the main culprit. Fix is in the session token re-issue logic — 3 days of effort, well-understood.',                           time: '4w ago' },
+      { sender: '@james.c',             role: 'Dev · Auth Team',       snippet: 'Android variant is cleaner — we can align both platforms in the same sprint if we tackle the OS permission layer first.',                                             time: '4w ago' }
+    ] },
+    customer: { total: 34, items: [
+      { sender: 'TKT-47201', role: 'P2 · iOS',     snippet: '"Fingerprint no longer works after app update. I have to enter my password every single time — very inconvenient."',                                                                     time: '3w ago' },
+      { sender: 'TKT-47388', role: 'P2 · Android', snippet: '"Biometric login stopped working after I updated the app. Support told me to reinstall — same issue. Please fix."',                                                                      time: '4w ago' },
+      { sender: 'TKT-47512', role: 'P3 · NPS 3',   snippet: '"Why does your app ask for biometric permission on every launch? Every other banking app I use just works."',                                                                             time: '4w ago' }
+    ] }
+   }
+  },
+  {id:'f2',  num:'FTR0010002', name:'Real-time Fraud Alerts',              type:'Feature', state:'In Progress',    pct:25,  size:'L', wsjf:9.8,  parent:'Risk & Fraud',     team:'Fraud',      pi:'pi26', pts:29, atRisk:true, openDefects:3, owner:'Ananya', goal:'g1',
+   signalsSummary: 'AI clustered 68 signals across 3 sources — fraud alert latency is driving chargeback rate up and surfacing in PSD2 audit risk',
+   signals: {
+    outlook:  { total: 6, items: [
+      { sender: 'Maya Thompson', role: 'VP Risk',    subject: 'Fraud notification latency — regulatory risk',  snippet: 'Current alert latency averages 4.2 minutes. PSD2 expects near-real-time. Regulators flagged this in the last two audits — we need to demonstrate progress before Q3 review.', time: '6w ago' },
+      { sender: 'Lisa Chen',     role: 'CISO',        subject: 'Fraud alert SLA — escalation',                 snippet: 'Seeing escalation to chargebacks because customers are not alerted in time to stop the transaction. Real-time alerting is the primary mitigation for PI 26.',               time: '6w ago' },
+      { sender: 'Emma Walsh',    role: 'VP Payments',  subject: 'Chargeback rate up 0.4pts Q1',                 snippet: 'Chargeback rate at 1.2% vs 0.8% industry benchmark. Fraud alert speed is the identified gap — real-time alerts would intercept ~40% of disputed transactions.',            time: '7w ago' }
+    ] },
+    teams:    { total: 11, items: [
+      { sender: '#fraud-discussions', role: 'Channel · 19 mentions', snippet: 'Alert latency is consistently the top complaint in monthly fraud review calls. Risk team has documented 3 cases where delayed alerts led to full chargebacks.',                 time: '5w ago' },
+      { sender: '@marcus.c',          role: 'Eng · Fraud Team',      snippet: 'The ML model is ready — the bottleneck is the notification pipeline. Fix the event bus latency and we get alerts under 30 seconds.',                                             time: '5w ago' },
+      { sender: '@aisha.o',           role: 'Sr Eng · Fraud Team',   snippet: 'The 3 open defects are all in the transaction event enrichment layer. Same root cause — one fix, three closures.',                                                               time: '1w ago' }
+    ] },
+    customer: { total: 51, items: [
+      { sender: 'TKT-46802', role: 'P1 · Fraud',  snippet: '"I only found out about the fraudulent transaction when I checked my statement three days later. I was never alerted. My bank should have told me immediately."',                                     time: '5w ago' },
+      { sender: 'TKT-46944', role: 'P1 · Fraud',  snippet: '"Received a fraud alert 4 hours after the transaction. By then it was too late to stop. Real-time alerts would have saved this."',                                                                   time: '4w ago' },
+      { sender: 'TKT-47102', role: 'P2 · Mobile', snippet: '"App shows fraud warning but only after I open it. Push notifications are delayed or not coming at all — I had no idea a transaction was disputed."',                                               time: '4w ago' }
+    ] }
+   }
+  },
+  {id:'f3',  num:'FTR0010003', name:'Payment Confirmation Flow',           type:'Feature', state:'Blocked',        pct:20,  size:'L', wsjf:12.1, parent:'Payments',         team:'Payments',   pi:'pi26', pts:24, blocked:true, blockReason:'Auth API dependency Day 2', owner:'Ananya', goal:'g1',
+   signalsSummary: 'AI clustered 38 signals across 3 sources — confirmation latency is the #2 UX complaint and a merchant retention risk',
+   signals: {
+    outlook:  { total: 4, items: [
+      { sender: 'Emma Walsh',   role: 'VP Payments', subject: 'Payment UX — merchant escalation',          snippet: 'Three of our top-10 merchants raised payment confirmation latency as a retention risk. Average confirmation is 8 seconds — competitor benchmark is under 2 seconds.', time: '7w ago' },
+      { sender: 'David Park',   role: 'VP Mobile',   subject: 'Re: payment confirmation complaints',       snippet: 'App Store reviews in the last 30 days cite slow payment confirmation in 18% of feedback. #2 UX complaint after biometric login.',                                    time: '7w ago' },
+      { sender: 'Ravi Menon',   role: 'CEO',          subject: 'Q3 product priorities — payments must improve', snippet: 'Payments reliability is non-negotiable for the Q3 investor briefing. Payment confirmation flow is specifically called out.',                                    time: '8w ago' }
+    ] },
+    teams:    { total: 8, items: [
+      { sender: '#payments-team', role: 'Channel · 11 mentions', snippet: 'Merchant SLA dashboard shows confirmation step is the bottleneck — 8s average vs 2s target. Auth API round-trip on every transaction is the root cause.', time: '6w ago' },
+      { sender: '@vikram.s',      role: 'Sr Eng · Payments',     snippet: 'The confirmation delay is purely Auth API round-trip. Once we have the async token contract we can drop confirmation to under 1.5 seconds.',             time: '6w ago' },
+      { sender: '@mei.c',         role: 'Eng · Payments',        snippet: 'Redesigned the confirmation state machine — eliminates 3 redundant network calls. Waiting on the Auth API contract to finalise before we can close.',     time: '5w ago' }
+    ] },
+    customer: { total: 26, items: [
+      { sender: 'TKT-47601', role: 'P2 · Mobile',   snippet: '"Payments take forever to confirm. 8–10 seconds staring at a spinner. I have switched to a competitor app for most payments."',                                       time: '6w ago' },
+      { sender: 'TKT-47788', role: 'P2 · Merchant', snippet: '"The payment confirmation step is causing customers to abandon at checkout. We have 12% drop-off at exactly that point in the flow."',                                time: '5w ago' },
+      { sender: 'TKT-47901', role: 'P3 · Mobile',   snippet: '"Is the payment processing? Did it go through? I can never tell. 8 seconds of uncertainty every single time."',                                                       time: '5w ago' }
+    ] }
+   }
+  },
   {id:'f4',  num:'FTR0010004', name:'Balance on Home Screen',              type:'Feature', state:'Done',           pct:100, size:'S', wsjf:8.1,  parent:'Account Vis.',     team:'Mobile',     pi:'pi26', pts:21, owner:'Ananya', goal:'g1'},
   {id:'f5',  num:'FTR0010005', name:'Account Statement Export PDF',        type:'Feature', state:'In Progress',    pct:40,  size:'M', wsjf:7.4,  parent:'Self-Service',     team:'Accounts',   pi:'pi26', pts:13, owner:'Priya', goal:'g2'},
   {id:'f6',  num:'FTR0010006', name:'Streamlined Onboarding Flow',         type:'Feature', state:'Funnel',         pct:0,   size:'L', wsjf:8.3,  parent:'Onboarding',       team:'Onboard',    pi:'pi26', pts:22, noTeamSprint3:true, owner:'Raj', goal:'g2'},
-  {id:'f7',  num:'FTR0010007', name:'Enhanced Biometric Auth Flow',        type:'Feature', state:'Backlog',        pct:0,   size:'M', wsjf:12.4, parent:'Seamless Auth',    team:'',           pi:null,   pts:0, owner:'Ananya', goal:'g1'},
+  {id:'f7',  num:'FTR0010007', name:'Enhanced Biometric Auth Flow',        type:'Feature', state:'Backlog',        pct:0,   size:'M', wsjf:12.4, parent:'Seamless Auth',    team:'',           pi:null,   pts:0, owner:'Ananya', goal:'g1',
+   signalsSummary: 'AI clustered 65 signals across 3 sources — biometric auth gap is the #1 WSJF item, with security debt and competitor pressure compounding urgency',
+   signals: {
+    outlook:  { total: 6, items: [
+      { sender: 'David Park',  role: 'VP Mobile', subject: 'Biometric auth — competitor pressure',       snippet: 'Three competitors shipped enhanced biometric flows in Q1. Our current implementation is 2 generations behind. NPS data shows biometric login is the #1 requested improvement.', time: '3w ago' },
+      { sender: 'Lisa Chen',   role: 'CISO',       subject: 'Biometric auth upgrade — security brief',   snippet: 'Enhanced biometric auth (liveness detection + fallback hardening) closes two pen test findings from Q4. Security sign-off for PI 27 is conditional on this scope.',            time: '3w ago' },
+      { sender: 'Ravi Menon',  role: 'CEO',         subject: 'Re: digital banking differentiation Q3',   snippet: 'Enhanced biometric auth is specifically cited in the Q3 roadshow script. Competitors are demonstrating it at FinTech Week. We need this in PI 27.',                             time: '4w ago' }
+    ] },
+    teams:    { total: 12, items: [
+      { sender: '#digital-banking-leadership', role: 'Channel · 18 mentions', snippet: 'Biometric auth improvements are top of the Q3 priority list in 3 separate threads. Auth Team confirmed the technical approach is low-risk — existing infrastructure supports liveness detection.', time: '1w ago' },
+      { sender: '@james.c',                   role: 'Dev · Auth Team',        snippet: 'Already researched the liveness detection SDK — 2 weeks of integration. Hardened fallback flow is another sprint. Well-defined, low-risk. Auth Team has Sprint 1 capacity in PI 27.',               time: '1w ago' },
+      { sender: '@kiran.p',                   role: 'Eng · Auth Team',        snippet: 'If we commit this feature now we can start design review in the IP sprint. No blockers. Cleaner to deliver in PI 27 than bolt on to current sprint.',                                                time: '4d ago' }
+    ] },
+    customer: { total: 47, items: [
+      { sender: 'TKT-48012', role: 'P2 · iOS',     snippet: '"Your competitor\'s app uses face recognition that works in low light. Your biometric login fails when it\'s slightly dark. Please improve."',                                                                                   time: '2w ago' },
+      { sender: 'TKT-48109', role: 'P2 · Android', snippet: '"Fingerprint login is unreliable — works 50% of the time. I end up using password every time. Makes the biometric option pointless."',                                                                                          time: '2w ago' },
+      { sender: 'TKT-48234', role: 'P3 · NPS 4',   snippet: '"The biometric login on your app is the worst I\'ve used on any banking app. Others have completely smooth flows."',                                                                                                             time: '1w ago' }
+    ] }
+   }
+  },
   // ── PI 27 planned ──
   {id:'f8',  num:'FTR0010008', name:'Dark Mode Support',                   type:'Feature', state:'Funnel', pct:0, size:'M', wsjf:8.4, parent:'Account Vis.',     team:'Mobile',    pi:'pi27', pts:0, owner:'Priya', goal:'g1'},
   {id:'f9',  num:'FTR0010009', name:'Transaction Dispute Resolution',      type:'Feature', state:'Funnel', pct:0, size:'L', wsjf:7.9, parent:'Self-Service',     team:'Accounts',  pi:'pi27', pts:0, owner:'Priya', goal:'g2'},
@@ -282,7 +358,7 @@ EAP.workItems = {
     ]
   },
   sprints: [
-    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:64, totalPts:46, donePts:8,
+    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:64, totalPts:46, donePts:8, goal:'Deliver PIN fallback handler and biometric onboarding scaffold',
       items: [
         {id:'ls6',  num:'STRY61094201', name:'Handle fallback to PIN on failed biometric scan',     type:'Story',     state:'In Progress', pct:50, pts:3, owner:'James',  team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1'},
         {id:'ls7',  num:'STRY61094202', name:'Build payment confirmation screen layout',            type:'Story',     state:'In Progress', pct:40, pts:5, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
@@ -301,7 +377,7 @@ EAP.workItems = {
         {id:'ls27', num:'STRY61094222', name:'Build biometric onboarding for new users',                       type:'Story',     state:'In Progress', pct:25, pts:5, owner:'James',  team:'Auth Team',      parent:'Enhanced Biometric Auth Flow', goal:'g1'}
       ]
     },
-    {id:'sp3', name:'Sprint 3', dates:EAP._sprintDisplay[2].dates, active:false, capPct:0, totalPts:34, donePts:0,
+    {id:'sp3', name:'Sprint 3', dates:EAP._sprintDisplay[2].dates, active:false, capPct:0, totalPts:34, donePts:0, goal:'Complete auth regression suite and payment retry mechanism',
       items: [
         {id:'ls15', num:'STRY61094210', name:'Retry mechanism for failed payment submissions',       type:'Story', state:'Planned', pct:0, pts:3, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls16', num:'STRY61094211', name:'Scheduled payment UI with recurring options',          type:'Story', state:'Planned', pct:0, pts:8, owner:'Mei',    team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
@@ -313,7 +389,7 @@ EAP.workItems = {
         {id:'ls28', num:'STRY61094223', name:'Migrate auth tests to new test framework',             type:'Story', state:'Planned', pct:0, pts:5, owner:'James',  team:'Auth Team',       parent:'Fingerprint Login Redesign',  goal:'g1'}
       ]
     },
-    {id:'sp4', name:'Sprint 4', dates:EAP._sprintDisplay[3].dates, active:false, capPct:0, totalPts:32, donePts:0,
+    {id:'sp4', name:'Sprint 4', dates:EAP._sprintDisplay[3].dates, active:false, capPct:0, totalPts:32, donePts:0, goal:'Close PI 26 — step-up auth and recurring payments in production',
       items: [
         {id:'ls22', num:'STRY61094217', name:'Recurring payment logic and edge case handling',       type:'Story', state:'Planned', pct:0, pts:8, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls23', num:'STRY61094218', name:'Payment limit enforcement at API level',               type:'Story', state:'Planned', pct:0, pts:5, owner:'Mei',    team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
@@ -484,7 +560,7 @@ EAP.insights = {
     predict: {value:72, label:'Completion probability', trend:'down', interval:8},
     health: true,
     signals: [
-      {level:'urgent', title:'Payment Confirmation Flow blocked <strong>Day 2</strong>', desc:'Auth Team dependency unresolved. <strong>8 days</strong> left in Sprint 2.', why:'The Auth API contract was not finalised before sprint start — creating a hard dependency that only Auth Team can resolve.', recommended:'Escalate to Auth Team lead today. If unresolved by Day 4, move the 2 downstream items to Sprint 3 to protect sprint integrity.', action:'Escalate now', meta:'2 downstream items at risk', target:'f3', targetName:'Payment Confirmation Flow'},
+      {level:'urgent', title:'Payment Confirmation Flow blocked since <strong>Sprint Day 2</strong>', desc:'Auth Team dependency unresolved. <strong>8 days</strong> left in Sprint 2.', why:'The Auth API contract was not finalised before sprint start — creating a hard dependency that only Auth Team can resolve.', recommended:'Escalate to Auth Team lead today. If unresolved by Sprint Day 4, move the 2 downstream items to Sprint 3 to protect sprint integrity.', action:'Escalate now', meta:'2 downstream items at risk', target:'f3', targetName:'Payment Confirmation Flow'},
       {level:'urgent', title:'Fraud Team Sprint 4 at <strong>110% capacity</strong>', desc:'3 items need moving or descoping before PI closes.', why:'Unplanned work increased from <strong>12% to 18%</strong> across Sprints 3–4, adding scope without adjusting capacity.', recommended:'Move the 3 lowest-priority items to Sprint 5 or the backlog before sprint start to return to 95% capacity.', action:'Rebalance Sprint 4', meta:'Capacity across 4 sprints', miniChart:{type:'bars', values:[85,92,97,110], labels:['Sp 1','Sp 2','Sp 3','Sp 4'], colors:['#00834F','#00834F','#f59e0b','#e2161c'], refLine:100, unit:'%', tooltips:['Sprint 1: 85% — within limit','Sprint 2: 92% — approaching limit','Sprint 3: 97% — at limit','Sprint 4: 110% — over capacity · 3 items to move']}},
       {level:'urgent', ai:true, confidence:'High', title:'Streamlined Onboarding will miss PI 26', desc:'No team assigned Sprint 3. 0% chance of completion this PI.', action:'Assign team', meta:'Velocity analysis of 6 teams over 3 sprints', target:'f6', targetName:'Streamlined Onboarding Flow'},
       {level:'watch', ai:true, confidence:'Moderate', title:'Auth Team is critical path', desc:'At 80% capacity — slip cascades to Payments and Fraud.', action:'Monitor closely', meta:'Dependency chain across 4 Features'},
@@ -497,7 +573,7 @@ EAP.insights = {
     health: true,
     signals: [
       {level:'urgent', title:'14 Stories blocked across 4 teams', desc:'Auth API, Payments gateway and 2 Fraud dependencies unresolved.', action:'View all blockers', meta:'32 items across 6 teams'},
-      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2 forecast: 62–80% completion range', desc:'Median 71%. Auth and Payments teams below burn target on Day 3.', action:'Review with teams', meta:'Monte Carlo · 3-sprint velocity history', miniChart:{type:'forecast', median:71, lo:62, hi:80}},
+      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2 forecast: 62–80% completion range', desc:'Median 71%. Auth and Payments teams below burn target as of Sprint Day 3.', action:'Review with teams', meta:'Monte Carlo · 3-sprint velocity history', miniChart:{type:'forecast', median:71, lo:62, hi:80}},
       {level:'watch', title:'Unplanned work at 18% of Sprint 2', desc:'ART target is under 10%.', action:'Review sprint planning'},
       {level:'ok', title:'Defect rate within normal range', desc:'Quality holding despite new Feature work.', action:''}
     ]
@@ -505,15 +581,15 @@ EAP.insights = {
   // ── TIMELINE — "When will things land?" (thin, alerts only) ──
   'art-Feature-timeline': {
     signals: [
-      {level:'urgent', ai:true, confidence:'High', title:'Code freeze in 12 days — 3 features below 40%', desc:'Payment Confirmation (20%), Fraud Alerts (25%), Onboarding (0%).', action:'Review scope', meta:'Schedule compression analysis'},
-      {level:'urgent', ai:true, confidence:'High', title:'Payment Confirmation 68% ± 8% likely to miss Sprint 4', desc:'Blocked since Day 2. Dependency on Auth API unresolved.', action:'Escalate', meta:'Predicting from blocked duration + team velocity'},
+      {level:'urgent', ai:true, confidence:'High', title:'Code freeze in 12 days — 3 features below 40% complete', desc:'Payment Confirmation (20%), Fraud Alerts (25%), Onboarding (0%).', action:'Review scope', meta:'Schedule compression analysis'},
+      {level:'urgent', ai:true, confidence:'High', title:'Payment Confirmation 60–76% probability of missing Sprint 4', desc:'Blocked since Sprint Day 2. Dependency on Auth API unresolved.', action:'Escalate', meta:'Predicting from blocked duration + team velocity'},
       {level:'watch', title:'2 PI-27 items depend on unfinished PI-26 work', desc:'Transaction Dispute and Cross-Border Payment have cross-PI dependencies.', action:'Review dependencies'},
       {level:'ok', title:'Balance on Home Screen complete', desc:'Dependency for Dark Mode (PI 27) is satisfied.', action:''}
     ]
   },
   'art-WorkItem-timeline': {
     signals: [
-      {level:'urgent', title:'Auth API integration aging 8 days', desc:'Team P85 cycle time is 5 days. Exceeding norm by 60%.', action:'Escalate'},
+      {level:'urgent', title:'Auth API integration aging 8 days', desc:'85th-percentile cycle time is 5 days. Exceeding norm by 60%.', action:'Escalate'},
       {level:'watch', title:'Sprint 3 starts in 5 days', desc:'4 Sprint 2 items not yet started.', action:'Flag standup'},
       {level:'ok', title:'Sprint 1 items all complete', desc:'No carryover into Sprint 2.', action:''}
     ]
@@ -532,18 +608,18 @@ EAP.insights = {
       ]
     },
     signals: [
-      {level:'urgent', ai:true, confidence:'High', title:'Fraud Alerts will not complete this PI', desc:'At 25% after 2 of 5 sprints. 3 open defects blocking. Probability: 18% ± 6%.', action:'Escalate to Fraud Team', meta:'Team velocity + defect trend'},
-      {level:'urgent', ai:true, confidence:'High', title:'3 Features below 30% with 6 weeks left', desc:'Payment Confirmation (20%), Fraud Alerts (25%), Onboarding (0%). Slip probability: 84% ± 5%.', action:'Descope or add capacity', meta:'Progress vs remaining PI capacity'},
-      {level:'watch', title:'Account Statement Export at 40%', desc:'Accounts Team below velocity target this sprint.', action:'Check with Accounts Team'},
+      {level:'urgent', ai:true, confidence:'High', title:'Fraud Alerts will not complete this PI', desc:'At 25% complete after 2 of 5 sprints. 3 open defects blocking. Completion probability: 12–24%.', action:'Escalate to Fraud Team', meta:'Team velocity + defect trend'},
+      {level:'urgent', ai:true, confidence:'High', title:'3 Features below 30% complete with 6 weeks left in PI', desc:'Payment Confirmation (20%), Fraud Alerts (25%), Onboarding (0%). 79–89% probability of missing PI deadline.', action:'Descope or add capacity', meta:'Progress vs remaining PI capacity'},
+      {level:'watch', title:'Account Statement Export 40% complete', desc:'Accounts Team below velocity target this sprint.', action:'Check with Accounts Team'},
       {level:'ok', title:'Balance on Home Screen complete', desc:'Opportunity to pull additional scope.', action:''}
     ]
   },
   'art-WorkItem-board': {
     signals: [
-      {level:'urgent', title:'Payment Confirmation blocked Day 2', desc:'Auth API dependency. Blocks 2 others in same sprint. Cascade risk.', action:'Escalate now', meta:'Blocked since sprint start'},
+      {level:'urgent', title:'Payment Confirmation blocked since Sprint Day 2', desc:'Auth API dependency. Blocks 2 others in same sprint. Cascade risk.', action:'Escalate now', meta:'Blocked since sprint start'},
       {level:'urgent', ai:true, confidence:'Moderate', title:'Flow bottleneck detected', desc:'<strong>14 In Progress</strong>, only <strong>3 Done</strong>. Avg cycle time up <strong>40%</strong> this sprint.', why:'Tasks spend <strong>45%</strong> of their time in an inactive state — items are pulled before previous work closes, stacking pressure in In Progress.', recommended:'Cap In Progress at 6 items. Hold new pulls until 2 items complete. Review pickup times in the next standup.', action:'Check review process', meta:'Flow metrics vs last 3 sprints', miniChart:{type:'bars', values:[3,14,4,2], labels:['Done','In Prog','Review','Test'], colors:['#00834F','#0e4e69','#f59e0b','#2a6edc']}},
       {level:'watch', title:'Fraud Team Sprint 4 at 110% capacity', desc:'Items need moving before sprint start.', action:'Rebalance'},
-      {level:'watch', title:'Accounts Team 20% below velocity', desc:'3 Stories not yet started on Day 3.', action:'Flag in standup'},
+      {level:'watch', title:'Accounts Team 20% below velocity', desc:'3 Stories not yet started as of Sprint Day 3.', action:'Flag in standup'},
       {level:'ok', title:'Auth Team velocity consistent', desc:'On track with last 3 sprints.', action:''}
     ]
   },
@@ -560,7 +636,7 @@ EAP.insights = {
       days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri']
     },
     signals: [
-      {level:'urgent', title:'Auth API integration aging 8 days', desc:'Team P85 cycle time is 5 days. 60% above norm. Blocking 2 downstream items.', action:'Escalate', meta:'Work item age vs team baseline'},
+      {level:'urgent', title:'Auth API integration aging 8 days', desc:'85th-percentile cycle time is 5 days. 60% above norm. Blocking 2 downstream items.', action:'Escalate', meta:'Work item age vs team baseline'},
       {level:'urgent', ai:true, confidence:'High', title:'Vikram has 3 concurrent items (WIP limit: 2)', desc:'Context-switching risk. One item blocked, one in review.', action:'Redistribute work', meta:'WIP analysis across 12 team members'},
       {level:'urgent', title:'WIP limit exceeded: <strong>9 items</strong> in progress', desc:'In Progress has <strong>9 items</strong> against a WIP limit of <strong>6</strong>. 3 over limit — throughput stalling. 0 items in testing or done this sprint.', why:'Items are pulled before previous work closes. Teams optimise for starting, not finishing — increasing queue depth without increasing throughput.', recommended:'Finish before starting. Hold all new pulls until 2 items move to Done. Review WIP limits in next planning session.', action:'Reduce WIP', meta:'Queue depth vs throughput',
         miniChart:{type:'hbars', items:[
@@ -573,7 +649,7 @@ EAP.insights = {
       {level:'watch', ai:true, confidence:'Moderate', title:'Avg cycle time up <strong>40%</strong> this sprint', desc:'<strong>3.2 days</strong> in In Review vs <strong>2.0 day</strong> target. Review process slowing delivery.', why:'<strong>3 pull requests</strong> have been open for 3+ days with no reviewer activity. One reviewer holds 4 open reviews simultaneously.', recommended:'Redistribute review ownership. Cap each reviewer at 2 open PRs. Raise in next standup to unblock the queue.', action:'Check review process', meta:'Cycle time per column analysis',
         miniChart:{type:'sparkline', values:[2.1,1.9,2.0,2.5,3.2], labels:['Sprint −3','Sprint −2','Sprint −1','Last sprint','This sprint'], color:'#f59e0b', unit:'d', refLine:2.0}
       },
-      {level:'watch', title:'5 items not started on Day 5', desc:'Sprint 2 has 9 items, 5 still in Draft/Ready.', action:'Flag standup'},
+      {level:'watch', title:'5 items not started as of Sprint Day 5', desc:'Sprint 2 has 9 items, 5 still in Draft/Ready.', action:'Flag standup'},
       {level:'ok', title:'Auth Team delivering within velocity range', desc:'2 items done, 2 in progress, on track.', action:''}
     ]
   },
@@ -590,22 +666,22 @@ EAP.insights = {
     signals: [
       // Cross-persona — only James sees these (Ananya's actions affecting his work)
       {level:'ok', ai:true, confidence:'High', title:'Ananya signed off acceptance criteria for fallback flow', desc:'AC for Fingerprint Login PIN fallback (blc1) approved — ls6 has the AC it needs to close Sprint 2.', action:'Open story', meta:'Sign-off received 2h ago', forPersonas:['james']},
-      {level:'urgent', title:'Ananya escalated bld13 to your team', desc:'Biometric library throws on iOS 17.5 lock-screen entry — needs disposition before Sprint 3 commit.', action:'Review with Ananya', meta:'Defect escalated today', forPersonas:['james']},
-      {level:'urgent', title:'Auth API delivery is upstream blocker for Payments', desc:'Payments Team\'s ls8 has been blocked since Day 2 awaiting Auth API. ls12 (session expiry, 45%) is the prerequisite.', action:'Prioritise ls12 close', meta:'Cross-team dependency'},
-      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2: 4 items in flight, 0 done at Day 3', desc:'Auth Team committed 14 pts across 4 items (ls6, ls12, bld6, ls27). All in-progress, none completed — burn rate slow.', action:'Flag standup', meta:'Predicting from team velocity'},
-      {level:'watch', ai:true, confidence:'Moderate', title:'James at WIP limit', desc:'2 of 3 in-progress (ls6 PIN fallback, ls27 biometric onboarding). One more pull risks context-switching.', action:'Hold new pulls', meta:'WIP analysis vs personal limit'},
+      {level:'urgent', title:'Ananya escalated DEF0500650 to your team', desc:'Biometric library throws on iOS 17.5 lock-screen entry — needs disposition before Sprint 3 commit.', action:'Review with Ananya', meta:'Defect escalated today', forPersonas:['james']},
+      {level:'urgent', title:'Auth API delivery is upstream blocker for Payments', desc:'Payments Team\'s Auth API integration has been blocked since Sprint Day 2. Session expiry handler (STRY61094207, 45% done) is the prerequisite.', action:'Prioritise session expiry close', meta:'Cross-team dependency'},
+      {level:'urgent', ai:true, confidence:'High', title:'Sprint 2: 4 items in flight, 0 done as of Sprint Day 3', desc:'Auth Team committed 14 pts across 4 items. All in-progress, none completed — burn rate slow.', action:'Flag standup', meta:'Predicting from team velocity'},
+      {level:'watch', ai:true, confidence:'Moderate', title:'James at WIP limit', desc:'2 of 3 in-progress (PIN fallback, biometric onboarding). One more pull risks context-switching.', action:'Hold new pulls', meta:'WIP analysis vs personal limit'},
       {level:'ok', title:'No new defects raised in Sprint 2', desc:'Quality holding for Auth Team this sprint.', action:''}
     ]
   },
   // ── HIERARCHY — "Is strategy connecting to execution?" (structural, not execution) ──
   'art-Feature-hierarchy': {
     signals: [
-      {level:'urgent', ai:true, confidence:'High', title:'Goal 2 at risk — strategic imbalance', desc:'Cost reduction at 12% vs 42% for Goal 1. No Features in execution for Customer Self-Service.', action:'Rebalance portfolio', meta:'Goal progress across 6 Epics'},
+      {level:'urgent', ai:true, confidence:'High', title:'Goal 2 at risk — strategic imbalance', desc:'"Reduce operating costs" goal at 12% vs 42% for the digital bank growth goal. No Features in execution for Customer Self-Service.', action:'Rebalance portfolio', meta:'Goal progress across 6 Epics'},
       {level:'urgent', title:'Customer Self-Service has 0 Features defined', desc:'Primary Epic for Goal 2. Cannot recover this PI without scoping.', action:'Start scoping'},
       {level:'watch', title:'Open Banking has no Capability breakdown', desc:'PSD3 deadline Q3 2026. Delivery timeline unknown.', action:'Break down into Capabilities'},
       {level:'watch', ai:true, confidence:'Moderate', title:'Pipeline thinning: Next-Gen Mobile Banking', desc:'Epic at 42% but 3 Features unassigned. Nothing to pull in PI 27.', action:'Assign teams', meta:'Demand forecast for PI 27'},
       {level:'watch', title:'2 Epics are empty containers', desc:'Customer Self-Service and Open Banking have no children.', action:'Schedule scoping'},
-      {level:'ok', title:'Goal 1 structurally healthy', desc:'4 of 7 Features in execution. Hierarchy complete.', action:''}
+      {level:'ok', title:'Digital banking goal structurally healthy', desc:'4 of 7 Features in execution. Hierarchy complete.', action:''}
     ]
   },
   // ── BACKLOG Feature — prioritization focused ──
@@ -613,8 +689,8 @@ EAP.insights = {
     flowDist: { features:55, defects:20, enablers:15, maintenance:10 },
     signals: [
       // Cross-persona — only Ananya sees these (James activity rolling up)
-      {level:'urgent', ai:true, confidence:'High', title:'James raised bld13 — affects Fingerprint Login Redesign', desc:'Biometric library throws on iOS 17.5 lock-screen entry. Needs PM disposition before Sprint 3 commit.', action:'Review impact', meta:'Defect raised today by Auth Team', forPersonas:['ananya']},
-      {level:'watch',  ai:true, confidence:'High', title:'James advanced ls6 to 50% — f1 on track', desc:'PIN fallback handler in In Progress. Fingerprint Login Redesign burn rate matches plan for Sprint 2 close.', action:'Open feature', meta:'Auth Team velocity', forPersonas:['ananya']},
+      {level:'urgent', ai:true, confidence:'High', title:'James raised DEF0500650 — affects Fingerprint Login Redesign', desc:'Biometric library throws on iOS 17.5 lock-screen entry. Needs PM disposition before Sprint 3 commit.', action:'Review impact', meta:'Defect raised today by Auth Team', forPersonas:['ananya']},
+      {level:'watch',  ai:true, confidence:'High', title:'James advanced PIN fallback to 50% — Fingerprint Login on track', desc:'PIN fallback handler now In Progress. Fingerprint Login Redesign burn rate matches plan for Sprint 2 close.', action:'Open feature', meta:'Auth Team velocity', forPersonas:['ananya']},
       {level:'urgent', ai:true, confidence:'High', title:'47 customers flagged biometric issues', desc:'Up 3× from last month. Enhanced Biometric Auth ranks #1 by WSJF (12.4) in your backlog.', action:'Plan into PI 27', meta:'47 support tickets, 12 NPS comments', target:'f7', targetName:'Enhanced Biometric Auth Flow'},
       {level:'urgent', ai:true, confidence:'High', title:'New theme: payment confirmation too slow', desc:'31 mentions in 7 days. No Feature in backlog matches.', action:'Create Feature', meta:'31 tickets across 3 channels'},
       {level:'urgent', title:'2 Features backlogged for 3+ PIs', desc:'Loan Application Wizard and Investment Portfolio View never pulled.', action:'Prioritise or remove'},
@@ -632,7 +708,7 @@ EAP.insights = {
   },
   'team-WorkItem-planning': {
     signals: [
-      {level:'urgent', title:'Auth API integration blocked Day 2', desc:'Past team avg resolution: 1.4 days. Escalation window closing.', action:'Escalate'},
+      {level:'urgent', title:'Auth API integration blocked since Sprint Day 2', desc:'Past team avg resolution: 1.4 days. Escalation window closing.', action:'Escalate'},
       {level:'watch', ai:true, confidence:'Moderate', title:'3 Stories may not complete Sprint 2', desc:'4 Stories not started or blocked.', action:'Flag standup', meta:'Team burn rate prediction'},
       {level:'ok', title:'Defect count within normal range', desc:'Consistent with last 3 sprints.', action:''}
     ]
@@ -778,6 +854,36 @@ EAP.teamBgColors = {
   'Mobile': 'rgba(124,58,237,0.10)', 'Accounts': 'rgba(79,70,229,0.10)', 'Onboard': 'rgba(219,39,119,0.10)'
 };
 
+// ── Team productivity — per-member sprint health ───────
+// completionPct = completed/totalTasks; spCompleted = story pts done this sprint.
+EAP.teamProductivity = {
+  'Payments Team': [
+    { member:'Vikram', role:'Senior Developer', totalTasks:24, completed:18, utilHrs:142, completionPct:75, pending:6,  quality:'Good',      spCompleted:42 },
+    { member:'Mei',    role:'Developer',         totalTasks:19, completed:11, utilHrs: 98, completionPct:58, pending:8,  quality:'Average',   spCompleted:28 }
+  ],
+  'Auth Team': [
+    { member:'James', role:'Senior Developer',  totalTasks:21, completed:16, utilHrs:128, completionPct:76, pending:5,  quality:'Good',      spCompleted:38 },
+    { member:'Kiran', role:'Developer',          totalTasks:14, completed:11, utilHrs:104, completionPct:79, pending:3,  quality:'Good',      spCompleted:29 },
+    { member:'Sana',  role:'QA Engineer',        totalTasks: 8, completed: 7, utilHrs: 72, completionPct:88, pending:1,  quality:'Excellent', spCompleted:14 }
+  ],
+  'Fraud Team': [
+    { member:'Marcus', role:'Developer',         totalTasks:18, completed:13, utilHrs:120, completionPct:72, pending:5,  quality:'Good',      spCompleted:34 },
+    { member:'Aisha',  role:'QA Engineer',       totalTasks:12, completed: 9, utilHrs: 88, completionPct:75, pending:3,  quality:'Good',      spCompleted:22 }
+  ],
+  'Mobile Exp Team': [
+    { member:'Tomás', role:'Developer',          totalTasks:16, completed: 8, utilHrs: 92, completionPct:50, pending:8,  quality:'Average',   spCompleted:24 },
+    { member:'Yuki',  role:'UX Developer',       totalTasks:11, completed: 7, utilHrs: 80, completionPct:64, pending:4,  quality:'Good',      spCompleted:18 }
+  ],
+  'Accounts Team': [
+    { member:'Lena',  role:'Senior Developer',   totalTasks:20, completed:14, utilHrs:118, completionPct:70, pending:6,  quality:'Good',      spCompleted:32 },
+    { member:'Omar',  role:'Developer',          totalTasks:15, completed: 9, utilHrs: 96, completionPct:60, pending:6,  quality:'Average',   spCompleted:26 }
+  ],
+  'Onboarding Team': [
+    { member:'Nina',  role:'Developer',          totalTasks:17, completed:12, utilHrs:110, completionPct:71, pending:5,  quality:'Good',      spCompleted:28 },
+    { member:'Devi',  role:'QA Engineer',        totalTasks: 9, completed: 6, utilHrs: 68, completionPct:67, pending:3,  quality:'Good',      spCompleted:16 }
+  ]
+};
+
 // ── Team rosters (unique members per team) ─────────────
 EAP.teamMembers = {
   'Auth Team':       ['James', 'Kiran', 'Sana'],
@@ -812,6 +918,59 @@ EAP.velocityStats = (function() {
   var vals = done.map(function(s) { return s.pts; });
   var avg = Math.round(vals.reduce(function(a, b) { return a + b; }, 0) / vals.length);
   return { avg: avg, high: Math.max.apply(null, vals), low: Math.min.apply(null, vals) };
+})();
+
+// ── Monte Carlo delivery forecast ─────────────────────
+EAP.mcForecast = (function() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  function addDays(d, n) { var r = new Date(d); r.setDate(r.getDate() + n); return r; }
+  function fmtShort(d) {
+    var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return M[d.getMonth()] + ' ' + d.getDate();
+  }
+  var vs = EAP.velocityStats;
+  var SPRINT = 14;
+  var dayInSprint2 = (today.getDay() + 2) % 7 + 3;
+  var piStart = addDays(today, -(SPRINT + dayInSprint2 - 1));
+  // Sprint 2 completion: ~10pts remaining in the active sprint
+  var sprint2End = addDays(piStart, SPRINT * 2 - 1);
+  var spLeft = Math.round((sprint2End - today) / 86400000);
+  var spPts = 10;
+  var sP50 = Math.round(spPts / vs.avg * SPRINT);
+  var sP70 = Math.round(spPts / (vs.avg * 0.80) * SPRINT);
+  var sP85 = Math.round(spPts / (vs.avg * 0.64) * SPRINT);
+  // Team backlog horizon: ~35pts across Sprint 3 committed items (~11 items)
+  var tPts = 35;
+  var tP50 = Math.round(tPts / vs.avg * SPRINT);
+  var tP70 = Math.round(tPts / (vs.avg * 0.80) * SPRINT);
+  var tP85 = Math.round(tPts / (vs.avg * 0.64) * SPRINT);
+  // ART: PI end anchor. At current trajectory (avg 40% complete at 30% PI elapsed)
+  var piEndDate = addDays(piStart, 70 - 1);
+  var piLeft = Math.round((piEndDate - today) / 86400000);
+  var aP50 = piLeft - 2;
+  var aP70 = piLeft + 8;
+  var aP85 = piLeft + 21;
+  return {
+    sprint: {
+      p50: fmtShort(addDays(today, sP50)), p50days: sP50,
+      p70: fmtShort(addDays(today, sP70)), p70days: sP70,
+      p85: fmtShort(addDays(today, sP85)), p85days: sP85,
+      end: fmtShort(sprint2End), endDays: spLeft
+    },
+    team: {
+      p50: fmtShort(addDays(today, tP50)), p50days: tP50,
+      p70: fmtShort(addDays(today, tP70)), p70days: tP70,
+      p85: fmtShort(addDays(today, tP85)), p85days: tP85,
+      items: 11, basis: '4-sprint history'
+    },
+    art: {
+      p50: fmtShort(addDays(today, aP50)), p50days: aP50,
+      p70: fmtShort(addDays(today, aP70)), p70days: aP70,
+      p85: fmtShort(addDays(today, aP85)), p85days: aP85,
+      piEnd: fmtShort(piEndDate), piEndDays: piLeft,
+      features: 6, basis: '4-sprint ART history'
+    }
+  };
 })();
 
 // ── WIP limits per task board column ──────────────────

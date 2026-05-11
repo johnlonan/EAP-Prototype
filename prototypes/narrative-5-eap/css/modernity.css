@@ -72,12 +72,10 @@ html, body { font-size: 13px; line-height: 1.5; }
 }
 
 /* Name column in tables (Backlog, Planning) — weight 500 (matches
-   .bcard-title on cards) so visual weight is consistent across tabs.
-   Colour one step darker than --text-primary (#2d2c2a) — same warm hue
-   family, not pure black. */
+   .bcard-title on cards) so visual weight is consistent across tabs. */
 .item-nm {
   font-weight: 500 !important;
-  color: #1a1918 !important;
+  color: var(--text-primary) !important;
 }
 
 /* PHASE 1 END ════════════════════════════════════════════════════════ */
@@ -283,8 +281,8 @@ body { background: #d6e9e6 !important; }
 }
 
 .pi-acc {
-  background: rgba(255, 255, 255, 0.90) !important;
-  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
   box-shadow:
     0 1px 2px rgba(0,0,0,0.03),
     0 16px 40px rgba(0,0,0,0.05),
@@ -292,9 +290,9 @@ body { background: #d6e9e6 !important; }
 }
 @supports (backdrop-filter: blur(1px)) {
   .pi-acc {
-    background: rgba(255, 255, 255, 0.36) !important;
-    backdrop-filter: blur(24px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+    background: rgba(255, 255, 255, 0.42) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
   }
 }
 .pi-acc:hover {

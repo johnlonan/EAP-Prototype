@@ -1242,6 +1242,76 @@ body {
 .bdl-val.error { color: var(--color-error); }
 .bdl-val.muted { color: var(--text-tertiary); }
 
+/* ══════════════════════════════════════════════════════════
+   STANDUP BRIEF BAND — Dev (SM) persona only
+   Dark glass slab: --color-primary used as a surface,
+   not an accent. Inverted from every other persona's
+   light glass cards — creates the delta at first glance.
+   ══════════════════════════════════════════════════════════ */
+/* wrapper — no bg, just stacks header + band */
+.standup-brief {
+  flex-shrink: 0;
+  margin-bottom: 14px;
+}
+.sb-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+/* the colored band — columns only */
+.sb-band {
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  padding: 11px 22px 13px;
+  background: linear-gradient(110deg, #1a7a8c 0%, #0b3d5e 100%);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 4px 20px rgba(12,74,100,0.18);
+}
+.sb-eyebrow {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+.sb-eyebrow-spark { width: 13px; height: 13px; color: var(--ai-accent); flex-shrink: 0; }
+.sb-copy-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 11px; font-weight: 500;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 160ms ease;
+  font-family: var(--font-sans); letter-spacing: 0;
+}
+.sb-copy-btn:hover { color: var(--text-primary); }
+.sb-copy-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+.sb-cols { display: grid; grid-template-columns: repeat(3, 1fr); }
+.sb-col { padding-right: 28px; border-right: 1px solid rgba(255,255,255,0.08); }
+.sb-col + .sb-col { padding-left: 28px; }
+.sb-col:last-child { border-right: none; padding-right: 0; }
+.sb-q {
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ai-accent); margin-bottom: 5px; line-height: 1;
+}
+.sb-num {
+  font-size: 22px; font-weight: 600;
+  color: #ffffff; line-height: 1.1;
+  margin-bottom: 2px;
+  letter-spacing: -0.02em;
+}
+.sb-main {
+  font-size: 12px; font-weight: 400;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.35; margin-bottom: 2px;
+}
+.sb-sub { font-size: 11px; color: rgba(255,255,255,0.44); line-height: 1.45; }
+
 /* ── Responsive ── */
 @media (max-width: 1400px) {
   .hero-ananya, .hero-james, .hero-riya, .hero-dev, .hero-priya, .hero-marcus_cdo, .hero-kenji {
@@ -1289,6 +1359,9 @@ body {
       </div>
       <div class="ih-meta" id="ih-meta"></div>
     </div>
+
+    <!-- STANDUP BRIEF — Dev (SM) only. Hidden for all other personas via JS. -->
+    <div id="standup-brief"></div>
 
     <!-- HERO row — 3 independent cards, set per-persona -->
     <div class="ih-hero-row" id="hero"></div>
@@ -2056,12 +2129,13 @@ body {
         tab: 'board'
       },
       {
-        title: 'WIP by member', subtitle: 'In-progress items right now',
-        num: '3', suffix: 'in flight', trend: 'flat', trendPct: 'WIP limit 5',
-        comparison: '<strong>Vikram</strong> 2 · <strong>Mei</strong> 1 · headroom for 2 more',
-        spark: [2,3,3,3,3], sparkLabels: ['Day 3','Day 4','Day 5','Day 6','Today'], color: 'primary',
-        threshold: 5, thresholdLabel: 'WIP limit',
-        tab: 'board'
+        title: 'Team delivery rate', subtitle: 'Tasks closed · Payments Team · Sprint 2',
+        num: '65', suffix: '%', trend: 'down', trendPct: '−8 vs S1',
+        comparison: '<strong>Vikram</strong> 75% · <strong>Mei</strong> 58% · 14 pending tasks',
+        spark: [71,74,72,73,65], sparkLabels: ['S-4','S-3','S-2','S-1','Now'], color: 'warning',
+        yMin: 0, yMax: 100, threshold: 75, thresholdLabel: 'Team target',
+        callout: { text: 'Otto flagged <strong>Mei</strong> — 8 pending, pace below team norm', tab: 'taskboard', otto: 'Mei has 8 pending tasks and 58% completion rate — below team norm for this point in the sprint. Otto suggests reviewing her assignment load in the next standup.' },
+        tab: 'taskboard'
       }
     ],
     priya: [
@@ -3232,8 +3306,62 @@ body {
   }
 
   // ════════════════════════════════════════════════════════
+  // STANDUP BRIEF — Dev (SM) persona only
+  // Dark glass band that sits above the hero row. Answers
+  // the 3 standup questions from sprint state + activity.
+  // Hidden (display:none) for every other persona.
+  // ════════════════════════════════════════════════════════
+  function renderStandupBrief() {
+    var el = document.getElementById('standup-brief');
+    if (!el) return;
+    if (personaKey !== 'dev') { el.style.display = 'none'; return; }
+
+    var OTTO_SVG = '<svg class="sb-eyebrow-spark" viewBox="0 0 118 118" fill="currentColor"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+    var SEND_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    var POST_BTN_INNER = SEND_SVG + 'Post standup';
+
+    el.className = 'standup-brief';
+    el.innerHTML =
+      '<div class="sb-hd">' +
+        '<div class="sb-eyebrow">' + OTTO_SVG + 'Standup brief · Payments Team · Sprint 2 · Day 7</div>' +
+        '<button class="sb-copy-btn" id="sb-copy-btn">' + POST_BTN_INNER + '</button>' +
+      '</div>' +
+      '<div class="sb-band">' +
+        '<div class="sb-cols">' +
+          '<div class="sb-col">' +
+            '<div class="sb-q">Yesterday</div>' +
+            '<div class="sb-num">8 pts</div>' +
+            '<div class="sb-main">burned this sprint</div>' +
+            '<div class="sb-sub">Retro doc completed · impediment log updated by Otto</div>' +
+          '</div>' +
+          '<div class="sb-col">' +
+            '<div class="sb-q">Today</div>' +
+            '<div class="sb-num">3 in flight</div>' +
+            '<div class="sb-main">Day 7 of 10 · closes Friday</div>' +
+            '<div class="sb-sub">Auth session expiry 45% · Biometric fallback 0% · Validation Rules in review</div>' +
+          '</div>' +
+          '<div class="sb-col">' +
+            '<div class="sb-q">Blockers</div>' +
+            '<div class="sb-num">1 impediment</div>' +
+            '<div class="sb-main">ownerless 4 days</div>' +
+            '<div class="sb-sub">Escalation drafted · Biometric acceptance criteria unclear</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById('sb-copy-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      var btn = this;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Posted';
+      btn.style.color = 'var(--color-success)';
+      setTimeout(function() { btn.innerHTML = POST_BTN_INNER; btn.style.color = ''; }, 2200);
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
   // BOOT
   // ════════════════════════════════════════════════════════
+  renderStandupBrief();
   renderHero();
   renderStats();
   renderFocus();

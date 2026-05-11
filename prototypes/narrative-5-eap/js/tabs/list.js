@@ -52,10 +52,20 @@ EAP.renderList = function() {
   groups.forEach(function(g, gi) {
     var isA = !!g.active, isO = !!EAP.state.openAccordions[g.id];
     var rollingWave = activeIdx >= 0 && gi >= activeIdx + 2;
+    var isGoalOpen = s.level === 'WorkItem' && g.goal ? !!EAP.state.openGoals[g.id] : false;
     var pgId = 'ls-' + g.id;
     acc += '<div class="pi-acc"><div class="pi-hd' + (isA ? ' active' : '') + (rollingWave ? ' pi-hd-wave' : '') + '" data-pi-toggle="' + g.id + '">';
     acc += '<div class="pi-tog' + (isO ? ' open' : '') + '" id="pi-tog-' + g.id + '">' + (isO ? '−' : '+') + '</div>';
     acc += '<span class="pi-nm">' + g.name + '</span>';
+    if (s.level === 'WorkItem' && g.goal) {
+      acc += '<span class="sprint-goal-tog' + (isGoalOpen ? ' on' : '') + '" id="goal-tog-' + g.id + '"' +
+        ' onclick="EAP.toggleSprintGoal(\'' + g.id + '\');event.stopPropagation()"' +
+        ' onmouseenter="EAP.showGoalTip(\'' + g.id + '\',event)"' +
+        ' onmouseleave="if(typeof hideTip===\'function\')hideTip()">' +
+        EAP.iconFilled('flag', 13) + '</span>';
+      EAP._sprintGoalLabels = EAP._sprintGoalLabels || {};
+      EAP._sprintGoalLabels[g.id] = g.goal;
+    }
     if (g.dates) acc += '<span class="pi-dates">' + g.dates + '</span>';
     if (isA) acc += '<span class="pi-badge">Current ' + (s.level === 'WorkItem' ? 'Sprint' : 'PI') + '</span>';
     acc += '<div class="pi-meta">';
@@ -82,6 +92,12 @@ EAP.renderList = function() {
     if (isA) acc += '<button class="pi-complete">Complete ' + (s.level === 'WorkItem' ? 'Sprint' : 'PI') + ' ▸</button>';
     acc += '</div></div>';
 
+    if (s.level === 'WorkItem' && g.goal) {
+      acc += '<div class="sprint-goal-strip' + (isGoalOpen ? ' open' : '') + '" id="goal-strip-' + g.id + '">' +
+        '<div class="sprint-goal-inner"><span class="sprint-goal-lbl">Goal:</span><span>' + g.goal + '</span></div>' +
+        '</div>';
+    }
+
     acc += '<div class="pi-body' + (isO ? ' open' : '') + '" id="pi-body-' + g.id + '"><div class="pi-pad">';
     if (g.items && g.items.length) {
       var pageItems = EAP.pgSlice(EAP.wsjfSorted(g.items), pgId);
@@ -106,4 +122,28 @@ EAP.renderList = function() {
 
   acc += '</div>';
   return blHtml + acc;
+};
+
+EAP.showGoalTip = function(id, event) {
+  var goal = EAP._sprintGoalLabels && EAP._sprintGoalLabels[id];
+  if (goal && typeof showTip === 'function') {
+    showTip('<span style="font-weight:500;font-size:11px;">Sprint goal</span><br>' + goal, event);
+  }
+};
+
+EAP.toggleSprintGoal = function(sprintId) {
+  EAP.state.openGoals[sprintId] = !EAP.state.openGoals[sprintId];
+  var open  = !!EAP.state.openGoals[sprintId];
+  var strip = document.getElementById('goal-strip-' + sprintId);
+  var tog   = document.getElementById('goal-tog-' + sprintId);
+  if (strip) strip.classList.toggle('open', open);
+  if (tog) {
+    tog.classList.toggle('on', open);
+    // Brighten when active — detect context from parent header
+    var hd = tog.closest ? tog.closest('.pi-hd') : null;
+    var isActiveSprint = hd && hd.classList.contains('active');
+    tog.style.color = open
+      ? (isActiveSprint ? '#fff' : 'var(--color-primary)')
+      : (isActiveSprint ? 'rgba(255,255,255,0.65)' : 'rgba(14,78,105,0.55)');
+  }
 };

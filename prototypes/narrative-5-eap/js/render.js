@@ -251,6 +251,14 @@ EAP.renderContent = function() {
     EAP.render();
   });
 
+  // Wire track view toggle (Board | Team)
+  el.querySelectorAll('[data-track-view]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      EAP.state.trackView = btn.dataset.trackView;
+      EAP.render();
+    });
+  });
+
   // Wire track member/team chips
   el.querySelectorAll('[data-track-member]').forEach(function(chip) {
     chip.addEventListener('click', function() { EAP.toggleTrackMember(chip.dataset.trackMember); });
