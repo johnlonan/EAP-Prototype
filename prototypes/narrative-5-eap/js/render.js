@@ -101,7 +101,7 @@ EAP.renderFilterBar = function() {
     var filterActive = ownerActive;
     h += '<div class="fbar-sep"></div>' +
       '<button class="fbar-filter-btn' + (filterActive ? ' active' : '') + '" id="filter-btn" title="Filter by owner">' +
-        EAP.icon('filter', 13) +
+        EAP.icon('filter', 14) +
       '</button>';
     if (filterActive) {
       var displayOwners = (s.ownerFilter || []).slice();
@@ -145,6 +145,7 @@ EAP.renderFilterBar = function() {
 
   // Right-side toggles — all with icons
   if (s.tab === 'planning') h += '<span class="fbar-vtog' + (s.splitView ? ' on' : '') + '" id="split-toggle">' + EAP.icon('columns', 14) + ' Split</span>';
+  if (s.tab === 'backlog' && s.level === 'Feature') h += '<span class="fbar-vtog" id="pm-map-btn">' + EAP.icon('layout-list', 14) + ' Priority Map</span>';
   if ((s.tab === 'board' || s.tab === 'taskboard' || s.tab === 'timeline') && (s.level === 'Feature' || s.level === 'WorkItem')) {
     // Single dropdown: Hide / All / Conflicts / Risks / Satisfied. Selection determines both on/off and filter.
     var dv = s.showDeps ? (s.depFilter || 'all') : 'hide';
@@ -158,7 +159,7 @@ EAP.renderFilterBar = function() {
       '</select>';
   }
   if (s.tab === 'board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">' + EAP.icon('rows', 14) + ' Compact</span>';
-  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('sparkle', 16) + ' Insights</span>';
+  h += '<span class="fbar-vtog' + (s.insightsOpen ? ' on' : '') + '" id="insights-toggle">' + EAP.icon('sparkle', 14) + ' Insights</span>';
 
   el.innerHTML = h;
 
@@ -174,6 +175,8 @@ EAP.renderFilterBar = function() {
   });
   var sb = document.getElementById('split-toggle');
   if (sb) sb.addEventListener('click', function() { EAP.toggleSplit(); });
+  var pmb = document.getElementById('pm-map-btn');
+  if (pmb) pmb.addEventListener('click', function() { EAP.openPriorityMap(); });
   document.getElementById('insights-toggle').addEventListener('click', function() { EAP.toggleInsights(); });
   var dsel = document.getElementById('dep-select');
   if (dsel) dsel.addEventListener('change', function() {
