@@ -796,12 +796,13 @@ EAP._pmInjectStyles = function() {
     '#pm-overlay .ins-sig.ins-sig-ai.urgent{border-left-color:#dc2626;}',
     /* All PM analysis titles are strategic-weight findings — bump to 500 */
     '#pm-overlay .ins-sig.ins-sig-ai .ins-sig-title{font-weight:500;}',
-    /* rec-blk colour matches each card's semantic — never the global amber default */
-    '#pm-overlay .ins-sig.ins-sig-ai.ok .ins-sig-rec-blk{background:rgba(14,165,233,0.09);border-left-color:#0284c7;}',
+    /* rec-blk: no left border (noise), background tint only */
+    '#pm-overlay .ins-sig.ins-sig-ai .ins-sig-rec-blk{border-left:none;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.ok .ins-sig-rec-blk{background:rgba(14,165,233,0.09);}',
     '#pm-overlay .ins-sig.ins-sig-ai.ok .ins-sig-rec-blk-lbl{color:#0369a1;}',
-    '#pm-overlay .ins-sig.ins-sig-ai.watch .ins-sig-rec-blk{background:rgba(180,83,9,0.09);border-left-color:#b45309;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.watch .ins-sig-rec-blk{background:rgba(180,83,9,0.09);}',
     '#pm-overlay .ins-sig.ins-sig-ai.watch .ins-sig-rec-blk-lbl{color:#92400e;}',
-    '#pm-overlay .ins-sig.ins-sig-ai.urgent .ins-sig-rec-blk{background:rgba(185,28,28,0.08);border-left-color:#b91c1c;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.urgent .ins-sig-rec-blk{background:rgba(185,28,28,0.08);}',
     '#pm-overlay .ins-sig.ins-sig-ai.urgent .ins-sig-rec-blk-lbl{color:#991b1b;}',
     /* fbar-filter-btn is styled for the teal gradient bg — white on white in the overlay */
     '#pm-overlay .fbar-filter-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.14);}',
