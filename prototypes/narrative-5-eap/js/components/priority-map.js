@@ -799,11 +799,9 @@ EAP._pmInjectStyles = function() {
     /* rec-blk: no left border (noise), background tint only */
     '#pm-overlay .ins-sig.ins-sig-ai .ins-sig-rec-blk{border-left:none;}',
     '#pm-overlay .ins-sig.ins-sig-ai.ok .ins-sig-rec-blk{background:rgba(14,165,233,0.09);}',
-    '#pm-overlay .ins-sig.ins-sig-ai.ok .ins-sig-rec-blk-lbl{color:#0369a1;}',
+    '#pm-overlay .ins-sig.ins-sig-ai .ins-sig-rec-blk-lbl{color:#6B7280;}',
     '#pm-overlay .ins-sig.ins-sig-ai.watch .ins-sig-rec-blk{background:rgba(180,83,9,0.09);}',
-    '#pm-overlay .ins-sig.ins-sig-ai.watch .ins-sig-rec-blk-lbl{color:#92400e;}',
     '#pm-overlay .ins-sig.ins-sig-ai.urgent .ins-sig-rec-blk{background:rgba(185,28,28,0.08);}',
-    '#pm-overlay .ins-sig.ins-sig-ai.urgent .ins-sig-rec-blk-lbl{color:#991b1b;}',
     /* fbar-filter-btn is styled for the teal gradient bg — white on white in the overlay */
     '#pm-overlay .fbar-filter-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.14);}',
     '#pm-overlay .fbar-filter-btn:hover{background:rgba(0,0,0,0.08);}',
