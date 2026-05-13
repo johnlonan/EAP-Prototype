@@ -175,14 +175,20 @@ EAP._pmRankedHTML = function(items) {
   var sorted = items.slice().sort(function(a,b){ return (b.wsjf||0)-(a.wsjf||0); });
   return sorted.slice(0, 14).map(function(it) {
     var qc  = EAP._pmQ[EAP._pmQuad(it)];
-    var cls = it.blocked ? ' urgent' : (it.atRisk ? ' watch' : ' ok');
     var pi  = it.pi
       ? (EAP.piDates && EAP.piDates[it.pi] ? EAP.piDates[it.pi].name : it.pi)
       : 'Unscheduled';
     var nm  = it.name.length > 27 ? it.name.slice(0,25)+'…' : it.name;
-    return '<div class="ins-sig' + cls + '" style="border-left-color:' + qc.fill + '">' +
+    // Status dot — secondary signal only; quadrant left border is the primary identity
+    var statusDot = it.blocked
+      ? '<span style="width:5px;height:5px;border-radius:50%;background:#dc2626;flex-shrink:0;display:inline-block;margin-left:4px;" title="Blocked"></span>'
+      : it.atRisk
+      ? '<span style="width:5px;height:5px;border-radius:50%;background:#d97706;flex-shrink:0;display:inline-block;margin-left:4px;" title="At risk"></span>'
+      : '';
+    return '<div class="ins-sig" style="border-left-color:' + qc.fill + '">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">' +
         '<span class="ins-sig-title" style="padding-right:0;flex:1;min-width:0;">' + EAP._pmEsc(nm) + '</span>' +
+        statusDot +
         '<span class="wsjf ' + (EAP.wsjfTier ? EAP.wsjfTier(it.wsjf) : '') + '" style="flex-shrink:0;">' + (it.wsjf||'—') + '</span>' +
       '</div>' +
       '<div class="ins-sig-desc">' + EAP._pmEsc(qc.label) + (it.team ? ' · ' + EAP._pmEsc(it.team) : '') + ' · ' + EAP._pmEsc(pi) + '</div>' +
