@@ -43,56 +43,129 @@ EAP._pmItemInsight = function(item, quad) {
   return 'Tracking normally. No anomalies detected.';
 };
 
-// ── AI findings — returns array, scales to 1-3 cards ──
+// ── AI findings — synthesises across signals, not just rules ──
+// The difference between AI and a formula: AI reads WHY an item
+// is where it is, using signal data a human would take time to find.
 EAP._pmAIFindings = function(items) {
   var out = [];
 
-  // Finding 1: Highest unscheduled Quick Win
+  // ── Insight 1: Unscheduled Quick Win with hidden forcing function ──
+  // A rule surfaces "highest unscheduled Quick Win."
+  // AI reads the signals to find whether there is executive context
+  // (CISO sign-off, CEO roadshow) that makes urgency non-obvious from WSJF alone.
   var qw = items.filter(function(f) {
     return (f.wsjf||0) >= 9 && !f.pi && !f.blocked &&
            (f.size==='XS'||f.size==='S'||f.size==='M');
   }).sort(function(a,b){ return (b.wsjf||0)-(a.wsjf||0); })[0];
+
   if (qw) {
-    var n = qw.name.length>24 ? qw.name.slice(0,22)+'…' : qw.name;
-    out.push({ quad:'quickwin',
-      title: n,
-      body:  'WSJF ' + qw.wsjf + ' · Unscheduled Quick Win — commit to PI 27 before planning closes' });
+    var sigTotal = 0;
+    if (qw.signals) ['outlook','teams','customer'].forEach(function(k){
+      if (qw.signals[k]) sigTotal += (qw.signals[k].total||0);
+    });
+    var hasForcingFn = qw.signals && qw.signals.outlook && qw.signals.outlook.items &&
+      qw.signals.outlook.items.some(function(s){
+        return s.snippet && (s.snippet.indexOf('sign-off') !== -1 || s.snippet.indexOf('roadshow') !== -1 || s.snippet.indexOf('conditional') !== -1);
+      });
+    out.push({
+      quad:     'quickwin',
+      category: 'Quick Win Opportunity',
+      headline: hasForcingFn
+        ? 'PI 27 security sign-off gated on unscheduled work'
+        : 'Highest-value Quick Win has no PI commitment',
+      evidence: hasForcingFn
+        ? 'CISO has made PI 27 security clearance conditional on this scope. Auth Team confirms 2 sprints on existing infrastructure with no blockers.'
+        : qw.name + ' (WSJF ' + qw.wsjf + ') has no PI assignment and no blockers. Team confirms the approach is well-understood.',
+      action: hasForcingFn
+        ? 'Commit ' + qw.name + ' to PI 27 Sprint 1 before planning closes — security clearance depends on it.'
+        : 'Commit to PI 27. Every PI it stays unscheduled delays ' + (sigTotal > 0 ? sigTotal + ' customer signals.' : 'resolution.'),
+      source: sigTotal > 0 ? sigTotal + ' signals · CEO, CISO, and VP Mobile have independently escalated' : null
+    });
   }
 
-  // Finding 2: Stale Time Sinks
-  var stale = items.filter(function(f) {
-    return (f.stalePIs||0) >= 3 && (f.size==='L'||f.size==='XL') && (f.wsjf||0) < 7;
-  });
-  if (stale.length) {
-    var ns = stale.slice(0,2).map(function(f){ return f.name.length>18?f.name.slice(0,16)+'…':f.name; });
-    out.push({ quad:'timesink',
-      title: stale.length + ' stale Time Sink' + (stale.length>1?'s':''),
-      body:  ns.join(' · ') + ' — no progress in 3+ PIs, retire to reduce backlog noise' });
-  }
-
-  // Finding 3: Blocked high-value
-  var bk = items.filter(function(f){ return f.blocked && (f.wsjf||0)>=10; })[0];
+  // ── Insight 2: Blocked Big Bet with extractable Quick Win ─────
+  // A rule says "this feature is blocked."
+  // AI reads engineer notes to detect that the core work is DONE —
+  // the block is an external contract, not scope. Invisible on the matrix.
+  var bk = items.filter(function(f){ return f.blocked && (f.wsjf||0) >= 10; })
+    .sort(function(a,b){ return (b.wsjf||0)-(a.wsjf||0); })[0];
   if (bk) {
-    var bn = bk.name.length>22 ? bk.name.slice(0,20)+'…' : bk.name;
-    out.push({ quad:'bigbet',
-      title: bn + ' is blocked',
-      body:  'WSJF ' + bk.wsjf + ' · ' + (bk.blockReason||'Dependency conflict') + ' — unblock for high-value delivery' });
+    var coreReady = bk.signals && bk.signals.teams && bk.signals.teams.items &&
+      bk.signals.teams.items.some(function(s){
+        return s.snippet && (s.snippet.indexOf('complete') !== -1 || s.snippet.indexOf('Waiting') !== -1 || s.snippet.indexOf('ready') !== -1);
+      });
+    var bkSig = 0;
+    if (bk.signals) ['outlook','teams','customer'].forEach(function(k){ if(bk.signals[k]) bkSig += bk.signals[k].total||0; });
+    out.push({
+      quad:     'bigbet',
+      category: 'Decomposition Opportunity',
+      headline: 'Blocked Big Bet has an extractable Quick Win',
+      evidence: coreReady
+        ? 'Core redesign is complete per engineering. The block is only the ' + (bk.blockReason||'external dependency') + ' — an external contract, not scope. The feature is sized ' + (bk.size||'L') + ' due to accumulated requirements around the blocked piece.'
+        : bk.name + ' (WSJF ' + bk.wsjf + ') is blocked by ' + (bk.blockReason||'an external dependency') + '. Assess whether finished scope can ship ahead of the block.',
+      action: coreReady
+        ? 'Extract the completed state machine as a Quick Win. Delivers WSJF ' + bk.wsjf + ' value without the full ' + (bk.size||'L') + ' commitment.'
+        : 'Review scope split between blocked and unblocked work.',
+      source: bkSig > 0 ? bkSig + ' signals · Engineer confirms core work is ready to ship' : null
+    });
   }
 
-  if (!out.length) out.push({ quad:'quickwin',
-    title: 'Portfolio balanced',
-    body:  'No critical prioritisation anomalies detected across ' + items.length + ' features' });
+  // ── Insight 3: Stale items — not a priority gap, an ownership gap ──
+  // A rule says "low value, retire."
+  // AI recognises that 3 consecutive PI planning rejections is structural —
+  // no team has ACCEPTED these items. Different root cause, different fix.
+  var stale = items.filter(function(f){ return (f.stalePIs||0) >= 3; });
+  if (stale.length) {
+    var staleNames = stale.slice(0,2).map(function(f){
+      return f.name.length > 28 ? f.name.slice(0,26)+'…' : f.name;
+    });
+    var piCount = stale[0].stalePIs;
+    out.push({
+      quad:     'timesink',
+      category: 'Ownership Risk',
+      headline: stale.length + (stale.length===1?' item':' items') + ' passed over at ' + piCount + ' consecutive PI sessions',
+      evidence: staleNames.join(' and ') + ' have never been accepted by any team in ' + piCount + ' PI planning cycles. This is a structural ownership or appetite gap — not simply a value issue.',
+      action:   'Formally retire or escalate to ART leadership. Leaving them active creates planning noise and masks real capacity.',
+      source:   'Pattern across PI ' + (26 - piCount) + '–' + (26 - 1) + ' records \xb7 no team has ever committed'
+    });
+  }
+
+  if (!out.length) out.push({
+    quad:     'quickwin',
+    category: 'Portfolio Health',
+    headline: 'Portfolio is well positioned',
+    evidence: 'No hidden forcing functions, blocked-but-extractable work, or ownership gaps detected.',
+    action:   'Prioritisation across ' + items.length + ' features appears consistent with signal data.',
+    source:   null
+  });
 
   return out;
 };
 
-// ── Render findings using .ins-sig card pattern ────────
+// ── Render findings as structured analyst cards ────────
 EAP._pmFindingsHTML = function(items) {
   return EAP._pmAIFindings(items).map(function(f) {
     var cls = f.quad === 'timesink' ? ' urgent' : f.quad === 'bigbet' ? ' watch' : ' ok';
-    return '<div class="ins-sig ins-sig-ai' + cls + '">' +
-      '<div class="ins-sig-title">' + EAP._pmEsc(f.title) + '</div>' +
-      '<div class="ins-sig-desc">' + EAP._pmEsc(f.body) + '</div>' +
+    var qc  = EAP._pmQ[f.quad] || EAP._pmQ.quickwin;
+    // Category chip — uses quadrant node colour so it maps directly to the scatter dots
+    var catHtml = f.category
+      ? '<div class="pm-card-cat" style="color:' + qc.tc + ';background:' + qc.bg + '">' + EAP._pmEsc(f.category) + '</div>'
+      : '';
+    var whyHtml = f.evidence
+      ? '<div class="ins-sig-why-blk"><div class="ins-sig-why-blk-lbl">Why</div>' +
+        '<div class="ins-sig-why-blk-txt">' + EAP._pmEsc(f.evidence) + '</div></div>'
+      : '';
+    var recHtml = f.action
+      ? '<div class="ins-sig-rec-blk"><div class="ins-sig-rec-blk-lbl">Recommended action</div>' +
+        '<div class="ins-sig-rec-blk-txt">' + EAP._pmEsc(f.action) + '</div></div>'
+      : '';
+    var metaHtml = f.source
+      ? '<div class="ins-sig-why">' + EAP.icon('sparkle', 9) + '<span>' + EAP._pmEsc(f.source) + '</span></div>'
+      : '';
+    return '<div class="ins-sig' + cls + ' ins-sig-ai">' +
+      catHtml +
+      '<div class="ins-sig-title">' + EAP._pmEsc(f.headline) + '</div>' +
+      whyHtml + recHtml + metaHtml +
       '</div>';
   }).join('');
 };
@@ -150,19 +223,26 @@ EAP._pmPosTip = function(event) {
   tip.style.left = tx+'px'; tip.style.top = ty+'px';
 };
 
-// ── Fetch items respecting current filter state ────────
+// ── Fetch ALL features in scope (not just backlog-state) ──
+// getBacklogData() = features.backlog = f.pi===null only.
+// Every PI-committed feature is excluded, leaving Big Bets nearly empty.
+// Priority map needs the full cross-PI picture via allFeatures + scope.
 EAP._pmItems = function() {
-  var raw = EAP.getBacklogData();
-  return (Array.isArray(raw) ? raw : []).filter(function(f) {
-    return f && f.wsjf != null && f.size;
-  });
+  var s = EAP.state;
+  var all = EAP.applyScope(EAP.allFeatures || [], 'Feature');
+  if (s.ownerFilter && s.ownerFilter.length) {
+    all = all.filter(function(f){ return s.ownerFilter.indexOf(f.owner) !== -1; });
+  }
+  return all.filter(function(f){ return f && f.wsjf != null && f.size; });
 };
 
 // ── Sync header filter controls to current state ───────
 EAP._pmSyncHeader = function() {
   var s = EAP.state;
+  // Priority map is a strategic view — mineOnly does not auto-carry over.
+  // Only show the owner chip when an explicit ownerFilter is set.
   var ownerActive  = s.ownerFilter && s.ownerFilter.length > 0;
-  var filterActive = ownerActive || s.mineOnly;
+  var filterActive = ownerActive;
 
   // Update filter button active class
   var fbtn = document.getElementById('pm-filter-btn');
@@ -174,7 +254,6 @@ EAP._pmSyncHeader = function() {
 
   if (filterActive) {
     var displayOwners = (s.ownerFilter || []).slice();
-    if (s.mineOnly && displayOwners.indexOf(EAP.ME) === -1) displayOwners = displayOwners.concat([EAP.ME]);
     var prefix, label;
     if (displayOwners.length === 1) {
       var ok = displayOwners[0], op = EAP.people && EAP.people[ok];
@@ -222,14 +301,14 @@ EAP._pmShell = function(items) {
   try { activePi = EAP._piDisplay.filter(function(p){return p.active();})[0].name; } catch(e) {
     try { activePi = EAP._piDisplay.filter(function(p){return p.active;})[0].name; } catch(e2){}
   }
+  // Priority map is a strategic view — mineOnly does not carry over.
   var ownerActive  = s.ownerFilter && s.ownerFilter.length > 0;
-  var filterActive = ownerActive || s.mineOnly;
+  var filterActive = ownerActive;
 
   // Owner pill — same pattern as backlog fbar
   var ownerPill = '';
   if (filterActive) {
     var displayOwners = (s.ownerFilter || []).slice();
-    if (s.mineOnly && displayOwners.indexOf(EAP.ME) === -1) displayOwners = displayOwners.concat([EAP.ME]);
     var pillPrefix, pillLabel;
     if (displayOwners.length === 1) {
       var ok = displayOwners[0];
@@ -500,9 +579,13 @@ EAP._pmDraw = function(items) {
     .attr('fill','#fff')
     .text(function(d){return d.item.wsjf!=null ? d.item.wsjf : '—';});
 
-  // Name label — below circle, on background
+  // Name label — below circle for top-row quadrants (header above),
+  // above circle for bottom-row quadrants (header below)
   nodeG.append('text')
-    .attr('text-anchor','middle').attr('y', R+14)
+    .attr('text-anchor','middle')
+    .attr('y', function(d){
+      return (d.quad==='maybe'||d.quad==='timesink') ? -(R+10) : (R+14);
+    })
     .attr('font-family',FONT).attr('font-size','10').attr('font-weight','500')
     .attr('fill','#374151')
     .text(function(d){
@@ -574,6 +657,13 @@ EAP.openPriorityMap = function() {
   if (document.getElementById('pm-overlay')) return;
   EAP._pmInjectStyles();
 
+  // Save ownerFilter so close can restore it without affecting the backlog view.
+  // Auto-apply the current persona as the default owner filter if none is set.
+  EAP._pmPrevOwnerFilter = EAP.state.ownerFilter.slice();
+  if (!EAP.state.ownerFilter.length && EAP.ME) {
+    EAP.state.ownerFilter = [EAP.ME];
+  }
+
   var items = EAP._pmItems();
   if (!items.length) return;
 
@@ -600,18 +690,19 @@ EAP.openPriorityMap = function() {
         EAP.closeFilterPopover = orig;
       };
       EAP.openFilterPopover();
-      // Reposition popover to this button (openFilterPopover targets #filter-btn in main fbar)
+      // Reposition above the overlay (pm-overlay is z-index 9000, tip is 9100 — use 9200)
       if (EAP._fpop) {
         var r = filterBtn.getBoundingClientRect();
-        EAP._fpop.style.top  = (r.bottom + 6) + 'px';
-        EAP._fpop.style.left = r.left + 'px';
+        EAP._fpop.style.top    = (r.bottom + 6) + 'px';
+        EAP._fpop.style.left   = r.left + 'px';
+        EAP._fpop.style.zIndex = '9200';
       }
     });
   }
-  // Owner pill clear
+  // Owner pill clear — zero the filter within the map without touching backlog state
   el.addEventListener('click', function(e) {
     if (e.target.closest && e.target.closest('#pm-owner-clear')) {
-      EAP.clearOwnerFilter && EAP.clearOwnerFilter(false);
+      EAP.state.ownerFilter = [];
       EAP._pmRefresh();
     }
   });
@@ -627,6 +718,11 @@ EAP.closePriorityMap = function() {
   var el = document.getElementById('pm-overlay');
   if (!el) return;
   if (EAP._pmKeyHandler) document.removeEventListener('keydown', EAP._pmKeyHandler);
+  // Restore ownerFilter to what it was before the map opened
+  if (EAP._pmPrevOwnerFilter !== undefined) {
+    EAP.state.ownerFilter = EAP._pmPrevOwnerFilter;
+    EAP._pmPrevOwnerFilter = undefined;
+  }
   var tip = document.getElementById('pm-tip');
   if (tip) tip.style.display = 'none';
   el.classList.remove('pm-on');
@@ -675,11 +771,37 @@ EAP._pmInjectStyles = function() {
     '#pm-canvas{position:absolute;inset:0;}',
     '#pm-canvas svg{display:block;}',
 
-    /* Right panel — uses existing ins-sig / ins-sec-lbl classes from app.css */
-    '.pm-rpanel{width:292px;flex-shrink:0;border-left:1px solid rgba(0,0,0,0.07);',
+    /* Right panel */
+    '.pm-rpanel{width:300px;flex-shrink:0;border-left:1px solid rgba(0,0,0,0.07);',
       'overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:0;',
       'scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.10) transparent;}',
     '.pm-rpanel .ins-sig-group{margin-bottom:0;}',
+
+    /* Category chip — quadrant node colour; maps directly to the scatter dots */
+    '.pm-card-cat{font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;',
+      'display:inline-flex;padding:2px 8px;border-radius:4px;margin-bottom:6px;}',
+
+    /* Three coherent card states — border, background, title weight all in sync */
+    /* ok = blue (informational opportunity — not green/success, not teal/AI-accent) */
+    '#pm-overlay .ins-sig.ins-sig-ai.ok{background:rgba(14,165,233,0.05);border-left-color:#0284c7;}',
+    /* watch = amber (warning, decision needed) — base ins-sig-ai forces teal; override here */
+    '#pm-overlay .ins-sig.ins-sig-ai.watch{background:rgba(180,83,9,0.03);border-left-color:#b45309;}',
+    /* urgent = red — base already handles background; border override reinforces */
+    '#pm-overlay .ins-sig.ins-sig-ai.urgent{border-left-color:#dc2626;}',
+    /* All PM analysis titles are strategic-weight findings — bump to 500 */
+    '#pm-overlay .ins-sig.ins-sig-ai .ins-sig-title{font-weight:500;}',
+    /* rec-blk colour matches each card's semantic — never the global amber default */
+    '#pm-overlay .ins-sig.ins-sig-ai.ok .ins-sig-rec-blk{background:rgba(14,165,233,0.09);border-left-color:#0284c7;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.ok .ins-sig-rec-blk-lbl{color:#0369a1;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.watch .ins-sig-rec-blk{background:rgba(180,83,9,0.09);border-left-color:#b45309;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.watch .ins-sig-rec-blk-lbl{color:#92400e;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.urgent .ins-sig-rec-blk{background:rgba(185,28,28,0.08);border-left-color:#b91c1c;}',
+    '#pm-overlay .ins-sig.ins-sig-ai.urgent .ins-sig-rec-blk-lbl{color:#991b1b;}',
+    /* fbar-filter-btn is styled for the teal gradient bg — white on white in the overlay */
+    '#pm-overlay .fbar-filter-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.14);}',
+    '#pm-overlay .fbar-filter-btn:hover{background:rgba(0,0,0,0.08);}',
+    '#pm-overlay .fbar-filter-btn.active{background:rgba(14,78,105,0.08);border-color:rgba(14,78,105,0.22);}',
+    '#pm-overlay .fbar-owner-pill{background:rgba(14,78,105,0.06);border-color:rgba(14,78,105,0.18);}',
 
     /* Tooltip */
     '#pm-tip{position:fixed;z-index:9100;display:none;',
