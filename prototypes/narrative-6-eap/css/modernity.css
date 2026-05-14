@@ -1,0 +1,418 @@
+/* ═══════════════════════════════════════════════════════════════════
+   MODERNITY.CSS — Phased modernization overrides for N6 EAP (Sand theme)
+
+   Loaded after app.css so these rules win the cascade. Each phase is
+   wrapped in clearly-marked START/END blocks so it can be reversed
+   surgically: delete from "/* PHASE N START */" to "/* PHASE N END */"
+   to remove that phase's effects.
+
+   Memory of rules + current active state:
+     ~/.claude/projects/.../memory/feedback_modernity_design_system.md
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* PHASE 1 START — TYPOGRAPHY + RADII ════════════════════════════════
+   Goal: shed the 2018-Bootstrap density. Body ↑13px, sentence case
+   throughout, labels ↑11px (the uppercase boost is gone so they need
+   the size). Cards 20px, inputs 10px.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Base */
+html, body { font-size: 13px; line-height: 1.5; }
+
+/* Drop ALL uppercase + letter-spacing on small labels — sentence case wins */
+.dtbl th,
+.ins-sec-lbl,
+.ins-hero-label,
+.ins-health-grid th,
+.dep-pop-hd,
+.dep-pop-item-label,
+.dep-pop-reason-label,
+.persona-pop-hd,
+.wsjf-pop-hd-lbl,
+.art-sel-badge {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+/* Bump 9-10px labels to 11px now that uppercase is gone */
+.dtbl th,
+.ins-sec-lbl,
+.ins-hero-label,
+.dep-pop-hd,
+.persona-pop-hd,
+.wsjf-pop-hd-lbl {
+  font-size: 11px !important;
+}
+
+/* Card / panel radii: 16 → 20 */
+.gpanel,
+.pi-acc {
+  border-radius: 20px !important;
+}
+
+/* Input / dropdown / button radii: 8 → 10/12 */
+.fbar-select,
+.chrome-search,
+.fbar-filter,
+.fbar-vtog,
+.empty-state-clear,
+.pg-select {
+  border-radius: 10px !important;
+}
+.tab-item {
+  border-radius: 12px !important;
+}
+
+/* Tabular nums on every numeric column — was partial, make universal */
+.dtbl td .sz,
+.dtbl td .pi-mv,
+.pg-info,
+[class*="num-"],
+[class*="-num"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Name column in tables (Backlog, Planning) — weight 500 (matches
+   .bcard-title on cards) so visual weight is consistent across tabs. */
+.item-nm {
+  font-weight: 500 !important;
+  color: var(--text-primary) !important;
+}
+
+/* PHASE 1 END ════════════════════════════════════════════════════════ */
+
+
+/* PHASE 2 START — SHADOWS + MOTION ══════════════════════════════════
+   Goal: replace utilitarian single-layer shadows with atmospheric
+   layered shadows. Add a real motion identity — ease-out-expo, 200ms,
+   subtle hover lifts on interactive cards and accordions.
+   ──────────────────────────────────────────────────────────────────── */
+
+:root {
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-base: 200ms;
+}
+
+/* Glass slabs — layered atmospheric shadow + inner edge highlight */
+.gpanel {
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 16px 40px rgba(0,0,0,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.6) !important;
+  transition: box-shadow var(--dur-base) var(--ease-out-expo) !important;
+}
+
+/* PI accordions — contained shadow sized for 8px stacking gap */
+.pi-acc {
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 1px 6px rgba(0,0,0,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.55) !important;
+  transition: box-shadow var(--dur-base) var(--ease-out-expo),
+              transform var(--dur-base) var(--ease-out-expo) !important;
+}
+.pi-acc:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.05),
+    0 2px 10px rgba(0,0,0,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.6) !important;
+}
+
+/* Board / sprint cards — hover lift */
+.bcard {
+  transition: transform var(--dur-base) var(--ease-out-expo),
+              box-shadow var(--dur-base) var(--ease-out-expo) !important;
+}
+.bcard:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 0 rgba(0,0,0,0.04);
+}
+.bcard-blocked:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1.5px var(--color-error), 0 4px 14px rgba(185,28,28,0.22);
+}
+.bcard-atrisk:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1.5px var(--color-warning), 0 4px 14px rgba(217,119,6,0.18);
+}
+
+/* Common interactive surfaces — modernized easing + duration */
+.tab-item,
+.fbar-select,
+.fbar-chip,
+.fbar-filter,
+.fbar-vtog,
+.add-btn,
+.empty-state-clear,
+.hier-check-pill,
+.cap-chip {
+  transition: all var(--dur-base) var(--ease-out-expo) !important;
+}
+
+/* Buttons — subtle hover lift */
+.add-btn:hover,
+.fbar-filter:hover,
+.fbar-vtog:hover {
+  transform: translateY(-0.5px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* PHASE 2 END ════════════════════════════════════════════════════════ */
+
+
+/* PHASE 3 START — AI SIGNATURE ══════════════════════════════════════
+   Goal: give AI-flavoured surfaces a recognizable identity.
+   Ambient gradients, gradient-stroked sparkles, soft glows on AI
+   actions. Refined glass. This is the differentiator vs generic
+   enterprise UI.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Insights panel — deepen the ambient radial highlight */
+.ins-panel {
+  background-image:
+    radial-gradient(circle at top right, rgba(0,199,177,0.07), transparent 45%),
+    radial-gradient(circle at bottom left, rgba(14,78,105,0.05), transparent 55%) !important;
+}
+
+/* Insights header — AI-accent at the left (where the sparkle icon sits)
+   fading to mint at the right. Mint reads cleanly against the AI
+   radial gradient that sits in the top-right of the panel body —
+   sea-blue at low alpha was getting absorbed by it, hence the fade.
+   Both stops are cool greens, alpha 0.14 so neither end ghosts. */
+.ins-hdr {
+  background: linear-gradient(135deg, rgba(0, 199, 177, 0.14), rgba(140, 215, 180, 0.14)) !important;
+  border-bottom: 1px solid rgba(14, 78, 105, 0.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Sparkle stays the AI-accent teal — the icon path itself is now filled
+   (see icons.js sparkle entry). Keep this rule simple; no mask trickery. */
+.ins-hdr-left svg { color: #00C7B1 !important; }
+
+/* Refined glass — bigger backdrop-filter blur for richer feel */
+@supports (backdrop-filter: blur(1px)) {
+  .gpanel {
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+  }
+}
+
+/* AI-accent inner top edge on insights panel (extra dimensional cue) */
+.ins-panel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,199,177,0.35), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+.ins-panel { position: relative; }
+
+/* AI buttons / actions — soft glow ring on hover */
+.btn-ai,
+[data-ai-btn],
+.ai-action {
+  transition: box-shadow 240ms var(--ease-out-expo, ease) !important;
+}
+.btn-ai:hover,
+[data-ai-btn]:hover,
+.ai-action:hover {
+  box-shadow:
+    0 0 0 4px rgba(0,199,177,0.14),
+    0 4px 16px rgba(14,78,105,0.10) !important;
+}
+
+/* Hover shimmer on AI-flagged content */
+[data-ai-content]:hover,
+.ai-content:hover {
+  background-image: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,199,177,0.06) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: aiShimmer 1.6s ease-in-out infinite;
+}
+@keyframes aiShimmer {
+  0%   { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* PHASE 3 END ════════════════════════════════════════════════════════ */
+
+
+/* PHASE 4 START — GLASSMORPHISM POLISH ══════════════════════════════
+   Goal: make the glass actually read as glass. Today's body gradient is
+   a narrow pale-teal wash — when surfaces blur it, you get pale glass on
+   pale background, no contrast. Solution: a multi-blob atmospheric
+   background gives the glass colour to actually refract, plus stronger
+   backdrop-filter (blur + saturate) gives the panes that "creamy
+   frosted" quality (Linear / Vercel pattern).
+
+   Reverse Phase 4: delete this block.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* 4A — Multi-blob atmospheric background — Sand theme.
+   Three radial blobs in warm sand/amber/stone — same structural pattern
+   as the teal variant, shifted to the Sand palette (#EDECE9 base).
+   Glass panels refract warm instead of cool. */
+body { background: #edece9 !important; }
+
+/* 4B — Stronger frost on glass surfaces.
+   blur(30px) + saturate(180%) is the classic combo that gives glass
+   that "creamy" quality (Linear / Vercel use this). Lower base white
+   opacity (0.42 vs 0.52) lets the underlying colour bleed through more.
+   Stronger inner top-edge highlight reads as light catching the glass. */
+.gpanel {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 24px 60px rgba(0,0,0,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.78) !important;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .gpanel {
+    background: rgba(255, 255, 255, 0.42) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  }
+}
+
+.pi-acc {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 1px 6px rgba(0,0,0,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.65) !important;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .pi-acc {
+    background: rgba(255, 255, 255, 0.42) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  }
+}
+.pi-acc:hover {
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.05),
+    0 2px 10px rgba(0,0,0,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.72) !important;
+}
+
+/* Timeline glass slab — same treatment so the timeline panel matches. */
+.tl-wrap {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 24px 60px rgba(0,0,0,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.78) !important;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .tl-wrap {
+    background: rgba(255, 255, 255, 0.42) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  }
+}
+
+/* 4C — Header gradient — applied to every flat-tint header strip across
+   the prototype so they all share the same gradient treatment instead
+   of the old olive-grey flat fill.
+
+   The gradient itself: 135° from mint rgba(140,215,180,0.22) → primary
+   rgba(14,78,105,0.10). Picks up the mint from the body's top-left
+   blob and fades into the brand teal — depth without colour shift.
+   Plus inset top-edge highlight for "catching the light" feel.
+
+   Targets:
+   - .gpanel-hd            : Backlog / Hierarchy / Planning split-panel header
+   - .pi-hd:not(.active)   : Planning collapsed PI accordion headers
+   - JS-driven (Board colHd, Task Board, Hierarchy top rows) updated in
+     their respective tab files. */
+
+.gpanel-hd,
+.pi-hd:not(.active) {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+}
+/* gpanel-hd always separates header from scrollable content below */
+.gpanel-hd {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07) !important;
+}
+/* accordion separator only when body is open — collapsed headers have no divider */
+.pi-acc:has(.pi-body.open) .pi-hd:not(.active) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07) !important;
+}
+.pi-hd:not(.active):hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.12)) !important;
+}
+
+/* PHASE 4 END ════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   SAND THEME — neutralise all glass from Phases 1–4
+   Appended after all phase blocks so these always win via cascade order.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Canonical Sand page background */
+body { background: #F1F0ED !important; }
+
+/* ── Main glass panels → flat white Sand cards ── */
+.gpanel,
+.pi-acc,
+.tl-wrap {
+  background: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04) !important;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .gpanel,
+  .pi-acc,
+  .tl-wrap {
+    background: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+.pi-acc:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04) !important; }
+
+/* ── Panel headers → no fill ── */
+.gpanel-hd,
+.pi-hd:not(.active) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.gpanel-hd { border-bottom: none !important; }
+.pi-acc:has(.pi-body.open) .pi-hd:not(.active) { border-bottom: 1px solid #E3E2DF !important; }
+.pi-hd:not(.active):hover { background: #F1F0ED !important; }
+
+/* ── Insights header → no fill ── */
+.ins-hdr { background: transparent !important; box-shadow: none !important; border-bottom: none !important; }
+
+/* Active PI accordion header → Sand charcoal (keeps inverted text correct) */
+.pi-hd.active { background: #343331 !important; }
+
+/* ── Remove teal decorative gradient on insights panel ── */
+.ins-panel::before { background: none !important; }
+
+/* ── AI sparkle → green not teal ── */
+.ins-hdr-left svg { color: #16A34A !important; }
+
+/* ── AI button hover glow → green ── */
+.btn-ai:hover,
+[data-ai-btn]:hover,
+.ai-action:hover {
+  box-shadow: 0 0 0 4px rgba(22,163,74,0.14), 0 4px 16px rgba(0,0,0,0.08) !important;
+}
+
+/* ── AI content shimmer → green ── */
+[data-ai-content]:hover,
+.ai-content:hover {
+  background-image: linear-gradient(90deg, transparent 0%, rgba(22,163,74,0.05) 50%, transparent 100%) !important;
+}

@@ -1,0 +1,257 @@
+/* ═══════════════════════════════════════════════════════════════════
+   INTERACTIONS.CSS — Phase 1: toast notifications + scroll-and-pulse
+
+   Loaded after modernity.css. Hosts the styling for the toast queue
+   (top-right, dark glass, auto-dismissing) and the .eap-pulse flash
+   used to highlight an item the user just navigated to (e.g. by
+   clicking an insight card).
+
+   Reversal: remove the <link> in index.html plus the <script> for
+   interactions-pass.js. The data-* attributes referenced by these
+   styles are inert without the JS.
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ── Toast queue ───────────────────────────────────────────────────── */
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 16px;
+  background: #171614;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.18),
+    0 12px 32px rgba(0,0,0,0.22);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans, inherit);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toast-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.toast.dismissing {
+  animation: toast-out 200ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.toast-msg     { flex: 1; line-height: 1.4; }
+.toast-action  {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: background 120ms ease;
+}
+.toast-action:hover { background: rgba(255,255,255,0.1); }
+.toast-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.7);
+  flex-shrink: 0;
+}
+
+@keyframes toast-in {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(10px); opacity: 0; }
+}
+
+
+/* ── Scroll-and-pulse highlight ────────────────────────────────────── */
+/* Applied to an item when an insight click navigates to it.            */
+
+.eap-pulse {
+  animation: eap-pulse 1400ms cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes eap-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 199, 177, 0);
+    background-color: transparent;
+  }
+  20% {
+    box-shadow: 0 0 0 4px rgba(0, 199, 177, 0.40);
+    background-color: rgba(0, 199, 177, 0.12);
+  }
+  60% {
+    box-shadow: 0 0 0 2px rgba(0, 199, 177, 0.20);
+    background-color: rgba(0, 199, 177, 0.06);
+  }
+}
+
+
+/* ── Insight card affordance ───────────────────────────────────────── */
+/* Anything tagged data-insight-target becomes visibly clickable.       */
+
+.ins-sig[data-insight-target] {
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.ins-sig[data-insight-target]:hover {
+  transform: translateX(2px);
+}
+
+
+/* PHASE 2 START — HOVER TOOLTIPS ════════════════════════════════════
+   Singleton JS-managed tooltip — mounted on document.body, positioned
+   per-hover by interactions-pass.js. Works regardless of parent
+   overflow:hidden (which the old pseudo-element approach broke against,
+   notably on .tl-bar timeline bars).
+
+   Apply by adding data-tip="..." to any element. Multiline via \n.
+
+   Reverse Phase 2: delete this block + the PHASE 2 JS in interactions-pass.js
+   ──────────────────────────────────────────────────────────────────── */
+
+[data-tip] { cursor: help; }
+
+.eap-tip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  background: rgba(15, 27, 35, 0.96);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: pre-line;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  max-width: 240px;
+  text-align: left;
+  line-height: 1.4;
+  margin-top: -2px;          /* small offset to feel detached from cursor */
+}
+.eap-tip.show {
+  opacity: 1;
+  transform: translate(-50%, -100%) translateY(-4px);
+}
+.eap-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: rgba(15, 27, 35, 0.96);
+}
+
+/* PHASE 2 END ════════════════════════════════════════════════════════ */
+
+
+/* PHASE 3 START — CASCADE ENTRANCE ══════════════════════════════════
+   Subtle staggered fade-up on table rows and board cards. Runs after
+   every render — gives the canvas an "alive on refresh" quality
+   without demanding attention. Caps at 10 children to keep total
+   animation time short on long lists.
+
+   Reverse Phase 3: delete this block.
+   ──────────────────────────────────────────────────────────────────── */
+
+@keyframes cascade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dtbl tbody tr,
+.bcard {
+  animation: cascade-in 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+/* Tight 12ms stagger — covers a 30-row backlog in 360ms total. Beyond
+   that, the modulo trick wraps around so even very long lists keep
+   subtle staggering. */
+.dtbl tbody tr:nth-child(1)  { animation-delay: 0ms;   }
+.dtbl tbody tr:nth-child(2)  { animation-delay: 12ms;  }
+.dtbl tbody tr:nth-child(3)  { animation-delay: 24ms;  }
+.dtbl tbody tr:nth-child(4)  { animation-delay: 36ms;  }
+.dtbl tbody tr:nth-child(5)  { animation-delay: 48ms;  }
+.dtbl tbody tr:nth-child(6)  { animation-delay: 60ms;  }
+.dtbl tbody tr:nth-child(7)  { animation-delay: 72ms;  }
+.dtbl tbody tr:nth-child(8)  { animation-delay: 84ms;  }
+.dtbl tbody tr:nth-child(9)  { animation-delay: 96ms;  }
+.dtbl tbody tr:nth-child(10) { animation-delay: 108ms; }
+.dtbl tbody tr:nth-child(11) { animation-delay: 120ms; }
+.dtbl tbody tr:nth-child(12) { animation-delay: 132ms; }
+.dtbl tbody tr:nth-child(13) { animation-delay: 144ms; }
+.dtbl tbody tr:nth-child(14) { animation-delay: 156ms; }
+.dtbl tbody tr:nth-child(15) { animation-delay: 168ms; }
+.dtbl tbody tr:nth-child(16) { animation-delay: 180ms; }
+.dtbl tbody tr:nth-child(17) { animation-delay: 192ms; }
+.dtbl tbody tr:nth-child(18) { animation-delay: 204ms; }
+.dtbl tbody tr:nth-child(19) { animation-delay: 216ms; }
+.dtbl tbody tr:nth-child(20) { animation-delay: 228ms; }
+.dtbl tbody tr:nth-child(21) { animation-delay: 240ms; }
+.dtbl tbody tr:nth-child(22) { animation-delay: 252ms; }
+.dtbl tbody tr:nth-child(23) { animation-delay: 264ms; }
+.dtbl tbody tr:nth-child(24) { animation-delay: 276ms; }
+.dtbl tbody tr:nth-child(25) { animation-delay: 288ms; }
+.dtbl tbody tr:nth-child(26) { animation-delay: 300ms; }
+.dtbl tbody tr:nth-child(27) { animation-delay: 312ms; }
+.dtbl tbody tr:nth-child(28) { animation-delay: 324ms; }
+.dtbl tbody tr:nth-child(29) { animation-delay: 336ms; }
+.dtbl tbody tr:nth-child(30) { animation-delay: 348ms; }
+
+.bcard:nth-child(1)  { animation-delay: 0ms;   }
+.bcard:nth-child(2)  { animation-delay: 18ms;  }
+.bcard:nth-child(3)  { animation-delay: 36ms;  }
+.bcard:nth-child(4)  { animation-delay: 54ms;  }
+.bcard:nth-child(5)  { animation-delay: 72ms;  }
+.bcard:nth-child(6)  { animation-delay: 90ms;  }
+.bcard:nth-child(7)  { animation-delay: 108ms; }
+.bcard:nth-child(8)  { animation-delay: 126ms; }
+.bcard:nth-child(9)  { animation-delay: 144ms; }
+.bcard:nth-child(10) { animation-delay: 162ms; }
+.bcard:nth-child(11) { animation-delay: 180ms; }
+.bcard:nth-child(12) { animation-delay: 198ms; }
+.bcard:nth-child(13) { animation-delay: 216ms; }
+.bcard:nth-child(14) { animation-delay: 234ms; }
+.bcard:nth-child(15) { animation-delay: 252ms; }
+.bcard:nth-child(16) { animation-delay: 270ms; }
+
+/* PHASE 3 END ════════════════════════════════════════════════════════ */
+
+
+/* PHASE 5 START — COUNTER ANIMATION */
+.ins-hero-val, .ins-metric-val, .ins-member-num, .ins-member-ppct { font-variant-numeric: tabular-nums; }
+/* PHASE 5 END */
+
+
+/* PHASE 6 START — AI SIGNATURE */
+.ins-sig-ai.ai-entering { opacity: 0; transform: translateY(8px) scale(0.97); }
+.ins-sig-ai.ai-arrived { opacity: 1; transform: translateY(0) scale(1); transition: opacity 380ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.ai-word { opacity: 0; transition: opacity 80ms ease; }
+.ai-word.vis { opacity: 1; }
+/* PHASE 6 END */
