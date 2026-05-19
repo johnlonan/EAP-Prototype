@@ -47,7 +47,7 @@ EAP.renderList = function() {
   }
 
   // Accordions
-  var acc = '<div class="' + (s.splitView ? 'split-right' : '') + '" style="' + (s.splitView ? '' : 'flex:1;min-width:0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 4px 24px;') + '">';
+  var acc = '<div class="' + (s.splitView ? 'split-right' : 'ns-wrap') + '" style="' + (s.splitView ? '' : 'flex:1;min-width:0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 4px 24px;') + '">';
 
   groups.forEach(function(g, gi) {
     var isA = !!g.active, isO = !!EAP.state.openAccordions[g.id];
@@ -117,7 +117,7 @@ EAP.renderList = function() {
     var bc2 = EAP.bkCols();
     var blPgId2 = 'ls-bl-stack';
     var blPage2 = EAP.pgSlice(blD2, blPgId2);
-    acc += '<div class="pi-acc" style="margin-top:4px;"><div class="gpanel-hd" style="border-radius:16px 16px 0 0;"><div class="gpanel-hd-left"><span class="gpanel-title">Backlog</span><span class="gpanel-count">' + blD2.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div><div style="padding:10px 14px 14px;overflow-x:auto;"><table class="dtbl"><thead><tr>' + bc2.h + '</tr></thead><tbody>' + blPage2.map(function(i) { return '<tr data-item-id="' + i.id + '">' + bc2.r(i) + '</tr>'; }).join('') + '</tbody></table>' + EAP.pgFooter(blD2.length, blPgId2) + '</div></div>';
+    acc += '<div class="pi-acc ns-backlog" style="margin-top:4px;"><div class="gpanel-hd" style="border-radius:16px 16px 0 0;"><div class="gpanel-hd-left"><span class="gpanel-title">Backlog</span><span class="gpanel-count">' + blD2.length + '</span></div><button class="add-btn">' + EAP._ADD + 'New</button></div><div style="padding:10px 14px 14px;overflow-x:auto;"><table class="dtbl"><thead><tr>' + bc2.h + '</tr></thead><tbody>' + blPage2.map(function(i) { return '<tr data-item-id="' + i.id + '">' + bc2.r(i) + '</tr>'; }).join('') + '</tbody></table>' + EAP.pgFooter(blD2.length, blPgId2) + '</div></div>';
   }
 
   acc += '</div>';

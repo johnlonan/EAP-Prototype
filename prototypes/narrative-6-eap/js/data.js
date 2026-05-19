@@ -363,7 +363,7 @@ EAP.workItems = {
     ]
   },
   sprints: [
-    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:64, totalPts:56, donePts:8, goal:'Deliver PIN fallback handler and biometric onboarding scaffold',
+    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:81, totalPts:84, donePts:15, goal:'Deliver PIN fallback handler and biometric onboarding scaffold',
       items: [
         {id:'ls6',  num:'STRY61094201', name:'Handle fallback to PIN on failed biometric scan',     type:'Story',     state:'In Progress', pct:50, pts:3, owner:'James',  team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1'},
         {id:'ls7',  num:'STRY61094202', name:'Build payment confirmation screen layout',            type:'Story',     state:'In Progress', pct:40, pts:5, owner:'Vikram', team:'Payments Team', blocked:true, blockReason:'Auth API contract not finalised — screen layout cannot be signed off', parent:'Payment Confirmation Flow', goal:'g1'},
@@ -379,29 +379,51 @@ EAP.workItems = {
         {id:'bld6', num:'DEF0500643',   name:'Auth token refresh fails silently after 24h session',           type:'Defect',    state:'In Progress', pct:60, pts:3, owner:'Sana',   team:'Auth Team',      parent:'Fingerprint Login Redesign', goal:'g1'},
         {id:'bld9', num:'DEF0500646',   name:'Payment confirmation timeout not handled gracefully',           type:'Defect',    state:'To Do',       pct:0,  pts:2, owner:'Vikram', team:'Payments Team',  parent:'Payment Confirmation Flow',  goal:'g1'},
         {id:'blc3', num:'CSTASK1222242',name:'Document API contract for payment confirmation',                type:'Case Task', state:'In Progress', pct:50, pts:2, owner:'Mei',    team:'Payments Team',  blocked:true, blockReason:'Auth API contract not yet finalised by Auth Team', parent:'Payment Confirmation Flow',  goal:'g1'},
-        {id:'ls27', num:'STRY61094222', name:'Build biometric onboarding for new users',                       type:'Story',     state:'In Progress', pct:25, pts:5, owner:'James',  team:'Auth Team',      parent:'Enhanced Biometric Auth Flow', goal:'g1'}
+        {id:'ls27', num:'STRY61094222', name:'Build biometric onboarding for new users',                       type:'Story',     state:'In Progress', pct:25, pts:5, owner:'James',  team:'Auth Team',      parent:'Enhanced Biometric Auth Flow', goal:'g1'},
+        // Auth Team — Kiran had no Sprint 2 items despite commitPts:7 in memberMetrics
+        {id:'ls36', num:'STRY61094231', name:'Biometric prompt accessibility and error state refinements', type:'Story', state:'In Progress', pct:35, pts:4, owner:'Kiran', team:'Auth Team', parent:'Fingerprint Login Redesign',    goal:'g1'},
+        {id:'ls37', num:'STRY61094232', name:'PIN authentication integration with keychain storage',       type:'Story', state:'In Progress', pct:20, pts:3, owner:'Kiran', team:'Auth Team', parent:'Fingerprint Login Redesign',    goal:'g1'},
+        // Mobile Exp Team — Yuki had no Sprint 2 work; Tomás had one blocked carryover
+        {id:'ls30', num:'STRY61094225', name:'Dark mode color token implementation and theme switcher',        type:'Story', state:'In Progress', pct:20, pts:4, owner:'Yuki',  team:'Mobile Exp Team',  parent:'Dark Mode Support',              goal:'g1'},
+        {id:'ls31', num:'STRY61094226', name:'Home screen skeleton loading state',                             type:'Story', state:'In Progress', pct:15, pts:3, owner:'Tomás', team:'Mobile Exp Team',  parent:'Balance on Home Screen',          goal:'g1'},
+        // Accounts Team — Omar had no Sprint 2 work; Lena had one not-started item
+        {id:'ls32', num:'STRY61094227', name:'Account statement period filter and date range picker',          type:'Story', state:'In Progress', pct:25, pts:5, owner:'Omar',  team:'Accounts Team',    parent:'Account Statement Export PDF',   goal:'g2'},
+        {id:'ls33', num:'STRY61094228', name:'Statement export PDF layout and template scaffolding',           type:'Story', state:'In Progress', pct:30, pts:4, owner:'Lena',  team:'Accounts Team',    parent:'Account Statement Export PDF',   goal:'g2'},
+        // Onboarding Team — Devi had no Sprint 2 work; Nina had one blocked carryover
+        {id:'ls34', num:'STRY61094229', name:'Collect and persist user preferences in onboarding step 3',     type:'Story', state:'In Progress', pct:10, pts:2, owner:'Nina',  team:'Onboarding Team',  parent:'Streamlined Onboarding Flow',    goal:'g2'},
+        {id:'ls35', num:'STRY61094230', name:'Onboarding progress indicator and step tracker',                 type:'Story', state:'In Progress', pct:20, pts:3, owner:'Devi',  team:'Onboarding Team',  parent:'Streamlined Onboarding Flow',    goal:'g2'}
       ]
     },
-    {id:'sp3', name:'Sprint 3', dates:EAP._sprintDisplay[2].dates, active:false, capPct:0, totalPts:34, donePts:0, goal:'Complete auth regression suite and payment retry mechanism',
+    {id:'sp3', name:'Sprint 3', dates:EAP._sprintDisplay[2].dates, active:false, capPct:0, totalPts:60, donePts:0, goal:'Complete auth regression suite and payment retry mechanism',
       items: [
         {id:'ls15', num:'STRY61094210', name:'Retry mechanism for failed payment submissions',       type:'Story', state:'Planned', pct:0, pts:3, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls16', num:'STRY61094211', name:'Scheduled payment UI with recurring options',          type:'Story', state:'Planned', pct:0, pts:8, owner:'Mei',    team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls17', num:'STRY61094212', name:'Statement PDF export component and layout',            type:'Story', state:'Planned', pct:0, pts:5, owner:'Omar',   team:'Accounts Team', parent:'Statement Export PDF', goal:'g2'},
         {id:'ls18', num:'STRY61094213', name:'Auth session expiry handler regression tests',         type:'Story', state:'Planned', pct:0, pts:3, owner:'James',  team:'Auth Team', parent:'Fingerprint Login Redesign', goal:'g1'},
+        {id:'ls38', num:'STRY61094233', name:'Biometric integration regression test suite',           type:'Story', state:'Planned', pct:0, pts:5, owner:'Kiran',  team:'Auth Team', parent:'Fingerprint Login Redesign', goal:'g1'},
         {id:'ls19', num:'STRY61094214', name:'Fraud alert deduplication logic and tests',            type:'Story', state:'Planned', pct:0, pts:5, owner:'Aisha',  team:'Fraud Team', parent:'Real-time Fraud Alerts', goal:'g1'},
         {id:'ls20', num:'STRY61094215', name:'App navigation component refactor',                    type:'Story', state:'Planned', pct:0, pts:3, owner:'Yuki',   team:'Mobile Exp Team', parent:'Dark Mode Support', goal:'g1'},
         {id:'ls21', num:'STRY61094216', name:'Onboarding step progress tracker component',           type:'Story', state:'Planned', pct:0, pts:2, owner:'Devi',   team:'Onboarding Team', parent:'Streamlined Onboarding Flow', goal:'g2'},
-        {id:'ls28', num:'STRY61094223', name:'Migrate auth tests to new test framework',             type:'Story', state:'Planned', pct:0, pts:5, owner:'James',  team:'Auth Team',       parent:'Fingerprint Login Redesign',  goal:'g1'}
+        {id:'ls28', num:'STRY61094223', name:'Migrate auth tests to new test framework',             type:'Story', state:'Planned', pct:0, pts:5, owner:'James',  team:'Auth Team',       parent:'Fingerprint Login Redesign',  goal:'g1'},
+        // Sprint 3 gap-fill: Marcus/Tomás skipped S3; Lena/Nina had no future pipeline
+        {id:'ls39', num:'STRY61094234', name:'Fraud alert threshold configuration and rules editor',  type:'Story', state:'Planned', pct:0, pts:5, owner:'Marcus', team:'Fraud Team',       parent:'Real-time Fraud Alerts',       goal:'g1'},
+        {id:'ls40', num:'STRY61094235', name:'Dark mode card and list view component updates',         type:'Story', state:'Planned', pct:0, pts:4, owner:'Tomás',  team:'Mobile Exp Team',  parent:'Dark Mode Support',             goal:'g1'},
+        {id:'ls41', num:'STRY61094236', name:'Account statement pagination and column sort',           type:'Story', state:'Planned', pct:0, pts:5, owner:'Lena',   team:'Accounts Team',    parent:'Account Statement Export PDF',  goal:'g2'},
+        {id:'ls42', num:'STRY61094237', name:'Identity verification with third-party API integration', type:'Story', state:'Planned', pct:0, pts:4, owner:'Nina',   team:'Onboarding Team',  parent:'Streamlined Onboarding Flow',   goal:'g2'},
+        {id:'ls45', num:'STRY61094240', name:'Auth biometric regression and acceptance test pass',     type:'Story', state:'Planned', pct:0, pts:3, owner:'Sana',   team:'Auth Team',        parent:'Fingerprint Login Redesign',    goal:'g1'}
       ]
     },
-    {id:'sp4', name:'Sprint 4', dates:EAP._sprintDisplay[3].dates, active:false, capPct:0, totalPts:32, donePts:0, goal:'Close PI 26 — step-up auth and recurring payments in production',
+    {id:'sp4', name:'Sprint 4', dates:EAP._sprintDisplay[3].dates, active:false, capPct:0, totalPts:39, donePts:0, goal:'Close PI 26 — step-up auth and recurring payments in production',
       items: [
         {id:'ls22', num:'STRY61094217', name:'Recurring payment logic and edge case handling',       type:'Story', state:'Planned', pct:0, pts:8, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls23', num:'STRY61094218', name:'Payment limit enforcement at API level',               type:'Story', state:'Planned', pct:0, pts:5, owner:'Mei',    team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls24', num:'STRY61094219', name:'Biometric returning user login flow',                  type:'Story', state:'Planned', pct:0, pts:3, owner:'Sana',   team:'Auth Team', parent:'Fingerprint Login Redesign', goal:'g1'},
         {id:'ls25', num:'STRY61094220', name:'Fraud dispute UI integration with backend',            type:'Story', state:'Planned', pct:0, pts:5, owner:'Marcus', team:'Fraud Team', parent:'Real-time Fraud Alerts', goal:'g1'},
         {id:'ls26', num:'STRY61094221', name:'Dark mode story card components',                      type:'Story', state:'Planned', pct:0, pts:3, owner:'Tomás',  team:'Mobile Exp Team', parent:'Dark Mode Support', goal:'g1'},
-        {id:'ls29', num:'STRY61094224', name:'Implement step-up auth for high-value transactions',   type:'Story', state:'Planned', pct:0, pts:8, owner:'James',  team:'Auth Team',       parent:'Enhanced Biometric Auth Flow', goal:'g1'}
+        {id:'ls29', num:'STRY61094224', name:'Implement step-up auth for high-value transactions',   type:'Story', state:'Planned', pct:0, pts:8, owner:'James',  team:'Auth Team',       parent:'Enhanced Biometric Auth Flow', goal:'g1'},
+        // Sprint 4 pipeline for Lena and Nina who had no forward work beyond Sprint 2
+        {id:'ls43', num:'STRY61094238', name:'Scheduled statement export and email delivery',         type:'Story', state:'Planned', pct:0, pts:4, owner:'Lena',   team:'Accounts Team',   parent:'Account Statement Export PDF',  goal:'g2'},
+        {id:'ls44', num:'STRY61094239', name:'Onboarding completion flow and account activation',     type:'Story', state:'Planned', pct:0, pts:3, owner:'Nina',   team:'Onboarding Team', parent:'Streamlined Onboarding Flow',   goal:'g2'}
       ]
     },
     {id:'sp5', name:'IP Sprint', dates:EAP._sprintDisplay[4].dates, active:false, capPct:0, totalPts:0, donePts:0, items:[]}
@@ -537,13 +559,29 @@ EAP.memberWorkload = {
 
 // ── Team health dimensions (for heatmap grid) ──
 // cap=capacity%, flow=cycle time health, qual=defect trend, block=blocked count
+// blockV = blocked items in active sprint (ls7+ls8+blc3=Payments, ls10=Fraud, ls11=Mobile, ls14=Onboard)
+// qualV = open defects (authoritative — referenced in insight signal text)
 EAP.teamHealth = {
   'Auth':       { cap:'healthy', flow:'healthy', qual:'watch',   block:'healthy', capV:80,  flowV:2.1, qualV:3,  blockV:0 },
-  'Payments':   { cap:'over',    flow:'watch',   qual:'healthy', block:'over',    capV:92,  flowV:3.1, qualV:1,  blockV:2 },
-  'Fraud':      { cap:'healthy', flow:'over',    qual:'over',    block:'healthy', capV:78,  flowV:4.2, qualV:8,  blockV:0 },
-  'Mobile':     { cap:'healthy', flow:'healthy', qual:'healthy', block:'healthy', capV:70,  flowV:1.5, qualV:0,  blockV:0 },
+  'Payments':   { cap:'over',    flow:'watch',   qual:'healthy', block:'over',    capV:92,  flowV:3.1, qualV:1,  blockV:3 },
+  'Fraud':      { cap:'healthy', flow:'over',    qual:'over',    block:'watch',   capV:78,  flowV:4.2, qualV:8,  blockV:1 },
+  'Mobile':     { cap:'healthy', flow:'healthy', qual:'healthy', block:'watch',   capV:70,  flowV:1.5, qualV:0,  blockV:1 },
   'Accounts':   { cap:'healthy', flow:'watch',   qual:'watch',   block:'healthy', capV:65,  flowV:2.8, qualV:2,  blockV:0 },
-  'Onboard':    { cap:'healthy', flow:'healthy', qual:'healthy', block:'healthy', capV:60,  flowV:1.7, qualV:0,  blockV:0 }
+  'Onboard':    { cap:'healthy', flow:'healthy', qual:'healthy', block:'watch',   capV:60,  flowV:1.7, qualV:0,  blockV:1 }
+};
+
+// ── Team key normalisation — maps both hierarchy IDs (t1…t6) and persona
+// contextIds (team-auth, team-payments) to a canonical short key.
+EAP.getTeamKey = function(contextId) {
+  var map = {
+    't1': 'auth',     'team-auth':     'auth',
+    't2': 'payments', 'team-payments': 'payments',
+    't3': 'fraud',
+    't4': 'mobile',
+    't5': 'accounts',
+    't6': 'onboard'
+  };
+  return contextId ? (map[contextId] || null) : null;
 };
 
 // Signal types: ai=true means AI-inferred (sparkle + teal + confidence + source).
@@ -604,15 +642,15 @@ EAP.insights = {
     panelChart: {
       type: 'burndown',
       label: 'Sprint 2 Burndown',
-      totalPts: 56,
+      totalPts: 84,
       // Flat burn for first 3 days (WIP piling up), slight movement day 4-5 — matches WIP bottleneck story
-      actual:   [56, 56, 55, 54, 52, null, null, null, null, null],
-      forecast: [null, null, null, null, null, 42, 30, 18, 8, 0],
+      actual:   [84, 84, 83, 82, 80, null, null, null, null, null],
+      forecast: [null, null, null, null, null, 68, 56, 45, 34, 20],
       days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri']
     },
     signals: [
       {level:'urgent', title:'Payment Confirmation blocked since Sprint Day 2', desc:'Auth API dependency. Blocks 2 others in same sprint. Cascade risk.', action:'Escalate now', meta:'Blocked since sprint start', agingDays:3, causeGroup:'auth-api'},
-      {level:'urgent', ai:true, confidence:'Moderate', title:'Flow bottleneck detected', desc:'<strong>8 In Progress</strong>, only <strong>0 Done</strong>. Avg cycle time up <strong>40%</strong> this sprint.', why:'Tasks spend <strong>45%</strong> of their time in an inactive state — items are pulled before previous work closes, stacking pressure in In Progress.', recommended:'Cap In Progress at 6 items. Hold new pulls until 2 items complete. Review pickup times in the next standup.', action:'Check review process', meta:'Flow metrics vs last 3 sprints', miniChart:{type:'bars', values:[0,8,1,0], labels:['Done','In Prog','Review','Test'], colors:['#00834F','#7C3AED','#f59e0b','#2563EB']}},
+      {level:'urgent', ai:true, confidence:'Moderate', title:'Flow bottleneck detected', desc:'<strong>17 In Progress</strong>, only <strong>0 Done</strong>. Avg cycle time up <strong>40%</strong> this sprint.', why:'Tasks spend <strong>45%</strong> of their time in an inactive state — items are pulled before previous work closes, stacking pressure in In Progress.', recommended:'Cap In Progress at 6 items. Hold new pulls until 2 items complete. Review pickup times in the next standup.', action:'Check review process', meta:'Flow metrics vs last 3 sprints', miniChart:{type:'bars', values:[0,17,1,0], labels:['Done','In Prog','Review','Test'], colors:['#00834F','#7C3AED','#f59e0b','#2563EB']}},
       {level:'watch', title:'Fraud Team Sprint 4 at 110% capacity', desc:'Items need moving before sprint start.', action:'Rebalance'},
       {level:'watch', title:'Accounts Team 20% below velocity', desc:'3 Stories not yet started as of Sprint Day 3.', action:'Flag in standup'},
       {level:'ok', title:'Auth Team velocity consistent', desc:'On track with last 3 sprints.', action:''}
@@ -870,31 +908,35 @@ EAP.teamBgColors = {
 
 // ── Team productivity — per-member sprint health ───────
 // completionPct = completed/totalTasks; spCompleted = story pts done this sprint.
+// utilHrs are calibrated so member-level Utilized% averages match teamCapacity.sp2
+// ensuring the ART view and Team member view tell the same story.
+// Formula: utilHrs / roleCap(hrs) = Utilized%
+//   Dev/Sr Dev cap = 120hrs  |  QA cap = 80hrs  |  UX cap = 100hrs
 EAP.teamProductivity = {
-  'Payments Team': [
-    { member:'Vikram', role:'Senior Developer', totalTasks:24, completed:18, utilHrs:142, completionPct:75, pending:6,  quality:'Good',      spCompleted:42 },
-    { member:'Mei',    role:'Developer',         totalTasks:19, completed:11, utilHrs: 98, completionPct:58, pending:8,  quality:'Average',   spCompleted:28 }
+  'Payments Team': [                                            // team avg → 92%
+    { member:'Vikram', role:'Senior Developer', totalTasks:24, completed:18, utilHrs:112, completionPct:75, pending:6, quality:'Good',      spCompleted:42 },
+    { member:'Mei',    role:'Developer',         totalTasks:19, completed:11, utilHrs:109, completionPct:58, pending:8, quality:'Average',   spCompleted:28 }
   ],
-  'Auth Team': [
-    { member:'James', role:'Senior Developer',  totalTasks:21, completed:16, utilHrs:128, completionPct:76, pending:5,  quality:'Good',      spCompleted:38 },
-    { member:'Kiran', role:'Developer',          totalTasks:14, completed:11, utilHrs:104, completionPct:79, pending:3,  quality:'Good',      spCompleted:29 },
-    { member:'Sana',  role:'QA Engineer',        totalTasks: 8, completed: 7, utilHrs: 72, completionPct:88, pending:1,  quality:'Excellent', spCompleted:14 }
+  'Auth Team': [                                                // team avg → 80%
+    { member:'James', role:'Senior Developer',  totalTasks:21, completed:16, utilHrs:100, completionPct:76, pending:5, quality:'Good',      spCompleted:38 },
+    { member:'Kiran', role:'Developer',          totalTasks:14, completed:11, utilHrs: 95, completionPct:79, pending:3, quality:'Good',      spCompleted:29 },
+    { member:'Sana',  role:'QA Engineer',        totalTasks: 8, completed: 7, utilHrs: 62, completionPct:88, pending:1, quality:'Excellent', spCompleted:14 }
   ],
-  'Fraud Team': [
-    { member:'Marcus', role:'Developer',         totalTasks:18, completed:13, utilHrs:120, completionPct:72, pending:5,  quality:'Good',      spCompleted:34 },
-    { member:'Aisha',  role:'QA Engineer',       totalTasks:12, completed: 9, utilHrs: 88, completionPct:75, pending:3,  quality:'Good',      spCompleted:22 }
+  'Fraud Team': [                                               // team avg → 78%
+    { member:'Marcus', role:'Developer',         totalTasks:18, completed:13, utilHrs: 95, completionPct:72, pending:5, quality:'Good',      spCompleted:34 },
+    { member:'Aisha',  role:'QA Engineer',       totalTasks:12, completed: 9, utilHrs: 62, completionPct:75, pending:3, quality:'Good',      spCompleted:22 }
   ],
-  'Mobile Exp Team': [
-    { member:'Tomás', role:'Developer',          totalTasks:16, completed: 8, utilHrs: 92, completionPct:50, pending:8,  quality:'Average',   spCompleted:24 },
-    { member:'Yuki',  role:'UX Developer',       totalTasks:11, completed: 7, utilHrs: 80, completionPct:64, pending:4,  quality:'Good',      spCompleted:18 }
+  'Mobile Exp Team': [                                          // team avg → 82%
+    { member:'Tomás', role:'Developer',          totalTasks:16, completed: 8, utilHrs: 98, completionPct:50, pending:8, quality:'Average',   spCompleted:24 },
+    { member:'Yuki',  role:'UX Developer',       totalTasks:11, completed: 7, utilHrs: 82, completionPct:64, pending:4, quality:'Good',      spCompleted:18 }
   ],
-  'Accounts Team': [
-    { member:'Lena',  role:'Senior Developer',   totalTasks:20, completed:14, utilHrs:118, completionPct:70, pending:6,  quality:'Good',      spCompleted:32 },
-    { member:'Omar',  role:'Developer',          totalTasks:15, completed: 9, utilHrs: 96, completionPct:60, pending:6,  quality:'Average',   spCompleted:26 }
+  'Accounts Team': [                                            // team avg → 80%
+    { member:'Lena',  role:'Senior Developer',   totalTasks:20, completed:14, utilHrs: 96, completionPct:70, pending:6, quality:'Good',      spCompleted:32 },
+    { member:'Omar',  role:'Developer',          totalTasks:15, completed: 9, utilHrs: 96, completionPct:60, pending:6, quality:'Average',   spCompleted:26 }
   ],
-  'Onboarding Team': [
-    { member:'Nina',  role:'Developer',          totalTasks:17, completed:12, utilHrs:110, completionPct:71, pending:5,  quality:'Good',      spCompleted:28 },
-    { member:'Devi',  role:'QA Engineer',        totalTasks: 9, completed: 6, utilHrs: 68, completionPct:67, pending:3,  quality:'Good',      spCompleted:16 }
+  'Onboarding Team': [                                          // team avg → 75%
+    { member:'Nina',  role:'Developer',          totalTasks:17, completed:12, utilHrs: 90, completionPct:71, pending:5, quality:'Good',      spCompleted:28 },
+    { member:'Devi',  role:'QA Engineer',        totalTasks: 9, completed: 6, utilHrs: 60, completionPct:67, pending:3, quality:'Good',      spCompleted:16 }
   ]
 };
 
@@ -913,9 +955,37 @@ EAP.teamCapacity = {
   'Auth Team':       {sp2:80,sp3:75,sp4:70,ip:40},
   'Payments Team':   {sp2:92,sp3:85,sp4:80,ip:40},
   'Fraud Team':      {sp2:78,sp3:80,sp4:110,ip:40},
-  'Mobile Exp Team': {sp2:70,sp3:0,sp4:65,ip:40},
-  'Accounts Team':   {sp2:65,sp3:62,sp4:60,ip:40},
-  'Onboarding Team': {sp2:60,sp3:58,sp4:55,ip:40}
+  'Mobile Exp Team': {sp2:82,sp3:75,sp4:70,ip:40},
+  'Accounts Team':   {sp2:80,sp3:75,sp4:70,ip:40},
+  'Onboarding Team': {sp2:75,sp3:68,sp4:60,ip:40}
+};
+
+// ── Per-member velocity: last 4 complete sprints (PI25-S3 → PI26-S1) ─────
+// Member values sum exactly to their team's history — data is coherent.
+// Trend signals: Auth/Onboarding growing, Mobile Exp declining, Payments volatile.
+EAP.memberVelocity = {
+  'James':  [11, 13, 13, 14],
+  'Kiran':  [ 7,  8,  8,  9],
+  'Sana':   [ 4,  5,  3,  4],
+  'Vikram': [11,  9,  8, 10],
+  'Mei':    [ 9,  7,  6,  8],
+  'Marcus': [ 9,  7,  8,  7],
+  'Aisha':  [ 7,  5,  6,  6],
+  'Tomás':  [ 9,  9,  7,  6],
+  'Yuki':   [ 7,  7,  6,  5],
+  'Lena':   [ 9,  7,  9, 10],
+  'Omar':   [ 8,  7,  7,  8],
+  'Nina':   [ 6,  7,  8,  9],
+  'Devi':   [ 5,  6,  6,  7]
+};
+
+EAP.teamVelocityHistory = {
+  'Auth Team':       [22, 26, 24, 27],
+  'Payments Team':   [20, 16, 14, 18],
+  'Fraud Team':      [16, 12, 14, 13],
+  'Mobile Exp Team': [16, 16, 13, 11],
+  'Accounts Team':   [17, 14, 16, 18],
+  'Onboarding Team': [11, 13, 14, 16]
 };
 
 // ── Velocity history ───────────────────────────────────
@@ -933,6 +1003,94 @@ EAP.velocityStats = (function() {
   var avg = Math.round(vals.reduce(function(a, b) { return a + b; }, 0) / vals.length);
   return { avg: avg, high: Math.max.apply(null, vals), low: Math.min.apply(null, vals) };
 })();
+
+// ── Per-team velocity histories — Insights Planning tab ───────────────────────
+// One entry per team, same structure as EAP.velocityHistory.
+// Values tell distinct team stories consistent with EAP.teamHealth.
+// Auth team matches EAP.velocityHistory exactly (canonical team context).
+// Team burndown totals sum to EAP.sprintHistory active sprint total (84 pts):
+//   Auth 14 + Payments 18 + Fraud 14 + Mobile 21 + Accounts 11 + Onboard 6 = 84.
+EAP.teamVelocity = (function() {
+  function calcStats(history) {
+    var done = history.filter(function(s) { return !s.partial; });
+    var vals = done.map(function(s) { return s.pts; });
+    var avg = Math.round(vals.reduce(function(a, b) { return a + b; }, 0) / vals.length);
+    return { avg: avg, high: Math.max.apply(null, vals), low: Math.min.apply(null, vals) };
+  }
+  var raw = {
+    // Auth: steady team, slow this sprint due to blocked Auth API dependency.
+    auth:     [{ id:'prevsp3', name:'PI25 S3', pts:19 }, { id:'prevsp4', name:'PI25 S4', pts:22 },
+               { id:'prevsp5', name:'PI25 IP', pts:16 }, { id:'sp1',     name:'PI26 S1', pts:21 },
+               { id:'sp2',     name:'PI26 S2', pts:8,  active:true, partial:true }],
+    // Payments: strong team, current sprint hit by 3 blocked items (cap: over).
+    payments: [{ id:'prevsp3', name:'PI25 S3', pts:22 }, { id:'prevsp4', name:'PI25 S4', pts:24 },
+               { id:'prevsp5', name:'PI25 IP', pts:17 }, { id:'sp1',     name:'PI26 S1', pts:22 },
+               { id:'sp2',     name:'PI26 S2', pts:11, active:true, partial:true }],
+    // Fraud: declining trend — cycle time over 4.2d and 8 open defects dragging output.
+    fraud:    [{ id:'prevsp3', name:'PI25 S3', pts:18 }, { id:'prevsp4', name:'PI25 S4', pts:16 },
+               { id:'prevsp5', name:'PI25 IP', pts:12 }, { id:'sp1',     name:'PI26 S1', pts:17 },
+               { id:'sp2',     name:'PI26 S2', pts:9,  active:true, partial:true }],
+    // Mobile: healthiest team, consistent linear delivery.
+    mobile:   [{ id:'prevsp3', name:'PI25 S3', pts:20 }, { id:'prevsp4', name:'PI25 S4', pts:22 },
+               { id:'prevsp5', name:'PI25 IP', pts:14 }, { id:'sp1',     name:'PI26 S1', pts:21 },
+               { id:'sp2',     name:'PI26 S2', pts:14, active:true, partial:true }],
+    // Accounts: smaller team, modest velocity, slightly behind this sprint.
+    accounts: [{ id:'prevsp3', name:'PI25 S3', pts:14 }, { id:'prevsp4', name:'PI25 S4', pts:16 },
+               { id:'prevsp5', name:'PI25 IP', pts:11 }, { id:'sp1',     name:'PI26 S1', pts:15 },
+               { id:'sp2',     name:'PI26 S2', pts:7,  active:true, partial:true }],
+    // Onboard: smallest team, improving trend, on pace this sprint.
+    onboard:  [{ id:'prevsp3', name:'PI25 S3', pts:12 }, { id:'prevsp4', name:'PI25 S4', pts:13 },
+               { id:'prevsp5', name:'PI25 IP', pts:9  }, { id:'sp1',     name:'PI26 S1', pts:14 },
+               { id:'sp2',     name:'PI26 S2', pts:10, active:true, partial:true }]
+  };
+  var result = {};
+  Object.keys(raw).forEach(function(key) {
+    result[key] = { history: raw[key], stats: calcStats(raw[key]) };
+  });
+  return result;
+})();
+
+// ── Per-team sprint burndown — Insights Taskboard panel chart ────────────────
+// 10-day sprint. 4 actual days (Mon–Thu), forecast from Thursday forward.
+// Shapes reflect each team's health story from EAP.teamHealth.
+EAP.teamBurndown = {
+  // Flat for 4 days — blocked Auth API dependency. Forecast assumes resolution Thu.
+  auth:     { type:'burndown', label:'Sprint 2 Burndown · Auth',
+              totalPts:14,
+              actual:   [14, 14, 14, 14, null, null, null, null, null, null],
+              forecast: [null, null, null, 14, 10,  7,  4,  2,  0, null],
+              days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri'] },
+  // Flat Mon–Wed (3 blocked items), slight movement Thu. Steep forecast recovery.
+  payments: { type:'burndown', label:'Sprint 2 Burndown · Payments',
+              totalPts:18,
+              actual:   [18, 18, 18, 17, null, null, null, null, null, null],
+              forecast: [null, null, null, 17, 13,  9,  5,  1,  0, null],
+              days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri'] },
+  // Slow but consistent burn — 1 pt/day. Cycle time and defects limiting throughput.
+  fraud:    { type:'burndown', label:'Sprint 2 Burndown · Fraud',
+              totalPts:14,
+              actual:   [14, 13, 12, 11, null, null, null, null, null, null],
+              forecast: [null, null, null, 11,  8,  5,  3,  1,  0, null],
+              days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri'] },
+  // Smooth linear burn ~3 pts/day — healthiest execution in the ART.
+  mobile:   { type:'burndown', label:'Sprint 2 Burndown · Mobile',
+              totalPts:21,
+              actual:   [21, 18, 15, 12, null, null, null, null, null, null],
+              forecast: [null, null, null, 12,  8,  5,  2,  0, null, null],
+              days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri'] },
+  // Slow start Mon–Tue, picking up. Should complete but monitoring.
+  accounts: { type:'burndown', label:'Sprint 2 Burndown · Accounts',
+              totalPts:11,
+              actual:   [11, 11, 10,  9, null, null, null, null, null, null],
+              forecast: [null, null, null,  9,  6,  4,  2,  0, null, null],
+              days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri'] },
+  // Small team, small commitment. Steady execution, on track.
+  onboard:  { type:'burndown', label:'Sprint 2 Burndown · Onboard',
+              totalPts:6,
+              actual:   [ 6,  5,  5,  4, null, null, null, null, null, null],
+              forecast: [null, null, null,  4,  3,  2,  1,  0, null, null],
+              days: ['Mon','Tue','Wed','Thu','Fri','Mon','Tue','Wed','Thu','Fri'] }
+};
 
 // ── Monte Carlo delivery forecast ─────────────────────
 EAP.mcForecast = (function() {
@@ -989,3 +1147,53 @@ EAP.mcForecast = (function() {
 
 // ── WIP limits per task board column ──────────────────
 EAP.wipLimits = { 'In Progress': 6, 'In Review': 4, 'Testing': 3, 'Ready for Acceptance': 3 };
+
+// ── Item priority lookup (Sprint 2 active items) ───────
+// H=High, M=Medium, L=Low. Stored separately to keep item definitions clean.
+// Blocked/carry-over items → H. Defects → H/M. Unstarted To Do → L.
+EAP.itemPriority = {
+  'ls6':  'M',  // Auth fallback PIN, In Progress
+  'ls7':  'H',  // Payments screen, blocked
+  'ls8':  'H',  // Auth API integration, blocked
+  'ls9':  'M',  // Payment validation, In Review
+  'ls10': 'H',  // Fraud webhook, blocked
+  'ls11': 'H',  // Balance refresh, carried over + blocked
+  'ls12': 'M',  // Auth session expiry, In Progress
+  'ls13': 'L',  // Account statement fetch, To Do
+  'ls14': 'H',  // KYC upload, carried over + blocked
+  'bld5': 'H',  // Fraud alert defect
+  'bld6': 'H',  // Auth token defect
+  'bld9': 'M',  // Payment timeout defect
+  'blc3': 'H',  // API contract doc, blocked
+  'ls27': 'M'   // Biometric onboarding, In Progress (added mid-sprint)
+};
+
+// ── Sprint scope delta — Sprint 2 ──────────────────────
+// initial* = state at sprint planning. Added mid-sprint: ls27 (Auth +5pts),
+// blc3 (Payments +2pts). Removed: none. Net: +7pts, +2 items → 56 total.
+EAP.sprintScopeData = {
+  sprint: 'Sprint 2',
+  initialPts: 49, initialItems: 12,
+  addedPts: 7,   addedItems: 2,
+  removedPts: 0, removedItems: 0,
+  teams: {
+    'Auth Team':       { added:1, removed:0, addedPts:5,  removedPts:0 },
+    'Payments Team':   { added:1, removed:0, addedPts:2,  removedPts:0 },
+    'Fraud Team':      { added:0, removed:0, addedPts:0,  removedPts:0 },
+    'Mobile Exp Team': { added:0, removed:0, addedPts:0,  removedPts:0 },
+    'Accounts Team':   { added:0, removed:0, addedPts:0,  removedPts:0 },
+    'Onboarding Team': { added:0, removed:0, addedPts:0,  removedPts:0 }
+  }
+};
+
+// ── ART sprint history — last 5 sprints ────────────────
+// Completed values derived from teamVelocityHistory sums for coherence:
+//   PI25 S3 = 102 (22+20+16+16+17+11), PI25 S4 = 97, PI26 S1 = 95
+//   PI26 S2 active: donePts=13 (day 5 of 14), total committed=77
+EAP.sprintHistory = [
+  { name:'PI25 S3', initial:108, added:4,  removed:2, completed:102, notDone:8  },
+  { name:'PI25 S4', initial:103, added:6,  removed:2, completed:97,  notDone:10 },
+  { name:'PI25 IP', initial:46,  added:2,  removed:0, completed:44,  notDone:4  },
+  { name:'PI26 S1', initial:96,  added:8,  removed:2, completed:95,  notDone:7  },
+  { name:'PI26 S2', initial:49,  added:7,  removed:0, completed:8,   notDone:0, active:true, dayOf:5, totalDays:14 }
+];

@@ -86,6 +86,404 @@ function qualityBadge(q) {
   return '<span style="font-size:11px;font-weight:500;color:' + s.color + ';background:' + s.bg + ';padding:2px 7px;border-radius:10px;">' + q + '</span>';
 }
 
+// ── Workload enrichment: WIP, type mix from live data; defects + blocked from teamHealth for ART ──
+// ART context uses EAP.teamHealth as the single source of truth — same data the Insights panel reads.
+// Team (member) context derives everything from live sprint items.
+var _HEALTH_KEY = {
+  'Auth Team':'Auth', 'Payments Team':'Payments', 'Fraud Team':'Fraud',
+  'Mobile Exp Team':'Mobile', 'Accounts Team':'Accounts', 'Onboarding Team':'Onboard'
+};
+function buildWorkloadEnrichment(rows, isTeamCtx) {
+  var lookup = {};
+  rows.forEach(function(r) {
+    lookup[r.member] = { wip: 0, blocked: 0, story: 0, defect: 0, task: 0, blockedItems: [] };
+  });
+  var allItems = [];
+  EAP.workItems.sprints.forEach(function(sp) { allItems = allItems.concat(sp.items || []); });
+  allItems = allItems.concat(EAP.getBacklogFlat ? EAP.getBacklogFlat() : []);
+  allItems.forEach(function(item) {
+    var key = isTeamCtx ? item.owner : item.team;
+    if (!key || !lookup[key]) return;
+    var e = lookup[key];
+    var st = item.state || '';
+    if (st === 'In Progress' || st === 'In Review') e.wip++;
+    if (item.blocked || st === 'Blocked') {
+      e.blocked++;
+      e.blockedItems.push(item.name || item.num || '');
+    }
+    var t = (item.type || '').toLowerCase();
+    if (t === 'story') e.story++;
+    else if (t === 'defect') e.defect++;
+    else e.task++;
+  });
+  // ART context: override defect + blocked counts from teamHealth so both panels agree
+  if (!isTeamCtx && EAP.teamHealth) {
+    rows.forEach(function(r) {
+      var hKey = _HEALTH_KEY[r.member];
+      var th = hKey && EAP.teamHealth[hKey];
+      if (!th || !lookup[r.member]) return;
+      lookup[r.member].defect  = th.qualV  || 0;
+      lookup[r.member].blocked = th.blockV || 0;
+      // Rebuild blockedItems from live sprint stories for hover tooltip
+      lookup[r.member].blockedItems = [];
+      allItems.forEach(function(item) {
+        if (item.team !== r.member) return;
+        if ((item.blocked || item.state === 'Blocked') && item.type === 'Story') {
+          lookup[r.member].blockedItems.push(item.name || item.num || '');
+        }
+      });
+    });
+  }
+  return lookup;
+}
+
+// ── Flow health: sprint capacity breakdown per team — active sprint only ──
+// Each team bar = total sprint capacity. Segments: Flowing | Not Started | At Risk | Free.
+// Capacity derived from teamCapacity.sp2 utilization %: committed / (capPct/100).
+function buildFlowHealth(rows, isTeamCtx) {
+  var result = {};
+  rows.forEach(function(r) {
+    result[r.member] = { flowing: 0, atRisk: 0, notStarted: 0, total: 0, capacity: 0, free: 0 };
+  });
+  var activeItems = [];
+  EAP.workItems.sprints.forEach(function(sp) {
+    if (sp.active) activeItems = activeItems.concat(sp.items || []);
+  });
+  activeItems.forEach(function(item) {
+    var key = isTeamCtx ? item.owner : item.team;
+    if (!key || !result[key]) return;
+    var pts = item.pts || 0;
+    var e = result[key];
+    e.total += pts;
+    if (item.blocked || item.state === 'Blocked') {
+      e.atRisk += pts;
+    } else {
+      var st = item.state || '';
+      if (st === 'In Progress' || st === 'In Review' || st === 'Done' || st === 'Complete') {
+        e.flowing += pts;
+      } else {
+        e.notStarted += pts;
+      }
+    }
+  });
+  // Derive sprint capacity in pts from utilization %; free = capacity − committed
+  rows.forEach(function(r) {
+    var e = result[r.member];
+    var capPct = ((EAP.teamCapacity || {})[r.member] || {}).sp2 || 100;
+    e.capacity = capPct > 0 ? Math.round(e.total / (capPct / 100)) : e.total;
+    e.free = Math.max(0, e.capacity - e.total);
+  });
+  return result;
+}
+
+function flowHealthPanel(rows, isTeamCtx, flowData, sprintLabel) {
+  var h = '<div class="tteam-chart">' +
+    '<div class="tteam-chart-title">' + sprintLabel + ' · Sprint flow</div>' +
+    '<div class="tteam-chart-subtitle">Sprint capacity · committed vs free</div>' +
+    '<div class="tteam-bars">';
+
+  rows.forEach(function(r) {
+    var d = flowData[r.member] || { flowing: 0, atRisk: 0, notStarted: 0, total: 0, capacity: 1, free: 0 };
+    var cap = d.capacity || 1;
+    var label = isTeamCtx ? r.member : r.member.replace(' Team', '');
+
+    // All segments as % of total sprint capacity — bar is always 100% wide
+    var flowPct = Math.round((d.flowing    / cap) * 100);
+    var notPct  = Math.round((d.notStarted / cap) * 100);
+    var riskPct = Math.round((d.atRisk     / cap) * 100);
+    var freePct = Math.max(0, 100 - flowPct - notPct - riskPct);
+
+    var tips = [];
+    if (d.flowing    > 0) tips.push(d.flowing    + 'pt flowing');
+    if (d.notStarted > 0) tips.push(d.notStarted + 'pt not started');
+    if (d.atRisk     > 0) tips.push(d.atRisk     + 'pt at risk');
+    if (d.free       > 0) tips.push(d.free       + 'pt free');
+    tips.push(cap + 'pt capacity');
+
+    h += '<div class="tteam-bar-row">' +
+      '<span class="tteam-bar-label">' + label + '</span>' +
+      '<div class="tteam-bar-track-wrap">' +
+        '<div class="tteam-fh-track">' +
+          '<div class="tteam-fh-bar" style="width:100%" title="' + tips.join(' · ') + '">' +
+            (flowPct > 0 ? '<div class="tteam-sdist-seg" style="width:' + flowPct + '%;background:rgba(22,163,74,0.75)"></div>' : '') +
+            (notPct  > 0 ? '<div class="tteam-sdist-seg" style="width:' + notPct  + '%;background:rgba(99,102,241,0.45)"></div>' : '') +
+            (riskPct > 0 ? '<div class="tteam-sdist-seg" style="width:' + riskPct + '%;background:rgba(220,38,38,0.80)"></div>' : '') +
+            (freePct > 0 ? '<div class="tteam-sdist-seg" style="width:' + freePct + '%;background:rgba(0,0,0,0.08)"></div>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<span class="tteam-bar-val">' + d.total + '<span style="color:#BBBBB7">/' + cap + '</span><span style="font-size:10px;color:#BBBBB7;margin-left:1px">pt</span></span>' +
+    '</div>';
+  });
+
+  h += '</div><div class="tteam-chart-legend">' +
+    '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:rgba(22,163,74,0.75)"></span>Flowing</span>' +
+    '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:rgba(99,102,241,0.45)"></span>Not started</span>' +
+    '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:rgba(220,38,38,0.80)"></span>At risk</span>' +
+    '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:rgba(0,0,0,0.12)"></span>Free</span>' +
+  '</div></div>';
+  return h;
+}
+
+// ── State distribution: count items in each workflow state per team/member ──
+// Uses all sprint items (PI horizon) so member-level bars have enough items to be meaningful.
+function buildStateDistribution(rows, isTeamCtx) {
+  var result = {};
+  rows.forEach(function(r) {
+    result[r.member] = { todo: 0, inprog: 0, review: 0, done: 0, blocked: 0, total: 0 };
+  });
+  var allItems = [];
+  EAP.workItems.sprints.forEach(function(sp) { allItems = allItems.concat(sp.items || []); });
+  allItems.forEach(function(item) {
+    var key = isTeamCtx ? item.owner : item.team;
+    if (!key || !result[key]) return;
+    var e = result[key];
+    e.total++;
+    if (item.blocked || item.state === 'Blocked') {
+      e.blocked++;
+    } else {
+      var st = item.state || '';
+      if (st === 'Done' || st === 'Complete' || st === 'Accepted') e.done++;
+      else if (st === 'In Review') e.review++;
+      else if (st === 'In Progress') e.inprog++;
+      else e.todo++; // Draft, Planned, To Do
+    }
+  });
+  return result;
+}
+
+// ── Priority map: count H/M/L per team or member from active sprint ──
+function buildPriorityMap(rows, isTeamCtx) {
+  var result = {};
+  rows.forEach(function(r) { result[r.member] = { H: 0, M: 0, L: 0 }; });
+  var activeItems = [];
+  EAP.workItems.sprints.forEach(function(sp) {
+    if (sp.active) activeItems = activeItems.concat(sp.items || []);
+  });
+  var pmap = EAP.itemPriority || {};
+  activeItems.forEach(function(item) {
+    var key = isTeamCtx ? item.owner : item.team;
+    var pri = pmap[item.id];
+    if (!key || !result[key] || !pri) return;
+    result[key][pri]++;
+  });
+  return result;
+}
+
+// ── Sprint pts: done / committed from the active sprint per team or member ──
+function getSprintPts(isTeamCtx, teamFilter) {
+  var result = {};
+  var sp2 = null;
+  for (var i = 0; i < EAP.workItems.sprints.length; i++) {
+    if (EAP.workItems.sprints[i].active) { sp2 = EAP.workItems.sprints[i]; break; }
+  }
+  if (!sp2) return result;
+  (sp2.items || []).forEach(function(item) {
+    var key = isTeamCtx ? item.owner : item.team;
+    if (!key) return;
+    if (teamFilter && item.team !== teamFilter) return;
+    if (!result[key]) result[key] = { committed: 0, done: 0 };
+    var pts = item.pts || 0;
+    result[key].committed += pts;
+    result[key].done += Math.round((item.pct || 0) * pts / 100);
+  });
+  return result;
+}
+
+// ── Capacity % per row ────────────────────────────────
+// Team context: role-based hour cap (Dev=120h, QA=80h, UX=100h) vs utilHrs.
+// ART context: pull Sprint 2 % directly from teamCapacity data.
+function rowCapPct(r, isTeamCtx) {
+  if (!isTeamCtx) {
+    return ((EAP.teamCapacity || {})[r.member] || {}).sp2 || 0;
+  }
+  var role = (r.role || '').toLowerCase();
+  var cap = role.indexOf('qa') !== -1 ? 80 : role.indexOf('ux') !== -1 ? 100 : 120;
+  return Math.round((r.utilHrs / cap) * 100);
+}
+
+function capBarCell(pct) {
+  var color = pct > 100 ? '#DC2626' : pct > 85 ? '#D97706' : '#16A34A';
+  var barW = Math.min(pct, 100);
+  var tip = pct > 100 ? 'Capacity utilization over 100% — workload exceeds allocation' : pct > 85 ? 'Approaching full utilization' : 'Utilization within healthy range';
+  return '<div class="tteam-cap-wrap" title="' + tip + '">' +
+    '<div class="tteam-cap-bar"><div class="tteam-cap-fill" style="width:' + barW + '%;background:' + color + '"></div></div>' +
+    '<span class="tteam-cap-pct" style="color:' + color + '">' + pct + '%</span>' +
+  '</div>';
+}
+
+function typeMixCell(e) {
+  var parts = [];
+  if (e.story > 0)  parts.push('<span class="tteam-type-st">' + e.story + '&thinsp;' + (e.story === 1 ? 'story' : 'stories') + '</span>');
+  if (e.defect > 0) parts.push('<span class="tteam-type-bg">' + e.defect + '&thinsp;' + (e.defect === 1 ? 'defect' : 'defects') + '</span>');
+  if (e.task > 0)   parts.push('<span class="tteam-type-tk">' + e.task + '&thinsp;' + (e.task === 1 ? 'task' : 'tasks') + '</span>');
+  if (!parts.length) return '<span style="color:#BBBBB7;font-size:11px">—</span>';
+  return '<div class="tteam-type-mix">' + parts.join('<span class="tteam-type-dot">·</span>') + '</div>';
+}
+
+function signalsCell(e) {
+  if (e.wip === 0 && e.blocked === 0) return '<span style="color:#BBBBB7;font-size:11px">—</span>';
+  var h = '<div class="tteam-signals">';
+  if (e.wip > 0) h += '<span class="tteam-wip-count">' + e.wip + ' active</span>';
+  if (e.blocked > 0) {
+    var tipText = (e.blockedItems || []).length
+      ? e.blockedItems.slice(0, 3).join(' · ') + (e.blockedItems.length > 3 ? ' …' : '')
+      : e.blocked + ' item' + (e.blocked > 1 ? 's' : '') + ' blocked';
+    var names = (e.blockedItems || []).join('||');
+    h += '<span class="tteam-blocked-badge" data-blocked-names="' + names + '">' + e.blocked + ' blocked</span>';
+  }
+  return h + '</div>';
+}
+
+function sprintPtsCell(p) {
+  if (!p || p.committed === 0) return '<span style="color:#BBBBB7;font-size:11px">—</span>';
+  var pct = Math.round(p.done / p.committed * 100);
+  var color = pct >= 70 ? '#383733' : pct >= 40 ? '#D97706' : '#DC2626';
+  return '<div class="tteam-spts-wrap" title="' + pct + '% of sprint commitment done">' +
+    '<div class="tteam-spts-bar"><div class="tteam-spts-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+    '<span class="tteam-spts-lbl">' + p.done + '<span class="tteam-spts-denom"> / ' + p.committed + ' pts</span></span>' +
+  '</div>';
+}
+
+// ── State distribution stacked bar chart panel ───────
+var SD_STATES = [
+  { key:'todo',    label:'To Do',       color:'rgba(99,102,241,0.45)' },
+  { key:'inprog',  label:'In Progress', color:'rgba(37,99,235,0.70)' },
+  { key:'review',  label:'In Review',   color:'rgba(217,119,6,0.70)' },
+  { key:'done',    label:'Done',        color:'rgba(22,163,74,0.70)' },
+  { key:'blocked', label:'Blocked',     color:'rgba(220,38,38,0.85)' }
+];
+function stateDistributionPanel(rows, isTeamCtx, stateDist) {
+  var h = '<div class="tteam-chart">' +
+    '<div class="tteam-chart-title">Workload by state</div>' +
+    '<div class="tteam-chart-subtitle">All sprint items this PI</div>' +
+    '<div class="tteam-bars">';
+  rows.forEach(function(r) {
+    var d = stateDist[r.member] || { todo:0, inprog:0, review:0, done:0, blocked:0, total:0 };
+    var total = d.total || 1;
+    var label = isTeamCtx ? r.member : r.member.replace(' Team', '');
+    var tipParts = [];
+    SD_STATES.forEach(function(s) { if (d[s.key] > 0) tipParts.push(d[s.key] + ' ' + s.label); });
+    h += '<div class="tteam-bar-row">' +
+      '<span class="tteam-bar-label">' + label + '</span>' +
+      '<div class="tteam-sdist-bar" title="' + tipParts.join(' · ') + '">';
+    SD_STATES.forEach(function(s) {
+      var pct = Math.round((d[s.key] / total) * 100);
+      if (pct === 0) return;
+      h += '<div class="tteam-sdist-seg" style="width:' + pct + '%;background:' + s.color + '" title="' + d[s.key] + ' ' + s.label + '"></div>';
+    });
+    h += '</div><span class="tteam-bar-val">' + (d.total || 0) + '</span></div>';
+  });
+  h += '</div><div class="tteam-chart-legend">';
+  SD_STATES.forEach(function(s) {
+    h += '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:' + s.color + '"></span>' + s.label + '</span>';
+  });
+  return h + '</div></div>';
+}
+
+// ── Priority cell: H / M / L counts ──────────────────
+function priorityCell(p) {
+  if (!p || (p.H + p.M + p.L === 0)) return '<span style="color:#BBBBB7;font-size:11px">—</span>';
+  var tips = [];
+  if (p.H > 0) tips.push(p.H + ' High');
+  if (p.M > 0) tips.push(p.M + ' Medium');
+  if (p.L > 0) tips.push(p.L + ' Low');
+  var h = '<div class="tteam-pri-wrap" title="' + tips.join(' · ') + '">';
+  if (p.H > 0) h += '<span class="tteam-pri-h">' + p.H + '&thinsp;H</span>';
+  if (p.M > 0) h += '<span class="tteam-pri-m">' + p.M + '&thinsp;M</span>';
+  if (p.L > 0) h += '<span class="tteam-pri-l">' + p.L + '&thinsp;L</span>';
+  return h + '</div>';
+}
+
+// ── Scope delta tile ─────────────────────────────────
+function scopeDeltaTile(isTeamCtx, teamName) {
+  var sd = EAP.sprintScopeData;
+  if (!sd) return '<div class="tteam-sum-tile"><span class="tteam-sum-val">—</span><span class="tteam-sum-lbl">Scope added</span></div>';
+  var netPts;
+  if (isTeamCtx) {
+    var td = (sd.teams || {})[teamName] || {};
+    netPts = (td.addedPts || 0) - (td.removedPts || 0);
+  } else {
+    netPts = sd.addedPts - sd.removedPts;
+  }
+  var valStr = netPts > 0 ? '+' + netPts + ' pts' : netPts < 0 ? netPts + ' pts' : '—';
+  return '<div class="tteam-sum-tile">' +
+    '<span class="tteam-sum-val">' + valStr + '</span>' +
+    '<span class="tteam-sum-lbl">Scope added · ' + sd.sprint + '</span>' +
+  '</div>';
+}
+
+// ── Sprint comparison chart panel (D3 init deferred) ──
+function renderSprintComparisonPanel() {
+  return '<div class="tteam-sc-panel">' +
+    '<div class="tteam-sc-header">' +
+      '<div>' +
+        '<div class="tteam-chart-title">Sprint performance</div>' +
+        '<div class="tteam-chart-subtitle">ART committed vs completed · 4 completed · 1 active</div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="tteam-sprint-comp-svg" class="tteam-sc-svg-host"></div>' +
+    '<div class="tteam-chart-legend tteam-sc-legend">' +
+      '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:#2563EB"></span>Committed</span>' +
+      '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:#F59E0B"></span>Added scope</span>' +
+      '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:#16A34A"></span>Completed</span>' +
+      '<span class="tteam-lgd-item"><span class="tteam-lgd-swatch" style="background:#E1E0DD;border:1px solid #CCCBC8;box-sizing:border-box;"></span>Not completed</span>' +
+      '<span class="tteam-lgd-item"><span class="tteam-sc-lgd-proj"></span>Projected</span>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── Velocity trend panel — D3 sparklines rendered post-mount ──
+// Placeholder spans with data-values; EAP.initWorkloadSparklines() draws via D3.
+var VEL_SPRINT_LABELS = ['PI25 S3', 'PI25 S4', 'PI26 S1', 'PI26 S2'];
+function renderVelocityPanel(rows, isTeamCtx) {
+  var lookup = isTeamCtx ? (EAP.memberVelocity || {}) : (EAP.teamVelocityHistory || {});
+  function trendIcon(color, dir) {
+    if (dir === 'up')   return '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V3M2 5.5L5 3l3 2.5" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (dir === 'down') return '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v5M2 4.5L5 7l3-2.5" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M6 3l2 2-2 2" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  var h = '<div class="tteam-vel-panel">' +
+    '<div class="tteam-chart-title">Velocity trend</div>' +
+    '<div class="tteam-vel-subtitle">' + VEL_SPRINT_LABELS.join('&ensp;&middot;&ensp;') + '</div>';
+  rows.forEach(function(r) {
+    var vals = lookup[r.member];
+    if (!vals) return;
+    var lastSp = vals[vals.length - 1];
+    var delta = lastSp - vals[0];
+    var dir = delta > 1 ? 'up' : delta < -1 ? 'down' : 'flat';
+    var trendColor = dir === 'up' ? '#16A34A' : dir === 'down' ? '#DC2626' : '#585753';
+    var label = isTeamCtx ? r.member : r.member.replace(' Team', '');
+    h += '<div class="tteam-vel-row">' +
+      '<span class="tteam-vel-label">' + label + '</span>' +
+      '<span class="tteam-vel-spark vel-spark-target" data-values="' + JSON.stringify(vals) + '"></span>' +
+      '<span class="tteam-vel-last">' + lastSp + '<span class="tteam-vel-unit"> sp</span></span>' +
+      '<span class="tteam-vel-trend">' + trendIcon(trendColor, dir) + '</span>' +
+    '</div>';
+  });
+  h += '<div class="tteam-vel-footnote">Last 4 complete sprints — PI26 S2 active</div>';
+  return h + '</div>';
+}
+
+function workloadTiles(avgCap, blocked, slack, isTeamCtx, teamName) {
+  var entity = isTeamCtx ? 'Members' : 'Teams';
+  return '<div class="tteam-summary">' +
+    '<div class="tteam-sum-tile">' +
+      '<span class="tteam-sum-val">' + avgCap + '%</span>' +
+      '<span class="tteam-sum-lbl">Avg capacity used</span>' +
+    '</div>' +
+    '<div class="tteam-sum-tile">' +
+      '<span class="tteam-sum-val">' + blocked + '</span>' +
+      '<span class="tteam-sum-lbl">Blocked items</span>' +
+    '</div>' +
+    '<div class="tteam-sum-tile">' +
+      '<span class="tteam-sum-val">' + slack + '</span>' +
+      '<span class="tteam-sum-lbl">' + entity + ' with slack</span>' +
+    '</div>' +
+    scopeDeltaTile(isTeamCtx, teamName) +
+  '</div>';
+}
+
 // ── Team view renderer ────────────────────────────────
 function renderTeamView(teamName, isTeamCtx) {
   var rows = [];
@@ -117,55 +515,80 @@ function renderTeamView(teamName, isTeamCtx) {
     return '<div style="padding:40px;text-align:center;color:#6B7280;font-size:13px;">No productivity data for this team.</div>';
   }
 
-  // SP bar chart — compact horizontal bars above the table
-  var chartHtml = '<div class="tteam-chart">' +
-    '<div class="tteam-chart-title">Story points completed · ' + (isTeamCtx ? 'by member' : 'by team') + '</div>' +
-    '<div class="tteam-bars">';
-  rows.forEach(function(r) {
-    var pct = Math.round((r.spCompleted / maxSp) * 100);
-    var label = isTeamCtx ? r.member : r.member.replace(' Team', '');
-    chartHtml +=
-      '<div class="tteam-bar-row">' +
-        '<span class="tteam-bar-label">' + label + '</span>' +
-        '<div class="tteam-bar-track">' +
-          '<div class="tteam-bar-fill" style="width:' + pct + '%"></div>' +
-        '</div>' +
-        '<span class="tteam-bar-val">' + r.spCompleted + '</span>' +
-      '</div>';
-  });
-  chartHtml += '</div></div>';
+  // Enrich with live work item signals
+  var enr = buildWorkloadEnrichment(rows, isTeamCtx);
+  var stateDist = buildStateDistribution(rows, isTeamCtx);
+  var priMap = buildPriorityMap(rows, isTeamCtx);
+  rows.forEach(function(r) { r._capPct = rowCapPct(r, isTeamCtx); });
 
-  // Table
+  var avgCap = Math.round(rows.reduce(function(a, r) { return a + r._capPct; }, 0) / rows.length);
+  var totalBlocked = rows.reduce(function(a, r) { return a + ((enr[r.member] || {}).blocked || 0); }, 0);
+  var slackCount = rows.filter(function(r) { return r._capPct < 85; }).length;
+
+  // Active sprint name for chart and table title
+  var activeSp = EAP.workItems.sprints.filter(function(s) { return s.active; })[0];
+  var sprintLabel = activeSp ? activeSp.name : 'Sprint 2';
+
+  // Sprint pts per row (done / committed) from live sprint data
+  var sp2pts = getSprintPts(isTeamCtx, isTeamCtx ? teamName : null);
+  var maxCommitted = rows.reduce(function(m, r) { return Math.max(m, (sp2pts[r.member] || {}).committed || 0); }, 0) || 1;
+
+  // ART: flow health chart (committed pts, colored by flowing / at-risk / not-started).
+  // Team: workload by state across full PI — enough items per member for meaningful bars.
+  var chartHtml;
+  if (!isTeamCtx) {
+    var flowData = buildFlowHealth(rows, false);
+    chartHtml = flowHealthPanel(rows, false, flowData, sprintLabel);
+  } else {
+    chartHtml = stateDistributionPanel(rows, isTeamCtx, stateDist);
+  }
+
+  // Summary tiles (4th = scope delta)
+  var tilesHtml = workloadTiles(avgCap, totalBlocked, slackCount, isTeamCtx, teamName);
+
+  // Table — title outside the table, no header bg, sprint pts replaces quality
   var tableHtml = '<div class="tteam-table-wrap">' +
+    '<div class="tteam-table-hdr"><span class="tteam-table-title">Workload breakdown &middot; ' + sprintLabel + '</span></div>' +
     '<table class="tteam-table">' +
     '<thead><tr>' +
       '<th>' + (isTeamCtx ? 'Member' : 'Team') + '</th>' +
-      '<th>' + (isTeamCtx ? 'Role' : 'Size') + '</th>' +
-      '<th>Tasks</th>' +
-      '<th>Util hrs</th>' +
-      '<th>Completion</th>' +
-      '<th>Pending</th>' +
-      '<th>Quality</th>' +
+      '<th>Utilized</th>' +
+      '<th>Sprint pts</th>' +
+      '<th title="H = High · M = Medium · L = Low — active sprint">Priority</th>' +
+      '<th style="color:#383733">Stories</th>' +
+      '<th style="color:#D97706">Defects</th>' +
+      '<th style="color:#797874">Tasks</th>' +
+      '<th>Active / Blocked</th>' +
     '</tr></thead>' +
     '<tbody>';
   rows.forEach(function(r) {
-    var pctColor = r.completionPct >= 80 ? '#16A34A' : r.completionPct >= 65 ? '#D97706' : '#DC2626';
+    var e = enr[r.member] || { wip: 0, blocked: 0, story: 0, defect: 0, task: 0, blockedItems: [] };
+    var p = sp2pts[r.member] || { committed: 0, done: 0 };
+    var pri = priMap[r.member] || { H: 0, M: 0, L: 0 };
+    var nameLabel = isTeamCtx ? r.member : r.member.replace(' Team', '');
     tableHtml +=
       '<tr>' +
         '<td class="tteam-td-name">' +
-          (isTeamCtx ? EAP.avatar(r.member, 24) + '<span>' + r.member + '</span>' : '<span>' + r.member + '</span>') +
+          (isTeamCtx ? EAP.avatar(r.member, 24) : '') +
+          '<div class="tteam-td-namestack">' +
+            '<span class="tteam-td-nameprimary">' + nameLabel + '</span>' +
+            '<span class="tteam-td-namesub">' + r.role + '</span>' +
+          '</div>' +
         '</td>' +
-        '<td class="tteam-td-role">' + r.role + '</td>' +
-        '<td class="tteam-td-num">' + r.completed + '<span class="tteam-td-total"> / ' + r.totalTasks + '</span></td>' +
-        '<td class="tteam-td-num">' + r.utilHrs + ' hrs</td>' +
-        '<td class="tteam-td-pct" style="color:' + pctColor + '">' + r.completionPct + '%</td>' +
-        '<td class="tteam-td-num">' + r.pending + '</td>' +
-        '<td>' + qualityBadge(r.quality) + '</td>' +
+        '<td>' + capBarCell(r._capPct) + '</td>' +
+        '<td>' + sprintPtsCell(p) + '</td>' +
+        '<td>' + priorityCell(pri) + '</td>' +
+        '<td class="tteam-td-num" style="color:#383733">' + (e.story > 0 ? e.story : '<span style="color:#BBBBB7">—</span>') + '</td>' +
+        '<td class="tteam-td-num" style="color:#D97706">' + (e.defect > 0 ? e.defect : '<span style="color:#BBBBB7">—</span>') + '</td>' +
+        '<td class="tteam-td-num" style="color:#797874">' + (e.task > 0 ? e.task : '<span style="color:#BBBBB7">—</span>') + '</td>' +
+        '<td>' + signalsCell(e) + '</td>' +
       '</tr>';
   });
   tableHtml += '</tbody></table></div>';
 
-  return '<div class="tteam-view">' + chartHtml + tableHtml + '</div>';
+  var topRow = '<div class="tteam-top-row">' + chartHtml + renderVelocityPanel(rows, isTeamCtx) + '</div>';
+  var compPanel = renderSprintComparisonPanel();
+  return '<div class="tteam-view">' + tilesHtml + topRow + compPanel + tableHtml + '</div>';
 }
 
 // ── Main render ───────────────────────────────────────
@@ -328,3 +751,273 @@ EAP.renderTrack = function() {
   return h;
 };
 
+
+// ── D3 sparkline init — called post-render (setTimeout in render.js) ──
+EAP.initWorkloadSparklines = function() {
+  var targets = document.querySelectorAll('.vel-spark-target');
+  if (!targets.length || typeof d3 === 'undefined') return;
+
+  var tip = document.getElementById('vel-spark-tip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'vel-spark-tip';
+    tip.className = 'vel-spark-tip';
+    document.body.appendChild(tip);
+  }
+
+  targets.forEach(function(el) {
+    var raw = el.getAttribute('data-values');
+    if (!raw) return;
+    var values;
+    try { values = JSON.parse(raw); } catch(err) { return; }
+    if (!values || values.length < 2) return;
+
+    var W = Math.max(80, Math.round(el.getBoundingClientRect().width) || 120);
+    var H = 28, px = 3, py = 4;
+    var yMin = d3.min(values), yMax = d3.max(values);
+    var yPad = (yMax - yMin) * 0.2 || 1;
+    var xSc = d3.scaleLinear().domain([0, values.length - 1]).range([px, W - px]);
+    var ySc = d3.scaleLinear().domain([yMin - yPad, yMax + yPad]).range([H - py, py]);
+    var delta = values[values.length - 1] - values[0];
+    var stroke = delta > 1 ? '#16A34A' : delta < -1 ? '#DC2626' : '#585753';
+
+    var line = d3.line()
+      .x(function(d, i) { return xSc(i); })
+      .y(function(d) { return ySc(d); })
+      .curve(d3.curveMonotoneX);
+
+    var area = d3.area()
+      .x(function(d, i) { return xSc(i); })
+      .y0(H - py).y1(function(d) { return ySc(d); })
+      .curve(d3.curveMonotoneX);
+
+    var svg = d3.select(el).append('svg')
+      .attr('width', W).attr('height', H)
+      .style('overflow', 'visible').style('display', 'block');
+
+    svg.append('path').datum(values)
+      .attr('fill', stroke).attr('opacity', 0.08).attr('d', area);
+
+    svg.append('path').datum(values)
+      .attr('fill', 'none').attr('stroke', stroke)
+      .attr('stroke-width', 1.5).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round')
+      .attr('d', line);
+
+    // Last-point dot
+    svg.append('circle')
+      .attr('cx', xSc(values.length - 1)).attr('cy', ySc(values[values.length - 1]))
+      .attr('r', 2.5).attr('fill', stroke);
+
+    // Hover overlay — shows sprint label + value
+    svg.append('rect')
+      .attr('width', W).attr('height', H).attr('fill', 'transparent').style('cursor', 'crosshair')
+      .on('mousemove', function(event) {
+        var mx = d3.pointer(event)[0];
+        var idx = Math.round((mx - px) / (W - px * 2) * (values.length - 1));
+        idx = Math.max(0, Math.min(values.length - 1, idx));
+        var lbl = VEL_SPRINT_LABELS[idx] || ('Sprint ' + (idx + 1));
+        tip.innerHTML = '<span class="vel-tip-label">' + lbl + '</span><span class="vel-tip-val">' + values[idx] + ' sp</span>';
+        tip.style.opacity = '1';
+        tip.style.left = (event.pageX + 12) + 'px';
+        tip.style.top = (event.pageY - 36) + 'px';
+      })
+      .on('mouseleave', function() { tip.style.opacity = '0'; });
+  });
+
+  // Wire blocked badge hover popup
+  var blkPop = document.getElementById('tteam-blk-popup');
+  if (!blkPop) {
+    blkPop = document.createElement('div');
+    blkPop.id = 'tteam-blk-popup';
+    blkPop.className = 'tteam-blocked-popup';
+    document.body.appendChild(blkPop);
+  }
+  document.querySelectorAll('.tteam-blocked-badge').forEach(function(badge) {
+    badge.style.cursor = 'help';
+    badge.addEventListener('mouseenter', function(evt) {
+      var raw = badge.getAttribute('data-blocked-names') || '';
+      var items = raw ? raw.split('||').filter(Boolean) : [];
+      if (!items.length) return;
+      var inner = '<div class="tteam-blk-pop-title">' + items.length + ' blocked item' + (items.length > 1 ? 's' : '') + '</div>';
+      items.forEach(function(name) {
+        inner += '<div class="tteam-blk-pop-item"><span class="tteam-blk-pop-dot"></span>' + name + '</div>';
+      });
+      blkPop.innerHTML = inner;
+      blkPop.style.opacity = '1';
+      var r = badge.getBoundingClientRect();
+      blkPop.style.left = Math.min(r.left, window.innerWidth - 340) + 'px';
+      blkPop.style.top = (r.bottom + 6) + 'px';
+    });
+    badge.addEventListener('mouseleave', function() { blkPop.style.opacity = '0'; });
+  });
+};
+
+// ── Sprint comparison D3 chart — grouped bars per sprint ──────────────────────
+// Two bars per sprint: left=committed (charcoal base + amber added scope on top),
+// right=completed (green) + not-done (light grey). Active sprint: dashed outline.
+EAP.initSprintComparisonChart = function() {
+  var container = document.getElementById('tteam-sprint-comp-svg');
+  if (!container || typeof d3 === 'undefined' || !EAP.sprintHistory) return;
+  d3.select(container).selectAll('*').remove();
+
+  var data = EAP.sprintHistory;
+  var W = Math.max(container.getBoundingClientRect().width || 0, 300);
+  var H = 158;
+  var margin = { top: 8, right: 42, bottom: 36, left: 8 };
+  var iW = W - margin.left - margin.right;
+  var iH = H - margin.top - margin.bottom;
+
+  var sprintNames = data.map(function(d) { return d.name; });
+  var maxY = d3.max(data, function(d) { return d.initial + d.added; });
+  maxY = Math.ceil(maxY * 1.12 / 20) * 20;
+
+  var x0 = d3.scaleBand().domain(sprintNames).range([0, iW]).paddingInner(0.28).paddingOuter(0.08);
+  var x1 = d3.scaleBand().domain(['commit', 'complete']).range([0, x0.bandwidth()]).padding(0.06);
+  var y = d3.scaleLinear().domain([0, maxY]).range([iH, 0]);
+
+  var svg = d3.select(container).append('svg')
+    .attr('width', W).attr('height', H).style('display', 'block');
+  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+  // Gridlines + Y labels
+  var yTicks = y.ticks(4);
+  yTicks.forEach(function(tick) {
+    g.append('line')
+      .attr('x1', 0).attr('x2', iW).attr('y1', y(tick)).attr('y2', y(tick))
+      .attr('stroke', 'rgba(0,0,0,0.05)').attr('stroke-width', 1);
+    g.append('text')
+      .attr('x', iW + 5).attr('y', y(tick) + 3.5)
+      .attr('font-size', '9').attr('fill', '#BBBBB7').attr('font-family', 'var(--font-sans)')
+      .text(tick);
+  });
+
+  var sprintG = g.selectAll('.sc-sp')
+    .data(data).join('g').attr('class', 'sc-sp')
+    .attr('transform', function(d) { return 'translate(' + x0(d.name) + ',0)'; });
+
+  // ── Commitment bar (left): blue base, amber added-scope cap ──
+  // Full colors on all sprints including active — committed is committed.
+  sprintG.append('rect')
+    .attr('x', x1('commit')).attr('width', x1.bandwidth())
+    .attr('y', function(d) { return y(d.initial); })
+    .attr('height', function(d) { return iH - y(d.initial); })
+    .attr('fill', '#2563EB')
+    .attr('rx', 2);
+
+  sprintG.filter(function(d) { return d.added > 0; }).append('rect')
+    .attr('x', x1('commit')).attr('width', x1.bandwidth())
+    .attr('y', function(d) { return y(d.initial + d.added); })
+    .attr('height', function(d) { return y(d.initial) - y(d.initial + d.added); })
+    .attr('fill', '#F59E0B')
+    .attr('rx', 2);
+
+  // ── Completion bar (right): completed (green) + not-done (light grey on top) ──
+  sprintG.filter(function(d) { return !d.active; }).each(function(d) {
+    var total = d.initial + d.added;
+    d3.select(this).append('rect')
+      .attr('x', x1('complete')).attr('width', x1.bandwidth())
+      .attr('y', y(total)).attr('height', iH - y(total))
+      .attr('fill', '#E1E0DD').attr('rx', 2);
+    d3.select(this).append('rect')
+      .attr('x', x1('complete')).attr('width', x1.bandwidth())
+      .attr('y', y(d.completed)).attr('height', iH - y(d.completed))
+      .attr('fill', '#16A34A').attr('rx', 2);
+  });
+
+  // Active sprint: dashed outline + partial green fill
+  sprintG.filter(function(d) { return d.active; }).each(function(d) {
+    var total = d.initial + d.added;
+    d3.select(this).append('rect')
+      .attr('x', x1('complete')).attr('width', x1.bandwidth())
+      .attr('y', y(total)).attr('height', iH - y(total))
+      .attr('fill', 'none').attr('stroke', '#CCCBC8')
+      .attr('stroke-width', 1).attr('stroke-dasharray', '3,2').attr('rx', 2);
+    if (d.completed > 0) {
+      d3.select(this).append('rect')
+        .attr('x', x1('complete')).attr('width', x1.bandwidth())
+        .attr('y', y(d.completed)).attr('height', iH - y(d.completed))
+        .attr('fill', 'rgba(22,163,74,0.50)').attr('rx', 2);
+    }
+  });
+
+  // Prediction mark on active sprint completion bar — extends beyond bar edges to
+  // distinguish it clearly from the dashed bar border; inline label makes it self-explanatory.
+  sprintG.filter(function(d) { return d.active && d.dayOf && d.totalDays; }).each(function(d) {
+    var projected = Math.round(d.completed / d.dayOf * d.totalDays);
+    var xLeft = x1('complete') - 4;
+    var xRight = x1('complete') + x1.bandwidth() + 4;
+    var yProj = y(projected);
+    d3.select(this).append('line')
+      .attr('x1', xLeft).attr('x2', xRight)
+      .attr('y1', yProj).attr('y2', yProj)
+      .attr('stroke', '#585753').attr('stroke-width', 1.5).attr('stroke-dasharray', '3,2');
+    d3.select(this).append('text')
+      .attr('x', x1('complete') + x1.bandwidth() / 2)
+      .attr('y', yProj - 4)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '8').attr('fill', '#797874')
+      .attr('font-family', 'var(--font-sans)')
+      .text('~' + projected);
+  });
+
+  // Sprint name labels
+  g.selectAll('.sc-lbl').data(data).join('text').attr('class', 'sc-lbl')
+    .attr('x', function(d) { return x0(d.name) + x0.bandwidth() / 2; })
+    .attr('y', iH + 16).attr('text-anchor', 'middle')
+    .attr('font-size', '10')
+    .attr('fill', function(d) { return d.active ? '#383733' : '#797874'; })
+    .attr('font-weight', function(d) { return d.active ? '500' : '400'; })
+    .attr('font-family', 'var(--font-sans)')
+    .text(function(d) { return d.name; });
+
+  // "Active" pill below active sprint label — SVG rect + text for visual weight
+  var pillW = 36, pillH = 14;
+  var pillG = g.selectAll('.sc-pill-g').data(data.filter(function(d) { return d.active; }))
+    .join('g').attr('class', 'sc-pill-g');
+  pillG.append('rect')
+    .attr('x', function(d) { return x0(d.name) + x0.bandwidth() / 2 - pillW / 2; })
+    .attr('y', iH + 20)
+    .attr('width', pillW).attr('height', pillH).attr('rx', 7)
+    .attr('fill', 'rgba(22,163,74,0.10)');
+  pillG.append('text')
+    .attr('x', function(d) { return x0(d.name) + x0.bandwidth() / 2; })
+    .attr('y', iH + 30)
+    .attr('text-anchor', 'middle')
+    .attr('font-size', '9').attr('fill', '#15803D').attr('font-weight', '500')
+    .attr('font-family', 'var(--font-sans)')
+    .text('Active');
+
+  // Hover tooltip (reuse vel-spark-tip style)
+  var tip = document.getElementById('tteam-sc-tip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'tteam-sc-tip';
+    tip.className = 'vel-spark-tip';
+    document.body.appendChild(tip);
+  }
+
+  sprintG.append('rect')
+    .attr('x', 0).attr('y', 0)
+    .attr('width', x0.bandwidth()).attr('height', iH)
+    .attr('fill', 'transparent').style('cursor', 'default')
+    .on('mousemove', function(event, d) {
+      var total = d.initial + d.added;
+      var pct = total > 0 ? Math.round(d.completed / total * 100) : 0;
+      var statusStr = d.active ? '~' + pct + '% in progress' : pct + '% completed';
+      var html = '<span class="vel-tip-label">' + d.name + (d.active ? ' · Active' : '') + '</span>';
+      html += '<span class="vel-tip-val">' + d.initial + ' pts committed</span>';
+      if (d.added > 0) html += '<span class="vel-tip-val" style="color:#F59E0B">+' + d.added + ' added scope</span>';
+      html += '<span class="vel-tip-val" style="color:' + (d.active ? 'rgba(22,163,74,0.85)' : '#16A34A') + '">' +
+        d.completed + ' pts done · ' + statusStr + '</span>';
+      if (d.active && d.dayOf && d.totalDays) {
+        var proj = Math.round(d.completed / d.dayOf * d.totalDays);
+        html += '<span class="vel-tip-val" style="color:#BBBBB7">~' + proj + ' pts projected at current rate</span>';
+      }
+      if (!d.active && d.notDone > 0) html += '<span class="vel-tip-val" style="color:#BBBBB7">' + d.notDone + ' pts carried</span>';
+      tip.innerHTML = html;
+      tip.style.opacity = '1';
+      tip.style.left = (event.pageX + 12) + 'px';
+      tip.style.top = (event.pageY - 80) + 'px';
+    })
+    .on('mouseleave', function() { tip.style.opacity = '0'; });
+};

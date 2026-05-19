@@ -29,7 +29,7 @@ EAP.openContextDropdown = function(anchor) {
   dd.style.cssText = 'position:fixed;top:' + (rect.bottom + 4) + 'px;left:' + rect.left + 'px;width:300px;background:#FFFFFF;border:1px solid #CCCBC8;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.10),0 1px 4px rgba(0,0,0,0.06);z-index:600;overflow:hidden;animation:ddFadeIn 150ms ease;';
 
   var html = '<div style="padding:10px;border-bottom:1px solid rgba(0,0,0,0.06);">' +
-    '<input type="text" id="ctx-search" placeholder="Search structure…" style="width:100%;padding:6px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;font-size:12px;outline:none;font-family:var(--font-sans);background:rgba(255,255,255,0.7);box-sizing:border-box;" autocomplete="off"/></div>' +
+    '<input type="text" id="ctx-search" placeholder="Search teams, ARTs…" style="width:100%;padding:6px 10px;border:1px solid rgba(0,0,0,0.1);border-radius:8px;font-size:12px;outline:none;font-family:var(--font-sans);background:rgba(255,255,255,0.7);box-sizing:border-box;" autocomplete="off"/></div>' +
     '<div id="ctx-tree" style="max-height:280px;overflow-y:auto;padding:6px 0;">' + EAP.buildContextTree('') + '</div>';
 
   dd.innerHTML = html;
@@ -626,6 +626,35 @@ EAP.initInteractions = function() {
   EAP.initContextSelector();
   EAP.initSplitResize();
   EAP.initSearch();
+};
+
+// ── Tab Slider ────────────────────────────────────────
+// Positions an absolutely-placed pill inside .tab-group. When fromRect is
+// supplied (the previous active tab's rect), the slider starts there and
+// transitions to the current active tab — giving the appearance of sliding.
+EAP.initTabSlider = function(fromRect) {
+  var group = document.querySelector('.tab-group');
+  if (!group) return;
+  var active = group.querySelector('.tab-item.active');
+  if (!active) return;
+
+  var slider = document.createElement('div');
+  slider.className = 'tab-slider';
+  group.insertBefore(slider, group.firstChild);
+
+  var gr = group.getBoundingClientRect();
+  var ar = active.getBoundingClientRect();
+  var toLeft  = ar.left  - gr.left;
+  var toWidth = ar.width;
+
+  if (fromRect && (Math.abs(fromRect.left - toLeft) > 2 || Math.abs(fromRect.width - toWidth) > 2)) {
+    // Teleport to old position (no transition), then animate to new
+    slider.style.cssText = 'transition:none;left:' + fromRect.left + 'px;width:' + fromRect.width + 'px;';
+    slider.offsetWidth; // force reflow
+    slider.style.cssText = 'left:' + toLeft + 'px;width:' + toWidth + 'px;';
+  } else {
+    slider.style.cssText = 'transition:none;left:' + toLeft + 'px;width:' + toWidth + 'px;';
+  }
 };
 
 // ── Hook into render cycle ─────────────────────────────

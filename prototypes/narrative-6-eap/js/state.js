@@ -557,6 +557,13 @@ EAP.getInsights = function() {
   var result = {};
   for (var k in data) result[k] = data[k];
 
+  // Inject per-team burndown for board/taskboard when viewing a specific team.
+  // Overrides the generic team-WorkItem-taskboard panelChart with team-specific data.
+  if (s.context === 'team' && result.panelChart && EAP.teamBurndown && EAP.getTeamKey) {
+    var _tk = EAP.getTeamKey(s.contextId);
+    if (_tk && EAP.teamBurndown[_tk]) result.panelChart = EAP.teamBurndown[_tk];
+  }
+
   // Gauge/predict only on views that have them (Planning, Board)
   var showGauge = (s.context === 'art' && (s.tab === 'planning' || s.tab === 'board'));
   if (!showGauge) { delete result.gauge; delete result.predict; }

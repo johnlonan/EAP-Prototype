@@ -128,19 +128,26 @@ EAP.renderInsights = function() {
     h += '</div>';
   }
 
-  // ── Velocity trend chart — team context + planning tab only (data is team-scale) ──
-  if (s.tab === 'planning' && s.context === 'team' && EAP.velocityHistory && EAP.velocityStats) {
-    var vs = EAP.velocityStats;
-    var velPartial = EAP.velocityHistory.filter(function(sp) { return sp.partial; })[0];
-    var velGap = velPartial ? (vs.avg - velPartial.pts) : 0;
-    var velBadge = velGap > 0
-      ? '<span class="ins-vel-badge ins-vel-badge-warn">Below avg</span>'
-      : '<span class="ins-vel-badge ins-vel-badge-ok">On track</span>';
-    h += '<div class="ins-velocity">' +
-      '<div class="ins-sec-lbl ins-sec-lbl-split">Sprint Velocity' + velBadge + '</div>' +
-      '<div class="ins-vel-chart"><svg id="velocitySvg" class="ins-vel-svg"></svg></div>' +
-      '<div class="ins-vel-meta">Avg&nbsp;<strong>' + vs.avg + '</strong>&nbsp;pts&nbsp;·&nbsp;Range&nbsp;' + vs.low + '–' + vs.high + '</div>' +
-      '</div>';
+  // ── Velocity trend chart — team context + planning tab only ──
+  if (s.tab === 'planning' && s.context === 'team') {
+    var _velKey = EAP.getTeamKey && EAP.getTeamKey(s.contextId);
+    var _tvd    = _velKey && EAP.teamVelocity && EAP.teamVelocity[_velKey];
+    var _velH   = _tvd ? _tvd.history : EAP.velocityHistory;
+    var vs      = _tvd ? _tvd.stats   : EAP.velocityStats;
+    if (_velH && vs) {
+      var velPartial = _velH.filter(function(sp) { return sp.partial; })[0];
+      var velGap = velPartial ? (vs.avg - velPartial.pts) : 0;
+      var velBadge = velGap > 0
+        ? '<span class="ins-vel-badge ins-vel-badge-warn">Below avg</span>'
+        : '<span class="ins-vel-badge ins-vel-badge-ok">On track</span>';
+      var velCtxName = s.contextName ? s.contextName.replace(/\s*Team$/, '') : '';
+      var velTitle = velCtxName ? velCtxName + ' · Sprint Velocity' : 'Sprint Velocity';
+      h += '<div class="ins-velocity">' +
+        '<div class="ins-sec-lbl ins-sec-lbl-split">' + velTitle + velBadge + '</div>' +
+        '<div class="ins-vel-chart"><svg id="velocitySvg" class="ins-vel-svg"></svg></div>' +
+        '<div class="ins-vel-meta">Avg&nbsp;<strong>' + vs.avg + '</strong>&nbsp;pts&nbsp;·&nbsp;Range&nbsp;' + vs.low + '–' + vs.high + '</div>' +
+        '</div>';
+    }
   }
 
   // ── Monte Carlo delivery forecast — Planning tab (team + art) ──
@@ -234,7 +241,7 @@ EAP.renderInsights = function() {
       var wipRevLimit = (EAP.wipLimits && EAP.wipLimits['In Review']) || 4;
       var reviewPct = Math.min(100, Math.round(inRevCount / wipRevLimit * 100));
       var reviewColor = reviewPct >= 100 ? 'var(--dv-error)' : reviewPct >= 75 ? 'var(--dv-warning)' : 'var(--color-primary)';
-      h += '<div class="ins-metrics-section"><div class="ins-sec-lbl">At a glance</div>';
+      h += '<div class="ins-metrics-section"><div class="ins-sec-lbl">This sprint</div>';
       h += '<div class="ins-metrics">' +
         '<div class="ins-metric"><div class="ins-metric-val">' + remaining + '</div><div class="ins-metric-lbl">Pts left</div>' +
         '<div class="ins-metric-bar"><div class="ins-metric-fill" style="width:' + Math.round(sp.donePts / sp.totalPts * 100) + '%;background:var(--color-primary);"></div></div></div>' +
@@ -257,7 +264,7 @@ EAP.renderInsights = function() {
       var wipOver = mw.inProgress > mw.wipLimit;
 
       h += '<div class="ins-member">' +
-        '<div class="ins-sec-lbl">Member focus</div>' +
+        '<div class="ins-sec-lbl">Team workload</div>' +
         '<div class="ins-member-hd">' + EAP.avatar(s.trackMember, 24) + '<div class="ins-member-info"><span class="ins-member-name">' + pName + '</span><span class="ins-member-role">Sprint workload</span></div></div>';
 
       h += '<div class="ins-member-stats">' +
@@ -619,7 +626,7 @@ function renderSignal(s, id) {
     agingHtml = '<span class="ins-sig-age" style="color:' + agingColor + ';">' + s.agingDays + 'd</span>';
   }
   h += '<div class="ins-sig-actions">' + agingHtml +
-    '<button class="ins-sig-act" title="Snooze" data-sig-snooze="' + sigId + '">' + EAP.icon('clock', 11) + '</button>' +
+    '<button class="ins-sig-act" title="Snooze for 24h" data-sig-snooze="' + sigId + '">' + EAP.icon('clock', 11) + '</button>' +
     '<button class="ins-sig-act" title="Dismiss" data-sig-dismiss="' + sigId + '">' + EAP.icon('x', 11) + '</button>' +
     '<button class="ins-sig-act ins-sig-act-override" title="Mark as reviewed" data-sig-override="' + sigId + '">' + EAP.icon('check-square', 11) + '</button>' +
     '</div>';
@@ -917,7 +924,11 @@ EAP.drawFlowDist = function(fd) {
 // ── Velocity trend — D3 annotated area chart ─────────
 EAP.drawVelocityD3 = function() {
   if (typeof d3 === 'undefined') return;
-  var vh = EAP.velocityHistory, vs = EAP.velocityStats;
+  var _s   = EAP.state;
+  var _tk  = EAP.getTeamKey && EAP.getTeamKey(_s.contextId);
+  var _tvd = _tk && EAP.teamVelocity && EAP.teamVelocity[_tk];
+  var vh   = _tvd ? _tvd.history : EAP.velocityHistory;
+  var vs   = _tvd ? _tvd.stats   : EAP.velocityStats;
   if (!vh || !vs) return;
   var container = document.querySelector('.ins-vel-chart');
   if (!container) return;

@@ -382,15 +382,23 @@ body { background: #F1F0ED !important; }
 }
 .pi-acc:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04) !important; }
 
-/* ── Panel headers → no fill ── */
-.gpanel-hd,
-.pi-hd:not(.active) {
+/* ── Panel headers ── */
+/* gpanel-hd (Backlog header etc.) — no fill, blends into white card */
+.gpanel-hd {
   background: transparent !important;
   box-shadow: none !important;
+  border-bottom: none !important;
 }
-.gpanel-hd { border-bottom: none !important; }
+/* Collapsed sprint/PI accordion headers — white at rest, shadow on hover */
+.pi-hd:not(.active) {
+  background: #FFFFFF !important;
+  box-shadow: none !important;
+}
 .pi-acc:has(.pi-body.open) .pi-hd:not(.active) { border-bottom: 1px solid #E3E2DF !important; }
-.pi-hd:not(.active):hover { background: #F1F0ED !important; }
+.pi-hd:not(.active):hover {
+  background: #FFFFFF !important;
+  box-shadow: inset 0 1px 0 rgba(56,55,51,0.07), inset 0 -1px 0 rgba(56,55,51,0.05) !important;
+}
 
 /* ── Insights header → no fill ── */
 .ins-hdr { background: transparent !important; box-shadow: none !important; border-bottom: none !important; }
@@ -416,3 +424,49 @@ body { background: #F1F0ED !important; }
 .ai-content:hover {
   background-image: linear-gradient(90deg, transparent 0%, rgba(22,163,74,0.05) 50%, transparent 100%) !important;
 }
+
+
+/* DELIGHT START — Micro-interactions + precision moments ════════════
+   Goal: tactile feedback, smooth state transitions, earned satisfaction.
+   Sliding tab indicator. Content fade on switch. Press feedback on all
+   interactive controls.
+   Reverse: delete from DELIGHT START to DELIGHT END.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* ── Sliding tab indicator ──
+   A pill that translates between tabs instead of snapping. JS injects
+   .tab-slider as first child of .tab-group and animates left + width.
+   Active tab background becomes transparent — the slider is the bg. */
+.tab-group { position: relative !important; }
+.tab-item   { position: relative; z-index: 1; }
+.tab-item.active { background: transparent !important; }
+.tab-slider {
+  position: absolute;
+  top: 0; bottom: 0;
+  border-radius: 12px;
+  background: #343331;
+  pointer-events: none;
+  z-index: 0;
+  transition: left 220ms cubic-bezier(0.22, 1, 0.36, 1),
+              width 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Content area enter transition ──
+   JS adds .tab-enter after innerHTML is set; removed + re-added each
+   render to re-trigger. 140ms ease-out-expo matches tab animation. */
+@keyframes tabContentEnter {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: none; }
+}
+.content-area.tab-enter {
+  animation: tabContentEnter 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Button press tactile feedback ── */
+.btn-primary:active    { transform: scale(0.97) !important; transition-duration: 70ms !important; }
+.btn-secondary:active  { transform: scale(0.97) !important; transition-duration: 70ms !important; }
+.fbar-chip:active      { transform: scale(0.95) !important; transition-duration: 70ms !important; }
+.fbar-vtog:active      { transform: scale(0.95) !important; transition-duration: 70ms !important; }
+.fbar-filter-btn:active { transform: scale(0.95) !important; transition-duration: 70ms !important; }
+
+/* DELIGHT END ════════════════════════════════════════════════════════ */

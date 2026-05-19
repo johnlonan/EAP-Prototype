@@ -36,6 +36,28 @@ function dpFind(id) {
   return item;
 }
 
+// ── Sprint lookup helper ──────────────────────────────
+function dpFindSprint(id) {
+  var found = null;
+  (EAP.workItems.sprints || []).forEach(function(sp) {
+    (sp.items || []).forEach(function(wi) { if (wi.id === id) found = sp; });
+  });
+  return found;
+}
+
+// ── Blocker callout ───────────────────────────────────
+function dpRenderBlocker(item) {
+  if (!item.blocked && !item.blockReason) return '';
+  var reason = item.blockReason || 'This item is blocked.';
+  return '<div class="dp-blocker">' +
+    '<span class="dp-blocker-icon">' + EAP.icon('alert-triangle', 14) + '</span>' +
+    '<div class="dp-blocker-body">' +
+      '<span class="dp-blocker-label">Blocked</span>' +
+      '<p class="dp-blocker-reason">' + reason + '</p>' +
+    '</div>' +
+  '</div>';
+}
+
 // ── Static placeholder content ────────────────────────
 var DP_DESC = {
   Epic: 'This epic encompasses a strategic initiative spanning multiple PIs. It defines the high-level business outcome and is broken down into capabilities and features for execution by the ART.',
@@ -164,7 +186,11 @@ function dpRender(item) {
   if (item.num) h += '<span class="dp-num">' + item.num + '</span>';
   h += '<h2 class="dp-title">' + item.name + '</h2>';
   h += '<div class="dp-state">' + EAP.pill(item.state) + '</div>';
+  if (item.carriedOver) h += '<div class="dp-carryover">' + EAP.icon('rotate-ccw', 11) + ' Carried over</div>';
   h += '</div>';
+
+  // Blocker callout (shown prominently between header and fields)
+  h += dpRenderBlocker(item);
 
   // Fields grid
   h += '<div class="dp-fields">';
@@ -179,6 +205,10 @@ function dpRender(item) {
   if (item.art) fields.push({ label: 'ART', value: item.art });
   if (item.st) fields.push({ label: 'Solution Train', value: item.st });
   if (goalName) fields.push({ label: 'Primary Goal', value: goalName });
+  var sprintCtx = dpFindSprint(item.id);
+  if (sprintCtx) fields.push({ label: 'Sprint', value: sprintCtx.name + (sprintCtx.active ? ' <span class="dp-sprint-active">Active</span>' : '') });
+  if (item.openDefects) fields.push({ label: 'Open Defects', value: '<span style="font-family:var(--font-mono);color:#DC2626;">' + item.openDefects + '</span>' });
+  if (item.atRisk) fields.push({ label: 'Risk', value: '<span class="dp-atrisk-badge">' + EAP.icon('alert-triangle', 11) + ' At risk</span>' });
 
   fields.forEach(function(f) {
     h += '<div class="dp-field"><span class="dp-field-label">' + f.label + '</span><span class="dp-field-value">' + f.value + '</span></div>';

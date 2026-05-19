@@ -25,6 +25,16 @@ EAP.renderChrome = function() {
   var el = document.getElementById('chrome-bar');
   if (!el) return;
 
+  // Capture active tab rect before DOM rebuild so slider can animate from it
+  var _sliderFrom = null;
+  var _oldGroup = document.querySelector('.tab-group');
+  var _oldActive = _oldGroup ? _oldGroup.querySelector('.tab-item.active') : null;
+  if (_oldActive) {
+    var _gr = _oldGroup.getBoundingClientRect();
+    var _ar = _oldActive.getBoundingClientRect();
+    _sliderFrom = { left: _ar.left - _gr.left, width: _ar.width };
+  }
+
   el.innerHTML =
     '<div class="chrome-dd-wrap"><span class="chrome-dd-label">Scope</span>' +
       '<div class="art-sel" id="ctx-sel-btn"><span class="art-sel-badge">' + tl[s.context] + '</span>' +
@@ -51,6 +61,9 @@ EAP.renderChrome = function() {
     if (si) { si.value = ''; si.focus(); }
     EAP.applySearch('');
   });
+
+  // Animate the tab slider from old position to new
+  if (EAP.initTabSlider) EAP.initTabSlider(_sliderFrom);
 };
 
 // ── Filter Bar ─────────────────────────────────────────
@@ -149,7 +162,7 @@ EAP.renderFilterBar = function() {
   if (s.tab === 'backlog' && s.level === 'Feature') h += '<span class="fbar-vtog" id="pm-map-btn">' + EAP.icon('layout-list', 14) + ' Priority Map</span>';
   if (s.tab === 'taskboard') {
     var tv = s.trackView || 'board';
-    var tvIcon = tv === 'board' ? EAP.icon('columns', 14) : EAP.icon('gauge', 14);
+    var tvIcon = tv === 'board' ? EAP.icon('kanban', 14) : EAP.icon('bar-chart', 14);
     var tvLabel = tv === 'board' ? 'Board' : 'Workload';
     h += '<div class="fbar-tv-wrap" id="track-view-dd">' +
       '<button class="fbar-vtog fbar-tv-trigger" id="track-view-trigger">' +
@@ -157,10 +170,10 @@ EAP.renderFilterBar = function() {
       '</button>' +
       '<div class="fbar-tv-panel" id="track-view-panel">' +
         '<div class="fbar-tv-opt' + (tv === 'board' ? ' active' : '') + '" data-tv="board">' +
-          EAP.icon('columns', 14) + '<span>Board</span>' +
+          EAP.icon('kanban', 14) + '<span>Board</span>' +
         '</div>' +
         '<div class="fbar-tv-opt' + (tv === 'team' ? ' active' : '') + '" data-tv="team">' +
-          EAP.icon('gauge', 14) + '<span>Workload</span>' +
+          EAP.icon('bar-chart', 14) + '<span>Workload</span>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -170,11 +183,11 @@ EAP.renderFilterBar = function() {
     var dv = s.showDeps ? (s.depFilter || 'all') : 'hide';
     var activeClass = s.showDeps ? ' fbar-select-on' : '';
     h += '<select class="fbar-select dep-select' + activeClass + '" id="dep-select" data-prefix="' + EAP.icon('link', 12) + '">' +
-      '<option value="hide"' + (dv === 'hide' ? ' selected' : '') + '>Dependencies: Hide</option>' +
+      '<option value="hide"' + (dv === 'hide' ? ' selected' : '') + '>Dependencies: Off</option>' +
       '<option value="all"' + (dv === 'all' ? ' selected' : '') + '>Dependencies: All</option>' +
-      '<option value="conflict"' + (dv === 'conflict' ? ' selected' : '') + '>Dependencies: Conflicts</option>' +
-      '<option value="risk"' + (dv === 'risk' ? ' selected' : '') + '>Dependencies: Risks</option>' +
-      '<option value="satisfied"' + (dv === 'satisfied' ? ' selected' : '') + '>Dependencies: Satisfied</option>' +
+      '<option value="conflict"' + (dv === 'conflict' ? ' selected' : '') + '>Dependencies: Conflicts only</option>' +
+      '<option value="risk"' + (dv === 'risk' ? ' selected' : '') + '>Dependencies: Risks only</option>' +
+      '<option value="satisfied"' + (dv === 'satisfied' ? ' selected' : '') + '>Dependencies: Satisfied only</option>' +
       '</select>';
   }
   if (s.tab === 'board') h += '<span class="fbar-vtog' + (s.boardDensity === 'compact' ? ' on' : '') + '" id="density-toggle">' + EAP.icon('rows', 14) + ' Compact</span>';
@@ -264,10 +277,23 @@ EAP.renderContent = function() {
   if (s.tab === 'timeline')  h = EAP.renderTimeline();
   if (s.tab === 'board')     h = EAP.renderBoard();
   if (s.tab === 'taskboard') h = EAP.renderTrack();
+  var _isWorkloadView = s.tab === 'taskboard' && (s.trackView || 'board') === 'team';
   if (s.tab === 'hierarchy') h = EAP.renderHierarchy();
   if (s.insightsOpen) h += '<div class="gpanel ins-panel" id="insights-panel"></div>';
 
   el.innerHTML = h;
+
+  // Fade-in on every tab switch
+  el.classList.remove('tab-enter');
+  void el.offsetWidth;
+  el.classList.add('tab-enter');
+
+  if (_isWorkloadView && EAP.initWorkloadSparklines) {
+    setTimeout(function() {
+      EAP.initWorkloadSparklines();
+      if (EAP.initSprintComparisonChart) EAP.initSprintComparisonChart();
+    }, 50);
+  }
 
   // Wire accordions
   el.querySelectorAll('[data-pi-toggle]').forEach(function(hd) {

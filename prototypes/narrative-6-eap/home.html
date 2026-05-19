@@ -56,7 +56,7 @@ body {
   box-shadow: none;
   overflow-y: auto;
   display: flex; flex-direction: column;
-  padding: 0 32px 28px 8px;
+  padding: 0 32px 28px 16px;
 }
 .content-viewport::-webkit-scrollbar { width: 4px; }
 .content-viewport::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
@@ -162,7 +162,7 @@ body {
 .ih-hero-row {
   display: grid;
   gap: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 24px;
 }
 .hero-card {
   background: #FFFFFF;
@@ -174,6 +174,11 @@ body {
   gap: 12px;
   position: relative;
   min-height: 280px;
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.hero-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.09), 0 8px 24px rgba(0,0,0,0.07);
+  transform: translateY(-1px);
 }
 .hero-card-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .hero-card-title-block { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -212,7 +217,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 .stat-card {
   background: #FFFFFF;
@@ -228,8 +233,9 @@ body {
   min-height: 240px;
 }
 .stat-card:hover {
-  background: #F1F0ED;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  background: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.09), 0 8px 24px rgba(0,0,0,0.07);
+  transform: translateY(-1px);
 }
 .stat-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .stat-title-block { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -320,7 +326,7 @@ body {
   padding: 16px 16px 14px;
   display: flex; flex-direction: column; gap: 10px;
   min-width: 0;
-  min-height: 540px;
+  min-height: 460px;
 }
 .zone-eyebrow { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.4; padding-top: 2px; }
 .zone.focus .zone-eyebrow    { color: #b91c1c; }
@@ -1325,6 +1331,25 @@ body {
 }
 /* Outcome action link → charcoal */
 .outcome-bar-action { color: #343331; }
+
+/* ── Delight: stat card staggered entry ──
+   hero-card already has card-enter. Stat cards and zone cards join. */
+.stat-card { animation: card-enter 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.stat-card:nth-child(2) { animation-delay: 0.09s; }
+.stat-card:nth-child(3) { animation-delay: 0.18s; }
+.zone { animation: card-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.zone:nth-child(2) { animation-delay: 0.09s; }
+.zone:nth-child(3) { animation-delay: 0.18s; }
+
+/* ── Delight: omnibar focus glow — green bloom matching send button ── */
+.bottom-omni {
+  transition: box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bottom-omni:focus-within {
+  border-color: rgba(22, 163, 74, 0.45);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.10);
+}
 </style>
 </head>
 <body>
@@ -2441,7 +2466,7 @@ body {
     card.innerHTML =
       '<div class="zone-eyebrow">ACTIVITY · 2</div>' +
       '<h2 class="zone-title">What Otto did for you</h2>' +
-      '<div class="zone-sub">Drafts, links and synthesis · pending your review</div>' +
+      '<div class="zone-sub">Drafts, links and summaries, pending your review</div>' +
       '<div class="activity-list">' + rows + '</div>';
 
     card.querySelectorAll('.activity-row[data-tab]').forEach(function(el) {
@@ -3356,6 +3381,26 @@ body {
   renderStandupBrief();
   renderHero();
   renderStats();
+
+  // Animate stat numbers up from 0 on first render
+  (function() {
+    var dur = 650;
+    function ease(t) { return 1 - Math.pow(1 - t, 3); }
+    document.querySelectorAll('.stat-num-big').forEach(function(el) {
+      var tn = el.firstChild;
+      if (!tn || tn.nodeType !== 3) return;
+      var raw = tn.textContent.trim();
+      var target = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+      if (isNaN(target) || target === 0) return;
+      var start = performance.now();
+      (function tick(now) {
+        var t = Math.min((now - start) / dur, 1);
+        tn.textContent = String(Math.round(ease(t) * target));
+        if (t < 1) requestAnimationFrame(tick);
+      })(start);
+    });
+  })();
+
   renderFocus();
   renderActivity();
   renderNext();
