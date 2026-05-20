@@ -9,6 +9,87 @@ var EAP = EAP || {};
 // Column body style (shared constant)
 var TCB = EAP._colBodyStyle;
 
+// ── Traceability ring — four-segment SVG arc ─────────────
+// Segments clockwise from 12 o'clock: PR merged · Tests · DoD · Deploy
+// Each 80° arc with 10° gap. r=5.5, centre (8,8).
+// size param scales the rendered SVG; viewBox stays 0 0 16 16.
+function traceRing(item, size) {
+  size = size || 16;
+  var code   = !!(item.pr && item.pr.status === 'merged');
+  var tests  = !!(item.dod && item.dod.some(function(d) { return d.label === 'Tests written' && d.done; }));
+  var dod    = !!(item.dod && item.dod.every(function(d) { return d.done; }));
+  var deploy = !!(item.env && item.env.status === 'deployed');
+  if (!item.pr && !item.dod) return '';
+  var LIT = '#16A34A', DIM = '#CCCBC8';
+  var arcs = [
+    { d:'M 8,2.5 A 5.5,5.5 0 0 1 13.42,7.04',  lit:code },
+    { d:'M 13.5,8 A 5.5,5.5 0 0 1 8.96,13.42', lit:tests },
+    { d:'M 8,13.5 A 5.5,5.5 0 0 1 2.58,8.96',  lit:dod },
+    { d:'M 2.5,8 A 5.5,5.5 0 0 1 7.04,2.58',   lit:deploy }
+  ];
+  // data-* attrs are read by initTracePopovers for the rich popover
+  var svg = '<svg class="bcard-trace-ring" width="' + size + '" height="' + size + '" viewBox="0 0 16 16"' +
+    ' data-code="' + code + '" data-tests="' + tests + '" data-dod="' + dod + '" data-deploy="' + deploy + '">';
+  arcs.forEach(function(a) {
+    svg += '<path d="' + a.d + '" fill="none" stroke="' + (a.lit ? LIT : DIM) + '" stroke-width="2" stroke-linecap="round"/>';
+  });
+  return svg + '</svg>';
+}
+
+// ── Trace ring rich popover — event-delegated, works on cards + detail panel ──
+EAP.initTracePopovers = function() {
+  if (document.getElementById('trace-pop')) return; // already initialised
+  var pop = document.createElement('div');
+  pop.id = 'trace-pop';
+  document.body.appendChild(pop);
+
+  var ARCS = [
+    { d:'M 8,2.5 A 5.5,5.5 0 0 1 13.42,7.04' },
+    { d:'M 13.5,8 A 5.5,5.5 0 0 1 8.96,13.42' },
+    { d:'M 8,13.5 A 5.5,5.5 0 0 1 2.58,8.96' },
+    { d:'M 2.5,8 A 5.5,5.5 0 0 1 7.04,2.58' }
+  ];
+  var SEGS = ['PR merged', 'Tests written', 'DoD complete', 'Deployed'];
+  var LIT = '#16A34A', DIM = '#CCCBC8';
+
+  document.addEventListener('mouseover', function(e) {
+    var ring = e.target.closest ? e.target.closest('.bcard-trace-ring') : null;
+    if (!ring) return;
+    var vals = [
+      ring.getAttribute('data-code')   === 'true',
+      ring.getAttribute('data-tests')  === 'true',
+      ring.getAttribute('data-dod')    === 'true',
+      ring.getAttribute('data-deploy') === 'true'
+    ];
+    var svgStr = '<svg width="52" height="52" viewBox="0 0 16 16" style="display:block;flex-shrink:0;">';
+    ARCS.forEach(function(a, i) {
+      svgStr += '<path d="' + a.d + '" fill="none" stroke="' + (vals[i] ? LIT : DIM) + '" stroke-width="2" stroke-linecap="round"/>';
+    });
+    svgStr += '</svg>';
+    var segsHtml = SEGS.map(function(lbl, i) {
+      var lit = vals[i];
+      return '<div class="trace-pop-seg">' +
+        '<span class="trace-pop-seg-icon" style="color:' + (lit ? LIT : DIM) + ';">' + (lit ? '✓' : '○') + '</span>' +
+        '<span class="trace-pop-seg-lbl" style="color:' + (lit ? 'var(--text-primary)' : 'var(--text-tertiary)') + ';">' + lbl + '</span>' +
+      '</div>';
+    }).join('');
+    pop.innerHTML =
+      '<div class="trace-pop-hd">Delivery readiness</div>' +
+      '<div class="trace-pop-body">' + svgStr + '<div class="trace-pop-segs">' + segsHtml + '</div></div>';
+    var r = ring.getBoundingClientRect();
+    var left = r.right + 10;
+    if (left + 240 > window.innerWidth) left = r.left - 244;
+    pop.style.left = Math.max(8, left) + 'px';
+    pop.style.top = Math.min(r.top - 8, window.innerHeight - 200) + 'px';
+    pop.classList.add('trace-pop-visible');
+  });
+
+  document.addEventListener('mouseout', function(e) {
+    var ring = e.target.closest ? e.target.closest('.bcard-trace-ring') : null;
+    if (ring) pop.classList.remove('trace-pop-visible');
+  });
+};
+
 // ── Track card renderer (own copy — independent of Board) ──
 function trackCard(item, opts) {
   opts = opts || {};
@@ -30,7 +111,7 @@ function trackCard(item, opts) {
   var t = item.type;
   var isWI = EAP.isWorkItemType(t);
   if (isWI) {
-    var carryTag = item.carriedOver ? '<span class="bcard-carry-tag">↑ Carry-over</span>' : '';
+    var carryTag = item.carriedOver ? '<span class="bcard-carry-tag">Carried over</span>' : '';
     h += '<div class="bcard-tags">' + EAP.typeCell(t) + carryTag + '</div>';
   }
 
@@ -49,11 +130,14 @@ function trackCard(item, opts) {
   if (opts.showTeam && item.team) h += '<span class="bcard-owner">' + item.team + '</span>';
   h += '</div>';
 
-  // PR state — branch + status pill (only when PR data present and item is not blocked)
+  // PR state — CI dot + branch + status pill (only when PR data present and item is not blocked)
   if (item.pr && !isBlocked) {
-    var _prCls = {'open':'bcard-pr-open','in-review':'bcard-pr-in-review','merged':'bcard-pr-merged'};
-    var _prLbl = {'open':'Open','in-review':'In Review','merged':'Merged'};
+    var _prCls = {'draft':'bcard-pr-draft','open':'bcard-pr-open','in-review':'bcard-pr-in-review','merged':'bcard-pr-merged'};
+    var _prLbl = {'draft':'Draft','open':'Open','in-review':'In Review','merged':'Merged'};
+    var _ciTips = { passing:'Build passing — all tests green', failing:'Build failing — needs fixing before merge', running:'Build running — tests in progress' };
+    var _ciDot = item.ci ? '<span class="bcard-pr-ci bcard-ci-' + item.ci.status + '" data-tip="' + (_ciTips[item.ci.status] || 'Build status') + '"></span>' : '';
     h += '<div class="bcard-pr">' +
+      _ciDot +
       '<span class="bcard-pr-branch">' + item.pr.branch + '</span>' +
       '<span class="bcard-pr-pill ' + (_prCls[item.pr.status] || 'bcard-pr-open') + '">' + (_prLbl[item.pr.status] || 'Open') + '</span>' +
     '</div>';
@@ -62,6 +146,17 @@ function trackCard(item, opts) {
   // Progress bar — stays in content area
   if (item.pct > 0 && !isDone) {
     h += '<div class="bcard-progress">' + EAP.pbar(item.pct, item.state) + '</div>';
+  }
+
+  // Quality row — traceability ring left, DoD micro-label right
+  var _ring = traceRing(item);
+  var _dodLabel = '';
+  if (item.dod) {
+    var _dodDone = item.dod.filter(function(d) { return d.done; }).length;
+    if (_dodDone < item.dod.length) _dodLabel = '<span class="bcard-dod-label">DoD ' + _dodDone + '/' + item.dod.length + '</span>';
+  }
+  if (_ring || _dodLabel) {
+    h += '<div class="bcard-quality">' + _ring + _dodLabel + '</div>';
   }
 
   // Footer — avatar left; dep icon + separator (only if has dependency) + chevron right

@@ -15,6 +15,17 @@ function colHd(isActive, height) {
     : 'background:#FFFFFF;border-color:#E3E2DF;color:#000000;box-shadow:0 8px 12px rgba(56,56,56,0.10);');
 }
 
+// ── Feature PR aggregation — rolls up child story PR/CI state ──
+function getFeaturePRSummary(featureName) {
+  var all = [];
+  EAP.workItems.sprints.forEach(function(sp) { all = all.concat(sp.items || []); });
+  var children = all.filter(function(i) { return i.parent === featureName && i.pr; });
+  if (!children.length) return null;
+  var merged  = children.filter(function(i) { return i.pr.status === 'merged'; }).length;
+  var failing = children.filter(function(i) { return i.ci && i.ci.status === 'failing'; }).length;
+  return { total: children.length, merged: merged, failing: failing };
+}
+
 // ── Card renderer — shared across all board views ──────
 function renderCard(item, opts) {
   opts = opts || {};
@@ -72,6 +83,18 @@ function renderCard(item, opts) {
   // Progress bar — stays in content area (hidden in compact via CSS)
   if (item.pct > 0 && !isDone) {
     h += '<div class="bcard-progress">' + EAP.pbar(item.pct, item.state) + '</div>';
+  }
+
+  // Feature PR aggregation row — shows child story VCS rollup on Feature cards
+  if (t === 'Feature' && !compact) {
+    var _fpr = getFeaturePRSummary(item.name);
+    if (_fpr) {
+      var _allDone = _fpr.merged === _fpr.total && _fpr.failing === 0;
+      var _aggrTxt = _allDone
+        ? _fpr.total + '/' + _fpr.total + ' code merged · CI passing'
+        : _fpr.merged + '/' + _fpr.total + ' code merged' + (_fpr.failing > 0 ? ' · <span class="bcard-aggr-fail">' + _fpr.failing + ' build' + (_fpr.failing > 1 ? 's' : '') + ' failing</span>' : '');
+      h += '<div class="bcard-aggr' + (_allDone ? ' bcard-aggr-done' : '') + '">' + _aggrTxt + '</div>';
+    }
   }
 
   // Footer — avatar left; dep icon + separator (only if has dependency) + chevron right

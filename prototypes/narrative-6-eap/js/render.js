@@ -294,6 +294,8 @@ EAP.renderContent = function() {
       if (EAP.initSprintComparisonChart) EAP.initSprintComparisonChart();
     }, 50);
   }
+  // Trace ring popover — idempotent, works via event delegation on any tab
+  if (EAP.initTracePopovers) EAP.initTracePopovers();
 
   // Wire accordions
   el.querySelectorAll('[data-pi-toggle]').forEach(function(hd) {

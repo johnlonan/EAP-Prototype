@@ -1,0 +1,371 @@
+{
+  "tool": "GitLab Issues + MRs",
+  "id": "gitlab",
+  "research_date": "2026-05-20",
+
+  "card_surface": {
+    "summary": "GitLab issue board cards are intentionally lightweight and do NOT surface linked merge request, branch, or CI status on the card face by default. The card shows title, issue number, assignee avatars, labels, milestone/iteration, weight, due date, health status (Premium/Ultimate), and a blocked icon when relationships exist. Linked MRs are accessible only by opening the issue.",
+    "what_appears_on_card_face": [
+      "Issue title and reference (e.g. #1234)",
+      "Confidential icon (if confidential)",
+      "Blocked icon (when blocked by another issue) — hover for details",
+      "Labels (coloured pills)",
+      "Assignee avatars (stacked, up to a small limit then '+N')",
+      "Milestone name (since GitLab 16.11)",
+      "Iteration (since GitLab 16.11)",
+      "Weight (numeric)",
+      "Due date",
+      "Health status pill (On track / Needs attention / At risk — Premium/Ultimate)",
+      "Issue type icon (issue, task, incident)"
+    ],
+    "what_does_NOT_appear_on_card_face": [
+      "Linked Merge Request number, status, or icon (long-standing feature request — issue gitlab-foss#27533 — still not implemented as of 2026-05)",
+      "Branch name",
+      "CI/CD pipeline status pill",
+      "Reviewer avatars or approval count",
+      "Draft vs Ready MR state",
+      "Deployment/environment badge"
+    ],
+    "pattern_strength": "Spartan by design — the issue board is a planning surface, not a delivery dashboard. VCS context is intentionally pushed to the issue detail view. A multi-year community request to surface 'related MRs on issue board' (gitlab-foss#27533) remains open.",
+    "epic_board_difference": "Epic boards show child item rollups: number of open/closed work items, total weight, and progress percentage (hover for breakdown). Still no VCS state on the epic card face."
+  },
+
+  "detail_panel": {
+    "summary": "GitLab uses a tabbed detail view on the issue itself — the right sidebar carries metadata, the main column carries description and a 'Linked merge requests' section. The Merge Request page is where the MR widget lives with the dense status surface.",
+    "issue_detail_view_surfaces": {
+      "right_sidebar": [
+        "Assignees",
+        "Reviewers (when applicable)",
+        "Labels",
+        "Milestone",
+        "Iteration",
+        "Due date",
+        "Time tracking",
+        "Weight",
+        "Confidentiality",
+        "Lock discussion",
+        "Notifications",
+        "Health status"
+      ],
+      "main_column_sections": [
+        "Title + issue type",
+        "Description (markdown)",
+        "Child items (tasks/sub-tasks) with progress",
+        "Linked items (blocks/blocked-by/relates-to)",
+        "Linked merge requests panel — lists MRs that auto-close this issue via 'Closes #N', plus mentions",
+        "Activity / Comments stream"
+      ]
+    },
+    "linked_mr_panel_shows": [
+      "MR title with link",
+      "MR state pill (Open / Draft / Merged / Closed)",
+      "MR number",
+      "Source → target branch",
+      "Pipeline status icon (green tick / red cross / blue running)"
+    ],
+    "mr_detail_view_surfaces": {
+      "header_area": [
+        "MR title + reference (!1234)",
+        "State badge (Open / Draft / Merged / Closed)",
+        "Author + 'opened N days ago'",
+        "Branch chips: source-branch → target-branch with copy button",
+        "Pipeline status badge",
+        "Approvals summary"
+      ],
+      "mr_widget_stack_order": [
+        "Pipeline widget — pipeline number, status, jobs summary",
+        "Code Quality widget — degradations introduced",
+        "Test summary widget — JUnit XML diff (new failures, fixed, total)",
+        "Code coverage widget — % and delta vs target branch",
+        "Security scan widgets (SAST, Dependency, Container, Secret detection — Ultimate)",
+        "Approvals widget — required / received / who approved / requested reviewers",
+        "Merge checks block — explicit list of blockers: 'CI must pass', 'Threads must be resolved', 'No blocking reviews', 'Draft must be removed'",
+        "Merge button (green when ready, red when 'Merge with failing pipeline' allowed)",
+        "Deployment / environments widget — which envs the change has reached",
+        "Post-merge pipeline status",
+        "Commits / Pipelines / Changes tabs"
+      ]
+    },
+    "n6_implication": "GitLab's MR widget is the canonical reference for 'dense merge readiness': it concatenates approvals, CI, threads, and policy blockers into an explicit checklist. For N6's detail panel, this argues for a single 'Merge readiness' section that enumerates blockers rather than scattering status across the panel."
+  },
+
+  "state_coupling": {
+    "summary": "GitLab has strong, opinionated native coupling between MR merge events and issue state via the 'Closes' keyword pattern. Coupling is text-driven (description keyword), not relational, and runs only on merge to the default branch.",
+    "auto_close_keywords": [
+      "Close / Closes / Closed / Closing",
+      "Fix / Fixes / Fixed / Fixing",
+      "Resolve / Resolves / Resolved / Resolving",
+      "Implement / Implements / Implemented / Implementing"
+    ],
+    "trigger_conditions": {
+      "trigger": "MR merged (or commit pushed) into the project default branch",
+      "scope": "All issues referenced after a closing keyword in the MR description or commit message are closed",
+      "cross_project": "Supported using full path: 'Closes group/project#123'",
+      "non_default_branch": "Closing keywords do NOT auto-close when MR targets a non-default branch — the issue is linked but not closed"
+    },
+    "validation_changes": "GitLab 17.x change (MR !158395) — auto-close issue list is now re-checked on merge, so issues added to the description after MR creation are still closed on merge.",
+    "additional_couplings": [
+      "Create branch from issue: button on issue page creates branch named '<issue-id>-<slug>' and links it",
+      "Create MR from issue: button creates MR from auto-generated branch, pre-fills 'Closes #N'",
+      "Auto-merge (formerly 'Merge when pipeline succeeds') — MR auto-merges when pipeline passes; renamed to Auto-merge in GitLab 16.0",
+      "Merge trains — Ultimate feature, serialises merges so each is tested against the latest target branch"
+    ],
+    "opt_in_vs_default": "Default behaviour: issue closing on MR merge is automatic if keyword present — no opt-in required. Can be disabled instance-wide by admin via issue_closing_pattern setting. Branch creation from issue is opt-in (user clicks button).",
+    "granularity": "Per-project (issue closing pattern admin-configurable per instance); per-MR (each MR's description controls which issues it closes); per-branch (only default branch merges trigger closure)."
+  },
+
+  "draft_vs_ready_state": {
+    "summary": "GitLab has a first-class Draft state on MRs. Draft MRs are visually distinguished by a 'Draft' prefix in the title and a Draft badge, and they are explicitly blocked from merging until marked ready.",
+    "card_face_treatment": "Not applicable on issue board cards — MR state is not surfaced on issue cards at all.",
+    "mr_list_treatment": "On the MR list view, Draft MRs show a grey 'Draft' badge inline with the title. Filter chips include 'Draft = Yes/No'.",
+    "mr_detail_treatment": "Header shows 'Draft' status badge prominently. Merge button is disabled with explanatory text 'Mark as ready' button available top-right and at the bottom of the description.",
+    "state_transitions": [
+      "Title-based: prefix title with 'Draft:' / '[Draft]' / '(Draft)'",
+      "UI toggle: 'Mark as draft' / 'Mark as ready' button",
+      "Quick action: /draft or /ready in a comment or description",
+      "Toggle 'Mark as draft' checkbox under Title field"
+    ],
+    "merge_blocking": "Draft MRs CANNOT merge — this is a hard block, not a warning, even if all other merge criteria are met.",
+    "notifications": "Marking ready notifies all participants and watchers — explicit hand-off signal.",
+    "auto_close_behaviour": "Draft MRs do not close their referenced issues until merged (and merge is blocked until ready), so the Closes #N coupling only fires after Draft → Ready → Merge."
+  },
+
+  "review_state": {
+    "summary": "Approvals and review state are surfaced richly in the MR widget but not on issue board cards. Approval is treated as a first-class object with required counts, blocking rules, and policy-driven approver groups (Ultimate).",
+    "card_face_treatment": "Not surfaced on issue board cards.",
+    "mr_detail_surfaces": [
+      "Approval widget shows 'N of M approvals' with required count",
+      "Each reviewer's status shown next to their avatar — green check when approved",
+      "Required approvers / approval rules (e.g. 'Backend team — 2 approvers required')",
+      "Blocking reviews surface as a red merge-check item: 'Resolve all reviewer threads' / 'Required approvals missing'",
+      "'Request review' adds a reviewer; reviewer can mark 'Request changes' / 'Approve' / 'Comment'",
+      "Reviewer status updates feed into merge readiness checklist"
+    ],
+    "merge_request_approvals_api": "REST endpoint /merge_requests/:iid/approval_state — surfaces rule-by-rule approval state programmatically.",
+    "policy_layer_ultimate": "Merge request approval policies (Ultimate) — security-scoped rules that can force-add approver groups (e.g. AppSec) when scans detect vulnerabilities.",
+    "detailed_merge_status_field": [
+      "ci_must_pass",
+      "ci_still_running",
+      "approvals_syncing",
+      "discussions_not_resolved",
+      "draft_status",
+      "external_status_checks",
+      "policies_denied",
+      "not_approved"
+    ],
+    "n6_implication": "GitLab's detailed_merge_status enum is the most useful primitive from this tool — it gives a structured, machine-readable list of merge blockers that a card or panel can render as an explicit reasons list. N6 could mirror this with '2 reviewers requested · CI failing · DoD incomplete'."
+  },
+
+  "dod_checklist": {
+    "summary": "GitLab does NOT have a first-class Definition of Done feature for issues. DoD is handled through three weaker mechanisms: markdown task lists in the description, Tasks (child work items, added 2022+), and project-level/handbook documentation.",
+    "first_class_dod": false,
+    "available_mechanisms": [
+      "Markdown task lists ('- [ ] item') in issue description — auto-renders to checkboxes, tracked as completion percentage",
+      "Tasks (child work items) — promoted task list items become first-class tasks with their own assignee, status, weight (Premium for status); rollup progress shown on parent",
+      "Issue templates — projects can ship default templates that include a DoD task list as boilerplate",
+      "Project handbook / .gitlab/ markdown — documented DoD that team manually applies"
+    ],
+    "completion_percentage": "Task list completion shown as 'N of M tasks completed' inline with the description; tasks/child items show aggregated progress on parent epic/issue (e.g. '5 of 8 completed').",
+    "template_support": "Issue templates per issue type. Templates can include task lists or sub-task scaffolds. No DoD template type per se — it is convention only.",
+    "gates_state_transitions": "No — markdown task completion does NOT gate issue close. Issue can be closed with unchecked tasks. MR merge does NOT require parent issue's task list to be complete.",
+    "card_face_treatment": "Task progress (e.g. '3/5') is NOT surfaced on the issue board card face. Progress IS visible on epic board cards (descendant work items count and weight).",
+    "panel_treatment": "Task list rendered inline in description; child tasks listed in 'Child items' section with status, weight, assignee, and aggregated progress %.",
+    "gitlab_internal_dod_docs": "GitLab the company documents a feature-level Definition of Done in their development docs (docs.gitlab.com/development/definition_of_done/) — this is an aspirational standard, not a product feature.",
+    "open_request": "gitlab#31807 — open feature request to add first-class DoD checklist attached to every issue, still open after years.",
+    "n6_implication": "GitLab confirms the broader research finding: no major tool has solved DoD as a first-class structured field. The Tasks child-item pattern is the most credible building block — it gives structure without forcing rigidity. N6 could adopt this: structured child checklist items that roll up on the parent card."
+  },
+
+  "test_linkage": {
+    "summary": "GitLab has best-in-class native test linkage — JUnit XML test reports, code coverage parsing, and security scans are all surfaced in the MR widget as diff against the target branch. No third-party app required for the core cases.",
+    "native_support": true,
+    "report_types_in_mr_widget": [
+      "JUnit XML — Test summary widget shows new failures, newly resolved, total tests, and per-suite breakdown",
+      "Code coverage — Cobertura/JaCoCo, % and delta vs target",
+      "Code coverage visualisation — inline gutters in the Changes tab (red/green per line)",
+      "Code Quality — degradations introduced",
+      "SAST — Static Application Security Testing findings (Ultimate)",
+      "Dependency Scanning — vulnerable deps (Ultimate)",
+      "Container Scanning — image vulnerabilities (Ultimate)",
+      "Secret Detection — leaked credentials",
+      "DAST — Dynamic Application Security Testing (Ultimate)",
+      "License Compliance — disallowed licenses",
+      "Accessibility (a11y) — pa11y report"
+    ],
+    "card_face_treatment": "Not surfaced on issue board cards. CI status icons appear on the MR list and on the MR header.",
+    "panel_treatment": "MR widget stack shows each report as a collapsible section. Failed tests expand to show stack trace; coverage shows % with arrow indicating change.",
+    "ci_pass_fail_vs_test_results": "Distinct. CI pipeline status (pass/fail/running) is a single overall signal; test reports are a second, more granular signal. A pipeline can pass overall while individual test report widgets show degradation (e.g. coverage dropped 0.3%).",
+    "third_party_integrations": "Xray, Zephyr Scale, qTest, TestRail integrations exist for teams that want test management as a separate discipline, but they are not required for GitLab's native pass/fail/coverage display.",
+    "issue_level_linkage": "Test results are anchored to MRs and pipelines, not to issues. The link issue→test is indirect: issue links to MR, MR has test report.",
+    "n6_implication": "GitLab argues for a layered model: a pipeline pass/fail icon on the surface, with test report widgets surfaced only on drill-in. The 'diff vs target' framing (new failures, newly resolved) is far more useful than absolute pass/fail counts and could inspire N6's quality signals."
+  },
+
+  "cicd_status": {
+    "summary": "CI/CD pipeline status is a first-class, prominently surfaced signal on the MR header and MR list. On issue board cards it does NOT appear. GitLab CI is native; external CI providers (Jenkins, etc.) can post status via the External Status Checks API or external pipelines integration.",
+    "providers_supported": [
+      "GitLab CI/CD (native, primary)",
+      "External CI via External Pipelines (Jenkins, CircleCI, GitHub Actions)",
+      "External Status Checks API for arbitrary external systems"
+    ],
+    "card_face_treatment_issue_board": "Not surfaced.",
+    "card_face_treatment_mr_list": "Pipeline status icon shown inline with the MR row — green tick (passed), red cross (failed), blue circle (running), grey (skipped/manual).",
+    "mr_widget_treatment": "Pipeline widget shows pipeline number, status, jobs summary, and links to per-job logs. Below the MR title: pipeline status pill with link.",
+    "visual_treatment": "Icon + colour combination. Specific GitLab pajamas tokens: green-500 passed, red-500 failed, blue-500 running, orange-500 waiting/manual, grey-500 skipped/canceled.",
+    "individual_check_names_shown": "Yes — each job (e.g. 'rspec:unit', 'eslint', 'deploy-staging') is listed with its individual status. Hover/click drills into job logs.",
+    "merge_request_pipelines_vs_branch_pipelines": "GitLab distinguishes merge_request_event pipelines (run on merged-source-into-target ref) from branch pipelines. MR widget shows the MR-event pipeline as the primary signal.",
+    "story_level_risk_signal": "A failing pipeline on a linked MR is NOT propagated to the issue card as a risk signal — this is a notable gap. The only way the issue surfaces CI risk is if a human adds a label or health status.",
+    "post_merge_pipeline": "After merge, the post-merge pipeline (which deploys, runs full suite, etc.) is also shown in the widget — useful for knowing whether the merge actually succeeded in production.",
+    "n6_implication": "GitLab confirms CI status belongs prominently on the MR surface but does NOT appear on the planning surface (issue board). For N6, this is the design split: pipeline icon on the developer-centric task board, omitted from the strategic backlog."
+  },
+
+  "release_tagging": {
+    "summary": "GitLab has a dedicated Release object that ties together a Git tag, milestones, issues, MRs, assets, and release notes. Release assignment to a story is indirect — via Milestone — not via direct field on the issue.",
+    "data_model": {
+      "release_object_fields": [
+        "Tag name (e.g. v1.4.0) — Git tag required",
+        "Release name",
+        "Release notes (markdown)",
+        "Milestones (one or many — Premium supports group milestones)",
+        "Assets (links, binaries)",
+        "Release date",
+        "Evidence (audit snapshot)"
+      ],
+      "issue_to_release_link": "Indirect — issue is assigned to a Milestone; Milestone is associated with a Release. Closing an issue's milestone closes the issue's release association.",
+      "mr_to_release_link": "Same indirect path via Milestone. Release page shows MRs that landed in the release via their merged commits between previous and current tag."
+    },
+    "card_face_treatment": "Milestone name is shown on the issue board card (since GitLab 16.11). Release name is NOT directly shown — only via the milestone path.",
+    "panel_treatment": "Issue detail right sidebar shows Milestone and Iteration. Release page lists all issues whose milestones are tied to it.",
+    "multiple_releases_per_story": "An issue can be assigned to one Milestone at a time (multi-milestone is a long-standing request, gitlab#5135). A Release can have multiple Milestones, so one issue's milestone can contribute to a release; conversely an issue cannot belong to multiple Releases simultaneously through the milestone path.",
+    "release_scope_change_tracking": "Adding/removing a milestone from a release is auditable via release update events. Adding/removing an issue from a milestone is tracked in the issue activity stream.",
+    "iteration_distinction": "Iterations are a separate, time-boxed cadence concept (Premium) — analogous to sprints. Iterations are tracked alongside milestones and are also shown on the issue board card since 16.11.",
+    "deployment_to_environment_distinction": "Release ≠ deployment. A release tag is created at the commit level; environments and deployments track which environment a commit/tag has been deployed to.",
+    "n6_implication": "GitLab models release as a dedicated object (tag + milestones + assets + notes) rather than a tag on the issue. For N6's PI model, this argues for PI-as-container with sprint milestones nested inside, and explicit release objects only at PI close — not a release tag on every story card."
+  },
+
+  "aggregation": {
+    "summary": "GitLab DOES roll up child item progress on parent epics (weight completion %, descendant count) but does NOT roll up any VCS/PR/CI state from child issues' linked MRs to the parent epic or feature card.",
+    "epic_rollup_present": [
+      "Number of open and closed work items",
+      "Total weight (completed and incomplete)",
+      "Progress percentage (% of weight completed)",
+      "Visible on epic board cards: hover the work-items icon, weight icon, or progress icon for breakdown"
+    ],
+    "vcs_state_rollup": "Not implemented. An epic card does NOT show 'N of M child issues have merged MRs' or 'N of M child MRs have passing CI'.",
+    "feature_card_concept": "GitLab does not have a separate 'Feature' work item layer between Epic and Issue. Hierarchy is Epic → Issue → Task. SAFe-style ART/Feature concepts are not native — GitLab markets epics for this purpose.",
+    "available_workaround": "Can be computed via GraphQL: query an epic's child issues, then for each query merge_requests_count and pipeline status on the linked MR. No native UI surface for this.",
+    "what_the_epic_board_does_show_on_cards": [
+      "Epic title and reference",
+      "Description preview",
+      "Labels",
+      "Start date and due date",
+      "Confidential icon",
+      "Work-items icon with hover-rollup of children",
+      "Weight icon with hover-rollup",
+      "Progress icon with hover-rollup percentage"
+    ],
+    "n6_implication": "GitLab confirms the gap: no major tool aggregates VCS/PR state upward to parent epic/feature cards. This is a genuine differentiator opportunity for N6 — a Feature card showing '3 of 5 stories merged · 1 CI failing' would be novel."
+  },
+
+  "environment_deployment_target": {
+    "summary": "GitLab has first-class Environments, Deployments, and an Environments Dashboard. Deployment status is surfaced in the MR widget (after merge) and on a dedicated cross-project Environments Dashboard, but NOT on issue or epic board cards.",
+    "data_model": {
+      "environment": "Logical deploy target (production, staging, review/* dynamic environments). Configured in .gitlab-ci.yml via 'environment:' keyword on a job.",
+      "deployment": "An event when a CI job successfully deploys a commit/ref to an environment. Tracked per environment with history.",
+      "dynamic_environments": "Review apps — ephemeral environments per MR, auto-created/destroyed."
+    },
+    "card_face_treatment_issue_board": "Not surfaced.",
+    "card_face_treatment_mr_list": "Not surfaced directly; environment is implied by the MR's review app link.",
+    "mr_widget_treatment": [
+      "Pre-merge: review app environment link ('View app') if configured",
+      "Post-merge: deployment widget showing which environments the merge has reached and timestamps",
+      "Stop environment button for review apps",
+      "Pipeline jobs with environment annotations (e.g. 'deploy-staging — production')"
+    ],
+    "environments_dashboard": [
+      "Cross-project view, up to 150 projects, 3 environments per project shown",
+      "Each tile: latest commit, pipeline status, deployment time, environment name",
+      "Lets RTE-style users see prod/staging health across the portfolio",
+      "Operations Dashboard companion view with alerts and pipeline status"
+    ],
+    "deployment_to_issue_traceability": "Indirect — issue → MR → deployment. Issue page does not show deployment status of its linked MR's merged commit.",
+    "multiple_environments_simultaneously": "Yes — MR widget can show 'deployed to staging' and 'deployed to production' with timestamps. Environment tabs on the Environments page list every env independently.",
+    "n6_implication": "GitLab has the strongest native deployment model of major tools — review apps + environments dashboard. For N6's RTE persona, this validates surfacing 'In staging' / 'In prod' as story-level signals. The pattern of cross-project rollup is directly relevant to N6's ART/Portfolio views."
+  },
+
+  "traceability_completeness": {
+    "summary": "GitLab does NOT expose a composite traceability indicator. The closest construct is the explicit 'merge checks' list in the MR widget — a structured enumeration of blockers — but it is per-MR and does not roll up to the issue or epic.",
+    "composite_indicator_present": false,
+    "what_GitLab_does_have": [
+      "MR merge checks enumerator: 'CI passed ✓', 'Threads resolved ✓', 'Approvals received ✓', 'Draft removed ✓', 'No blocking external checks ✓' — visible on every MR",
+      "Compliance frameworks (Ultimate) — labels projects with required controls; surfaces compliance violations",
+      "Audit events stream — every state change recorded",
+      "Value Stream Analytics — measures cycle time issue→deploy but is analytics, not per-card indicator"
+    ],
+    "what_GitLab_does_NOT_have": [
+      "A single composite icon/progress ring on an issue card saying 'code ✓ tests ✓ deploy ✓'",
+      "Definition of Done gate on issue close",
+      "Cross-artifact rollup (code + tests + DoD + deploy) at issue level",
+      "Story-level traceability completeness score"
+    ],
+    "gates_state_transitions": "Merge checks gate MR merge (hard block). They do NOT gate issue close — issue can be closed with no MR, no tests, no deploy.",
+    "warning_vs_block": "MR merge checks are hard blocks. Issue close is unconstrained. There is no 'warn but allow' middle state.",
+    "n6_implication": "GitLab's merge_checks pattern is a strong precedent for an explicit reasons-list UI ('blocked because…'). The opportunity gap is unmistakable: no tool surfaces a composite ✓code · ✓tests · ✓DoD · ✓deploy strip on the story card. N6 building this would be a genuine novel pattern."
+  },
+
+  "design_pattern": {
+    "summary": "GitLab's overall pattern is 'planning surface stays clean, delivery surface goes dense'. The issue board card is spartan; the MR widget is information-rich and explicit. State is encoded via icon + colour + label combinations using the Pajamas design system; the closing keyword in markdown is the canonical state-coupling pattern.",
+    "card_type_consistency": {
+      "issue_card": "Title, labels, assignee, milestone, iteration, weight, due date, health status, blocked icon. No VCS.",
+      "epic_card": "Title, labels, dates, work-items icon w/ rollup, weight icon w/ rollup, progress icon w/ percentage. No VCS.",
+      "task_card_child_item": "Title, assignee, weight, status. Inline within parent.",
+      "incident_card": "Same as issue plus severity, escalation policy, on-call notification."
+    },
+    "vcs_state_encoding_on_mr_surfaces": "Icon (shape) for type + colour for status + textual label nearby. Pipeline status is icon+colour; Draft is a text badge; approvals are a count with avatars; merge readiness is an explicit reasons list.",
+    "empty_state_handling": "When no MR exists for an issue, the 'Linked merge requests' section is hidden entirely on the issue page (not shown as empty). When no pipeline exists for an MR, the pipeline widget is hidden. GitLab follows 'absence is silence' rather than 'absence is an empty pill'.",
+    "icon_only_vs_pill_vs_block": "GitLab uses ALL THREE depending on surface: icon-only on the MR list (pipeline tick), full pill on the MR header (Draft, Merged, Open), full block in the MR widget (pipeline, coverage, approvals).",
+    "colour_role": "Colour reserved for state semantics (red=failure/critical, green=passed/approved, blue=running/in-progress, grey=neutral/skipped, orange=pending/manual). The Pajamas design system documents these tokens explicitly.",
+    "consistency_across_card_types": "Issue and epic cards share the same visual vocabulary (labels, weight icon, progress icon). MR list cards use a different vocabulary (pipeline icon, approval count, mergeability). Pajamas enforces consistency within each surface, not across surfaces.",
+    "key_takeaway_for_N6": "GitLab teaches two strong lessons: (1) the planning surface should resist surfacing delivery state — the issue board card has stayed clean for a decade despite community pressure to add MR indicators; (2) when delivery state IS shown (MR widget), it should be EXPLICIT and enumerated, not collapsed into a single ambiguous status. Sand can adopt both: clean story cards, explicit reasons list when expanded."
+  },
+
+  "sources": [
+    {"title": "GitLab Docs — Issue boards", "url": "https://docs.gitlab.com/user/project/issue_board/"},
+    {"title": "GitLab Docs — Merge request widgets", "url": "https://docs.gitlab.com/user/project/merge_requests/widgets/"},
+    {"title": "GitLab Docs — Merge request approvals", "url": "https://docs.gitlab.com/user/project/merge_requests/approvals/"},
+    {"title": "GitLab Docs — Merge request approvals API", "url": "https://docs.gitlab.com/api/merge_request_approvals/"},
+    {"title": "GitLab Docs — Draft merge requests", "url": "https://docs.gitlab.com/user/project/merge_requests/drafts/"},
+    {"title": "GitLab Docs — Auto-merge (formerly Merge when pipeline succeeds)", "url": "https://docs.gitlab.com/user/project/merge_requests/auto_merge/"},
+    {"title": "GitLab Docs — Manage issues (closing pattern)", "url": "https://docs.gitlab.com/user/project/issues/managing_issues/"},
+    {"title": "GitLab Docs — Issue closing pattern (admin)", "url": "https://docs.gitlab.com/administration/issue_closing_pattern/"},
+    {"title": "GitLab Docs — Releases", "url": "https://docs.gitlab.com/user/project/releases/"},
+    {"title": "GitLab Docs — Milestones", "url": "https://docs.gitlab.com/user/project/milestones/"},
+    {"title": "GitLab Docs — Environments", "url": "https://docs.gitlab.com/ci/environments/"},
+    {"title": "GitLab Docs — Environments Dashboard", "url": "https://docs.gitlab.com/ci/environments/environments_dashboard/"},
+    {"title": "GitLab Docs — Operations Dashboard", "url": "https://docs.gitlab.com/user/operations_dashboard/"},
+    {"title": "GitLab Docs — Deployments", "url": "https://docs.gitlab.com/ci/environments/deployments/"},
+    {"title": "GitLab Docs — Unit test reports (JUnit)", "url": "https://docs.gitlab.com/ci/testing/unit_test_reports/"},
+    {"title": "GitLab Docs — Code coverage", "url": "https://docs.gitlab.com/ci/testing/code_coverage/"},
+    {"title": "GitLab Docs — CI/CD artifacts reports types", "url": "https://docs.gitlab.com/ci/yaml/artifacts_reports/"},
+    {"title": "GitLab Docs — Tasks (child work items)", "url": "https://docs.gitlab.com/user/tasks/"},
+    {"title": "GitLab Docs — Work items", "url": "https://docs.gitlab.com/user/work_items/"},
+    {"title": "GitLab Docs — Child items", "url": "https://docs.gitlab.com/user/work_items/child_items/"},
+    {"title": "GitLab Docs — Epics", "url": "https://docs.gitlab.com/user/group/epics/"},
+    {"title": "GitLab Docs — Epic boards", "url": "https://docs.gitlab.com/user/group/epics/epic_boards/"},
+    {"title": "GitLab Docs — Linked issues", "url": "https://docs.gitlab.com/user/project/issues/related_issues/"},
+    {"title": "GitLab Docs — Definition of Done (internal dev standard)", "url": "https://docs.gitlab.com/development/definition_of_done/"},
+    {"title": "GitLab Docs — Merge request approval policies (Ultimate)", "url": "https://docs.gitlab.com/user/application_security/policies/merge_request_approval_policies/"},
+    {"title": "GitLab Docs — Merge trains", "url": "https://docs.gitlab.com/ci/pipelines/merge_trains/"},
+    {"title": "GitLab Issue #27533 — Show related MRs on issue board (long-standing request)", "url": "https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27533"},
+    {"title": "GitLab Issue #31807 — Definition of Done checklist per issue (open feature request)", "url": "https://gitlab.com/gitlab-org/gitlab/-/issues/31807"},
+    {"title": "GitLab MR !158395 — Auto-close issue list re-checked on merge", "url": "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/158395"},
+    {"title": "GitLab Issue #29020 — Associate milestone(s) with a release", "url": "https://gitlab.com/gitlab-org/gitlab/-/issues/29020"},
+    {"title": "GitLab Issue #5135 — Assign issue to more than one milestone", "url": "https://gitlab.com/gitlab-org/gitlab/-/issues/5135"},
+    {"title": "GitLab Handbook — Merge Request Reviews (UX)", "url": "https://handbook.gitlab.com/handbook/product/ux/product-designer/mr-reviews/"},
+    {"title": "Pajamas Design System — Avatar", "url": "https://design.gitlab.com/components/avatar/"}
+  ],
+
+  "uncertain": [
+    "card_surface.pattern_strength",
+    "review_state.detailed_merge_status_field",
+    "design_pattern.colour_role"
+  ]
+}

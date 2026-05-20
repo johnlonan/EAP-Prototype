@@ -169,6 +169,96 @@ function dpRenderSignals(item) {
   '</div>';
 }
 
+// ── Structured PR section ─────────────────────────────
+function dpRenderPR(item) {
+  if (!item.pr) return '';
+  var pr = item.pr;
+  var prColors = { merged:'#16A34A', 'in-review':'#D97706', open:'#2563EB', draft:'#797874' };
+  var prBgs    = { merged:'rgba(22,163,74,0.12)', 'in-review':'rgba(217,119,6,0.12)', open:'rgba(37,99,235,0.12)', draft:'rgba(0,0,0,0.08)' };
+  var prLabels = { merged:'Merged', 'in-review':'In Review', open:'Open', draft:'Draft' };
+  var pc = prColors[pr.status] || prColors.open;
+  var pb = prBgs[pr.status]    || prBgs.open;
+  var pl = prLabels[pr.status] || pr.status;
+  var blockMod = (item.ci && item.ci.status === 'failing') ? 'dp-pr-block-fail'
+    : pr.status === 'merged'    ? 'dp-pr-block-merged'
+    : pr.status === 'in-review' ? 'dp-pr-block-review'
+    : pr.status === 'open'      ? 'dp-pr-block-open' : '';
+  var h = '<div class="dp-section dp-pr-section">' +
+    '<span class="dp-section-label">Pull Request</span>' +
+    '<div class="dp-pr-block' + (blockMod ? ' ' + blockMod : '') + '">';
+
+  // Header: status pill + PR number
+  h += '<div class="dp-pr-head">' +
+    '<span class="dp-pr-pill" style="color:' + pc + ';background:' + pb + ';">' + pl + '</span>' +
+    (pr.number ? '<span class="dp-pr-num">#' + pr.number + '</span>' : '') +
+  '</div>';
+
+  // Detail grid — 2-column CSS grid, labels pinned at exact width
+  h += '<div class="dp-pr-grid">';
+
+  h += '<span class="dp-pr-lbl">Branch</span>' +
+    '<span class="dp-pr-val dp-pr-branch">' + pr.branch + ' → main</span>';
+
+  if (item.ci) {
+    var ciC = { passing:'#16A34A', failing:'#DC2626', running:'#D97706' }[item.ci.status] || '#797874';
+    var ciL = { passing:'Passing', failing:'Failing', running:'Running' }[item.ci.status] || item.ci.status;
+    h += '<span class="dp-pr-lbl">Build</span>' +
+      '<span class="dp-pr-val" style="color:' + ciC + ';">' + ciL + '</span>';
+  }
+
+  if (item.reviewers) {
+    var rv = item.reviewers;
+    var rvTxt = rv.approved + ' of ' + rv.count + ' ' +
+      ({ approved:'approved', 'review-required':'awaiting review', 'changes-requested':'changes requested' }[rv.state] || rv.state);
+    var rvC = rv.state === 'approved' ? '#16A34A' : rv.state === 'changes-requested' ? '#DC2626' : 'var(--text-secondary)';
+    h += '<span class="dp-pr-lbl">Reviewers</span>' +
+      '<span class="dp-pr-val" style="color:' + rvC + ';">' + rvTxt + '</span>';
+  }
+
+  if (item.env) {
+    var envC = { deployed:'#16A34A', pending:'#797874', failed:'#DC2626' }[item.env.status] || '#797874';
+    h += '<span class="dp-pr-lbl">Environment</span>' +
+      '<span class="dp-pr-val"><span class="dp-pr-dot" style="background:' + envC + ';"></span>' +
+      '<span style="color:' + envC + ';">' + item.env.target + '</span></span>';
+  }
+
+  h += '</div>';
+
+  // Blockers callout — full-width, no label column
+  if (pr.status !== 'merged') {
+    var blockers = [];
+    if (item.ci && item.ci.status === 'failing') blockers.push('Build failing');
+    if (item.reviewers && item.reviewers.state === 'review-required') blockers.push('Review pending');
+    if (pr.status === 'draft') blockers.push('Draft — not mergeable');
+    if (blockers.length) {
+      h += '<div class="dp-pr-blockers">' + blockers.join(' · ') + '</div>';
+    }
+  }
+
+  return h + '</div></div>';
+}
+
+// ── DoD checklist section ─────────────────────────────
+function dpRenderDoD(item) {
+  if (!item.dod || !item.dod.length) return '';
+  var done = item.dod.filter(function(d) { return d.done; }).length;
+  var total = item.dod.length;
+  var allDone = done === total;
+  var h = '<div class="dp-section dp-dod-section">' +
+    '<div class="dp-dod-hd">' +
+      '<span class="dp-section-label">Definition of Done</span>' +
+      '<span class="dp-dod-progress"' + (allDone ? ' style="color:#16A34A;"' : '') + '>' + done + '/' + total + '</span>' +
+    '</div>' +
+    '<div class="dp-dod-list dp-dod-list-bg">';
+  item.dod.forEach(function(d) {
+    var icon = d.done
+      ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="rgba(22,163,74,0.18)"/><path d="M3 6l2 2 4-4" stroke="#16A34A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" stroke="#CCCBC8" stroke-width="1"/></svg>';
+    h += '<div class="dp-dod-item"><span class="dp-dod-check">' + icon + '</span><span class="dp-dod-item-label' + (d.done ? ' dp-dod-item-done' : '') + '">' + d.label + '</span></div>';
+  });
+  return h + '</div></div>';
+}
+
 // ── Render panel HTML ─────────────────────────────────
 function dpRender(item) {
   if (!item) return '';
@@ -209,15 +299,6 @@ function dpRender(item) {
   if (sprintCtx) fields.push({ label: 'Sprint', value: sprintCtx.name + (sprintCtx.active ? ' <span class="dp-sprint-active">Active</span>' : '') });
   if (item.openDefects) fields.push({ label: 'Open Defects', value: '<span style="font-family:var(--font-mono);color:#DC2626;">' + item.openDefects + '</span>' });
   if (item.atRisk) fields.push({ label: 'Risk', value: '<span class="dp-atrisk-badge">' + EAP.icon('alert-triangle', 11) + ' At risk</span>' });
-  if (item.pr) {
-    fields.push({ label: 'Branch', value: '<span style="font-family:var(--font-mono);font-size:11px;color:#585753;">' + item.pr.branch + '</span>' });
-    var _prC = {merged:'#16A34A','in-review':'#D97706',open:'#2563EB'};
-    var _prB = {merged:'rgba(22,163,74,0.08)','in-review':'rgba(217,119,6,0.08)',open:'rgba(37,99,235,0.08)'};
-    var _prL = {merged:'Merged','in-review':'In Review',open:'Open'};
-    var _c = _prC[item.pr.status]||_prC.open, _b = _prB[item.pr.status]||_prB.open, _l = _prL[item.pr.status]||_prL.open;
-    var _num = item.pr.number ? ' <span style="color:#797874;font-size:11px;font-family:var(--font-mono);">#'+item.pr.number+'</span>' : '';
-    fields.push({ label: 'Pull Request', value: '<span style="font-size:11px;font-weight:500;color:'+_c+';background:'+_b+';padding:2px 8px;border-radius:10px;">'+_l+'</span>'+_num });
-  }
 
   fields.forEach(function(f) {
     h += '<div class="dp-field"><span class="dp-field-label">' + f.label + '</span><span class="dp-field-value">' + f.value + '</span></div>';
@@ -228,6 +309,12 @@ function dpRender(item) {
   if (item.pct !== undefined && item.pct !== null) {
     h += '<div class="dp-section"><span class="dp-section-label">Progress</span>' + EAP.pbar(item.pct, item.state) + '</div>';
   }
+
+  // Structured PR + DoD sections (appear before dependencies)
+  var prHtml = dpRenderPR(item);
+  if (prHtml) h += prHtml;
+  var dodHtml = dpRenderDoD(item);
+  if (dodHtml) h += dodHtml;
 
   // Dependencies (if any)
   var depsHtml = dpRenderDeps(item);
@@ -285,6 +372,9 @@ EAP.openDetail = function(id) {
   // Wire close
   document.getElementById('dp-close').addEventListener('click', function() { EAP.closeDetail(); });
   document.getElementById('dp-overlay').addEventListener('click', function() { EAP.closeDetail(); });
+
+  // Init trace ring popover (event-delegated, idempotent)
+  if (EAP.initTracePopovers) EAP.initTracePopovers();
 
   // Wire dep rows to re-open detail for the linked item
   document.querySelectorAll('#dp-panel [data-dep-target]').forEach(function(el) {

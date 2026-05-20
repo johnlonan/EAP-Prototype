@@ -1,0 +1,98 @@
+topic: >
+  How PR/VCS state on Feature and Story cards should be shown in agile/EAP tools —
+  covering card surface design, detail panel fields, DoD checklists, test case linkage,
+  CI/CD status, release tagging, draft/review state, environment indicators,
+  and traceability completeness patterns.
+
+context: >
+  Research for ServiceNow AINPX / EAP Sand prototype (N6). The prototype already models
+  workflow state (In Progress, In Review, Done) on story cards. PR/VCS state is being
+  added as a second, orthogonal dimension. Research should inform: what belongs on the
+  card face vs. the detail panel, whether DoD and test linkage belong on the card or
+  panel, and what patterns modern tools use so N6 can match or exceed them.
+
+items:
+  - id: linear
+    name: Linear
+    notes: >
+      Most-cited parity benchmark. GitHub-native PR linking on issues.
+      Single git-icon + colour state on card; structured PR widget in side panel.
+      State coupling configurable per-workflow (PR opened → In Progress; merged → Done).
+
+  - id: jira_github
+    name: "Jira + GitHub/GitLab integration"
+    notes: >
+      Current enterprise standard. Counter-icon pattern on board card face (branch/
+      commit/PR counts); full Development panel in detail view with branches, commits,
+      PRs, builds, deployments as distinct rows. State coupling optional via automation.
+      Separate apps (Smart Checklist, Xray, Zephyr) handle DoD and test linkage.
+
+  - id: azure_devops
+    name: Azure DevOps
+    notes: >
+      Tightest native VCS+PM integration. Multi-control panel (Development, Deployment,
+      Related Work). PR merge can auto-complete the work item. Native Test Plans,
+      Test Cases as first-class work item types. Build/release pipelines surfaced inline.
+
+  - id: gitlab
+    name: "GitLab Issues + MRs"
+    notes: >
+      Native auto-close via "Closes #N" keyword on MR merge. MR widget surfaces CI
+      pipeline status, approvals, merge readiness prominently. Release object ties
+      tags, milestones, issues, and MRs together.
+
+  - id: shortcut
+    name: "Shortcut (formerly Clubhouse)"
+    notes: >
+      Developer-focused PM. Git Helpers puts branch creation inside the card UI (rare).
+      Branch/PR badges on card, state changes card badge colour. VCS event handlers
+      move stories between workflow states automatically.
+
+  - id: github_projects
+    name: "GitHub Projects v2"
+    notes: >
+      PM layer inside GitHub itself. Linked-PR pills with state colour as default
+      fields. Sub-issue progress bar at parent level. 2025 added draft/ready and
+      converted_from_draft events. Field-driven; data-table-first rather than card-first.
+
+  - id: rally
+    name: "Rally / CA Agile Central (Broadcom)"
+    notes: >
+      Enterprise SAFe tool. Changesets and Pull Requests as collection tabs on
+      story/defect. VCS connector is read-only into Rally. Native Test Cases as
+      first-class artifacts with bi-directional story linkage. Native Release object.
+
+  - id: targetprocess
+    name: "Targetprocess (Apptio/IBM)"
+    notes: >
+      SAFe-aligned. Cards can be customised to show a full DevOps block (branch,
+      pipeline state, approval count, mergeability) on the card face — the closest
+      tool to PR state as part of the card design. DevOps tab on each entity.
+      Nearest analog to what N6 is trying to build.
+
+  - id: height
+    name: Height
+    notes: >
+      Dev-tool-first PM; GitHub/GitLab PR status fields surfaced inline on task.
+      CI status pill when available. Note: Height announced service shutdown in 2025;
+      treat as a reference point rather than a live benchmark.
+
+  - id: dod_test_patterns
+    name: "DoD and Test Linkage Patterns (Xray, Zephyr, TestRail, Smart Checklist)"
+    notes: >
+      Cross-tool patterns for Definition of Done checklists and test case linkage.
+      DoD is rarely first-class — implemented via checklist apps, description markdown,
+      or sub-tasks. Xray/Zephyr/TestRail add a Tests tab and coverage badge on Jira.
+      Atlassian native Action Items (2025) is the lightweight DoD alternative.
+
+  - id: plane
+    name: "Plane (open source)"
+    notes: >
+      Newer open-source Linear-style PM with GitHub/GitLab integration. Card surface
+      and detail panel explicitly modelled on Linear. Frequently cited as a design
+      benchmark in open-source discussions. Lower-cost reference for card + panel IA.
+
+execution:
+  batch_size: 4          # run 4 research agents in parallel
+  items_per_agent: 1     # each agent handles 1 item in depth
+  output_dir: ./results

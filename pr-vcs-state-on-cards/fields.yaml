@@ -1,0 +1,166 @@
+# Field definitions for: PR/VCS state on Feature and Story cards
+# Research context: ServiceNow AINPX EAP Sand prototype (N6)
+# Each field is evaluated per tool/pattern in the deep research phase.
+
+fields:
+
+  # ── CARD SURFACE ────────────────────────────────────────────────────────────
+  - name: card_surface
+    description: >
+      What VCS information appears on the card face itself — the compact view visible
+      in board columns, backlog lists, and sprint boards. Distinguish: icon-only,
+      icon+count, branch name, PR status pill, CI badge, or nothing.
+    detail_level: detailed
+    why: >
+      This is the primary design decision for N6 — what survives compression to a
+      220–280px card. The Rams test: does every element on the card face earn its place?
+
+  - name: detail_panel
+    description: >
+      What the expanded/detail view (slide-in panel, full-page view, or right rail)
+      shows beyond the card. Cover: branch name(s), PR title, PR number, status,
+      author, reviewer, CI check summary, commit list, linked test runs.
+    detail_level: detailed
+    why: >
+      N6 already has a detail panel (detail-panel.js). This field informs which
+      fields to add there and in what order. Particularly: is branch name alone
+      enough, or does reviewer state / CI summary belong there too?
+
+  - name: state_coupling
+    description: >
+      Does PR/branch state drive work item state transitions automatically?
+      Cover: which events trigger transitions (PR opened, PR merged, branch created,
+      CI passes), whether it is opt-in or default, and granularity (per-workflow,
+      per-project, per-repo-branch).
+    detail_level: detailed
+    why: >
+      N6 uses a static snapshot; this field captures what the interactive version
+      would need to support. Informs whether PR status = merged should auto-advance
+      a story to Done or just show a visual indicator.
+
+  - name: draft_vs_ready_state
+    description: >
+      Whether and how Draft PRs (not yet ready for review) are visually distinguished
+      from Ready-for-review PRs on both the card face and in the detail panel.
+      Cover: colour/icon treatment, whether draft PRs trigger state transitions,
+      and whether draft state is surfaced at all.
+    detail_level: moderate
+    why: >
+      GitHub Projects v2 added explicit draft/ready events in 2025. A developer
+      looking at a sprint board should be able to tell at a glance whether code is
+      up for review or still a work-in-progress draft. Critical for N6's James persona.
+
+  - name: review_state
+    description: >
+      Whether reviewer approval status, blocking reviews, and requested reviewers are
+      surfaced on the card or panel. Cover: approval count (e.g. "2/2 approved"),
+      blocking review indicator, reviewer avatar pills, and whether this collapses
+      into the PR status pill or is shown separately.
+    detail_level: moderate
+    why: >
+      James's focus item "Push Auth Session Expiry to review" is about him being the
+      reviewer. If the card shows "1 reviewer requested", that surfaces the blocker
+      directly without opening the detail panel — the Rams case for including it.
+
+  - name: dod_checklist
+    description: >
+      Whether a Definition of Done checklist is implemented at all, and if so: is it
+      first-class (native field), checklist-app-based (markdown + app), or sub-task
+      based? Cover: template support per issue type, completion percentage display,
+      whether DoD gates state transitions, and where it appears (card face or panel).
+    detail_level: detailed
+    why: >
+      DoD is rarely first-class across tools — mostly checklist apps or markdown.
+      Research should surface whether any tool has solved this well enough to copy,
+      and whether N6 should surface DoD as a structured card-detail section
+      or just a progress indicator.
+
+  - name: test_linkage
+    description: >
+      How test cases and CI test results link to the work item. Cover: native test
+      management vs. third-party apps (Xray, Zephyr, TestRail), what appears on the
+      card face (coverage badge, pass/fail count), what appears in the panel (Tests
+      tab, test execution rows), and whether CI pass/fail is the same field or separate.
+    detail_level: detailed
+    why: >
+      N6 targets developer and RTE personas who care about quality signals alongside
+      delivery signals. The question is whether test linkage belongs on the card, in
+      the panel, or is a separate view entirely.
+
+  - name: cicd_status
+    description: >
+      Whether CI/CD pipeline status (pass/fail/building/blocked) appears on the card
+      or panel. Cover: which CI providers are supported, what the visual treatment is
+      (icon + colour, text pill, progress indicator), whether individual check names
+      are shown, and whether a failing CI check is surfaced as a story-level risk signal.
+    detail_level: moderate
+    why: >
+      CI status is distinct from PR state — a PR can be "Open" with a failing CI run.
+      Surfacing this on the card connects quality to delivery without requiring the
+      developer to switch tools.
+
+  - name: release_tagging
+    description: >
+      How version/release tags attach to features or stories. Cover: the data model
+      (Fix Version, Release object, Git tag, Milestone, Iteration), whether release
+      assignment is on the story card face, whether a story can belong to multiple
+      releases, and how release scope changes are tracked.
+    detail_level: moderate
+    why: >
+      N6 has PI as the release container, but within a PI there are sprint demos and
+      potentially individual feature releases. Whether release tag appears on the card
+      or only in the detail panel is an open design question.
+
+  - name: aggregation
+    description: >
+      How Feature or Epic cards roll up PR/VCS state from child Stories. Cover: whether
+      PR count, branch count, or CI status aggregates upward; whether a feature card
+      shows "3 of 5 stories have merged PRs"; and whether this rollup is automatic,
+      computed, or entirely absent.
+    detail_level: moderate
+    why: >
+      N6 has Feature cards in the Board tab. If a Feature has 5 child stories with
+      varying PR states, the Feature card could show a rollup indicator. No tool does
+      this well today — identifying the gap is valuable.
+
+  - name: environment_deployment_target
+    description: >
+      Whether the card or panel indicates which environment a change has reached
+      (dev, staging, UAT, production). Cover: how deployment events attach to the
+      story (webhook, CI job, release pipeline), what the visual treatment is
+      (environment badge, deployment timeline), and whether multiple environments
+      are shown simultaneously.
+    detail_level: moderate
+    why: >
+      For RTE and PM personas, knowing that a feature is in staging vs. production
+      is a delivery signal distinct from PR state. Azure DevOps, Jira Deployments,
+      and Linear Releases all distinguish this. Relevant for Riya's cross-team view.
+
+  - name: traceability_completeness
+    description: >
+      Whether a composite "traceability signal" is shown — e.g. a story has a linked
+      PR AND linked tests AND a linked deploy AND a completed DoD checklist. Cover:
+      which tools surface this as a visual indicator (progress ring, icon strip, badge),
+      what counts as a complete trace, and whether incomplete traceability gates
+      state transitions or just warns.
+    detail_level: moderate
+    why: >
+      Targetprocess and Jira Align expose traceability roll-ups. For N6, a single
+      composite indicator (✓ code · ✓ tests · ✓ DoD) on the card face would be
+      a stronger Rams choice than surfacing branch/PR/tests as three separate items.
+      This field determines whether that pattern is worth building.
+
+  - name: design_pattern
+    description: >
+      The visual/UI pattern used to represent VCS state. Cover: icon-only vs. icon+count
+      vs. pill vs. full block; whether state is encoded in colour, text, or both;
+      whether the pattern is consistent across card types (story vs. feature vs. defect);
+      and how the pattern handles the case when no VCS data exists (empty state).
+    detail_level: detailed
+    why: >
+      The design vocabulary decision for N6. Linear/Shortcut compress to a single
+      icon + colour; Jira uses a counter-icon strip; Targetprocess goes full block.
+      Sand's restrained philosophy aligns with single-pill — but research may reveal
+      a better pattern.
+
+uncertain: []

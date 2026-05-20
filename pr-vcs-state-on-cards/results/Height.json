@@ -1,0 +1,184 @@
+{
+  "tool": "Height",
+  "status_note": "Height announced shutdown on March 25, 2025 and was due to discontinue service on September 24, 2025. Findings reflect the product at its last shipping state; treat as a historical/reference benchmark, not a live product.",
+  "card_surface": {
+    "summary": "Dev-tool-first task surface. On the default spreadsheet/list view, Height exposed linked GitHub/GitLab pull/merge requests and branches as opt-in columns (View > Attributes > Pull/Merge requests or Branches). On Kanban cards (the closest equivalent to N6 board cards) the dominant signal was the linked task's status itself — because Height auto-transitioned task status from the PR lifecycle, the colored status pill on the card effectively encoded VCS state (e.g., 'In progress' when a PR was opened, 'In review' for ready PRs, 'Done' on merge). PR number/title and branch name were not shown as standalone glyphs on the kanban card face; users opened the task to see the linked PR row. List/spreadsheet rows could render a dedicated 'Pull requests' or 'Branches' attribute column showing the PR title and a state indicator (Open / Merged / Closed) and the branch name as a chip.",
+    "elements": [
+      "Status pill (driven by GitHub/GitLab workflow mapping — primary VCS signal on the card)",
+      "Optional 'Pull/Merge requests' attribute column in list/spreadsheet view: PR title + state",
+      "Optional 'Branches' attribute column in list/spreadsheet view: branch name chip",
+      "Task ID prefix (T-123) used as the linking key between code and card"
+    ],
+    "ci_pill_on_card": "[uncertain] No evidence of a native CI/check pill on the card face; CI status was not surfaced as a first-class card element."
+  },
+  "detail_panel": {
+    "summary": "The task detail view listed all linked GitHub/GitLab artifacts inline: pull/merge requests, branches, and commits, each as a row with the PR/MR title, number, repo, and state (Open / Draft / Merged / Closed). Linking happened automatically when the task ID (T-1) appeared in a branch name, PR title/description, or commit message, or via 'Link T-1' / 'Fixes T-1' / 'Closes T-1' keywords. Author was visible via the linked GitHub user. Reviewer state, individual CI check breakdown, and test-run details were not first-class fields in the panel.",
+    "fields_shown": [
+      "Linked pull/merge request rows: title, number, repo, PR state (Open / Draft / Merged / Closed)",
+      "Linked branch rows: branch name, repo",
+      "Linked commit rows: short SHA, commit message",
+      "Author (inherited from linked GitHub/GitLab actor) [uncertain — exact rendering]",
+      "Task status (auto-driven by PR lifecycle)"
+    ],
+    "fields_not_shown_natively": [
+      "Reviewer avatar pills / approval count",
+      "CI check summary per provider",
+      "Test execution results",
+      "Deployment environment"
+    ]
+  },
+  "state_coupling": {
+    "summary": "Tight, automatic, and configurable. Height's GitHub/GitLab integration mapped PR/MR lifecycle events directly to task status transitions out of the box. Default behavior: when a task was linked to a PR/MR/branch/commit, the task was auto-set to 'In progress'; when the PR/MR was merged, the task was auto-set to 'Done'. Custom workflow mapping let admins replace those defaults with statuses like 'In dev' (PR open) or 'In review' (PR ready for review) per integration.",
+    "triggers": [
+      "Task linked to branch/PR/MR/commit -> 'In progress' (default)",
+      "PR/MR opened -> custom status (e.g., 'In dev')",
+      "PR/MR marked ready for review -> custom status (e.g., 'In review')",
+      "PR/MR merged -> 'Done' (default) or custom",
+      "PR/MR closed without merge -> [uncertain] configurable"
+    ],
+    "opt_in_or_default": "Default-on once GitHub/GitLab integration is connected; status mapping is configurable per integration in preferences.",
+    "granularity": "Configured at the workspace integration level (per GitHub/GitLab connection / workflow), not per individual task. [uncertain] Per-repo granularity is not explicitly documented."
+  },
+  "draft_vs_ready_state": {
+    "summary": "Height's custom workflow mapping explicitly supported distinguishing draft vs. ready-for-review PRs by allowing different task statuses for 'PR opened' (often draft / in dev) vs. 'PR ready for review' (in review). The visual distinction surfaced through the task status pill on the card — not through a dedicated draft glyph next to the PR link. [uncertain] In the detail panel's linked-PR row, the PR's draft state was likely shown as part of the PR state label ('Draft' vs 'Open'), mirroring GitHub's own label.",
+    "card_face_treatment": "Encoded via the task status pill (e.g., 'In dev' = draft, 'In review' = ready). No separate badge.",
+    "panel_treatment": "[uncertain] PR state column in detail panel reflected the upstream Draft/Open/Merged label.",
+    "drives_transitions": true
+  },
+  "review_state": {
+    "summary": "Not surfaced as a first-class field on cards. Reviewer approval count, blocking reviews, and requested reviewer avatars were not exposed as Height attributes. The only review signal was indirect: if the workflow was configured so 'ready for review' mapped to an 'In review' status, the task status pill carried the signal.",
+    "approval_count_visible": false,
+    "blocking_review_indicator": false,
+    "reviewer_avatars": false,
+    "collapsed_into_status_pill": true
+  },
+  "dod_checklist": {
+    "summary": "[uncertain] Height supported subtasks and could be used to author lightweight DoD checklists as nested subtasks under a parent task. There is no evidence of a first-class 'Definition of Done' field, template support per issue type, or DoD-gated state transitions. Completion percentage on parent tasks reflected subtask completion in aggregate.",
+    "first_class": false,
+    "implementation": "Subtask-based checklist (informal) or markdown in description. [uncertain]",
+    "template_support": "[uncertain] Task templates existed; DoD-specific templating is not documented.",
+    "completion_percentage": "[uncertain] Subtask roll-up percentage shown on parent task.",
+    "gates_transitions": false,
+    "surface_location": "Inside the task detail panel only (subtask list)."
+  },
+  "test_linkage": {
+    "summary": "No native test-management capability. Height did not ship a Tests tab, test-case object, or test-run object. Linkage to CI/test results was achievable only via custom API integrations or third-party connectors (Zapier-style). No test coverage badge, pass/fail count, or test execution rows appeared on the card or in the standard panel.",
+    "native_test_management": false,
+    "third_party_apps_supported": "Only via API/Zapier-style custom integrations; no first-party Xray/Zephyr/TestRail integration.",
+    "card_face_elements": "None.",
+    "panel_elements": "None natively. [uncertain]",
+    "ci_same_field_or_separate": "Separate — and largely absent."
+  },
+  "cicd_status": {
+    "summary": "[uncertain] Height's GitHub/GitLab integration focused on branch/PR/commit linkage and status workflow mapping, not on surfacing CI check results. There is no documented CI pill, build-status badge, or per-check breakdown on the task card or panel. Teams that needed CI status had to push it in via the API or rely on PR state alone as a proxy.",
+    "providers_supported_natively": "[uncertain] No documented first-party CI integrations (e.g., GitHub Checks, GitLab Pipelines, CircleCI).",
+    "visual_treatment_card": "None.",
+    "visual_treatment_panel": "None natively.",
+    "individual_checks_shown": false,
+    "surfaced_as_risk_signal": false
+  },
+  "release_tagging": {
+    "summary": "Height did not have a dedicated 'Fix Version' or Release object. Version/release scoping was modeled through Height's list/smartlist mechanism — teams created one list per version and a backlog list, and could combine versions into a smartlist. Release association was effectively a list membership rather than a structured release field. Git tag / Milestone integration was not first-class.",
+    "data_model": "List membership (one list per version) plus smartlist aggregation; no first-class Release/Fix-Version field.",
+    "shown_on_card_face": "[uncertain] List name visible in cross-list views; no dedicated release pill on the card.",
+    "multi_release_support": "Yes, via membership in multiple lists.",
+    "release_scope_change_tracking": "[uncertain] Activity log on task captured list moves."
+  },
+  "aggregation": {
+    "summary": "Minimal. Height supported parent/child task relationships and subtask roll-up of completion percentage, but did not aggregate PR count, branch count, or CI status from child tasks onto a parent (Feature-equivalent) card. A parent task did not display 'X of Y child stories have merged PRs' as a rollup indicator.",
+    "rolls_up_pr_count": false,
+    "rolls_up_branch_count": false,
+    "rolls_up_ci_status": false,
+    "feature_card_rollup_indicator": false,
+    "computed_or_automatic": "Subtask completion percentage only."
+  },
+  "environment_deployment_target": {
+    "summary": "No native concept of environment or deployment target. Height tracked PR/MR merge as the terminal event in the workflow; what happened after merge (deploy to staging, deploy to production) was outside Height's data model. Teams could approximate this with custom statuses ('Deployed to staging', 'Released') but there was no environment badge, deployment timeline, or webhook-driven deployment-event surface in the card or panel.",
+    "native_environment_field": false,
+    "deployment_event_source": "[uncertain] Possible via custom API integration; not first-party.",
+    "visual_treatment": "Custom status pill at best; no dedicated environment badge.",
+    "simultaneous_environments_shown": false
+  },
+  "traceability_completeness": {
+    "summary": "No composite traceability indicator. Height did not expose a 'trace complete' signal that combined linked PR + linked tests + linked deploy + DoD status. Each artifact type was visible (or not) independently in the detail panel. Without native tests, DoD, and deployment objects, a meaningful traceability rollup was not possible. Traceability did not gate state transitions; only PR merge did, via the status workflow mapping.",
+    "composite_indicator_present": false,
+    "visual_treatment": "None.",
+    "definition_of_complete_trace": "Not defined natively.",
+    "gates_transitions": false
+  },
+  "design_pattern": {
+    "summary": "Status-pill-as-primary-signal. Height's design choice was to let the task's auto-driven status pill be the visible representation of VCS state on the card face, rather than adding a separate PR badge, branch glyph, or CI icon. The trade-off: a single, calm pill that already exists on every kanban card carries the lifecycle signal, but loses fidelity (you cannot tell from the card alone whether a PR has 0, 1, or 3 PRs linked, or which reviewers are blocking). Detail / spreadsheet views recovered the missing fidelity through optional PR/branch attribute columns.",
+    "primary_visual_unit": "Auto-driven task status pill (colored chip with status name).",
+    "secondary_visual_unit_in_lists": "Optional attribute columns ('Pull requests', 'Branches') showing title + state and branch chip.",
+    "uses_icon_only": false,
+    "uses_icon_plus_count": false,
+    "uses_pr_status_pill_as_separate_element": false,
+    "uses_full_block": false,
+    "color_or_text_encoding": "Both — status pill uses workflow-defined color plus status label.",
+    "consistent_across_card_types": "Yes — same status mechanism applies to all task types (no separate Story vs. Feature card schema in Height; type was a soft attribute).",
+    "empty_state_handling": "If no PR/branch is linked, no extra UI appears; the card simply shows the task's manually-set status. The attribute columns render empty cells in lists."
+  },
+  "sources": [
+    {
+      "title": "Link tasks to GitHub/GitLab branches, pull/merge requests and commits — Height Help Center",
+      "url": "https://help.height.app/en/articles/3300579-link-tasks-to-github-gitlab-branches-pull-merge-requests-and-commits"
+    },
+    {
+      "title": "Using custom statuses in your GitHub and GitLab workflows — Height Help Center",
+      "url": "https://help.height.app/en/articles/4136516-using-custom-statuses-in-your-github-and-gitlab-workflows"
+    },
+    {
+      "title": "How to automatically link and close Height tasks from GitHub & GitLab — Height Help Center",
+      "url": "https://help.height.app/en/articles/3299732-how-to-automatically-link-and-close-height-tasks-from-github-gitlab"
+    },
+    {
+      "title": "See linked GitHub/GitLab pull/merge requests and branches as columns in lists — Height Help Center",
+      "url": "https://help.height.app/en/articles/3300606-see-linked-github-gitlab-pull-merge-requests-and-branches-as-columns-in-lists"
+    },
+    {
+      "title": "How to connect GitHub to Height — Height Help Center",
+      "url": "https://help.height.app/en/articles/3580561-how-to-connect-github-to-height"
+    },
+    {
+      "title": "GitHub & GitLab integrations collection — Height Help Center",
+      "url": "https://help.height.app/en/collections/1033382-github-gitlab-integrations"
+    },
+    {
+      "title": "Kanban boards — Height Help Center",
+      "url": "https://help.height.app/en/articles/3691408-kanban-boards"
+    },
+    {
+      "title": "Height Overview — Height Help Center",
+      "url": "https://help.height.app/en/articles/3606831-height-overview"
+    },
+    {
+      "title": "Height.app Introduction Guide & Real-World Review — Fresh Van Root",
+      "url": "https://freshvanroot.com/blog/height-app-review/"
+    },
+    {
+      "title": "Height project management tool to shut down by September 2025 — AlternativeTo",
+      "url": "https://alternativeto.net/news/2025/3/height-project-management-tool-to-shut-down-by-september-2025/"
+    },
+    {
+      "title": "Height is shutting down after 3 1/2 years — Creativerly",
+      "url": "https://www.creativerly.com/height-app-is-shutting-down/"
+    },
+    {
+      "title": "Height on X: shutdown announcement (Sept 24, 2025)",
+      "url": "https://x.com/height_app/status/1903820182557999555"
+    }
+  ],
+  "uncertain": [
+    "card_surface.ci_pill_on_card",
+    "detail_panel.fields_shown (author rendering specifics)",
+    "state_coupling.triggers (PR closed without merge mapping)",
+    "state_coupling.granularity (per-repo granularity)",
+    "draft_vs_ready_state.panel_treatment",
+    "dod_checklist (entire field — implementation, templates, percentage)",
+    "test_linkage.panel_elements",
+    "cicd_status (entire field — no documented native CI surface)",
+    "release_tagging.shown_on_card_face",
+    "release_tagging.release_scope_change_tracking",
+    "environment_deployment_target.deployment_event_source"
+  ]
+}
