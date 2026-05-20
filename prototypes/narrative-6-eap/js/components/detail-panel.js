@@ -209,6 +209,15 @@ function dpRender(item) {
   if (sprintCtx) fields.push({ label: 'Sprint', value: sprintCtx.name + (sprintCtx.active ? ' <span class="dp-sprint-active">Active</span>' : '') });
   if (item.openDefects) fields.push({ label: 'Open Defects', value: '<span style="font-family:var(--font-mono);color:#DC2626;">' + item.openDefects + '</span>' });
   if (item.atRisk) fields.push({ label: 'Risk', value: '<span class="dp-atrisk-badge">' + EAP.icon('alert-triangle', 11) + ' At risk</span>' });
+  if (item.pr) {
+    fields.push({ label: 'Branch', value: '<span style="font-family:var(--font-mono);font-size:11px;color:#585753;">' + item.pr.branch + '</span>' });
+    var _prC = {merged:'#16A34A','in-review':'#D97706',open:'#2563EB'};
+    var _prB = {merged:'rgba(22,163,74,0.08)','in-review':'rgba(217,119,6,0.08)',open:'rgba(37,99,235,0.08)'};
+    var _prL = {merged:'Merged','in-review':'In Review',open:'Open'};
+    var _c = _prC[item.pr.status]||_prC.open, _b = _prB[item.pr.status]||_prB.open, _l = _prL[item.pr.status]||_prL.open;
+    var _num = item.pr.number ? ' <span style="color:#797874;font-size:11px;font-family:var(--font-mono);">#'+item.pr.number+'</span>' : '';
+    fields.push({ label: 'Pull Request', value: '<span style="font-size:11px;font-weight:500;color:'+_c+';background:'+_b+';padding:2px 8px;border-radius:10px;">'+_l+'</span>'+_num });
+  }
 
   fields.forEach(function(f) {
     h += '<div class="dp-field"><span class="dp-field-label">' + f.label + '</span><span class="dp-field-value">' + f.value + '</span></div>';

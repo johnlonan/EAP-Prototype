@@ -49,6 +49,16 @@ function trackCard(item, opts) {
   if (opts.showTeam && item.team) h += '<span class="bcard-owner">' + item.team + '</span>';
   h += '</div>';
 
+  // PR state — branch + status pill (only when PR data present and item is not blocked)
+  if (item.pr && !isBlocked) {
+    var _prCls = {'open':'bcard-pr-open','in-review':'bcard-pr-in-review','merged':'bcard-pr-merged'};
+    var _prLbl = {'open':'Open','in-review':'In Review','merged':'Merged'};
+    h += '<div class="bcard-pr">' +
+      '<span class="bcard-pr-branch">' + item.pr.branch + '</span>' +
+      '<span class="bcard-pr-pill ' + (_prCls[item.pr.status] || 'bcard-pr-open') + '">' + (_prLbl[item.pr.status] || 'Open') + '</span>' +
+    '</div>';
+  }
+
   // Progress bar — stays in content area
   if (item.pct > 0 && !isDone) {
     h += '<div class="bcard-progress">' + EAP.pbar(item.pct, item.state) + '</div>';

@@ -1299,6 +1299,12 @@ body { background: #F1F0ED !important; }
 .bcard-compact .bcard-progress { display: none; }
 .bcard-compact .bcard-meta { margin-bottom: 0; }
 .bcard-compact .bcard-meta .st-pill { font-size: 9px; padding: 1px 6px; }
+.bcard-pr { display: flex; align-items: center; gap: 6px; margin: -4px 0 8px; min-width: 0; }
+.bcard-pr-branch { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+.bcard-pr-pill { font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 10px; flex-shrink: 0; }
+.bcard-pr-open { color: #2563EB; background: rgba(37,99,235,0.08); }
+.bcard-pr-in-review { color: #D97706; background: rgba(217,119,6,0.08); }
+.bcard-pr-merged { color: #16A34A; background: rgba(22,163,74,0.08); }
 
 /* ═══ HIERARCHY SHOW/HIDE TOGGLES ═══ */
 .hier-check-pill {
