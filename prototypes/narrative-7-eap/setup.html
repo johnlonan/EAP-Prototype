@@ -60,10 +60,10 @@ body {
 
 /* ─────── LEFT: WIZARD ─────── */
 .setup-wizard {
-  /* 65 % of the split — gives form content room to breathe */
-  flex: 0 0 65%;
-  min-width: 480px;
-  max-width: 860px;
+  /* 75 % — gives the form cards comfortable breathing room */
+  flex: 0 0 75%;
+  min-width: 520px;
+  max-width: 1020px;
   display: flex; flex-direction: column;
   overflow-y: auto; overflow-x: hidden;
   border-right: 1.5px solid rgba(0,0,0,0.11);
@@ -246,8 +246,8 @@ body {
 
 /* AI Input — green tint signals this is AI territory */
 .ai-input-card {
-  background: rgba(22,163,74,0.05);
-  border: 1px solid rgba(22,163,74,0.16);
+  background: rgba(22,163,74,0.11);
+  border: 1px solid rgba(22,163,74,0.26);
   border-radius: 14px; padding: 18px 20px;
 }
 .ai-card-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
@@ -322,22 +322,30 @@ body {
 .btn-ghost:hover { background: var(--raised); color: var(--ink); }
 
 /* ─────── RIGHT: PREVIEW PANEL ─────── */
-/* Sand page background — white cards inside read as elevated surfaces,
-   faithfully simulating the live app. Intentionally darker than the
-   wizard panel (#F1F0ED) to give the split screen a clear left/right read. */
+/* Sand background wrapping the preview card — creates a shallow inset
+   so the white card reads as a floating panel within the overall layout */
 .setup-preview {
   flex: 1; min-width: 0;
   display: flex; flex-direction: column;
   background: #E1E0DD;
   overflow: hidden;
+  padding: 12px 14px 0 0; /* top + right breathing room; no left (separator already there); no bottom (footer provides its own) */
+}
+.preview-card {
+  flex: 1; display: flex; flex-direction: column;
+  background: #FFFFFF;
+  border-radius: 14px 14px 0 0; /* rounds top two corners — bottom flush with footer */
+  overflow: hidden;
+  min-height: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
 }
 
 .prev-hd {
   flex-shrink: 0;
-  padding: 12px 24px 12px;
-  border-bottom: 1px solid rgba(0,0,0,0.09);
+  padding: 11px 20px 11px;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
   display: flex; align-items: center; gap: 10px;
-  background: #F8F7F4; /* near-white toolbar — signals the preview panel is a distinct viewport */
+  background: transparent; /* inherits white from .preview-card */
 }
 .prev-hd-title {
   font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -794,6 +802,7 @@ body {
          RIGHT PANEL — live preview
     ════════════════════════════════════════════════ -->
     <div class="setup-preview" id="setup-preview">
+      <div class="preview-card">
 
       <div class="prev-hd">
         <span class="prev-hd-title">Live Preview</span>
@@ -838,15 +847,15 @@ body {
               Click any team name or date to edit
             </div>
             <div class="art-build-section">
-              <div class="art-build-label">Teams</div>
+              <div class="art-build-label" id="label-teams">Teams</div>
               <div class="art-teams-grid" id="art-teams-grid"><!-- teams added by JS --></div>
             </div>
             <div class="art-build-section" id="art-pi-section" style="display:none">
-              <div class="art-build-label">PI Calendar</div>
+              <div class="art-build-label" id="label-pi">PI Calendar</div>
               <div id="art-pi-rows"><!-- PI rows added by JS --></div>
             </div>
             <div class="art-build-section" id="art-conn-section" style="display:none">
-              <div class="art-build-label">Integrations</div>
+              <div class="art-build-label" id="label-conn">Integrations</div>
               <div class="art-connections" id="art-conn-rows"><!-- connections added by JS --></div>
             </div>
           </div>
@@ -884,6 +893,7 @@ body {
         </div>
 
       </div><!-- /prev-scroll -->
+      </div><!-- /preview-card -->
     </div><!-- /setup-preview -->
 
     </div><!-- /setup-split -->
@@ -919,12 +929,7 @@ body {
   var selectedFw = 'essential';
   var selectedMethod = 'ai';
   var genTimers  = [];
-  var generatedTeams = [
-    { name: 'Auth Team',          count: 5 },
-    { name: 'Payments Team',      count: 6 },
-    { name: 'Mobile Team',        count: 5 },
-    { name: 'Data & Analytics',   count: 4 }
-  ];
+  var generatedTeams = []; // populated at generation time from parsed input + selected framework
 
   // ── Auto-configured items per framework ─────────────────────────
   var autoConfigData = {
@@ -1014,6 +1019,81 @@ body {
     jira:     '<rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/>'
   };
   var OTTO_ICON_SM = '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
+  // ── Input parser — extracts team names, PI info, integrations ────
+  function parseInput(text) {
+    var r = { teams: [], teamCount: 4, piWeeks: 10, sprintWeeks: 2,
+              piLabel: 'PI 1', piStart: null, jiraKey: null,
+              hasSlack: false, hasJira: false, peopleCount: null };
+
+    // Named teams from "X squads — Auth, Payments, Mobile, Data"
+    var nameM = text.match(/(?:squads?|teams?|groups?)[^.—\-\n]*[—\-:]\s*([^\n.]+)/i);
+    if (nameM) {
+      var parts = nameM[1].split(/,\s*|\s+and\s+/i)
+        .map(function(s){ return s.trim().replace(/^and\s+/i,''); })
+        .filter(function(s){ return s.length > 1 && s.length < 36; });
+      if (parts.length >= 2) r.teams = parts;
+    }
+    var countM = text.match(/(\d+)\s+(?:engineering\s+)?(?:teams?|squads?|groups?)/i);
+    if (countM) r.teamCount = parseInt(countM[1]);
+    if (r.teams.length) r.teamCount = r.teams.length;
+
+    var pplM = text.match(/(?:about\s+)?(\d+)\s+people/i);
+    if (pplM) r.peopleCount = parseInt(pplM[1]);
+    var piM = text.match(/(\d+)[- ]week\s*PI/i);
+    if (piM) r.piWeeks = parseInt(piM[1]);
+    var spM = text.match(/(\d+)[- ]week\s*sprint/i);
+    if (spM) r.sprintWeeks = parseInt(spM[1]);
+
+    var jM = text.match(/(?:key:?\s*|project\s+key:?\s*)([A-Z]{2,8})\b/i);
+    if (jM) r.jiraKey = jM[1].toUpperCase();
+    var piLM = text.match(/PI\s+(\d+)\s+kicks?\s+off\s+(.+?)(?:\.|$)/i);
+    if (piLM) { r.piLabel = 'PI ' + piLM[1]; r.piStart = piLM[2].trim(); }
+
+    r.hasSlack = /slack/i.test(text);
+    r.hasJira  = /jira/i.test(text);
+    return r;
+  }
+
+  // ── Per-framework generation profiles ────────────────────────────
+  var fwProfiles = {
+    essential: {
+      phase1: 'Identifying <strong>team structure…</strong>',
+      phase2: 'Mapping <strong>PI calendar…</strong>',
+      phase3: 'Setting up <strong>integrations…</strong>',
+      doneMsg: '✓ <strong>ART configured.</strong> Review before saving',
+      doneLabel: function(p){ return (p.jiraKey ? p.jiraKey + ' ART' : 'Your ART'); },
+      teamsLabel: 'Teams', piLabel: 'PI Calendar', connLabel: 'Integrations',
+      hintText: 'Click any team name or date to edit'
+    },
+    portfolio: {
+      phase1: 'Identifying <strong>ART structure…</strong>',
+      phase2: 'Mapping <strong>Solution Train…</strong>',
+      phase3: 'Building <strong>portfolio layer…</strong>',
+      doneMsg: '✓ <strong>Portfolio configured.</strong> Review before saving',
+      doneLabel: function(){ return 'Multi-ART Portfolio'; },
+      teamsLabel: 'ARTs', piLabel: 'PI Calendar', connLabel: 'Integrations',
+      hintText: 'Click any ART name or date to edit'
+    },
+    kanban: {
+      phase1: 'Mapping <strong>value streams…</strong>',
+      phase2: 'Configuring <strong>WIP limits…</strong>',
+      phase3: 'Setting up <strong>flow metrics…</strong>',
+      doneMsg: '✓ <strong>Kanban board configured.</strong> Review before saving',
+      doneLabel: function(){ return 'Lean Kanban Board'; },
+      teamsLabel: 'Value Streams', piLabel: 'Flow Policy', connLabel: 'Integrations',
+      hintText: 'Click any stream name to edit'
+    },
+    blank: {
+      phase1: 'Creating <strong>blank workspace…</strong>',
+      phase2: 'Preparing <strong>custom structure…</strong>',
+      phase3: 'Finalising <strong>configuration…</strong>',
+      doneMsg: '✓ <strong>Workspace ready.</strong> Configure as you go',
+      doneLabel: function(){ return 'Custom Workspace'; },
+      teamsLabel: 'Structure', piLabel: 'Cadence', connLabel: 'Integrations',
+      hintText: 'Tap any label to configure'
+    }
+  };
 
   // ── Method preview data ──────────────────────────────────────────
   var methodData = {
@@ -1162,47 +1242,85 @@ body {
     renderInvitePreview();
   }
 
-  // ── Progressive ART build in preview ────────────────────────────
-  function buildArtPreview() {
-    document.getElementById('art-placeholder').style.display = 'none';
-    var build = document.getElementById('art-build');
-    build.style.display = 'flex';
+  // ── Editable field helper ────────────────────────────────────────
+  function makeEditable(el) {
+    el.addEventListener('click', function() {
+      el.contentEditable = 'true'; el.focus();
+      var r = document.createRange(); r.selectNodeContents(el);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+    });
+    el.addEventListener('blur', function() { el.contentEditable = 'false'; });
+    el.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+  }
 
+  // ── Progressive preview — adapts to selected framework + parsed input ──
+  function buildArtPreview(parsed) {
+    var fw = selectedFw;
+    var prof = fwProfiles[fw] || fwProfiles.essential;
+    var spW = parsed.sprintWeeks, piLbl = parsed.piLabel, piSt = parsed.piStart;
+    var sprintCount = Math.max(2, Math.floor(parsed.piWeeks / spW) - 1);
+
+    document.getElementById('art-placeholder').style.display = 'none';
+    document.getElementById('art-build').style.display = 'flex';
     var teamsGrid = document.getElementById('art-teams-grid');
     teamsGrid.innerHTML = '';
 
-    // Teams appear at t=500ms
-    generatedTeams.forEach(function(team, i) {
-      var t = 500 + i * 120;
+    // Update section labels to match framework
+    var lT = document.getElementById('label-teams'), lP = document.getElementById('label-pi'), lC = document.getElementById('label-conn');
+    if (lT) lT.textContent = prof.teamsLabel;
+    if (lP) lP.textContent = prof.piLabel;
+    if (lC) lC.textContent = prof.connLabel;
+
+    // ── Compute units (teams / ARTs / streams) ────────────────────
+    var units = [];
+    if (fw === 'kanban') {
+      var streamNames = parsed.teams.length >= 2
+        ? parsed.teams.map(function(n){ return n.replace(/ Team$/i,'') + ' Stream'; })
+        : ['Discovery Stream', 'Delivery Stream', 'Operations Stream'];
+      streamNames.forEach(function(n, i){ units.push({ name: n, sub: 'WIP limit: ' + (3 + i), sprId: null }); });
+
+    } else if (fw === 'portfolio') {
+      var artNames = parsed.teams.length >= 2
+        ? parsed.teams.map(function(n){ return n.replace(/ Team$/i,'') + ' ART'; })
+        : ['Core Platform ART', 'Customer Experience ART', 'Data & Analytics ART'];
+      artNames.forEach(function(n, i){ units.push({ name: n, sub: (3 + i%2) + ' teams', sprId: 'sprints-' + i }); });
+      generatedTeams = artNames.map(function(n, i){ return { name: n, count: 3 + i%2 }; });
+
+    } else if (fw === 'blank') {
+      ['Level 1 — Define your own', 'Level 2 — Add entities', 'Level 3 — No constraints'].forEach(function(n, i){
+        units.push({ name: n, sub: 'Tap to configure', sprId: null, muted: true });
+      });
+      generatedTeams = [];
+
+    } else { // essential (default)
+      var avg = Math.round((parsed.peopleCount || 80) / Math.max(1, parsed.teamCount));
+      var tms = parsed.teams.length >= 2
+        ? parsed.teams.map(function(n, i){ return { name: n, count: Math.max(3, avg + (i%2===0?1:-1)) }; })
+        : [{ name: 'Auth Team', count: 5 }, { name: 'Payments Team', count: 6 },
+           { name: 'Mobile Team', count: 5 }, { name: 'Data & Analytics', count: 4 }];
+      generatedTeams = tms;
+      tms.forEach(function(t, i){ units.push({ name: t.name, sub: t.count + ' members', sprId: 'sprints-' + i }); });
+    }
+
+    // ── Render units progressively ────────────────────────────────
+    var editSVG = '<svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    units.forEach(function(unit, i) {
       genTimers.push(setTimeout(function() {
         var card = document.createElement('div');
         card.className = 'art-team-card';
         card.style.animationDelay = '0ms';
+        if (unit.muted) card.style.opacity = '0.55';
         card.innerHTML =
-          '<div class="edit-hint"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
-          '<div class="art-team-name" contenteditable="false" spellcheck="false">' + team.name + '</div>' +
-          '<div class="art-team-count">' + team.count + ' members</div>' +
-          '<div class="art-team-sprints" id="sprints-' + i + '">2-week sprints · PI 26</div>';
-
-        // Click to edit
-        var nameEl = card.querySelector('.art-team-name');
-        nameEl.addEventListener('click', function() {
-          nameEl.contentEditable = 'true';
-          nameEl.focus();
-          // select all
-          var range = document.createRange();
-          range.selectNodeContents(nameEl);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-        });
-        nameEl.addEventListener('blur', function() { nameEl.contentEditable = 'false'; });
-        nameEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } });
-
+          (unit.muted ? '' : '<div class="edit-hint">' + editSVG + '</div>') +
+          '<div class="art-team-name"' + (unit.muted ? '' : '') + ' contenteditable="false" spellcheck="false">' + unit.name + '</div>' +
+          '<div class="art-team-count">' + unit.sub + '</div>' +
+          (unit.sprId ? '<div class="art-team-sprints" id="' + unit.sprId + '">' + spW + '-week sprints · ' + piLbl + '</div>' : '');
+        if (!unit.muted) makeEditable(card.querySelector('.art-team-name'));
         teamsGrid.appendChild(card);
-      }, t));
+      }, 500 + i * 120));
     });
 
-    // PI row appears at t=1850ms
+    // ── PI / Cadence section ──────────────────────────────────────
     genTimers.push(setTimeout(function() {
       var piSection = document.getElementById('art-pi-section');
       piSection.style.display = 'flex';
@@ -1210,96 +1328,135 @@ body {
       var piRow = document.createElement('div');
       piRow.className = 'art-pi-row';
       piRow.style.animationDelay = '0ms';
-      piRow.innerHTML =
-        '<span class="art-pi-pill active">● Active</span>' +
-        '<div class="art-pi-body">' +
-          '<div class="art-pi-name">PI 26 — 4 sprints + IP sprint</div>' +
-          '<div class="art-pi-dates" contenteditable="false" spellcheck="false">Jun 2 – Aug 10, 2025</div>' +
-        '</div>';
 
-      var datesEl = piRow.querySelector('.art-pi-dates');
-      datesEl.addEventListener('click', function() {
-        datesEl.contentEditable = 'true'; datesEl.focus();
-        var r = document.createRange(); r.selectNodeContents(datesEl);
-        window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
-      });
-      datesEl.addEventListener('blur', function() { datesEl.contentEditable = 'false'; });
-      datesEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); datesEl.blur(); } });
-
+      if (fw === 'kanban') {
+        piRow.innerHTML = '<span class="art-pi-pill active">● Active</span><div class="art-pi-body"><div class="art-pi-name">Pull-based · No fixed sprints</div><div class="art-pi-dates">Continuous flow — WIP enforced per column</div></div>';
+      } else if (fw === 'blank') {
+        piRow.innerHTML = '<div class="art-pi-body"><div class="art-pi-name" style="color:var(--muted);font-style:italic">No cadence set — configure from scratch</div></div>';
+      } else {
+        var piName = piLbl + ' — ' + sprintCount + ' sprints + IP sprint';
+        var piDate = piSt ? piSt + ' (auto-computed end)' : 'Dates auto-computed from today';
+        piRow.innerHTML = '<span class="art-pi-pill active">● Active</span><div class="art-pi-body"><div class="art-pi-name">' + piName + '</div><div class="art-pi-dates" contenteditable="false" spellcheck="false">' + piDate + '</div></div>';
+        var dEl = piRow.querySelector('.art-pi-dates');
+        if (dEl) makeEditable(dEl);
+        // Show sprint labels on cards
+        generatedTeams.forEach(function(_, i) {
+          var el = document.getElementById('sprints-' + i);
+          if (el) el.classList.add('visible');
+        });
+      }
       piRows.appendChild(piRow);
-
-      // Sprint dots appear on team cards
-      generatedTeams.forEach(function(_, i) {
-        var el = document.getElementById('sprints-' + i);
-        if (el) el.classList.add('visible');
-      });
     }, 1850));
 
-    // Jira connection at t=1400ms
-    genTimers.push(setTimeout(function() {
-      var connSection = document.getElementById('art-conn-section');
-      connSection.style.display = 'flex';
-      var connRows = document.getElementById('art-conn-rows');
-      var jira = document.createElement('div');
-      jira.className = 'art-conn-badge';
-      jira.style.animationDelay = '0ms';
-      jira.innerHTML = '<div class="conn-icon">J</div><span class="conn-name">Jira · DBKG</span><span class="conn-note">47 features mapped</span>';
-      connRows.appendChild(jira);
-    }, 1400));
+    // ── Integrations ──────────────────────────────────────────────
+    if (parsed.hasJira || fw === 'essential' || fw === 'portfolio') {
+      genTimers.push(setTimeout(function() {
+        document.getElementById('art-conn-section').style.display = 'flex';
+        var connRows = document.getElementById('art-conn-rows');
+        var key = parsed.jiraKey || 'PROJ';
+        var jira = document.createElement('div');
+        jira.className = 'art-conn-badge'; jira.style.animationDelay = '0ms';
+        jira.innerHTML = '<div class="conn-icon">J</div><span class="conn-name">Jira · ' + key + '</span><span class="conn-note">' + (fw === 'portfolio' ? 'All ARTs connected' : 'Features mapped') + '</span>';
+        connRows.appendChild(jira);
+      }, 1400));
+    }
+    if (parsed.hasSlack) {
+      genTimers.push(setTimeout(function() {
+        document.getElementById('art-conn-section').style.display = 'flex';
+        var connRows = document.getElementById('art-conn-rows');
+        var slack = document.createElement('div');
+        slack.className = 'art-conn-badge'; slack.style.animationDelay = '0ms';
+        var chan = parsed.jiraKey ? '#' + parsed.jiraKey.toLowerCase() + '-art' : '#art-updates';
+        slack.innerHTML = '<div class="conn-icon" style="font-size:10px">Sl</div><span class="conn-name">Slack · ' + chan + '</span><span class="conn-note">Ready</span>';
+        connRows.appendChild(slack);
+      }, 2750));
+    }
 
-    // Slack connection at t=2750ms
-    genTimers.push(setTimeout(function() {
-      var connRows = document.getElementById('art-conn-rows');
-      var slack = document.createElement('div');
-      slack.className = 'art-conn-badge';
-      slack.style.animationDelay = '0ms';
-      slack.innerHTML = '<div class="conn-icon" style="font-size:10px">Sl</div><span class="conn-name">Slack · #dbkg-art</span><span class="conn-note">Ready</span>';
-      connRows.appendChild(slack);
-    }, 2750));
-
-    // Edit hint appears after all elements loaded
     genTimers.push(setTimeout(function() {
       document.getElementById('edit-hint').classList.add('visible');
     }, 3600));
   }
 
-  // ── Left-panel generation sequence ──────────────────────────────
+  // ── Left-panel generation sequence — adapts to framework + input ─
   function runGeneration() {
     var ta = document.getElementById('ai-textarea');
+    var fw = selectedFw;
+    var prof = fwProfiles[fw] || fwProfiles.essential;
+
+    // Default placeholder if blank
     if (!ta.value.trim()) {
-      ta.value = 'We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd.';
+      var defaults = {
+        essential: 'We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd.',
+        portfolio: 'We have 3 ARTs — Core Platform, Customer Experience, and Data & Analytics — about 300 people total. 10-week PIs. We use Jira and Slack.',
+        kanban:    'We have 3 value streams — Discovery, Delivery, and Operations. Pull-based, no fixed sprints. WIP limits per column. Jira for tracking.',
+        blank:     'Custom structure — no preset framework. Define hierarchy and cadence from scratch.'
+      };
+      ta.value = defaults[fw] || defaults.essential;
     }
+
+    var parsed = parseInput(ta.value);
+
     document.getElementById('ai-input-card').style.display = 'none';
     document.getElementById('gen-card').classList.add('is-visible');
     document.getElementById('btn-continue').disabled = true;
-
-    // Update preview header
     var _p = document.getElementById('prev-hd-sub-panel');
-    if (_p) _p.textContent = 'Building your ART…';
+    if (_p) _p.textContent = 'Configuring…';
 
-    // Start progressive preview build in RIGHT panel
-    buildArtPreview();
+    // Start progressive preview in right panel
+    buildArtPreview(parsed);
 
+    // Framework-specific status messages
     var statuses = [
       [0,    'Reading your description…'],
-      [600,  'Identifying <strong>team structure…</strong>'],
-      [1300, 'Mapping <strong>PI calendar…</strong>'],
-      [2100, 'Setting up <strong>integrations…</strong>'],
-      [3100, '✓ <strong>ART configured.</strong> Review before saving']
+      [600,  prof.phase1],
+      [1300, prof.phase2],
+      [2100, prof.phase3],
+      [3100, prof.doneMsg]
     ];
-    var items = [
-      [500,  '4 teams',           'Auth · Payments · Mobile · Data & Analytics'],
-      [950,  'Framework',         'Essential SAFe — 10-week PI, 2-week sprints'],
-      [1400, 'Jira project DBKG', '47 features mapped to EAP Feature hierarchy'],
-      [1850, 'PI 26',             'Starts Jun 2 — Sprint 2 currently active'],
-      [2300, 'Sprint calendars',  '4 teams × 4 sprints + IP sprint per PI'],
-      [2750, 'Slack',             '#dbkg-art channel linked for notifications']
-    ];
+
+    // Framework-specific gen items
+    var fwLabel = { essential: 'Essential SAFe', portfolio: 'Portfolio SAFe', kanban: 'Lean Kanban', blank: 'Custom' }[fw] || 'Essential SAFe';
+    var teamCountStr = parsed.teamCount + (fw === 'portfolio' ? ' ARTs' : fw === 'kanban' ? ' value streams' : ' teams');
+    var teamNamesStr = parsed.teams.length ? parsed.teams.slice(0, 3).join(' · ') + (parsed.teams.length > 3 ? ' …' : '') : '';
+
+    var items = [];
+    if (fw === 'essential') {
+      items = [
+        [500,  teamCountStr,               teamNamesStr || 'From your description'],
+        [950,  'Framework',                fwLabel + ' — ' + parsed.piWeeks + '-week PI, ' + parsed.sprintWeeks + '-week sprints'],
+        [1400, parsed.jiraKey ? 'Jira · ' + parsed.jiraKey : 'Integrations', parsed.jiraKey ? 'Features mapped to EAP hierarchy' : 'No integration detected'],
+        [1850, parsed.piLabel,             parsed.piStart ? 'Starts ' + parsed.piStart : 'Cadence auto-computed'],
+        [2300, 'Sprint calendars',         parsed.teamCount + ' teams × ' + Math.max(2, Math.floor(parsed.piWeeks/parsed.sprintWeeks)-1) + ' sprints + IP sprint']
+      ];
+      if (parsed.hasSlack) items.push([2750, 'Slack', (parsed.jiraKey ? '#' + parsed.jiraKey.toLowerCase() + '-art' : '#art-updates') + ' channel linked']);
+    } else if (fw === 'portfolio') {
+      items = [
+        [500,  teamCountStr,               teamNamesStr || 'Across your portfolio'],
+        [950,  'Framework',                'Portfolio SAFe — ' + parsed.piWeeks + '-week PI cadence'],
+        [1400, 'Solution Train',           'Cross-ART coordination layer configured'],
+        [1850, 'Portfolio budget',         'Lean portfolio management layer ready'],
+        [2300, parsed.piLabel,             parsed.piStart ? 'All ARTs start ' + parsed.piStart : 'Synchronised PI cadence']
+      ];
+    } else if (fw === 'kanban') {
+      items = [
+        [500,  teamCountStr,               teamNamesStr || 'Pull-based, no fixed teams'],
+        [950,  'Framework',                'Lean Kanban — continuous flow'],
+        [1400, 'WIP limits',               'Per-column limits configured for each stream'],
+        [1850, 'CFD dashboard',            'Cumulative flow, cycle time, throughput ready'],
+        [2300, 'Flow board',               'Kanban columns mapped to your value streams']
+      ];
+      if (parsed.hasJira) items.push([2750, 'Jira', (parsed.jiraKey || 'PROJ') + ' → Kanban board synced']);
+    } else {
+      items = [
+        [500,  'Blank workspace',   'No assumptions — full control'],
+        [1200, 'Custom hierarchy',  'Define levels, entities, and relationships'],
+        [2200, 'Ready to configure', 'Add teams, cadence, and integrations as needed']
+      ];
+    }
 
     statuses.forEach(function(s) {
       genTimers.push(setTimeout(function() { document.getElementById('gen-txt').innerHTML = s[1]; }, s[0]));
     });
-
     var genItems = document.getElementById('gen-items');
     items.forEach(function(item) {
       genTimers.push(setTimeout(function() {
@@ -1313,7 +1470,7 @@ body {
     genTimers.push(setTimeout(function() {
       document.getElementById('gen-spinner').className = 'gen-spinner done';
       var _p2 = document.getElementById('prev-hd-sub-panel');
-      if (_p2) _p2.textContent = 'Digital Banking ART';
+      if (_p2) _p2.textContent = prof.doneLabel(parsed);
       aiDone = true;
       var btn = document.getElementById('btn-continue');
       btn.disabled = false;
