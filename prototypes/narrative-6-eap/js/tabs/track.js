@@ -12,26 +12,55 @@ var TCB = EAP._colBodyStyle;
 // ── Traceability ring — four-segment SVG arc ─────────────
 // Segments clockwise from 12 o'clock: PR merged · Tests · DoD · Deploy
 // Each 80° arc with 10° gap. r=5.5, centre (8,8).
+// Colours: green = complete/passing, amber = partial/gate-pending, dim = not started.
 // size param scales the rendered SVG; viewBox stays 0 0 16 16.
 function traceRing(item, size) {
   size = size || 16;
-  var code   = !!(item.pr && item.pr.status === 'merged');
-  var tests  = !!(item.dod && item.dod.some(function(d) { return d.label === 'Tests written' && d.done; }));
-  var dod    = !!(item.dod && item.dod.every(function(d) { return d.done; }));
-  var deploy = !!(item.env && item.env.status === 'deployed');
-  if (!item.pr && !item.dod) return '';
-  var LIT = '#16A34A', DIM = '#CCCBC8';
+  var GRN = '#16A34A', AMB = '#D97706', DIM = '#CCCBC8';
+
+  // PR segment: green = merged, amber = open/in-review, dim = no PR
+  var codeColor = item.pr
+    ? (item.pr.status === 'merged' ? GRN : AMB)
+    : DIM;
+
+  // Tests segment: green = all passing, amber = some failing, dim = no test data
+  var testsColor = item.tests
+    ? (item.tests.failed === 0 ? GRN : AMB)
+    : DIM;
+
+  // DoD segment: green = all done, amber = partially done, dim = no DoD
+  var dodColor = item.dod
+    ? (item.dod.every(function(d) { return d.done; }) ? GRN
+       : item.dod.some(function(d) { return d.done; }) ? AMB : DIM)
+    : DIM;
+
+  // Deploy segment: green = production deployed, amber = gate-pending or staging, dim = none
+  var deployColor = item.env
+    ? (item.env.status === 'deployed' && item.env.target === 'production' ? GRN
+       : item.env.status === 'gate-pending' ? AMB
+       : item.env.status === 'deployed' ? AMB  // staging = amber (progress, not complete)
+       : DIM)
+    : DIM;
+
+  if (!item.pr && !item.dod && !item.tests && !item.env) return '';
+
   var arcs = [
-    { d:'M 8,2.5 A 5.5,5.5 0 0 1 13.42,7.04',  lit:code },
-    { d:'M 13.5,8 A 5.5,5.5 0 0 1 8.96,13.42', lit:tests },
-    { d:'M 8,13.5 A 5.5,5.5 0 0 1 2.58,8.96',  lit:dod },
-    { d:'M 2.5,8 A 5.5,5.5 0 0 1 7.04,2.58',   lit:deploy }
+    { d:'M 8,2.5 A 5.5,5.5 0 0 1 13.42,7.04',  color:codeColor },
+    { d:'M 13.5,8 A 5.5,5.5 0 0 1 8.96,13.42', color:testsColor },
+    { d:'M 8,13.5 A 5.5,5.5 0 0 1 2.58,8.96',  color:dodColor },
+    { d:'M 2.5,8 A 5.5,5.5 0 0 1 7.04,2.58',   color:deployColor }
   ];
-  // data-* attrs are read by initTracePopovers for the rich popover
+
+  // Encode test counts + deploy state for the popover
+  var testStr = item.tests ? (item.tests.passed + '/' + item.tests.total) : 'none';
+  var envStr  = item.env   ? (item.env.target + ':' + item.env.status) : 'none';
+
   var svg = '<svg class="bcard-trace-ring" width="' + size + '" height="' + size + '" viewBox="0 0 16 16"' +
-    ' data-code="' + code + '" data-tests="' + tests + '" data-dod="' + dod + '" data-deploy="' + deploy + '">';
+    ' data-code="' + codeColor + '" data-tests="' + testsColor + '" data-dod="' + dodColor + '" data-deploy="' + deployColor + '"' +
+    ' data-test-str="' + testStr + '" data-env-str="' + envStr + '"' +
+    ' data-pr-status="' + (item.pr ? item.pr.status : '') + '">';
   arcs.forEach(function(a) {
-    svg += '<path d="' + a.d + '" fill="none" stroke="' + (a.lit ? LIT : DIM) + '" stroke-width="2" stroke-linecap="round"/>';
+    svg += '<path d="' + a.d + '" fill="none" stroke="' + a.color + '" stroke-width="2" stroke-linecap="round"/>';
   });
   return svg + '</svg>';
 }
@@ -49,30 +78,67 @@ EAP.initTracePopovers = function() {
     { d:'M 8,13.5 A 5.5,5.5 0 0 1 2.58,8.96' },
     { d:'M 2.5,8 A 5.5,5.5 0 0 1 7.04,2.58' }
   ];
-  var SEGS = ['PR merged', 'Tests written', 'DoD complete', 'Deployed'];
-  var LIT = '#16A34A', DIM = '#CCCBC8';
+  var GRN = '#16A34A', AMB = '#D97706', DIM = '#CCCBC8';
 
   document.addEventListener('mouseover', function(e) {
     var ring = e.target.closest ? e.target.closest('.bcard-trace-ring') : null;
     if (!ring) return;
-    var vals = [
-      ring.getAttribute('data-code')   === 'true',
-      ring.getAttribute('data-tests')  === 'true',
-      ring.getAttribute('data-dod')    === 'true',
-      ring.getAttribute('data-deploy') === 'true'
+
+    var colors = [
+      ring.getAttribute('data-code'),
+      ring.getAttribute('data-tests'),
+      ring.getAttribute('data-dod'),
+      ring.getAttribute('data-deploy')
     ];
+    var prStatus  = ring.getAttribute('data-pr-status') || '';
+    var testStr   = ring.getAttribute('data-test-str')  || 'none';
+    var envStr    = ring.getAttribute('data-env-str')   || 'none';
+
+    // Build popover labels with live data
+    var prLbl  = prStatus === 'merged'    ? 'PR merged'
+               : prStatus === 'open'      ? 'PR open · awaiting review'
+               : prStatus === 'draft'     ? 'PR draft · not ready'
+               : prStatus === 'in-review' ? 'PR in review'
+               : 'No pull request';
+    var tstLbl = testStr === 'none' ? 'No test results'
+               : (function() {
+                   var p = testStr.split('/');
+                   var pass = parseInt(p[0], 10), total = parseInt(p[1], 10);
+                   var fail = total - pass;
+                   return fail > 0 ? pass + ' passed · ' + fail + ' failed · Jenkins' : pass + '/' + total + ' passed · Jenkins';
+                 })();
+    var envLbl = envStr === 'none' ? 'Not deployed'
+               : (function() {
+                   var p = envStr.split(':');
+                   var target = p[0], status = p[1];
+                   if (status === 'gate-pending') return 'Production gate · awaiting approval';
+                   if (target === 'production' && status === 'deployed') return 'Deployed to production';
+                   if (target === 'staging' && status === 'deployed') return 'Deployed to staging';
+                   return target + ' · ' + status;
+                 })();
+
+    var SEGS = [
+      { lbl: prLbl,       color: colors[0] },
+      { lbl: tstLbl,      color: colors[1] },
+      { lbl: 'DoD',       color: colors[2] },
+      { lbl: envLbl,      color: colors[3] }
+    ];
+
     var svgStr = '<svg width="52" height="52" viewBox="0 0 16 16" style="display:block;flex-shrink:0;">';
     ARCS.forEach(function(a, i) {
-      svgStr += '<path d="' + a.d + '" fill="none" stroke="' + (vals[i] ? LIT : DIM) + '" stroke-width="2" stroke-linecap="round"/>';
+      svgStr += '<path d="' + a.d + '" fill="none" stroke="' + colors[i] + '" stroke-width="2" stroke-linecap="round"/>';
     });
     svgStr += '</svg>';
-    var segsHtml = SEGS.map(function(lbl, i) {
-      var lit = vals[i];
+
+    var segsHtml = SEGS.map(function(seg) {
+      var isGrn = seg.color === GRN, isAmb = seg.color === AMB;
+      var icon = isGrn ? '✓' : isAmb ? '◐' : '○';
       return '<div class="trace-pop-seg">' +
-        '<span class="trace-pop-seg-icon" style="color:' + (lit ? LIT : DIM) + ';">' + (lit ? '✓' : '○') + '</span>' +
-        '<span class="trace-pop-seg-lbl" style="color:' + (lit ? 'var(--text-primary)' : 'var(--text-tertiary)') + ';">' + lbl + '</span>' +
+        '<span class="trace-pop-seg-icon" style="color:' + seg.color + ';">' + icon + '</span>' +
+        '<span class="trace-pop-seg-lbl" style="color:' + (isGrn || isAmb ? 'var(--text-primary)' : 'var(--text-tertiary)') + ';">' + seg.lbl + '</span>' +
       '</div>';
     }).join('');
+
     pop.innerHTML =
       '<div class="trace-pop-hd">Delivery readiness</div>' +
       '<div class="trace-pop-body">' + svgStr + '<div class="trace-pop-segs">' + segsHtml + '</div></div>';
@@ -134,7 +200,7 @@ function trackCard(item, opts) {
   if (item.pr && !isBlocked) {
     var _prCls = {'draft':'bcard-pr-draft','open':'bcard-pr-open','in-review':'bcard-pr-in-review','merged':'bcard-pr-merged'};
     var _prLbl = {'draft':'Draft','open':'Open','in-review':'In Review','merged':'Merged'};
-    var _ciTips = { passing:'Build passing — all tests green', failing:'Build failing — needs fixing before merge', running:'Build running — tests in progress' };
+    var _ciTips = { passing:'CI passing', failing:'CI failing — build broken', running:'CI running — pipeline in progress' };
     var _ciDot = item.ci ? '<span class="bcard-pr-ci bcard-ci-' + item.ci.status + '" data-tip="' + (_ciTips[item.ci.status] || 'Build status') + '"></span>' : '';
     h += '<div class="bcard-pr">' +
       _ciDot +
@@ -692,8 +758,9 @@ function renderTeamView(teamName, isTeamCtx) {
   tableHtml += '</tbody></table></div>';
 
   var topRow = '<div class="tteam-top-row">' + chartHtml + renderVelocityPanel(rows, isTeamCtx) + '</div>';
+  var cfdPanel = !isTeamCtx ? renderCFDPanel() : '';
   var compPanel = renderSprintComparisonPanel();
-  return '<div class="tteam-view">' + tilesHtml + topRow + compPanel + tableHtml + '</div>';
+  return '<div class="tteam-view">' + tilesHtml + topRow + cfdPanel + compPanel + tableHtml + '</div>';
 }
 
 // ── Main render ───────────────────────────────────────
@@ -1125,4 +1192,227 @@ EAP.initSprintComparisonChart = function() {
       tip.style.top = (event.pageY - 80) + 'px';
     })
     .on('mouseleave', function() { tip.style.opacity = '0'; });
+};
+
+// ── CFD panel HTML scaffold ───────────────────────────
+function renderCFDPanel() {
+  var m = EAP.cfdMetrics || { throughput: '—', cycleTime: '—', flowEfficiency: '—' };
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var peakDateStr = (EAP.cfdData && EAP.cfdData[18])
+    ? (function() { var dt = EAP.cfdData[18].date; return months[dt.getMonth()] + ' ' + dt.getDate(); }())
+    : 'PI25 S4';
+
+  return '<div class="tcfd-panel">' +
+    '<div class="tcfd-hd">' +
+      '<div>' +
+        '<div class="tcfd-title">Cumulative Flow</div>' +
+        '<div class="tcfd-subtitle">PI to date · 4 sprints · work item throughput by state</div>' +
+      '</div>' +
+      '<div class="tcfd-metrics">' +
+        '<div class="tcfd-metric"><span class="tcfd-metric-val">' + m.cycleTime + 'd</span><span class="tcfd-metric-lbl">Avg cycle time</span></div>' +
+        '<div class="tcfd-metric"><span class="tcfd-metric-val">' + m.throughput + '</span><span class="tcfd-metric-lbl">Items / day</span></div>' +
+        '<div class="tcfd-metric"><span class="tcfd-metric-val">' + m.flowEfficiency + '%</span><span class="tcfd-metric-lbl">Flow efficiency</span></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="tcfd-ai-note">' +
+      '<span class="tcfd-ai-spark">✦</span>' +
+      '<span class="tcfd-ai-text">In Progress peaked at 9 items on ' + peakDateStr + ', exceeding the WIP limit of 6 for 6 days. Cycle time extended by ~2.1d during this period. <span class="tcfd-ai-action">Review blockers ›</span></span>' +
+    '</div>' +
+    '<div class="tcfd-svg-host" id="tcfd-svg-host"></div>' +
+    '<div class="tcfd-legend">' +
+      '<span class="tcfd-lgd-item"><span class="tcfd-lgd-swatch" style="background:rgba(22,163,74,0.65)"></span>Done</span>' +
+      '<span class="tcfd-lgd-item"><span class="tcfd-lgd-swatch" style="background:rgba(217,119,6,0.65)"></span>In Review</span>' +
+      '<span class="tcfd-lgd-item"><span class="tcfd-lgd-swatch" style="background:rgba(37,99,235,0.60)"></span>In Progress</span>' +
+      '<span class="tcfd-lgd-item"><span class="tcfd-lgd-swatch" style="background:rgba(156,163,175,0.75)"></span>To Do</span>' +
+      '<span class="tcfd-lgd-item"><span class="tcfd-lgd-swatch" style="background:rgba(220,38,38,0.70)"></span>Blocked</span>' +
+      '<span class="tcfd-lgd-item"><span style="display:inline-block;width:10px;height:8px;border-radius:2px;flex-shrink:0;background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(220,38,38,0.32) 2px,rgba(220,38,38,0.32) 3.5px)"></span>WIP breach</span>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── CFD D3 chart — stacked area, sprint guides, WIP breach hatch, bisect hover ──
+EAP.initCFDChart = function() {
+  var container = document.getElementById('tcfd-svg-host');
+  if (!container || typeof d3 === 'undefined' || !EAP.cfdData || !EAP.cfdData.length) return;
+  d3.select(container).selectAll('*').remove();
+
+  var data = EAP.cfdData;
+  var n = data.length;
+  var W = Math.max(container.getBoundingClientRect().width || 0, 380);
+  var H = 160;
+  var margin = { top: 6, right: 44, bottom: 28, left: 6 };
+  var iW = W - margin.left - margin.right;
+  var iH = H - margin.top - margin.bottom;
+
+  var xSc = d3.scaleLinear().domain([0, n - 1]).range([0, iW]);
+  var yMax = d3.max(data, function(d) { return d.total; });
+  var ySc = d3.scaleLinear().domain([0, Math.ceil(yMax * 1.08 / 20) * 20]).range([iH, 0]);
+
+  var svg = d3.select(container).append('svg')
+    .attr('width', W).attr('height', H).style('display', 'block');
+
+  // Diagonal hatch pattern for WIP breach overlay
+  var defs = svg.append('defs');
+  var pat = defs.append('pattern')
+    .attr('id', 'cfd-hatch').attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 5).attr('height', 5)
+    .attr('patternTransform', 'rotate(45)');
+  pat.append('line')
+    .attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 5)
+    .attr('stroke', 'rgba(220,38,38,0.38)').attr('stroke-width', 1.6);
+
+  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+  // Bands stacked bottom→top: blocked, todo, inprog, review, done
+  var BANDS = [
+    { key: 'blocked', color: 'rgba(220,38,38,0.70)'  },
+    { key: 'todo',    color: 'rgba(156,163,175,0.75)' },
+    { key: 'inprog',  color: 'rgba(37,99,235,0.60)'  },
+    { key: 'review',  color: 'rgba(217,119,6,0.65)'  },
+    { key: 'done',    color: 'rgba(22,163,74,0.65)'  }
+  ];
+
+  // Pre-compute stacked y0/y1 per band per day
+  var stacked = BANDS.map(function(band, bi) {
+    return data.map(function(d, i) {
+      var y0 = 0;
+      for (var j = 0; j < bi; j++) y0 += d[BANDS[j].key];
+      return { i: i, y0: y0, y1: y0 + d[band.key], d: d };
+    });
+  });
+
+  var area = d3.area()
+    .x(function(d) { return xSc(d.i); })
+    .y0(function(d) { return ySc(d.y0); })
+    .y1(function(d) { return ySc(d.y1); })
+    .curve(d3.curveMonotoneX);
+
+  // Draw bands
+  BANDS.forEach(function(band, bi) {
+    g.append('path').datum(stacked[bi]).attr('fill', band.color).attr('d', area);
+  });
+
+  // WIP breach hatch over inprog band where inprog > WIP limit
+  var WIP_LIMIT = (EAP.wipLimits && EAP.wipLimits['In Progress']) || 6;
+  var inprogStacked = stacked[2]; // index 2 = inprog in BANDS
+  var segStart = null;
+  function flushSeg(to) {
+    if (segStart === null) return;
+    var segData = inprogStacked.slice(segStart, to + 1);
+    if (segData.length >= 2) {
+      g.append('path').datum(segData).attr('fill', 'url(#cfd-hatch)').attr('d', area);
+    }
+    segStart = null;
+  }
+  data.forEach(function(d, i) {
+    if (d.inprog > WIP_LIMIT && segStart === null) segStart = i;
+    else if (d.inprog <= WIP_LIMIT && segStart !== null) flushSeg(i - 1);
+  });
+  flushSeg(data.length - 1);
+
+  // Gridlines + Y labels
+  ySc.ticks(4).forEach(function(tick) {
+    g.append('line')
+      .attr('x1', 0).attr('x2', iW).attr('y1', ySc(tick)).attr('y2', ySc(tick))
+      .attr('stroke', 'rgba(0,0,0,0.04)').attr('stroke-width', 1);
+    g.append('text')
+      .attr('x', iW + 4).attr('y', ySc(tick) + 3.5)
+      .attr('font-family', 'var(--font-sans)').attr('font-size', '9').attr('fill', '#BBBBB7')
+      .text(tick);
+  });
+
+  // Sprint boundary guides — dashed verticals + sprint labels
+  EAP.cfdSprints.forEach(function(sp) {
+    if (sp.idx === 0 || sp.idx >= n) return;
+    var x = xSc(sp.idx);
+    g.append('line')
+      .attr('x1', x).attr('x2', x).attr('y1', 0).attr('y2', iH)
+      .attr('stroke', 'rgba(0,0,0,0.13)').attr('stroke-width', 1).attr('stroke-dasharray', '3,2');
+    g.append('text')
+      .attr('x', x + 4).attr('y', 10)
+      .attr('font-family', 'var(--font-sans)').attr('font-size', '8')
+      .attr('fill', sp.active ? '#383733' : '#BBBBB7')
+      .attr('font-weight', sp.active ? '500' : '400')
+      .text(sp.label);
+  });
+
+  // First sprint label (day 0)
+  g.append('text')
+    .attr('x', 4).attr('y', 10)
+    .attr('font-family', 'var(--font-sans)').attr('font-size', '8').attr('fill', '#BBBBB7')
+    .text(EAP.cfdSprints[0].label);
+
+  // WIP peak callout — small red tick above the breach zone
+  var peakIdx = EAP.cfdWipPeakIdx;
+  if (peakIdx < n) {
+    var pk = inprogStacked[peakIdx];
+    var pkX = xSc(peakIdx);
+    var pkTopY = ySc(pk.y1);
+    g.append('line')
+      .attr('x1', pkX).attr('x2', pkX)
+      .attr('y1', pkTopY - 2).attr('y2', pkTopY - 12)
+      .attr('stroke', '#DC2626').attr('stroke-width', 1).attr('stroke-dasharray', '2,2');
+    g.append('circle')
+      .attr('cx', pkX).attr('cy', pkTopY - 13)
+      .attr('r', 2.5).attr('fill', '#DC2626');
+  }
+
+  // Today marker
+  var todayX = xSc(n - 1);
+  g.append('line')
+    .attr('x1', todayX).attr('x2', todayX).attr('y1', 0).attr('y2', iH)
+    .attr('stroke', 'rgba(56,55,51,0.50)').attr('stroke-width', 1);
+  g.append('text')
+    .attr('x', todayX - 3).attr('y', iH + 17)
+    .attr('text-anchor', 'end')
+    .attr('font-family', 'var(--font-sans)').attr('font-size', '9')
+    .attr('fill', '#383733').attr('font-weight', '500')
+    .text('Today');
+
+  // Bisect hover: crosshair + tooltip
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var tip = document.getElementById('tcfd-tip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'tcfd-tip';
+    tip.className = 'vel-spark-tip';
+    document.body.appendChild(tip);
+  }
+
+  var xhair = g.append('line').attr('class', 'cfd-xhair')
+    .attr('y1', 0).attr('y2', iH)
+    .attr('stroke', 'rgba(0,0,0,0.18)').attr('stroke-width', 1)
+    .style('display', 'none').attr('pointer-events', 'none');
+
+  g.append('rect')
+    .attr('width', iW).attr('height', iH)
+    .attr('fill', 'transparent').style('cursor', 'crosshair')
+    .on('mousemove', function(event) {
+      var mx = d3.pointer(event)[0];
+      var idx = Math.round(mx / iW * (n - 1));
+      idx = Math.max(0, Math.min(n - 1, idx));
+      var d = data[idx];
+      var x = xSc(idx);
+
+      xhair.attr('x1', x).attr('x2', x).style('display', null);
+
+      var dt = d.date;
+      var lbl = months[dt.getMonth()] + ' ' + dt.getDate();
+      var wipWarn = d.inprog > WIP_LIMIT ? ' · <span style="color:#DC2626">WIP over limit</span>' : '';
+      tip.innerHTML =
+        '<span class="vel-tip-label">' + lbl + wipWarn + '</span>' +
+        '<span class="vel-tip-val" style="color:rgba(22,163,74,0.9)">' + d.done + ' Done</span>' +
+        '<span class="vel-tip-val" style="color:rgba(217,119,6,0.9)">' + d.review + ' In Review</span>' +
+        '<span class="vel-tip-val" style="color:rgba(37,99,235,0.85)">' + d.inprog + ' In Progress' + (d.inprog > WIP_LIMIT ? ' ⚠' : '') + '</span>' +
+        '<span class="vel-tip-val" style="color:#797874">' + d.todo + ' To Do</span>' +
+        (d.blocked ? '<span class="vel-tip-val" style="color:#DC2626">' + d.blocked + ' Blocked</span>' : '') +
+        '<span class="vel-tip-val" style="color:#BBBBB7">' + d.total + ' total in system</span>';
+      tip.style.opacity = '1';
+      tip.style.left = (event.pageX + 12) + 'px';
+      tip.style.top = (event.pageY - 110) + 'px';
+    })
+    .on('mouseleave', function() {
+      xhair.style('display', 'none');
+      tip.style.opacity = '0';
+    });
 };

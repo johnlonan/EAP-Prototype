@@ -497,6 +497,63 @@ EAP.bkCols = function() {
   };
 };
 
+// ── VCS micro-cell for Planning/List WorkItem rows ──────
+// Compact: CI dot · PR status · test summary · env badge
+// Only renders when an item has PR data. Items without PRs get an empty cell.
+EAP.lsVcsCell = function(i) {
+  if (!i.pr) return '<td class="ls-vcs-cell ls-vcs-empty">—</td>';
+
+  var GRN = '#16A34A', AMB = '#D97706', RED = '#DC2626', DIM = '#CCCBC8';
+
+  // CI dot
+  var ciColor = i.ci
+    ? ({ passing:GRN, failing:RED, running:AMB }[i.ci.status] || DIM)
+    : DIM;
+  var ciTip = i.ci
+    ? ({ passing:'CI passing', failing:'CI failing', running:'CI running' }[i.ci.status] || 'CI')
+    : '';
+  var ciDot = '<span class="ls-vcs-ci" style="background:' + ciColor + ';" title="' + ciTip + '"></span>';
+
+  // PR label — single word, compact pill
+  var prLbl = { draft:'Draft', open:'Open', 'in-review':'Review', merged:'Merged' }[i.pr.status] || i.pr.status;
+  var prColor = { draft:DIM, open:'#2563EB', 'in-review':AMB, merged:GRN }[i.pr.status] || DIM;
+  var prBg = {
+    draft:'rgba(0,0,0,0.06)', open:'rgba(37,99,235,0.10)',
+    'in-review':'rgba(217,119,6,0.12)', merged:'rgba(22,163,74,0.12)'
+  }[i.pr.status] || 'rgba(0,0,0,0.06)';
+  var prPill = '<span class="ls-vcs-pr" style="color:' + prColor + ';background:' + prBg + ';">' + prLbl + '</span>';
+
+  // Test summary — only when test data present
+  var tstHtml = '';
+  if (i.tests) {
+    var hasFail = i.tests.failed > 0;
+    var tstColor = hasFail ? RED : GRN;
+    var tstText  = hasFail ? i.tests.failed + '✗' : i.tests.passed + '✓';
+    var tstTip = hasFail
+      ? i.tests.passed + ' passed · ' + i.tests.failed + ' failed · Jenkins'
+      : i.tests.passed + '/' + i.tests.total + ' passed · Jenkins';
+    tstHtml = '<span class="ls-vcs-tests" style="color:' + tstColor + ';" title="' + tstTip + '">' + tstText + '</span>';
+  }
+
+  // Env badge — only when env data present
+  var envHtml = '';
+  if (i.env) {
+    var envLabel, envColor;
+    if (i.env.status === 'gate-pending') {
+      envLabel = 'prod gate'; envColor = AMB;
+    } else if (i.env.target === 'production' && i.env.status === 'deployed') {
+      envLabel = 'prod ✓'; envColor = GRN;
+    } else if (i.env.target === 'staging' && i.env.status === 'deployed') {
+      envLabel = 'staging'; envColor = '#2563EB';
+    } else {
+      envLabel = i.env.target; envColor = DIM;
+    }
+    envHtml = '<span class="ls-vcs-env" style="color:' + envColor + ';">' + envLabel + '</span>';
+  }
+
+  return '<td class="ls-vcs-cell">' + ciDot + prPill + tstHtml + envHtml + '</td>';
+};
+
 // ── List/Board view column definitions ─────────────────
 EAP.lsCols = function() {
   var s = EAP.state;
@@ -510,7 +567,7 @@ EAP.lsCols = function() {
   };
   if (s.level === 'WorkItem') {
     return {
-      h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th class="td-blocked">Blocked</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>% Complete</th><th>Team</th><th>Primary Goal</th>',
+      h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th class="td-blocked">Blocked</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>% Complete</th><th>Team</th><th class="ls-vcs-th">Code</th><th>Primary Goal</th>',
       r: function(i) {
         var isBlocked = i.blocked || i.state === 'Blocked';
         var banIcon = EAP.icon('ban', 13);
@@ -528,6 +585,7 @@ EAP.lsCols = function() {
           '<td><span class="sz">' + (i.pts || '') + '</span></td>' +
           '<td>' + EAP.pbar(i.pct, i.state) + '</td>' +
           '<td>' + EAP.teamPill(i.team || '') + '</td>' +
+          EAP.lsVcsCell(i) +
           '<td>' + EAP.goalCell(i.goal) + '</td>';
       }
     };

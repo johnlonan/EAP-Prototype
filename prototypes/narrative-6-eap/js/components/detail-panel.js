@@ -206,6 +206,21 @@ function dpRenderPR(item) {
       '<span class="dp-pr-val" style="color:' + ciC + ';">' + ciL + '</span>';
   }
 
+  // Tests row — shows actual Jenkins pass/fail counts when available
+  if (item.tests) {
+    var tst = item.tests;
+    var hasFail = tst.failed > 0;
+    var tstC = hasFail ? '#DC2626' : '#16A34A';
+    var tstVal = hasFail
+      ? tst.passed + ' passed · <span style="color:#DC2626;font-weight:500;">' + tst.failed + ' failed</span> of ' + tst.total
+      : tst.passed + '/' + tst.total + ' passed';
+    h += '<span class="dp-pr-lbl">Tests</span>' +
+      '<span class="dp-pr-val">' +
+        '<span style="color:' + (hasFail ? 'var(--text-primary)' : tstC) + ';">' + tstVal + '</span>' +
+        '<span style="color:var(--text-tertiary);margin-left:6px;font-size:11px;">Jenkins</span>' +
+      '</span>';
+  }
+
   if (item.reviewers) {
     var rv = item.reviewers;
     var rvTxt = rv.approved + ' of ' + rv.count + ' ' +
@@ -216,10 +231,18 @@ function dpRenderPR(item) {
   }
 
   if (item.env) {
-    var envC = { deployed:'#16A34A', pending:'#797874', failed:'#DC2626' }[item.env.status] || '#797874';
+    var envMap = {
+      'gate-pending': { color:'#D97706', label:'Production gate · awaiting approval' },
+      'deployed':     { color: item.env.target === 'production' ? '#16A34A' : '#D97706',
+                        label: item.env.target === 'production' ? 'Deployed to production' : 'Deployed to staging' },
+      'failed':       { color:'#DC2626', label:'Deployment failed' }
+    };
+    var envEntry = envMap[item.env.status] || { color:'#797874', label: item.env.target + ' · ' + item.env.status };
     h += '<span class="dp-pr-lbl">Environment</span>' +
-      '<span class="dp-pr-val"><span class="dp-pr-dot" style="background:' + envC + ';"></span>' +
-      '<span style="color:' + envC + ';">' + item.env.target + '</span></span>';
+      '<span class="dp-pr-val">' +
+        '<span class="dp-pr-dot" style="background:' + envEntry.color + ';"></span>' +
+        '<span style="color:' + envEntry.color + ';">' + envEntry.label + '</span>' +
+      '</span>';
   }
 
   h += '</div>';
@@ -228,11 +251,16 @@ function dpRenderPR(item) {
   if (pr.status !== 'merged') {
     var blockers = [];
     if (item.ci && item.ci.status === 'failing') blockers.push('Build failing');
+    if (item.tests && item.tests.failed > 0) blockers.push(item.tests.failed + ' test' + (item.tests.failed > 1 ? 's' : '') + ' failing');
     if (item.reviewers && item.reviewers.state === 'review-required') blockers.push('Review pending');
     if (pr.status === 'draft') blockers.push('Draft — not mergeable');
     if (blockers.length) {
       h += '<div class="dp-pr-blockers">' + blockers.join(' · ') + '</div>';
     }
+  }
+  // Gate-pending notice — shown even when PR is merged
+  if (item.env && item.env.status === 'gate-pending') {
+    h += '<div class="dp-pr-gate">Production gate open · release approval required before deploy</div>';
   }
 
   return h + '</div></div>';

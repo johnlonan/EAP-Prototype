@@ -1129,6 +1129,14 @@ body { background: #F1F0ED !important; }
 .td-blocked { width: 54px; text-align: center; }
 .td-blocked-icon { display: inline-flex; align-items: center; justify-content: center; color: var(--color-error); }
 .td-blocked-icon--off { color: rgba(0,0,0,0.14); }
+/* ── Planning tab: Code / VCS column ── */
+.ls-vcs-th { width: 130px; white-space: nowrap; }
+.ls-vcs-cell { white-space: nowrap; }
+.ls-vcs-cell.ls-vcs-empty { color: var(--text-disabled); font-size: 12px; }
+.ls-vcs-ci { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
+.ls-vcs-pr { font-size: 11px; font-weight: 500; padding: 1px 6px; border-radius: 9999px; vertical-align: middle; margin-right: 4px; white-space: nowrap; }
+.ls-vcs-tests { font-size: 11px; font-weight: 500; font-family: var(--font-mono); vertical-align: middle; margin-right: 4px; }
+.ls-vcs-env { font-size: 10px; font-weight: 500; letter-spacing: 0.02em; text-transform: uppercase; vertical-align: middle; opacity: 0.9; }
 
 /* ── Track view dropdown — Board | Workload ── */
 .fbar-tv-wrap { position: relative; display: inline-flex; }
@@ -1348,6 +1356,7 @@ body { background: #F1F0ED !important; }
 .dp-pr-dot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
 /* Blockers callout: full width, no label column */
 .dp-pr-blockers { font-size: 11px; color: #DC2626; background: rgba(220,38,38,0.09); border: 1px solid rgba(220,38,38,0.20); border-radius: 6px; padding: 6px 10px; line-height: 1.4; }
+.dp-pr-gate { font-size: 11px; color: #92400E; background: rgba(217,119,6,0.10); border: 1px solid rgba(217,119,6,0.25); border-radius: 6px; padding: 6px 10px; line-height: 1.4; margin-top: 2px; }
 /* ── Detail panel: DoD section ── */
 .dp-dod-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .dp-dod-progress { font-size: 12px; font-weight: 500; color: var(--text-tertiary); font-family: var(--font-mono); }
@@ -2048,6 +2057,107 @@ body { background: #F1F0ED !important; }
 .tl-zoom-btn.active { background: #383733 !important; color: #fff !important; }
 .tl-zoom-btn:hover:not(.active) { background: #F1F0ED !important; }
 
+/* Sand: timeline — current PI/sprint calm blue "you are here" signal */
+.tl-pi-seg.current,
+.tl-pi-seg.current.tl-pi-even,
+.tl-pi-seg.current.tl-pi-odd {
+  background: rgba(14,165,233,0.08) !important;
+  color: #0369a1 !important;
+  border-color: rgba(14,165,233,0.30) !important;
+  box-shadow: none !important;
+}
+.tl-sp-seg.current {
+  background: rgba(14,165,233,0.05) !important;
+  color: #0369a1 !important;
+  border-color: rgba(14,165,233,0.18) !important;
+  font-weight: 500 !important;
+}
+
+/* Sand: timeline — PI header band alternating tints */
+.tl-pi-seg.tl-pi-odd  { background: rgba(56,55,51,0.03); }
+.tl-pi-seg.tl-pi-even { background: transparent; }
+
+/* Sand: timeline — PI zone body fills (behind bars) */
+.tl-pi-zone { pointer-events: none; }
+.tl-pi-z-odd  { background: rgba(56,55,51,0.018); }
+.tl-pi-z-even { background: transparent; }
+.tl-pi-zone.current { background: rgba(14,165,233,0.035) !important; }
+
+/* Sand: timeline — milestone area warm cream separation */
+.tl-ms-area { background: #F8F7F4 !important; }
+
+/* Sand: timeline — progress fill reveal animation */
+/* Hidden on load; .tl-fill-in triggers the reveal after delay */
+.tl-bar-fill { transform-origin: left center; transform: scaleX(0); }
+@keyframes tl-fill-reveal {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.tl-bar-fill.tl-fill-in {
+  animation: tl-fill-reveal 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Sand: timeline — row hover warm wash */
+.tl-row-lbl:hover,
+.tl-row-bg.tl-row-hover { background: rgba(56,55,51,0.03); }
+
+/* Sand: insights — shared animation keyframes */
+@keyframes ins-bar-reveal {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes ins-slide-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Sand: insights hero — completion probability bar + labels */
+.ins-hero-verdict .ins-pbar-fill {
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.ins-hero-verdict .ins-pbar-fill.ins-bar-in {
+  animation: ins-bar-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ins-pbar-rr-lo,
+.ins-pbar-rr-hi { opacity: 0; transition: opacity 300ms ease-out; }
+.ins-pbar-rr-lo.ins-label-visible,
+.ins-pbar-rr-hi.ins-label-visible { opacity: 1; }
+
+/* Sand: insights — signal cards staggered entrance */
+.ins-sig.ins-anim-in,
+.ins-ok-strip.ins-anim-in {
+  animation: ins-slide-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Sand: insights — Monte Carlo date rows staggered entrance */
+.ins-mc-row.ins-anim-in {
+  animation: ins-slide-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Sand: insights — feature progress bars (ghost → actual) */
+.ins-feat-ghost,
+.ins-feat-fill { transform-origin: left center; transform: scaleX(0); }
+.ins-feat-ghost.ins-anim-in { animation: ins-bar-reveal 500ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.ins-feat-fill.ins-anim-in  { animation: ins-bar-reveal 550ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Sand: insights — sprint metric bars (Task Board) */
+.ins-metric-fill { transform-origin: left center; transform: scaleX(0); }
+.ins-metric-fill.ins-anim-in { animation: ins-bar-reveal 480ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Sand: insights — member workload bar */
+.ins-member-pfill { transform-origin: left center; transform: scaleX(0); }
+.ins-member-pfill.ins-anim-in { animation: ins-bar-reveal 580ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ins-hero-verdict .ins-pbar-fill,
+  .ins-feat-ghost, .ins-feat-fill,
+  .ins-metric-fill, .ins-member-pfill { transform: scaleX(1) !important; animation: none !important; }
+  .ins-pbar-rr-lo, .ins-pbar-rr-hi { opacity: 1 !important; transition: none !important; }
+  .ins-sig.ins-anim-in, .ins-ok-strip.ins-anim-in,
+  .ins-mc-row.ins-anim-in { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
 /* Sand: board swimlane team header — consistent height and layout */
 .wi-swim-hd {
   display: flex;
@@ -2061,4 +2171,108 @@ body { background: #F1F0ED !important; }
   letter-spacing: 0.03em;
   color: #000000;
   box-sizing: border-box;
+}
+
+/* ── CFD panel ──────────────────────────────────────── */
+.tcfd-panel {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px 20px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  margin-bottom: 12px;
+}
+.tcfd-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.tcfd-title {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: #111111;
+  line-height: 20px;
+}
+.tcfd-subtitle {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: #797874;
+  margin-top: 1px;
+}
+.tcfd-metrics {
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.tcfd-metric { text-align: right; }
+.tcfd-metric-val {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: #111111;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.tcfd-metric-lbl {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: #797874;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tcfd-ai-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: rgba(22,163,74,0.06);
+  border: 1px solid rgba(22,163,74,0.18);
+  border-radius: 8px;
+  padding: 7px 10px;
+  margin-bottom: 10px;
+}
+.tcfd-ai-spark {
+  font-size: 11px;
+  color: #16A34A;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.tcfd-ai-text {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: #374151;
+  line-height: 1.5;
+}
+.tcfd-ai-action {
+  font-size: 11px;
+  color: #16A34A;
+  font-weight: 500;
+  margin-left: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tcfd-svg-host { position: relative; }
+.tcfd-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.04);
+}
+.tcfd-lgd-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: #797874;
+}
+.tcfd-lgd-swatch {
+  width: 10px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
 }

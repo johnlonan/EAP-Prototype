@@ -365,13 +365,13 @@ EAP.workItems = {
   sprints: [
     {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:81, totalPts:84, donePts:15, goal:'Deliver PIN fallback handler and biometric onboarding scaffold',
       items: [
-        {id:'ls6',  num:'STRY61094201', name:'Handle fallback to PIN on failed biometric scan',     type:'Story',     state:'In Progress', pct:50, pts:3, owner:'James',  team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1', pr:{branch:'feature/pin-fallback-handler', number:1247, status:'open'}, ci:{status:'passing'}, reviewers:{count:1, approved:0, state:'review-required'}, dod:[{label:'Tests written',done:false},{label:'Code reviewed',done:false},{label:'Design reviewed',done:true},{label:'Docs updated',done:false},{label:'Demo recorded',done:false},{label:'No open bugs',done:false}]},
+        {id:'ls6',  num:'STRY61094201', name:'Handle fallback to PIN on failed biometric scan',     type:'Story',     state:'In Progress', pct:50, pts:3, owner:'James',  team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1', pr:{branch:'feature/pin-fallback-handler', number:1247, status:'open'}, ci:{status:'passing'}, tests:{passed:12, failed:0, total:12}, reviewers:{count:1, approved:0, state:'review-required'}, env:{target:'staging', status:'deployed'}, dod:[{label:'Tests written',done:false},{label:'Code reviewed',done:false},{label:'Design reviewed',done:true},{label:'Docs updated',done:false},{label:'Demo recorded',done:false},{label:'No open bugs',done:false}]},
         {id:'ls7',  num:'STRY61094202', name:'Build payment confirmation screen layout',            type:'Story',     state:'In Progress', pct:40, pts:5, owner:'Vikram', team:'Payments Team', blocked:true, blockReason:'Auth API contract not finalised — screen layout cannot be signed off', parent:'Payment Confirmation Flow', goal:'g1'},
         {id:'ls8',  num:'STRY61094203', name:'Integrate Auth API for payment confirmation flow',    type:'Story',     state:'In Progress', pct:10, pts:8, owner:'Mei',    team:'Payments Team', blocked:true, blockReason:'Auth API dependency Day 2', parent:'Payment Confirmation Flow', goal:'g1'},
-        {id:'ls9',  num:'STRY61094204', name:'Payment amount validation rules and error states',    type:'Story',     state:'In Review',   pct:80, pts:3, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1', pr:{branch:'feature/payment-validation-rules', number:4291, status:'merged'}, ci:{status:'passing'}, reviewers:{count:2, approved:2, state:'approved'}, env:{target:'staging', status:'deployed'}, dod:[{label:'Tests written',done:true},{label:'Code reviewed',done:true},{label:'Design reviewed',done:true},{label:'Docs updated',done:true},{label:'Demo recorded',done:false},{label:'No open bugs',done:true}]},
+        {id:'ls9',  num:'STRY61094204', name:'Payment amount validation rules and error states',    type:'Story',     state:'In Review',   pct:80, pts:3, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1', pr:{branch:'feature/payment-validation-rules', number:4291, status:'merged'}, ci:{status:'passing'}, tests:{passed:47, failed:0, total:47}, reviewers:{count:2, approved:2, state:'approved'}, env:{target:'production', status:'gate-pending'}, dod:[{label:'Tests written',done:true},{label:'Code reviewed',done:true},{label:'Design reviewed',done:true},{label:'Docs updated',done:true},{label:'Demo recorded',done:false},{label:'No open bugs',done:true}]},
         {id:'ls10', num:'STRY61094205', name:'Fraud detection webhook integration and retry logic', type:'Story',     state:'In Progress', pct:30, pts:8, owner:'Marcus', team:'Fraud Team',    blocked:true, blockReason:'Event bus latency fix pending — webhook integration cannot validate end-to-end', parent:'Real-time Fraud Alerts', goal:'g1'},
         {id:'ls11', num:'STRY61094206', name:'Balance refresh on app resume and foreground event',  type:'Story',     state:'To Do',       pct:0,  pts:5, owner:'Tomás',  team:'Mobile Exp Team', blocked:true, blockReason:'Carried over from Sprint 1 — DEF0500644 (stale data) must resolve first', parent:'Balance on Home Screen', goal:'g1', carriedOver:true},
-        {id:'ls12', num:'STRY61094207', name:'Auth session expiry handler and token refresh',       type:'Story',     state:'In Progress', pct:45, pts:3, owner:'Sana',   team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1', pr:{branch:'feature/auth-session-expiry', number:1251, status:'draft'}, ci:{status:'passing'}, reviewers:{count:1, approved:0, state:'review-required'}},
+        {id:'ls12', num:'STRY61094207', name:'Auth session expiry handler and token refresh',       type:'Story',     state:'In Progress', pct:45, pts:3, owner:'Sana',   team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1', pr:{branch:'feature/auth-session-expiry', number:1251, status:'draft'}, ci:{status:'passing'}, tests:{passed:8, failed:0, total:8}, reviewers:{count:1, approved:0, state:'review-required'}},
         {id:'ls13', num:'STRY61094208', name:'Account statement data fetch from backend API',       type:'Story',     state:'To Do',       pct:0,  pts:3, owner:'Lena',   team:'Accounts Team', parent:'Account Statement Export PDF', goal:'g2'},
         {id:'ls14', num:'STRY61094209', name:'KYC document upload step in onboarding flow',         type:'Story',     state:'To Do',       pct:0,  pts:4, owner:'Nina',   team:'Onboarding Team', blocked:true, blockReason:'KYC compliance sign-off (blc4) not completed — upload step cannot proceed', parent:'Streamlined Onboarding Flow', goal:'g2', carriedOver:true},
         // Defects + Case Task in flight this sprint (realistic mix, not 100% Stories)
@@ -379,7 +379,7 @@ EAP.workItems = {
         {id:'bld6', num:'DEF0500643',   name:'Auth token refresh fails silently after 24h session',           type:'Defect',    state:'In Progress', pct:60, pts:3, owner:'Sana',   team:'Auth Team',      parent:'Fingerprint Login Redesign', goal:'g1', pr:{branch:'fix/auth-token-silent-fail', number:1244, status:'open'}, ci:{status:'running'}},
         {id:'bld9', num:'DEF0500646',   name:'Payment confirmation timeout not handled gracefully',           type:'Defect',    state:'To Do',       pct:0,  pts:2, owner:'Vikram', team:'Payments Team',  parent:'Payment Confirmation Flow',  goal:'g1'},
         {id:'blc3', num:'CSTASK1222242',name:'Document API contract for payment confirmation',                type:'Case Task', state:'In Progress', pct:50, pts:2, owner:'Mei',    team:'Payments Team',  blocked:true, blockReason:'Auth API contract not yet finalised by Auth Team', parent:'Payment Confirmation Flow',  goal:'g1'},
-        {id:'ls27', num:'STRY61094222', name:'Build biometric onboarding for new users',                       type:'Story',     state:'In Progress', pct:25, pts:5, owner:'James',  team:'Auth Team',      parent:'Enhanced Biometric Auth Flow', goal:'g1', pr:{branch:'feature/biometric-onboarding', number:1253, status:'open'}, ci:{status:'failing'}, reviewers:{count:1, approved:0, state:'review-required'}, dod:[{label:'Tests written',done:false},{label:'Code reviewed',done:false},{label:'Design reviewed',done:true},{label:'Docs updated',done:false},{label:'Demo recorded',done:false},{label:'No open bugs',done:false}]},
+        {id:'ls27', num:'STRY61094222', name:'Build biometric onboarding for new users',                       type:'Story',     state:'In Progress', pct:25, pts:5, owner:'James',  team:'Auth Team',      parent:'Enhanced Biometric Auth Flow', goal:'g1', pr:{branch:'feature/biometric-onboarding', number:1253, status:'open'}, ci:{status:'failing'}, tests:{passed:14, failed:3, total:17}, reviewers:{count:1, approved:0, state:'review-required'}, dod:[{label:'Tests written',done:false},{label:'Code reviewed',done:false},{label:'Design reviewed',done:true},{label:'Docs updated',done:false},{label:'Demo recorded',done:false},{label:'No open bugs',done:false}]},
         // Auth Team — Kiran had no Sprint 2 items despite commitPts:7 in memberMetrics
         {id:'ls36', num:'STRY61094231', name:'Biometric prompt accessibility and error state refinements', type:'Story', state:'In Progress', pct:35, pts:4, owner:'Kiran', team:'Auth Team', parent:'Fingerprint Login Redesign',    goal:'g1'},
         {id:'ls37', num:'STRY61094232', name:'PIN authentication integration with keychain storage',       type:'Story', state:'In Progress', pct:20, pts:3, owner:'Kiran', team:'Auth Team', parent:'Fingerprint Login Redesign',    goal:'g1'},
@@ -388,7 +388,7 @@ EAP.workItems = {
         {id:'ls31', num:'STRY61094226', name:'Home screen skeleton loading state',                             type:'Story', state:'In Progress', pct:15, pts:3, owner:'Tomás', team:'Mobile Exp Team',  parent:'Balance on Home Screen',          goal:'g1'},
         // Accounts Team — Omar had no Sprint 2 work; Lena had one not-started item
         {id:'ls32', num:'STRY61094227', name:'Account statement period filter and date range picker',          type:'Story', state:'In Progress', pct:25, pts:5, owner:'Omar',  team:'Accounts Team',    parent:'Account Statement Export PDF',   goal:'g2'},
-        {id:'ls33', num:'STRY61094228', name:'Statement export PDF layout and template scaffolding',           type:'Story', state:'In Progress', pct:30, pts:4, owner:'Lena',  team:'Accounts Team',    parent:'Account Statement Export PDF',   goal:'g2', pr:{branch:'feature/statement-export-layout', number:1248, status:'open'}, ci:{status:'passing'}, dod:[{label:'Tests written',done:false},{label:'Code reviewed',done:false},{label:'Design reviewed',done:true},{label:'Docs updated',done:false},{label:'Demo recorded',done:false},{label:'No open bugs',done:false}]},
+        {id:'ls33', num:'STRY61094228', name:'Statement export PDF layout and template scaffolding',           type:'Story', state:'In Progress', pct:30, pts:4, owner:'Lena',  team:'Accounts Team',    parent:'Account Statement Export PDF',   goal:'g2', pr:{branch:'feature/statement-export-layout', number:1248, status:'open'}, ci:{status:'passing'}, tests:{passed:9, failed:0, total:9}, env:{target:'staging', status:'deployed'}, dod:[{label:'Tests written',done:false},{label:'Code reviewed',done:false},{label:'Design reviewed',done:true},{label:'Docs updated',done:false},{label:'Demo recorded',done:false},{label:'No open bugs',done:false}]},
         // Onboarding Team — Devi had no Sprint 2 work; Nina had one blocked carryover
         {id:'ls34', num:'STRY61094229', name:'Collect and persist user preferences in onboarding step 3',     type:'Story', state:'In Progress', pct:10, pts:2, owner:'Nina',  team:'Onboarding Team',  parent:'Streamlined Onboarding Flow',    goal:'g2'},
         {id:'ls35', num:'STRY61094230', name:'Onboarding progress indicator and step tracker',                 type:'Story', state:'In Progress', pct:20, pts:3, owner:'Devi',  team:'Onboarding Team',  parent:'Streamlined Onboarding Flow',    goal:'g2'}
@@ -442,7 +442,7 @@ EAP.hierarchy = [
             children: [
               {id:'f1', type:'feature', name:'Fingerprint Login Redesign', state:'In Progress', pct:65, pts:18, owner:'Ananya', team:'Auth',
                 children: [
-                  {id:'s1', type:'story', name:'Build biometric prompt UI', state:'Done', pct:100, pts:5, owner:'Kiran', team:'Auth', pr:{branch:'feature/biometric-prompt-ui', number:1198, status:'merged'}, env:{target:'production', status:'deployed'}},
+                  {id:'s1', type:'story', name:'Build biometric prompt UI', state:'Done', pct:100, pts:5, owner:'Kiran', team:'Auth', pr:{branch:'feature/biometric-prompt-ui', number:1198, status:'merged'}, ci:{status:'passing'}, tests:{passed:31, failed:0, total:31}, env:{target:'production', status:'deployed'}},
                   {id:'s2', type:'story', name:'Handle fallback to PIN', state:'In Progress', pct:50, pts:3, owner:'Kiran', team:'Auth'},
                   {id:'s3', type:'story', name:'Error state on failed scan', state:'To Do', pct:0, pts:2, owner:'Sana', team:'Auth'},
                   {id:'d1', type:'defect', name:'DEF-001: Biometric fails on iOS 17.4', state:'Blocked', pct:0, pts:0, owner:'Sana', team:'Auth'}
@@ -1197,3 +1197,99 @@ EAP.sprintHistory = [
   { name:'PI26 S1', initial:96,  added:8,  removed:2, completed:95,  notDone:7  },
   { name:'PI26 S2', initial:49,  added:7,  removed:0, completed:8,   notDone:0, active:true, dayOf:5, totalDays:14 }
 ];
+
+// ── CFD (Cumulative Flow Diagram) — 4-sprint rolling history ──────────────
+// Covers PI25 S3 + S4 (complete) + PI26 S1 (complete) + PI26 S2 (active, partial).
+// Each row: [total, done, review, inprog, todo, blocked]
+// Constraints: row sum = total; done is strictly non-decreasing.
+// WIP spike days 16–21: inprog peaks at 9, limit is 6 → AI annotation trigger.
+(function() {
+  var ROWS = [
+    // Sprint 1 — PI25 S3 — days 0–13 — clean delivery
+    [ 50,  0,  0,  4, 46,  0],
+    [ 50,  0,  2,  6, 42,  0],
+    [ 50,  2,  3,  6, 39,  0],
+    [ 50,  5,  4,  6, 35,  0],
+    [ 50,  8,  4,  6, 32,  0],
+    [ 50, 12,  3,  5, 29,  1],
+    [ 50, 15,  4,  5, 26,  0],
+    [ 50, 19,  4,  5, 22,  0],
+    [ 50, 23,  3,  5, 19,  0],
+    [ 50, 27,  3,  4, 15,  1],
+    [ 50, 31,  3,  4, 11,  1],
+    [ 50, 35,  3,  3,  9,  0],
+    [ 50, 39,  3,  3,  5,  0],
+    [ 50, 42,  2,  3,  2,  1],  // end S1: 42/50 done
+
+    // Sprint 2 — PI25 S4 — days 14–27 — WIP spike days 16–21
+    [103, 42,  2,  4, 55,  0],  // +53 new items
+    [103, 43,  3,  6, 51,  0],
+    [103, 45,  4,  7, 47,  0],  // inprog=7, breach begins
+    [103, 46,  4,  8, 44,  1],  // inprog=8
+    [106, 47,  3,  9, 46,  1],  // scope+3, inprog=9 ← PEAK (AI annotation)
+    [106, 48,  3,  9, 45,  1],  // inprog=9 sustained
+    [106, 49,  4,  8, 44,  1],
+    [106, 51,  5,  7, 42,  1],  // inprog=7, recovering
+    [106, 54,  5,  5, 41,  1],  // inprog back below limit
+    [106, 58,  4,  5, 38,  1],
+    [106, 63,  3,  4, 35,  1],
+    [106, 68,  3,  4, 30,  1],
+    [106, 73,  3,  3, 26,  1],
+    [106, 78,  2,  3, 22,  1],  // end S2: 78/106 done
+
+    // Sprint 3 — PI26 S1 — days 28–41 — clean sprint
+    [158, 78,  2,  3, 74,  1],  // +52 new items
+    [158, 80,  3,  5, 69,  1],
+    [158, 83,  4,  6, 64,  1],
+    [158, 87,  4,  6, 60,  1],
+    [158, 91,  4,  6, 56,  1],
+    [158, 95,  4,  5, 53,  1],
+    [158, 99,  4,  5, 49,  1],
+    [158,104,  3,  5, 45,  1],
+    [158,109,  3,  5, 40,  1],
+    [158,114,  3,  4, 36,  1],
+    [158,119,  3,  4, 31,  1],
+    [158,124,  3,  3, 27,  1],
+    [158,129,  2,  3, 23,  1],
+    [158,133,  2,  2, 20,  1],  // end S3: 133/158 done
+
+    // Sprint 4 — PI26 S2 (active) — days 42–48
+    [214,133,  2,  3, 75,  1],  // +56 new items
+    [214,135,  2,  4, 72,  1],
+    [214,137,  3,  5, 68,  1],
+    [214,139,  3,  5, 65,  2],
+    [214,141,  3,  5, 64,  1],
+    [214,143,  3,  5, 62,  1],
+    [214,145,  3,  5, 60,  1]   // day 48: beyond typical dayInSprint range
+  ];
+
+  var addDays = EAP._addDays, fmt = EAP._fmt;
+  // Day 0 = start of PI25 S3 = 2 full sprints + (dayInSprint-1) days before today
+  var day0 = addDays(EAP._today, -(14 * 2 + EAP._dayInSprint - 1));
+  // Current day index into ROWS: sprint 4 starts at row 42, we're on dayInSprint
+  var todayIdx = Math.min(42 + EAP._dayInSprint - 1, ROWS.length - 1);
+
+  EAP.cfdData = ROWS.slice(0, todayIdx + 1).map(function(r, i) {
+    return { date: addDays(day0, i), dateStr: fmt(addDays(day0, i)),
+             total: r[0], done: r[1], review: r[2], inprog: r[3], todo: r[4], blocked: r[5] };
+  });
+
+  // Sprint boundary indices within the CFD window
+  EAP.cfdSprints = [
+    { idx:  0, label: 'PI25 S3', active: false },
+    { idx: 14, label: 'PI25 S4', active: false },
+    { idx: 28, label: 'PI26 S1', active: false },
+    { idx: 42, label: 'PI26 S2', active: true  }
+  ];
+
+  // Day 18 = PI25 S4 day 5 — inprog peak of 9 (WIP limit 6 exceeded for 6 days)
+  EAP.cfdWipPeakIdx = 18;
+
+  var n = EAP.cfdData.length;
+  var lastDone = EAP.cfdData[n - 1].done;
+  EAP.cfdMetrics = {
+    throughput: (lastDone / n).toFixed(1),  // items/day over visible window
+    cycleTime: 3.8,     // avg days in-flight (WIP / throughput, weighted)
+    flowEfficiency: 21  // % of cycle time spent actively worked vs waiting
+  };
+})();
