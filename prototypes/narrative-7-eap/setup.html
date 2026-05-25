@@ -34,6 +34,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 .liquid-bg { display: none; }
+/* Setup has its own footer chrome — suppress the global floating Otto bar */
+#floating-bar { display: none !important; }
 .page-shell { position: relative; z-index: 2; display: flex; height: 100vh; overflow: hidden; }
 
 /* ── Split-screen viewport ── */
@@ -58,10 +60,10 @@ body {
 
 /* ─────── LEFT: WIZARD ─────── */
 .setup-wizard {
-  /* Proportional, not fixed — adapts to the viewport */
-  flex: 0 0 42%;
-  min-width: 400px;
-  max-width: 560px;
+  /* 60 % of the split — gives form content room to breathe */
+  flex: 0 0 60%;
+  min-width: 480px;
+  max-width: 760px;
   display: flex; flex-direction: column;
   overflow-y: auto; overflow-x: hidden;
   border-right: 1px solid rgba(0,0,0,0.08);
@@ -76,7 +78,7 @@ body {
   .setup-preview { display: none; }
 }
 @media (min-width: 961px) and (max-width: 1200px) {
-  .setup-wizard { flex: 0 0 46%; max-width: 520px; }
+  .setup-wizard { flex: 0 0 58%; max-width: 640px; }
 }
 
 /* Chrome — full-width bar spanning both panels */
@@ -86,8 +88,19 @@ body {
   align-items: center;
   padding: 12px 24px;
   flex-shrink: 0;
-  background: var(--bg);
+  background: var(--surface);
   border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+
+/* Preview context label — right column of chrome, points to the preview panel */
+.chrome-context {
+  display: flex; align-items: center; justify-content: flex-end;
+  min-width: 0; overflow: hidden;
+}
+.chrome-context-label {
+  font-size: 11.5px; font-weight: 500; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 220px; transition: opacity 200ms ease;
 }
 .setup-back {
   display: inline-flex; align-items: center; gap: 5px;
@@ -286,11 +299,16 @@ body {
 .done-sub { font-size: 14px; color: var(--sub); line-height: 1.6; max-width: 40ch; margin-bottom: 24px; animation: pane-in 260ms ease 360ms both; }
 .done-actions { display: flex; gap: 10px; align-items: center; animation: pane-in 260ms ease 420ms both; }
 
-/* Footer — full-width bar spanning both panels */
+/* Footer — full-width, card rising from the bottom */
 .setup-footer {
-  flex-shrink: 0; border-top: 1px solid rgba(0,0,0,0.07);
-  background: var(--surface); padding: 11px 24px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.06), 0 -1px 3px rgba(0,0,0,0.04);
+  padding: 12px 24px;
   display: flex; align-items: center; gap: 10px;
+  /* Ensure it sits flush — no gap below */
+  margin-top: -1px;
 }
 .btn-back { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background 140ms, color 140ms; visibility: hidden; }
 .btn-back:hover { background: var(--raised); color: var(--ink); }
@@ -531,6 +549,43 @@ body {
 .ci-note { font-size: 11.5px; color: var(--sub); line-height: 1.4; }
 .ci-action { font-size: 11.5px; font-weight: 600; color: var(--charcoal); cursor: pointer; }
 .ci-action:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── AUTO-CONFIGURED SECTION (Step 1 preview) ── */
+.auto-config-section {
+  margin-top: 20px;
+  animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 320ms both;
+}
+.auto-config-hd {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.auto-config-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.10em; color: var(--muted);
+}
+.auto-config-ai-tag {
+  font-size: 9.5px; font-weight: 600; color: var(--ai-accent);
+  background: var(--ai-bg); padding: 2px 8px; border-radius: 999px;
+}
+.auto-config-rows {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px; overflow: hidden;
+}
+.auto-config-row {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.auto-config-row:last-child { border-bottom: none; }
+.acr-key {
+  font-size: 11.5px; font-weight: 500; color: var(--muted);
+  min-width: 84px; flex-shrink: 0;
+}
+.acr-val {
+  font-size: 12.5px; color: var(--ink); line-height: 1.4; flex: 1;
+}
 </style>
 </head>
 <body>
@@ -555,7 +610,7 @@ body {
         <button class="setup-step-btn" data-step="4" onclick="goStep(4)"><span class="step-num">4</span><span class="step-label">Invite</span></button>
         <button class="setup-step-btn" data-step="5" onclick="goStep(5)"><span class="step-num">5</span><span class="step-label">Ready</span></button>
       </div>
-      <div></div><!-- grid spacer — keeps tabs truly centred -->
+      <div class="chrome-context"><span class="chrome-context-label" id="prev-hd-sub">Essential SAFe hierarchy</span></div>
     </div>
 
     <!-- ═══════════════════════════════════════════════
@@ -712,16 +767,12 @@ body {
     ════════════════════════════════════════════════ -->
     <div class="setup-preview" id="setup-preview">
 
-      <div class="prev-hd">
-        <span class="prev-hd-title">Preview</span>
-        <span class="prev-hd-sub" id="prev-hd-sub">Essential SAFe hierarchy</span>
-      </div>
-
       <div class="prev-scroll" id="prev-scroll">
 
-        <!-- Step 1: Hierarchy diagram -->
+        <!-- Step 1: Hierarchy diagram + auto-configured items -->
         <div class="prev-pane is-active" id="prev-p1">
           <div class="hier-diagram" id="hier-diagram"><!-- populated by JS --></div>
+          <div class="auto-config-section" id="auto-config-section"><!-- populated by JS --></div>
         </div>
 
         <!-- Step 2: Method detail -->
@@ -842,6 +893,38 @@ body {
     { name: 'Data & Analytics',   count: 4 }
   ];
 
+  // ── Auto-configured items per framework ─────────────────────────
+  var autoConfigData = {
+    essential: [
+      { key: 'PI cadence',    val: '10 weeks — 4 sprints + IP sprint' },
+      { key: 'Sprint',        val: '2-week sprints' },
+      { key: 'Views',         val: 'Board · Backlog · Timeline · Hierarchy' },
+      { key: 'Roles',         val: 'RTE · Scrum Master · Product Owner' },
+      { key: 'Metrics',       val: 'Velocity · PI predictability · Flow efficiency' }
+    ],
+    portfolio: [
+      { key: 'PI cadence',    val: '10 weeks per ART · Solution Train cadence' },
+      { key: 'Sprint',        val: '2-week sprints across all teams' },
+      { key: 'Views',         val: 'Portfolio · ART · Team layers' },
+      { key: 'Roles',         val: 'LPM · RTE · Solution Architect' },
+      { key: 'Metrics',       val: 'Business outcomes · Epic health · Portfolio flow' }
+    ],
+    kanban: [
+      { key: 'Flow model',    val: 'Pull-based — no fixed sprints' },
+      { key: 'WIP limits',    val: 'Configurable per column' },
+      { key: 'Views',         val: 'Kanban board · CFD · Flow metrics' },
+      { key: 'Roles',         val: 'Flow manager · Work item owners' },
+      { key: 'Metrics',       val: 'Cycle time · Throughput · Queue length' }
+    ],
+    blank: [
+      { key: 'Hierarchy',     val: 'No preset — define your own levels' },
+      { key: 'Cadence',       val: 'Configure from scratch' },
+      { key: 'Views',         val: 'All views available to enable' },
+      { key: 'Roles',         val: 'No defaults — assign as needed' },
+      { key: 'Metrics',       val: 'No defaults — add what you need' }
+    ]
+  };
+
   // ── Framework data ───────────────────────────────────────────────
   var fwData = {
     essential: {
@@ -945,6 +1028,25 @@ body {
       });
       diag.innerHTML = html;
       diag.style.opacity = '1';
+
+      // Populate auto-configured section below the hierarchy
+      var acData = autoConfigData[fw] || autoConfigData.essential;
+      var acEl = document.getElementById('auto-config-section');
+      if (acEl) {
+        acEl.innerHTML =
+          '<div class="auto-config-hd">' +
+            '<span class="auto-config-label">Auto-configured</span>' +
+            '<span class="auto-config-ai-tag">✦ AI</span>' +
+          '</div>' +
+          '<div class="auto-config-rows">' +
+          acData.map(function(row, i) {
+            return '<div class="auto-config-row" style="animation-delay:' + (360 + i * 55) + 'ms">' +
+              '<span class="acr-key">' + row.key + '</span>' +
+              '<span class="acr-val">' + row.val + '</span>' +
+              '</div>';
+          }).join('') +
+          '</div>';
+      }
     }, 160);
   }
 
