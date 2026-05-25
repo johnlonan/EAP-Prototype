@@ -81,76 +81,63 @@ body {
   .setup-wizard { flex: 0 0 62%; max-width: 720px; }
 }
 
-/* Chrome — full-width bar spanning both panels */
+/* Chrome — full-width bar, centred stepper only */
 .setup-chrome {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 12px 24px;
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 14px 24px 0;
   flex-shrink: 0;
-  background: var(--surface);
+  background: var(--bg);
   border-bottom: 1px solid rgba(0,0,0,0.07);
 }
 
-/* Preview context label — right column of chrome, points to the preview panel */
-.chrome-context {
-  display: flex; align-items: center; justify-content: flex-end;
-  min-width: 0; overflow: hidden;
+/* ── Stepper ── */
+.setup-stepper {
+  display: flex; align-items: flex-start; gap: 0;
+  padding-bottom: 12px;
 }
-.chrome-context-label {
-  font-size: 11.5px; font-weight: 500; color: var(--muted);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 220px; transition: opacity 200ms ease;
+.stepper-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer; outline: none;
 }
-.setup-back {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12px; font-weight: 500; color: var(--muted);
-  text-decoration: none; padding: 5px 10px 5px 6px;
-  border-radius: 8px; transition: background 140ms, color 140ms;
-}
-.setup-back:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
-.setup-back svg { width: 13px; height: 13px; }
-
-/* Step tabs — centered in the full-width chrome via CSS grid */
-.setup-steps {
-  display: inline-flex; align-items: center; gap: 2px;
-  background: #F9F8F6; border: 1px solid #E3E2DF;
-  border-radius: 14px; padding: 3px; height: 42px;
-  /* Shrink if necessary — never overflow the chrome */
-  flex-shrink: 1; min-width: 0; overflow: hidden;
-}
-.setup-step-btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  height: 36px; padding: 0 10px; border-radius: 11px;
-  font-size: 12px; font-weight: 400; cursor: pointer;
-  border: none; background: transparent;
-  color: var(--muted); font-family: var(--font-sans);
-  transition: all 150ms ease; white-space: nowrap;
+.stepper-item:focus-visible .stepper-node { outline: 2px solid var(--charcoal); outline-offset: 2px; }
+.stepper-node {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,0.08); color: var(--muted);
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  transition: background 220ms cubic-bezier(0.22,1,0.36,1), color 180ms ease, transform 220ms cubic-bezier(0.22,1,0.36,1);
 }
-.setup-step-btn:hover { color: var(--sub); background: rgba(0,0,0,0.06); }
-.setup-step-btn.active { background: var(--charcoal); color: #fff; font-weight: 600; }
-.setup-step-btn.done { color: var(--sub); }
-/* On very narrow viewports only: collapse to number-only tabs */
-@media (max-width: 720px) {
-  .setup-step-btn .step-label { display: none; }
-  .setup-step-btn { padding: 0 8px; }
-}
-.step-num {
-  width: 19px; height: 19px; border-radius: 50%;
-  background: rgba(0,0,0,0.09); color: inherit;
-  font-size: 9.5px; font-weight: 700;
-  display: inline-flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: background 200ms;
-}
-.setup-step-btn.active .step-num { background: rgba(255,255,255,0.26); }
-.setup-step-btn.done .step-num {
+.stepper-item:hover:not(.active):not(.done) .stepper-node { background: rgba(0,0,0,0.13); }
+.stepper-item.active .stepper-node {
   background: var(--ai-accent); color: #fff;
+  transform: scale(1.1);
+}
+.stepper-item.done .stepper-node {
+  background: var(--ai-accent); color: #fff;
+  font-size: 0; /* hide number, show checkmark */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.5 9l3 3 6-6' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: center; background-size: 13px;
   animation: step-done 240ms cubic-bezier(0.22,1,0.36,1) both;
 }
-@keyframes step-done { from { transform: scale(0.65); } to { transform: scale(1); } }
+@keyframes step-done { from { transform: scale(0.65); } to { transform: scale(1.0); } }
+.stepper-label {
+  font-size: 10px; font-weight: 400; color: var(--muted);
+  white-space: nowrap; letter-spacing: 0.01em; line-height: 1;
+  transition: color 180ms ease;
+}
+.stepper-item.active .stepper-label { color: var(--ink); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--sub); }
+
+/* Connecting line between steps */
+.stepper-line {
+  width: 36px; height: 1.5px;
+  background: rgba(0,0,0,0.10); flex-shrink: 0;
+  margin-top: 11px; /* vertically center with node (24px/2 - 0.75px) */
+  border-radius: 1px;
+  transition: background 300ms ease;
+}
+.stepper-line.done { background: rgba(22,163,74,0.45); }
 
 /* Panes */
 .setup-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
@@ -200,7 +187,7 @@ body {
   transition: all 180ms cubic-bezier(0.22,1,0.36,1);
 }
 .fw-check svg { opacity: 0; transition: opacity 160ms; }
-.fw-card.is-selected .fw-check { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.32); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
+.fw-card.is-selected .fw-check { background: var(--ai-accent); border-color: var(--ai-accent); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
 .fw-card.is-selected .fw-check svg { opacity: 1; }
 .fw-desc { font-size: 13px; color: var(--sub); line-height: 1.55; }
 .fw-card.is-selected .fw-desc { color: rgba(255,255,255,0.78); }
@@ -340,7 +327,7 @@ body {
 .setup-preview {
   flex: 1; min-width: 0;
   display: flex; flex-direction: column;
-  background: #E1E0DD;
+  background: var(--bg);
   overflow: hidden;
 }
 
@@ -624,18 +611,32 @@ body {
          CHROME — full-width, spans both panels
     ════════════════════════════════════════════════ -->
     <div class="setup-chrome">
-      <a class="setup-back" href="home.html">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Home
-      </a>
-      <div class="setup-steps" id="step-tabs">
-        <button class="setup-step-btn active" data-step="1" onclick="goStep(1)"><span class="step-num">1</span><span class="step-label">Framework</span></button>
-        <button class="setup-step-btn" data-step="2" onclick="goStep(2)"><span class="step-num">2</span><span class="step-label">Configure</span></button>
-        <button class="setup-step-btn" data-step="3" onclick="goStep(3)"><span class="step-num">3</span><span class="step-label">Review</span></button>
-        <button class="setup-step-btn" data-step="4" onclick="goStep(4)"><span class="step-num">4</span><span class="step-label">Invite</span></button>
-        <button class="setup-step-btn" data-step="5" onclick="goStep(5)"><span class="step-num">5</span><span class="step-label">Ready</span></button>
+      <div class="setup-stepper" id="step-tabs">
+        <div class="stepper-item active" data-step="1" tabindex="0" onclick="goStep(1)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(1)">
+          <div class="stepper-node">1</div>
+          <span class="stepper-label">Framework</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="2" tabindex="0" onclick="goStep(2)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(2)">
+          <div class="stepper-node">2</div>
+          <span class="stepper-label">Configure</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="3" tabindex="0" onclick="goStep(3)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(3)">
+          <div class="stepper-node">3</div>
+          <span class="stepper-label">Review</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="4" tabindex="0" onclick="goStep(4)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(4)">
+          <div class="stepper-node">4</div>
+          <span class="stepper-label">Invite</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="5" tabindex="0" onclick="goStep(5)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(5)">
+          <div class="stepper-node">5</div>
+          <span class="stepper-label">Ready</span>
+        </div>
       </div>
-      <div class="chrome-context"><span class="chrome-context-label" id="prev-hd-sub">Essential SAFe hierarchy</span></div>
     </div>
 
     <!-- ═══════════════════════════════════════════════
@@ -700,9 +701,9 @@ body {
           <div class="method-list" role="radiogroup" aria-label="Setup method selection">
             <div class="method-card is-hero is-selected" data-method="ai" tabindex="0" role="radio" aria-checked="true">
               <div class="method-badge">Fastest</div>
-              <div class="method-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/></svg></div>
+              <div class="method-icon"><svg width="17" height="17" viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
               <div class="method-info">
-                <div class="method-name">✦ Describe your team: Otto builds the ART</div>
+                <div class="method-name">Describe your team: Otto builds the ART</div>
                 <div class="method-desc">Write a plain-language description: team names, size, PI length, tools. Otto generates the full configuration in seconds. Review before anything is saved.</div>
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -734,7 +735,7 @@ body {
           </div>
           <div class="ai-input-card" id="ai-input-card">
             <div class="ai-card-hd">
-              <div class="ai-otto"><svg viewBox="0 0 24 24" fill="none"><path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/></svg></div>
+              <div class="ai-otto"><svg viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
               <span class="ai-card-label">Otto</span>
             </div>
             <textarea class="ai-textarea" id="ai-textarea" rows="4" placeholder="e.g. We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd."></textarea>
@@ -1031,7 +1032,6 @@ body {
   // ── Render hierarchy diagram ─────────────────────────────────────
   function renderHierarchy(fw) {
     var data = fwData[fw] || fwData.essential;
-    document.getElementById('prev-hd-sub').textContent = data.label;
     var panelSub = document.getElementById('prev-hd-sub-panel');
     if (panelSub) panelSub.textContent = data.label;
     var diag = document.getElementById('hier-diagram');
@@ -1068,7 +1068,7 @@ body {
         acEl.innerHTML =
           '<div class="auto-config-hd">' +
             '<span class="auto-config-label">Auto-configured</span>' +
-            '<span class="auto-config-ai-tag">✦ AI</span>' +
+            '<span class="auto-config-ai-tag">AI</span>' +
           '</div>' +
           '<div class="auto-config-rows">' +
           acData.map(function(row, i) {
@@ -1085,7 +1085,6 @@ body {
   // ── Render method preview ────────────────────────────────────────
   function renderMethodPreview(method) {
     var data = methodData[method] || methodData.ai;
-    document.getElementById('prev-hd-sub').textContent = data.title;
     var _pm = document.getElementById('prev-hd-sub-panel');
     if (_pm) _pm.textContent = data.title;
     var container = document.getElementById('method-detail');
@@ -1250,7 +1249,6 @@ body {
     document.getElementById('btn-continue').disabled = true;
 
     // Update preview header
-    document.getElementById('prev-hd-sub').textContent = 'Building your ART…';
     var _p = document.getElementById('prev-hd-sub-panel');
     if (_p) _p.textContent = 'Building your ART…';
 
@@ -1262,7 +1260,7 @@ body {
       [600,  'Identifying <strong>team structure…</strong>'],
       [1300, 'Mapping <strong>PI calendar…</strong>'],
       [2100, 'Setting up <strong>integrations…</strong>'],
-      [3100, '✦ <strong>ART configured.</strong> Review before saving']
+      [3100, '✓ <strong>ART configured.</strong> Review before saving']
     ];
     var items = [
       [500,  '4 teams',           'Auth · Payments · Mobile · Data & Analytics'],
@@ -1289,7 +1287,6 @@ body {
 
     genTimers.push(setTimeout(function() {
       document.getElementById('gen-spinner').className = 'gen-spinner done';
-      document.getElementById('prev-hd-sub').textContent = 'Digital Banking ART';
       var _p2 = document.getElementById('prev-hd-sub-panel');
       if (_p2) _p2.textContent = 'Digital Banking ART';
       aiDone = true;
@@ -1309,12 +1306,16 @@ body {
     document.querySelectorAll('.prev-pane').forEach(function(p, i) {
       p.classList.toggle('is-active', i + 1 === step);
     });
-    // Step tabs
-    document.querySelectorAll('.setup-step-btn').forEach(function(b) {
+    // Stepper nodes
+    document.querySelectorAll('.stepper-item').forEach(function(b) {
       var s = parseInt(b.dataset.step);
       b.classList.remove('active','done');
       if (s === step) b.classList.add('active');
       if (s < step)  b.classList.add('done');
+    });
+    // Stepper lines
+    document.querySelectorAll('.stepper-line').forEach(function(line, i) {
+      line.classList.toggle('done', i + 1 < step);
     });
     // Back btn
     document.getElementById('btn-back').style.visibility = step > 1 ? 'visible' : 'hidden';
