@@ -66,7 +66,7 @@ body {
   max-width: 860px;
   display: flex; flex-direction: column;
   overflow-y: auto; overflow-x: hidden;
-  border-right: 1px solid rgba(0,0,0,0.08);
+  border-right: 1.5px solid rgba(0,0,0,0.11);
   background: var(--bg);
 }
 .setup-wizard::-webkit-scrollbar { width: 4px; }
@@ -225,7 +225,7 @@ body {
 .method-icon {
   width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
   background: var(--raised); display: flex; align-items: center; justify-content: center;
-  font-size: 15px; transition: transform 200ms cubic-bezier(0.22,1,0.36,1);
+  font-size: 15px; color: var(--sub); transition: transform 200ms cubic-bezier(0.22,1,0.36,1);
 }
 .method-card:hover .method-icon { transform: scale(1.08); }
 .method-card.is-hero .method-icon { background: rgba(22,163,74,0.12); color: var(--ai-accent); }
@@ -334,9 +334,10 @@ body {
 
 .prev-hd {
   flex-shrink: 0;
-  padding: 13px 24px 11px;
-  border-bottom: 1px solid rgba(0,0,0,0.07);
+  padding: 12px 24px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.09);
   display: flex; align-items: center; gap: 10px;
+  background: #F8F7F4; /* near-white toolbar — signals the preview panel is a distinct viewport */
 }
 .prev-hd-title {
   font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -421,7 +422,7 @@ body {
 .method-prev-item:nth-child(3) { animation-delay: 150ms; }
 .method-prev-item:nth-child(4) { animation-delay: 210ms; }
 .method-prev-item:nth-child(5) { animation-delay: 270ms; }
-.mpi-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.mpi-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; display: inline-flex; align-items: center; justify-content: center; width: 16px; color: var(--sub); }
 .mpi-body { flex: 1; }
 .mpi-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
 .mpi-note { font-size: 11px; color: var(--sub); line-height: 1.45; }
@@ -543,7 +544,7 @@ body {
 .checklist-item:nth-child(2){animation-delay:380ms}
 .checklist-item:nth-child(3){animation-delay:460ms}
 .checklist-item:nth-child(4){animation-delay:540ms}
-.ci-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; line-height: 1; }
+.ci-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; width: 16px; }
 .ci-body { flex: 1; }
 .ci-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 1px; }
 .ci-note { font-size: 11px; color: var(--sub); line-height: 1.45; }
@@ -710,7 +711,7 @@ body {
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
             <div class="method-card" data-method="template" tabindex="0" role="radio" aria-checked="false">
-              <div class="method-icon">📋</div>
+              <div class="method-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg></div>
               <div class="method-info">
                 <div class="method-name">Use an industry template</div>
                 <div class="method-desc">Pre-built for Digital Banking, Insurance, Retail Technology, and Healthcare IT. Teams, PI calendars, and feature categories already defined. Edit anything before launch.</div>
@@ -718,7 +719,7 @@ body {
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
             <div class="method-card" data-method="import" tabindex="0" role="radio" aria-checked="false">
-              <div class="method-icon">📥</div>
+              <div class="method-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
               <div class="method-info">
                 <div class="method-name">Import from Jira or Rally</div>
                 <div class="method-desc">Connect your project and EAP maps epics, stories, and sprints to the SAFe hierarchy. Review the mapping before anything is imported.</div>
@@ -873,11 +874,11 @@ body {
               </div>
             </div>
             <div class="readiness-checklist">
-              <div class="checklist-item done"><span class="ci-icon">✓</span><div class="ci-body"><div class="ci-name">4 teams configured</div><div class="ci-note">Auth · Payments · Mobile · Data &amp; Analytics</div></div></div>
-              <div class="checklist-item done"><span class="ci-icon">✓</span><div class="ci-body"><div class="ci-name">PI 26 scheduled</div><div class="ci-note">Jun 2 – Aug 10 · Sprint 2 active</div></div></div>
-              <div class="checklist-item done"><span class="ci-icon">✓</span><div class="ci-body"><div class="ci-name">47 features from Jira</div><div class="ci-note">DBKG project connected · features mapped</div></div></div>
-              <div class="checklist-item warn"><span class="ci-icon">⚠</span><div class="ci-body"><div class="ci-name">PI Planning session not scheduled</div><div class="ci-note">Add PI Planning to the team calendar before Sprint 4</div></div></div>
-              <div class="checklist-item warn"><span class="ci-icon">⚠</span><div class="ci-body"><div class="ci-name">Team capacity not set for Sprint 1</div><div class="ci-note">Needed for accurate velocity forecasting</div></div></div>
+              <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">4 teams configured</div><div class="ci-note">Auth · Payments · Mobile · Data &amp; Analytics</div></div></div>
+              <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">PI 26 scheduled</div><div class="ci-note">Jun 2 – Aug 10 · Sprint 2 active</div></div></div>
+              <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">47 features from Jira</div><div class="ci-note">DBKG project connected · features mapped</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">PI Planning session not scheduled</div><div class="ci-note">Add PI Planning to the team calendar before Sprint 4</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">Team capacity not set for Sprint 1</div><div class="ci-note">Needed for accurate velocity forecasting</div></div></div>
             </div>
           </div>
         </div>
@@ -994,39 +995,61 @@ body {
     }
   };
 
+  // ── Lucide icon helper + path constants ──────────────────────────
+  function icon(path, size) {
+    return '<svg width="' + (size||14) + '" height="' + (size||14) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
+  }
+  var IC = {
+    users:    '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    cal:      '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    msg:      '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    pencil:   '<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+    zap:      '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    chart:    '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+    arrowR:   '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+    warn:     '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    undo:     '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/>',
+    clip:     '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    jira:     '<rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/>'
+  };
+  var OTTO_ICON_SM = '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
   // ── Method preview data ──────────────────────────────────────────
   var methodData = {
     ai: {
-      icon: '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>',
+      icon: OTTO_ICON_SM,
       title: 'What Otto will configure',
       sub: 'Otto reads your description and generates a complete ART configuration in about 5 seconds.',
       items: [
-        { icon: '👥', name: 'Teams', note: 'Names, sizes, and sprint calendars for each team' },
-        { icon: '📅', name: 'PI Calendar', note: 'PI dates, sprint boundaries, and IP sprint for the next 4 PIs' },
-        { icon: 'J',  name: 'Jira Integration', note: 'Maps your Jira epics and stories to the SAFe hierarchy' },
-        { icon: '💬', name: 'Slack notifications', note: 'ART-level channel connected for sprint and PI updates' },
-        { icon: '✏',  name: 'Everything editable', note: 'Click any field in the preview to rename or adjust' }
+        { icon: icon(IC.users),  name: 'Teams', note: 'Names, sizes, and sprint calendars for each team' },
+        { icon: icon(IC.cal),    name: 'PI Calendar', note: 'PI dates, sprint boundaries, and IP sprint for the next 4 PIs' },
+        { icon: icon(IC.jira),   name: 'Jira Integration', note: 'Maps your Jira epics and stories to the SAFe hierarchy' },
+        { icon: icon(IC.msg),    name: 'Slack notifications', note: 'ART-level channel connected for sprint and PI updates' },
+        { icon: icon(IC.pencil), name: 'Everything editable', note: 'Click any field in the preview to rename or adjust' }
       ]
     },
     template: {
-      icon: '📋', title: 'Digital Banking template',
+      icon: icon(IC.clip, 28),
+      title: 'Digital Banking template',
       sub: 'Pre-built for teams building digital banking and financial services products.',
       items: [
-        { icon: '👥', name: '4 teams pre-configured', note: 'Auth · Payments · Mobile · Data & Analytics' },
-        { icon: '📅', name: 'PI cadence set', note: '12-week PIs · 2-week sprints · Starts next Monday' },
-        { icon: '⚡', name: '32 feature categories', note: 'Authentication, Payments, Regulatory, Mobile, Reporting' },
-        { icon: '📊', name: 'Velocity baselines', note: 'Realistic starting-point estimates from similar teams' }
+        { icon: icon(IC.users), name: '4 teams pre-configured', note: 'Auth · Payments · Mobile · Data & Analytics' },
+        { icon: icon(IC.cal),   name: 'PI cadence set', note: '12-week PIs · 2-week sprints · Starts next Monday' },
+        { icon: icon(IC.zap),   name: '32 feature categories', note: 'Authentication, Payments, Regulatory, Mobile, Reporting' },
+        { icon: icon(IC.chart), name: 'Velocity baselines', note: 'Realistic starting-point estimates from similar teams' }
       ]
     },
     import: {
-      icon: '📥', title: 'Jira import mapping',
+      icon: icon(IC.download, 28),
+      title: 'Jira import mapping',
       sub: 'EAP reads your Jira project and maps the existing hierarchy to SAFe. Review before importing.',
       items: [
-        { icon: '⤵', name: 'Jira Epic → EAP Feature', note: 'Preserves titles, descriptions, and assignments' },
-        { icon: '⤵', name: 'Jira Story → EAP Story', note: 'Story points, status, and sprint history carried over' },
-        { icon: '⤵', name: 'Jira Sprint → EAP Sprint', note: 'Sprint dates and team assignment mapped automatically' },
-        { icon: '⚠', name: 'Custom fields reviewed', note: 'You confirm how custom fields map before importing' },
-        { icon: '↩', name: 'Bulk undo available', note: 'One click removes the entire import if something looks wrong' }
+        { icon: icon(IC.arrowR), name: 'Jira Epic → EAP Feature', note: 'Preserves titles, descriptions, and assignments' },
+        { icon: icon(IC.arrowR), name: 'Jira Story → EAP Story', note: 'Story points, status, and sprint history carried over' },
+        { icon: icon(IC.arrowR), name: 'Jira Sprint → EAP Sprint', note: 'Sprint dates and team assignment mapped automatically' },
+        { icon: icon(IC.warn),   name: 'Custom fields reviewed', note: 'You confirm how custom fields map before importing' },
+        { icon: icon(IC.undo),   name: 'Bulk undo available', note: 'One click removes the entire import if something looks wrong' }
       ]
     }
   };
