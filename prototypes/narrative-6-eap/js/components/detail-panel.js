@@ -212,7 +212,7 @@ function dpRenderPR(item) {
     var hasFail = tst.failed > 0;
     var tstC = hasFail ? '#DC2626' : '#16A34A';
     var tstVal = hasFail
-      ? tst.passed + ' passed · <span style="color:#DC2626;font-weight:500;">' + tst.failed + ' failed</span> of ' + tst.total
+      ? tst.passed + ' passed · <span style="color:#DC2626;font-weight:500;">' + tst.failed + ' failed</span>'
       : tst.passed + '/' + tst.total + ' passed';
     h += '<span class="dp-pr-lbl">Tests</span>' +
       '<span class="dp-pr-val">' +
@@ -260,7 +260,7 @@ function dpRenderPR(item) {
   }
   // Gate-pending notice — shown even when PR is merged
   if (item.env && item.env.status === 'gate-pending') {
-    h += '<div class="dp-pr-gate">Production gate open · release approval required before deploy</div>';
+    h += '<div class="dp-pr-gate">At production gate · release approval required</div>';
   }
 
   return h + '</div></div>';

@@ -51,13 +51,17 @@ function traceRing(item, size) {
     { d:'M 2.5,8 A 5.5,5.5 0 0 1 7.04,2.58',   color:deployColor }
   ];
 
-  // Encode test counts + deploy state for the popover
+  // Encode test counts, DoD progress, and deploy state for the popover
   var testStr = item.tests ? (item.tests.passed + '/' + item.tests.total) : 'none';
   var envStr  = item.env   ? (item.env.target + ':' + item.env.status) : 'none';
+  var dodStr  = item.dod
+    ? (item.dod.every(function(d) { return d.done; }) ? 'complete'
+       : (item.dod.filter(function(d) { return d.done; }).length + '/' + item.dod.length))
+    : 'none';
 
   var svg = '<svg class="bcard-trace-ring" width="' + size + '" height="' + size + '" viewBox="0 0 16 16"' +
     ' data-code="' + codeColor + '" data-tests="' + testsColor + '" data-dod="' + dodColor + '" data-deploy="' + deployColor + '"' +
-    ' data-test-str="' + testStr + '" data-env-str="' + envStr + '"' +
+    ' data-test-str="' + testStr + '" data-env-str="' + envStr + '" data-dod-str="' + dodStr + '"' +
     ' data-pr-status="' + (item.pr ? item.pr.status : '') + '">';
   arcs.forEach(function(a) {
     svg += '<path d="' + a.d + '" fill="none" stroke="' + a.color + '" stroke-width="2" stroke-linecap="round"/>';
@@ -93,11 +97,12 @@ EAP.initTracePopovers = function() {
     var prStatus  = ring.getAttribute('data-pr-status') || '';
     var testStr   = ring.getAttribute('data-test-str')  || 'none';
     var envStr    = ring.getAttribute('data-env-str')   || 'none';
+    var dodStr    = ring.getAttribute('data-dod-str')   || 'none';
 
     // Build popover labels with live data
     var prLbl  = prStatus === 'merged'    ? 'PR merged'
                : prStatus === 'open'      ? 'PR open · awaiting review'
-               : prStatus === 'draft'     ? 'PR draft · not ready'
+               : prStatus === 'draft'     ? 'Draft PR · not yet ready for review'
                : prStatus === 'in-review' ? 'PR in review'
                : 'No pull request';
     var tstLbl = testStr === 'none' ? 'No test results'
@@ -107,21 +112,24 @@ EAP.initTracePopovers = function() {
                    var fail = total - pass;
                    return fail > 0 ? pass + ' passed · ' + fail + ' failed · Jenkins' : pass + '/' + total + ' passed · Jenkins';
                  })();
+    var dodLbl = dodStr === 'none'     ? 'No DoD defined'
+               : dodStr === 'complete' ? 'DoD complete'
+               : 'DoD ' + dodStr + ' items checked';
     var envLbl = envStr === 'none' ? 'Not deployed'
                : (function() {
                    var p = envStr.split(':');
                    var target = p[0], status = p[1];
-                   if (status === 'gate-pending') return 'Production gate · awaiting approval';
+                   if (status === 'gate-pending') return 'At production gate · approval required';
                    if (target === 'production' && status === 'deployed') return 'Deployed to production';
                    if (target === 'staging' && status === 'deployed') return 'Deployed to staging';
                    return target + ' · ' + status;
                  })();
 
     var SEGS = [
-      { lbl: prLbl,       color: colors[0] },
-      { lbl: tstLbl,      color: colors[1] },
-      { lbl: 'DoD',       color: colors[2] },
-      { lbl: envLbl,      color: colors[3] }
+      { lbl: prLbl,  color: colors[0] },
+      { lbl: tstLbl, color: colors[1] },
+      { lbl: dodLbl, color: colors[2] },
+      { lbl: envLbl, color: colors[3] }
     ];
 
     var svgStr = '<svg width="52" height="52" viewBox="0 0 16 16" style="display:block;flex-shrink:0;">';
