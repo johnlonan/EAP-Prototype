@@ -161,7 +161,7 @@ body {
 .setup-pane.is-active { display: flex; animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both; }
 @keyframes pane-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
-.pane-heading { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.pane-heading { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .pane-title { font-size: 38px; font-weight: 600; color: var(--ink); letter-spacing:-0.028em; line-height:1.06; margin:0; }
 .pane-sub   { font-size: 13px; color: var(--muted); line-height:1.6; margin:0; max-width:52ch; }
 
@@ -170,7 +170,7 @@ body {
 .fw-card {
   background: var(--surface); border: 1.5px solid transparent;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-  border-radius: 16px; padding: 18px 18px 16px;
+  border-radius: 16px; padding: 18px;
   cursor: pointer; user-select: none; outline: none;
   transition: box-shadow 220ms ease, transform 220ms ease, border-color 200ms ease, background 200ms ease, color 200ms ease;
   display: flex; flex-direction: column; gap: 10px;
@@ -190,7 +190,7 @@ body {
 .fw-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .fw-hd-left { display: flex; flex-direction: column; gap: 3px; }
 .fw-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
-.fw-card.is-selected .fw-eyebrow { color: rgba(255,255,255,0.50); }
+.fw-card.is-selected .fw-eyebrow { color: rgba(255,255,255,0.62); }
 .fw-name { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing:-0.012em; line-height:1.2; }
 .fw-card.is-selected .fw-name { color: #fff; }
 .fw-check {
@@ -203,11 +203,16 @@ body {
 .fw-card.is-selected .fw-check { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.32); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
 .fw-card.is-selected .fw-check svg { opacity: 1; }
 .fw-desc { font-size: 13px; color: var(--sub); line-height: 1.55; }
-.fw-card.is-selected .fw-desc { color: rgba(255,255,255,0.68); }
+.fw-card.is-selected .fw-desc { color: rgba(255,255,255,0.78); }
 .fw-meta { font-size: 11px; color: var(--muted); }
 .fw-meta strong { color: var(--sub); font-weight: 600; }
-.fw-card.is-selected .fw-meta { color: rgba(255,255,255,0.50); }
-.fw-card.is-selected .fw-meta strong { color: rgba(255,255,255,0.82); }
+.fw-card.is-selected .fw-meta { color: rgba(255,255,255,0.62); }
+.fw-card.is-selected .fw-meta strong { color: rgba(255,255,255,0.90); }
+/* Smooth child colour transitions during invert */
+.fw-eyebrow, .fw-name, .fw-desc, .fw-meta { transition: color 200ms ease; }
+/* Focus states — keyboard accessibility */
+.fw-card:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
+.fw-card.is-selected:focus-visible { outline: 2px solid rgba(255,255,255,0.55); outline-offset: 2px; }
 
 /* Method cards */
 .method-list { display: flex; flex-direction: column; gap: 8px; }
@@ -221,6 +226,7 @@ body {
 }
 .method-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); transform: translateY(-2px); }
 .method-card.is-selected { border-color: var(--charcoal); box-shadow: 0 0 0 4px rgba(56,55,51,0.10); transform:translateY(-1px); }
+.method-card:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
 .method-card.is-hero { border-color: rgba(22,163,74,0.45); background: rgba(22,163,74,0.09); }
 .method-card.is-hero:hover { border-color: rgba(22,163,74,0.55); }
 .method-card.is-hero.is-selected { border-color: var(--ai-accent); box-shadow: 0 0 0 4px rgba(22,163,74,0.12); }
@@ -592,6 +598,19 @@ body {
 .acr-val {
   font-size: 13px; color: var(--ink); line-height: 1.4; flex: 1;
 }
+
+/* Reduced motion — disable all decorative animations */
+@media (prefers-reduced-motion: reduce) {
+  .setup-pane.is-active, .prev-pane.is-active { animation: none; }
+  .hier-tier, .art-team-card, .art-pi-row, .art-conn-badge,
+  .method-prev-item, .gen-item, .checklist-item,
+  .auto-config-row, .gen-card.is-visible, .edit-mode-hint.visible { animation: none; opacity: 1; transform: none; }
+  .done-ring, .done-ring.glowed { animation: none; opacity: 1; transform: none; }
+  .done-title, .done-sub, .done-actions { animation: none; opacity: 1; transform: none; }
+  .setup-step-btn.done .step-num { animation: none; }
+  .ai-otto { animation: none; }
+  .gen-spinner { animation: none; border-color: var(--ai-accent); border-top-color: var(--ai-accent); }
+}
 </style>
 </head>
 <body>
@@ -636,35 +655,35 @@ body {
             <h1 class="pane-title">Pick your framework</h1>
             <p class="pane-sub">EAP sets up the hierarchy, PI cadence, and terminology automatically.</p>
           </div>
-          <div class="fw-grid">
-            <div class="fw-card is-selected" data-fw="essential" tabindex="0">
+          <div class="fw-grid" role="radiogroup" aria-label="Framework selection">
+            <div class="fw-card is-selected" data-fw="essential" tabindex="0" role="radio" aria-checked="true">
               <div class="fw-hd">
                 <div class="fw-hd-left"><div class="fw-eyebrow">Most common</div><div class="fw-name">Essential SAFe</div></div>
-                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               </div>
-              <div class="fw-desc">One ART, 50–125 people. Single programme, single PI cadence.</div>
+              <div class="fw-desc">One ART, 50–125 people. Single program, single PI cadence.</div>
               <div class="fw-meta"><strong>2–12 teams</strong> · 2-week sprints · 10-week PIs</div>
             </div>
-            <div class="fw-card" data-fw="portfolio" tabindex="0">
+            <div class="fw-card" data-fw="portfolio" tabindex="0" role="radio" aria-checked="false">
               <div class="fw-hd">
                 <div class="fw-hd-left"><div class="fw-eyebrow">Large orgs</div><div class="fw-name">Portfolio SAFe</div></div>
-                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               </div>
               <div class="fw-desc">Multiple ARTs, Solution Trains, and portfolio-level budgeting.</div>
               <div class="fw-meta"><strong>12+ teams</strong> · Multi-ART · LPM cadence</div>
             </div>
-            <div class="fw-card" data-fw="kanban" tabindex="0">
+            <div class="fw-card" data-fw="kanban" tabindex="0" role="radio" aria-checked="false">
               <div class="fw-hd">
                 <div class="fw-hd-left"><div class="fw-eyebrow">Flow-based</div><div class="fw-name">Lean Kanban</div></div>
-                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               </div>
               <div class="fw-desc">Continuous flow, no fixed sprints. For ops, support, or mixed teams.</div>
               <div class="fw-meta"><strong>No sprint cadence</strong> · Pull-based · WIP limits</div>
             </div>
-            <div class="fw-card" data-fw="blank" tabindex="0">
+            <div class="fw-card" data-fw="blank" tabindex="0" role="radio" aria-checked="false">
               <div class="fw-hd">
                 <div class="fw-hd-left"><div class="fw-eyebrow">Custom</div><div class="fw-name">Blank</div></div>
-                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               </div>
               <div class="fw-desc">EAP makes no assumptions. Define hierarchy and terminology from scratch.</div>
               <div class="fw-meta" style="color:var(--muted)">Full flexibility</div>
@@ -678,8 +697,8 @@ body {
             <h1 class="pane-title">How should Otto set up your ART?</h1>
             <p class="pane-sub">Choose the approach that fits your team. You review everything before it's saved.</p>
           </div>
-          <div class="method-list">
-            <div class="method-card is-hero is-selected" data-method="ai" tabindex="0">
+          <div class="method-list" role="radiogroup" aria-label="Setup method selection">
+            <div class="method-card is-hero is-selected" data-method="ai" tabindex="0" role="radio" aria-checked="true">
               <div class="method-badge">Fastest</div>
               <div class="method-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/></svg></div>
               <div class="method-info">
@@ -688,7 +707,7 @@ body {
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <div class="method-card" data-method="template" tabindex="0">
+            <div class="method-card" data-method="template" tabindex="0" role="radio" aria-checked="false">
               <div class="method-icon">📋</div>
               <div class="method-info">
                 <div class="method-name">Use an industry template</div>
@@ -696,7 +715,7 @@ body {
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <div class="method-card" data-method="import" tabindex="0">
+            <div class="method-card" data-method="import" tabindex="0" role="radio" aria-checked="false">
               <div class="method-icon">📥</div>
               <div class="method-info">
                 <div class="method-name">Import from Jira or Rally</div>
@@ -1363,8 +1382,12 @@ body {
   // ── Framework card interaction ───────────────────────────────────
   document.querySelectorAll('.fw-card').forEach(function(c) {
     c.addEventListener('click', function() {
-      document.querySelectorAll('.fw-card').forEach(function(x) { x.classList.remove('is-selected'); });
+      document.querySelectorAll('.fw-card').forEach(function(x) {
+        x.classList.remove('is-selected');
+        x.setAttribute('aria-checked', 'false');
+      });
       c.classList.add('is-selected');
+      c.setAttribute('aria-checked', 'true');
       selectedFw = c.dataset.fw;
       if (step === 1) renderHierarchy(selectedFw);
     });
@@ -1374,8 +1397,12 @@ body {
   // ── Method card interaction ──────────────────────────────────────
   document.querySelectorAll('.method-card').forEach(function(c) {
     c.addEventListener('click', function() {
-      document.querySelectorAll('.method-card').forEach(function(x) { x.classList.remove('is-selected'); });
+      document.querySelectorAll('.method-card').forEach(function(x) {
+        x.classList.remove('is-selected');
+        x.setAttribute('aria-checked', 'false');
+      });
       c.classList.add('is-selected');
+      c.setAttribute('aria-checked', 'true');
       selectedMethod = c.dataset.method;
       if (step === 2) renderMethodPreview(selectedMethod);
     });
