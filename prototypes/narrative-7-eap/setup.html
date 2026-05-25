@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ART Setup — Enterprise Agile Planning</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="../../assets/js/icons.js"></script>
+
+<style>
+:root {
+  --ai-accent:      #16A34A;
+  --ai-accent-deep: #15803D;
+  --ai-bg:          rgba(22,163,74,0.08);
+  --ink:    #111111;
+  --sub:    #585753;
+  --muted:  #797874;
+  --border: #CCCBC8;
+  --surface:#FFFFFF;
+  --raised: #F8F7F4;
+  --bg:     #F1F0ED;
+  --charcoal:#383733;
+}
+
+html, body { height: 100%; margin: 0; padding: 0; }
+body {
+  background: var(--bg) !important;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.liquid-bg { display: none; }
+.page-shell { position: relative; z-index: 2; display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Split-screen viewport ── */
+.content-viewport {
+  flex: 1; min-width: 0;
+  margin: 0 0 0 64px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+  border: none; box-shadow: none; border-radius: 0;
+}
+
+/* Holds the two panels side by side, filling the space between chrome and footer */
+.setup-split {
+  flex: 1; min-height: 0;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+/* ─────── LEFT: WIZARD ─────── */
+.setup-wizard {
+  /* Proportional, not fixed — adapts to the viewport */
+  flex: 0 0 42%;
+  min-width: 400px;
+  max-width: 560px;
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  border-right: 1px solid rgba(0,0,0,0.08);
+  background: var(--bg);
+}
+.setup-wizard::-webkit-scrollbar { width: 4px; }
+.setup-wizard::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+/* ── Responsive: collapse preview on narrow viewports ── */
+@media (max-width: 960px) {
+  .setup-wizard  { flex: 1; min-width: 0; max-width: none; border-right: none; }
+  .setup-preview { display: none; }
+}
+@media (min-width: 961px) and (max-width: 1200px) {
+  .setup-wizard { flex: 0 0 46%; max-width: 520px; }
+}
+
+/* Chrome — full-width bar spanning both panels */
+.setup-chrome {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 12px 24px;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+.setup-back {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500; color: var(--muted);
+  text-decoration: none; padding: 5px 10px 5px 6px;
+  border-radius: 8px; transition: background 140ms, color 140ms;
+}
+.setup-back:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+.setup-back svg { width: 13px; height: 13px; }
+
+/* Step tabs — centered in the full-width chrome via CSS grid */
+.setup-steps {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: #F9F8F6; border: 1px solid #E3E2DF;
+  border-radius: 14px; padding: 3px; height: 42px;
+  /* Shrink if necessary — never overflow the chrome */
+  flex-shrink: 1; min-width: 0; overflow: hidden;
+}
+.setup-step-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 36px; padding: 0 10px; border-radius: 11px;
+  font-size: 11.5px; font-weight: 400; cursor: pointer;
+  border: none; background: transparent;
+  color: var(--muted); font-family: var(--font-sans);
+  transition: all 150ms ease; white-space: nowrap;
+  flex-shrink: 0;
+}
+.setup-step-btn:hover { color: var(--sub); background: rgba(0,0,0,0.06); }
+.setup-step-btn.active { background: var(--charcoal); color: #fff; font-weight: 500; }
+.setup-step-btn.done { color: var(--sub); }
+/* On very narrow viewports only: collapse to number-only tabs */
+@media (max-width: 720px) {
+  .setup-step-btn .step-label { display: none; }
+  .setup-step-btn { padding: 0 8px; }
+}
+.step-num {
+  width: 17px; height: 17px; border-radius: 50%;
+  background: rgba(0,0,0,0.09); color: inherit;
+  font-size: 9.5px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 200ms;
+}
+.setup-step-btn.active .step-num { background: rgba(255,255,255,0.20); }
+.setup-step-btn.done .step-num {
+  background: var(--ai-accent); color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.5 9l3 3 6-6' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: center; background-size: 13px;
+  animation: step-done 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes step-done { from { transform: scale(0.65); } to { transform: scale(1); } }
+
+/* Panes */
+.setup-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.setup-pane {
+  display: none; flex-direction: column; gap: 20px;
+  padding: 8px 20px 20px 16px; flex: 1;
+}
+.setup-pane.is-active { display: flex; animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes pane-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+.pane-heading { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.pane-title { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing:-0.028em; line-height:1.15; margin:0; }
+.pane-sub   { font-size: 13.5px; color: var(--sub); line-height:1.58; margin:0; max-width:52ch; }
+
+/* Framework grid */
+.fw-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.fw-card {
+  background: var(--surface); border: 1.5px solid transparent;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  border-radius: 16px; padding: 18px 18px 16px;
+  cursor: pointer; user-select: none; outline: none;
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 160ms ease;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.fw-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07);
+  transform: translateY(-2px);
+}
+.fw-card.is-selected {
+  border-color: var(--charcoal);
+  box-shadow: 0 0 0 4px rgba(56,55,51,0.10), 0 4px 16px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+.fw-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.fw-hd-left { display: flex; flex-direction: column; gap: 3px; }
+.fw-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
+.fw-name { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing:-0.012em; line-height:1.2; }
+.fw-check {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 180ms cubic-bezier(0.22,1,0.36,1);
+}
+.fw-check svg { opacity: 0; transition: opacity 160ms; }
+.fw-card.is-selected .fw-check { background: var(--charcoal); border-color: var(--charcoal); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
+.fw-card.is-selected .fw-check svg { opacity: 1; }
+.fw-desc { font-size: 12px; color: var(--sub); line-height: 1.5; }
+.fw-meta { font-size: 11px; color: var(--muted); }
+.fw-meta strong { color: var(--sub); font-weight: 600; }
+
+/* Method cards */
+.method-list { display: flex; flex-direction: column; gap: 8px; }
+.method-card {
+  background: var(--surface); border: 1.5px solid transparent;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  border-radius: 14px; padding: 16px 18px;
+  cursor: pointer; user-select: none; outline: none;
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 160ms ease;
+  display: flex; gap: 14px; align-items: flex-start; position: relative;
+}
+.method-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); transform: translateY(-2px); }
+.method-card.is-selected { border-color: var(--charcoal); box-shadow: 0 0 0 4px rgba(56,55,51,0.10); transform:translateY(-1px); }
+.method-card.is-hero { border-color: rgba(22,163,74,0.28); background: rgba(22,163,74,0.04); }
+.method-card.is-hero:hover { border-color: rgba(22,163,74,0.50); }
+.method-card.is-hero.is-selected { border-color: var(--ai-accent); box-shadow: 0 0 0 4px rgba(22,163,74,0.12); }
+.method-badge {
+  position: absolute; top: -1px; right: 16px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em;
+  color: #fff; background: var(--ai-accent); padding: 3px 8px; border-radius: 0 0 7px 7px;
+}
+.method-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  background: var(--raised); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; transition: transform 200ms cubic-bezier(0.22,1,0.36,1);
+}
+.method-card:hover .method-icon { transform: scale(1.08); }
+.method-card.is-hero .method-icon { background: rgba(22,163,74,0.12); color: var(--ai-accent); }
+.method-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 3px; line-height: 1.3; }
+.method-card.is-hero .method-name { color: var(--ai-accent-deep); }
+.method-desc { font-size: 12px; color: var(--sub); line-height: 1.5; }
+.method-check {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 8px; transition: all 180ms cubic-bezier(0.22,1,0.36,1);
+}
+.method-check svg { opacity: 0; transition: opacity 160ms; }
+.method-card.is-selected .method-check { background: var(--charcoal); border-color: var(--charcoal); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
+.method-card.is-selected .method-check svg { opacity: 1; }
+.method-card.is-hero.is-selected .method-check { background: var(--ai-accent); border-color: var(--ai-accent); }
+.method-info { flex: 1; }
+
+/* AI Input */
+.ai-input-card {
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  border-radius: 14px; padding: 18px 20px;
+}
+.ai-card-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ai-otto { width: 28px; height: 28px; border-radius: 50%; background: var(--ai-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ai-accent); animation: otto-pulse 3s ease-in-out infinite; }
+@keyframes otto-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} 50%{box-shadow:0 0 0 5px rgba(22,163,74,0.12)} }
+.ai-otto svg { width: 14px; height: 14px; }
+.ai-card-label { font-size: 12.5px; font-weight: 600; color: var(--ai-accent-deep); }
+.ai-textarea {
+  width: 100%; border: 1px solid #E1E0DD; outline: none;
+  background: var(--raised); border-radius: 9px;
+  font-family: var(--font-sans); font-size: 13.5px; color: var(--ink);
+  line-height: 1.6; resize: none; padding: 11px 13px;
+  transition: border-color 180ms, background 180ms, box-shadow 180ms;
+  min-height: 88px;
+}
+.ai-textarea:focus { border-color: rgba(56,55,51,0.32); background: var(--surface); box-shadow: 0 0 0 3px rgba(56,55,51,0.08); }
+.ai-textarea::placeholder { color: #BBBBB7; }
+.ai-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 9px; }
+.ai-chip {
+  font-family: inherit; cursor: pointer; font-size: 11.5px; font-weight: 500; color: var(--sub);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 11px; transition: background 140ms, color 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms;
+}
+.ai-chip:hover { background: var(--raised); color: var(--ink); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+
+/* Gen card (left side, text items) */
+.gen-card { background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); border-radius: 14px; padding: 18px 20px; display: none; flex-direction: column; gap: 12px; }
+.gen-card.is-visible { display: flex; animation: pane-in 200ms ease both; }
+.gen-status-row { display: flex; align-items: center; gap: 10px; }
+.gen-spinner { width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(22,163,74,0.18); border-top-color: var(--ai-accent); animation: spin 0.7s linear infinite; }
+.gen-spinner.done { animation: done-spin 280ms cubic-bezier(0.22,1,0.36,1) both; border-color: transparent; background: rgba(22,163,74,0.12); background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none'%3E%3Cpath d='M4.5 9l3 3 6-6' stroke='%2316A34A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:center; background-size:12px; border-radius:50%; }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes done-spin { from{transform:scale(0.5)rotate(-90deg);opacity:0} to{transform:scale(1)rotate(0deg);opacity:1} }
+.gen-txt { font-size: 12.5px; font-weight: 500; color: var(--sub); }
+.gen-txt strong { color: var(--ai-accent-deep); }
+.gen-items { display: flex; flex-direction: column; gap: 3px; }
+.gen-item { font-size: 12px; color: var(--sub); display: flex; align-items: flex-start; gap: 7px; opacity: 0; transform: translateX(-5px); animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes gen-in { to{opacity:1;transform:none} }
+.gen-tick { color: var(--ai-accent); font-weight: 700; flex-shrink: 0; }
+.gen-key { color: var(--ink); font-weight: 600; }
+
+/* Done screen */
+.done-wrap { display: flex; flex-direction: column; align-items: center; padding: 24px 0 20px; text-align: center; flex: 1; }
+.done-ring { width: 68px; height: 68px; border-radius: 50%; background: rgba(22,163,74,0.10); border: 2px solid rgba(22,163,74,0.25); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; color: var(--ai-accent); animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both; }
+@keyframes done-pop { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
+.done-ring.glowed { animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both, done-glow 600ms ease-out 500ms both; }
+@keyframes done-glow { from{box-shadow:0 0 0 0 rgba(22,163,74,0.30)} to{box-shadow:0 0 0 16px rgba(22,163,74,0)} }
+.done-ring svg { width: 28px; height: 28px; }
+.done-title { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -0.022em; margin-bottom: 6px; animation: pane-in 260ms ease 300ms both; }
+.done-sub { font-size: 14px; color: var(--sub); line-height: 1.6; max-width: 40ch; margin-bottom: 24px; animation: pane-in 260ms ease 360ms both; }
+.done-actions { display: flex; gap: 10px; align-items: center; animation: pane-in 260ms ease 420ms both; }
+
+/* Footer — full-width bar spanning both panels */
+.setup-footer {
+  flex-shrink: 0; border-top: 1px solid rgba(0,0,0,0.07);
+  background: var(--surface); padding: 11px 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+.btn-back { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background 140ms, color 140ms; visibility: hidden; }
+.btn-back:hover { background: var(--raised); color: var(--ink); }
+.btn-continue { margin-left: auto; font-family: inherit; font-size: 12.5px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 8px 20px; cursor: pointer; transition: background 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms; }
+.btn-continue:hover:not(:disabled) { background: #262521; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.20); }
+.btn-continue:disabled { background: #CCCBC8; cursor: not-allowed; }
+.btn-open { font-family: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 10px 22px; cursor: pointer; transition: background 140ms, transform 160ms; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-open:hover { background: #262521; transform: translateY(-1px); }
+.btn-ghost { font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: background 140ms; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-ghost:hover { background: var(--raised); color: var(--ink); }
+
+/* ─────── RIGHT: PREVIEW PANEL ─────── */
+.setup-preview {
+  flex: 1; min-width: 0;
+  /* Cap at a sensible max so content doesn't float in too much white space */
+  max-width: 840px;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  overflow: hidden;
+  /* Anything beyond max-width becomes page background */
+  border-right: none;
+}
+
+.prev-hd {
+  flex-shrink: 0;
+  padding: 20px 28px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex; align-items: baseline; gap: 10px;
+}
+.prev-hd-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.10em; color: var(--muted);
+}
+.prev-hd-sub {
+  font-size: 12.5px; font-weight: 500; color: var(--ink);
+  transition: opacity 200ms ease;
+}
+
+.prev-scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 24px 28px;
+}
+.prev-scroll::-webkit-scrollbar { width: 4px; }
+.prev-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 4px; }
+
+/* Preview panes */
+.prev-pane { display: none; }
+.prev-pane.is-active { display: block; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ── HIERARCHY DIAGRAM (Step 1) ── */
+/* Left-aligned, fills the preview panel — no centering, no max-width cap */
+.hier-diagram { display: flex; flex-direction: column; gap: 0; padding: 4px 0; }
+
+.hier-tier {
+  width: 100%;
+  background: var(--raised); border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px; padding: 16px 18px;
+  animation: tier-in 300ms cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes tier-in { from { opacity:0; transform:scale(0.97) translateY(6px); } to { opacity:1; transform:none; } }
+.hier-tier:nth-child(1) { animation-delay: 0ms; }
+.hier-tier:nth-child(3) { animation-delay: 80ms; }
+.hier-tier:nth-child(5) { animation-delay: 160ms; }
+.hier-tier:nth-child(7) { animation-delay: 240ms; }
+
+.hier-tier-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.hier-tier-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.hier-tier-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; }
+.hier-tier-note { font-size: 10px; color: var(--muted); margin-left: auto; }
+.hier-entities { display: flex; gap: 6px; flex-wrap: wrap; }
+.hier-entity {
+  font-size: 12px; font-weight: 500; color: var(--ink);
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 999px; padding: 4px 12px;
+  transition: border-color 200ms, background 200ms;
+}
+.hier-entity.primary {
+  background: var(--charcoal); border-color: var(--charcoal); color: #fff;
+}
+
+/* Connector between tiers */
+.hier-connector {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 4px 0; width: 100%;
+  animation: pane-in 200ms ease both;
+}
+.hier-conn-line { width: 1.5px; height: 10px; background: rgba(0,0,0,0.14); }
+.hier-conn-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); background: var(--surface); padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.08); }
+.hier-conn-line-b { width: 1.5px; height: 10px; background: rgba(0,0,0,0.14); }
+
+/* ── METHOD PREVIEW (Step 2) ── */
+.method-prev-card {
+  background: var(--raised); border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.method-prev-icon { font-size: 32px; margin-bottom: 4px; }
+.method-prev-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
+.method-prev-sub { font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+.method-prev-items { display: flex; flex-direction: column; gap: 8px; }
+.method-prev-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px; background: var(--surface); border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.05);
+  animation: gen-in 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.method-prev-item:nth-child(1) { animation-delay: 30ms; }
+.method-prev-item:nth-child(2) { animation-delay: 90ms; }
+.method-prev-item:nth-child(3) { animation-delay: 150ms; }
+.method-prev-item:nth-child(4) { animation-delay: 210ms; }
+.method-prev-item:nth-child(5) { animation-delay: 270ms; }
+.mpi-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.mpi-body { flex: 1; }
+.mpi-name { font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
+.mpi-note { font-size: 11.5px; color: var(--sub); line-height: 1.4; }
+
+/* ── ART BUILD PREVIEW (Step 3) ── */
+.art-build { display: flex; flex-direction: column; gap: 20px; }
+
+.art-build-section { display: flex; flex-direction: column; gap: 8px; }
+.art-build-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.10em; color: var(--muted);
+}
+
+/* Team cards — appear during generation */
+.art-teams-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.art-team-card {
+  background: var(--raised); border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px; padding: 12px 14px;
+  opacity: 0; transform: translateY(6px);
+  animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+  position: relative;
+}
+.art-team-name {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  margin-bottom: 3px; line-height: 1.3;
+  /* EDITABLE: click to rename */
+  cursor: text; border-radius: 4px;
+  transition: background 120ms;
+}
+.art-team-name:hover { background: rgba(56,55,51,0.06); }
+.art-team-name[contenteditable="true"] {
+  background: rgba(56,55,51,0.08); outline: 2px solid var(--charcoal);
+  outline-offset: 1px; border-radius: 4px; padding: 0 3px;
+}
+.art-team-count { font-size: 11px; color: var(--muted); }
+.art-team-sprints { font-size: 10.5px; color: var(--muted); margin-top: 6px; display: none; }
+.art-team-sprints.visible { display: block; animation: gen-in 200ms ease both; }
+.edit-hint {
+  position: absolute; top: 8px; right: 8px;
+  width: 20px; height: 20px; border-radius: 6px;
+  background: rgba(56,55,51,0.08); display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 160ms; cursor: pointer;
+}
+.art-team-card:hover .edit-hint { opacity: 1; }
+.edit-hint svg { width: 10px; height: 10px; color: var(--sub); }
+
+/* PI row */
+.art-pi-row {
+  background: var(--raised); border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.art-pi-pill { font-size: 9.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.art-pi-pill.active { background: rgba(22,163,74,0.10); color: var(--ai-accent-deep); }
+.art-pi-body { flex: 1; }
+.art-pi-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
+.art-pi-dates {
+  font-size: 11.5px; color: var(--muted);
+  cursor: text; border-radius: 3px; display: inline-block;
+  transition: background 120ms;
+}
+.art-pi-dates:hover { background: rgba(56,55,51,0.06); }
+.art-pi-dates[contenteditable="true"] { background: rgba(56,55,51,0.08); outline: 2px solid var(--charcoal); outline-offset: 1px; padding: 0 3px; }
+
+/* Connection badges */
+.art-connections { display: flex; flex-direction: column; gap: 6px; }
+.art-conn-badge {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--raised); border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px; padding: 9px 12px;
+  opacity: 0; animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.conn-icon { width: 26px; height: 26px; border-radius: 7px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--sub); flex-shrink: 0; }
+.conn-name { font-size: 12.5px; font-weight: 500; color: var(--ink); flex: 1; }
+.conn-note { font-size: 11.5px; color: var(--ai-accent-deep); font-weight: 600; }
+
+/* Placeholder state (before generation) */
+.art-placeholder { display: flex; flex-direction: column; gap: 16px; opacity: 0.45; pointer-events: none; }
+.placeholder-row { height: 60px; background: var(--raised); border-radius: 12px; border: 1px dashed var(--border); }
+.placeholder-label { font-size: 11.5px; color: var(--muted); text-align: center; padding-top: 8px; }
+
+/* Edit mode CTA */
+.edit-mode-hint {
+  display: none; align-items: center; gap: 8px;
+  padding: 10px 14px; background: rgba(56,55,51,0.05);
+  border: 1px solid rgba(56,55,51,0.12); border-radius: 10px;
+  font-size: 11.5px; color: var(--sub);
+}
+.edit-mode-hint.visible { display: flex; animation: gen-in 300ms ease 400ms both; }
+.edit-mode-hint svg { width: 14px; height: 14px; color: var(--charcoal); flex-shrink: 0; }
+
+/* ── READINESS (Step 4) ── */
+.readiness-score {
+  background: var(--raised); border-radius: 16px;
+  padding: 24px; display: flex; flex-direction: column; gap: 20px;
+  animation: pane-in 300ms cubic-bezier(0.22,1,0.36,1) 200ms both;
+}
+.readiness-header { display: flex; align-items: center; gap: 14px; }
+.readiness-ring-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.readiness-ring-wrap svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+.readiness-ring-bg { fill: none; stroke: rgba(0,0,0,0.08); stroke-width: 6; }
+.readiness-ring-fill { fill: none; stroke: var(--ai-accent); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 164; stroke-dashoffset: 23; transition: stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1) 400ms; }
+.readiness-ring-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.readiness-pct { font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.readiness-text { flex: 1; }
+.readiness-title { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 2px; }
+.readiness-sub { font-size: 12px; color: var(--sub); line-height: 1.4; }
+
+.readiness-checklist { display: flex; flex-direction: column; gap: 6px; }
+.checklist-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 10px; border-radius: 9px;
+  animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.checklist-item.done  { background: rgba(22,163,74,0.06); }
+.checklist-item.warn  { background: rgba(217,119,6,0.06); }
+.checklist-item:nth-child(1){animation-delay:300ms}
+.checklist-item:nth-child(2){animation-delay:380ms}
+.checklist-item:nth-child(3){animation-delay:460ms}
+.checklist-item:nth-child(4){animation-delay:540ms}
+.ci-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; line-height: 1; }
+.ci-body { flex: 1; }
+.ci-name { font-size: 12.5px; font-weight: 500; color: var(--ink); margin-bottom: 1px; }
+.ci-note { font-size: 11.5px; color: var(--sub); line-height: 1.4; }
+.ci-action { font-size: 11.5px; font-weight: 600; color: var(--charcoal); cursor: pointer; }
+.ci-action:hover { text-decoration: underline; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="liquid-bg" aria-hidden="true"></div>
+<div class="page-shell">
+  <nav id="left-nav" aria-label="Primary navigation"></nav>
+
+  <main class="content-viewport">
+
+    <!-- ═══════════════════════════════════════════════
+         CHROME — full-width, spans both panels
+    ════════════════════════════════════════════════ -->
+    <div class="setup-chrome">
+      <a class="setup-back" href="home.html">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Home
+      </a>
+      <div class="setup-steps" id="step-tabs">
+        <button class="setup-step-btn active" data-step="1" onclick="goStep(1)"><span class="step-num">1</span><span class="step-label">Framework</span></button>
+        <button class="setup-step-btn" data-step="2" onclick="goStep(2)"><span class="step-num">2</span><span class="step-label">Configure</span></button>
+        <button class="setup-step-btn" data-step="3" onclick="goStep(3)"><span class="step-num">3</span><span class="step-label">Review</span></button>
+        <button class="setup-step-btn" data-step="4" onclick="goStep(4)"><span class="step-num">4</span><span class="step-label">Invite</span></button>
+        <button class="setup-step-btn" data-step="5" onclick="goStep(5)"><span class="step-num">5</span><span class="step-label">Ready</span></button>
+      </div>
+      <div></div><!-- grid spacer — keeps tabs truly centred -->
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         SPLIT — wizard left · preview right
+    ════════════════════════════════════════════════ -->
+    <div class="setup-split">
+
+    <!-- ═══════════════════════════════════════════════
+         LEFT PANEL — wizard
+    ════════════════════════════════════════════════ -->
+    <div class="setup-wizard">
+      <div class="setup-body">
+
+        <!-- PANE 1 — Framework -->
+        <section class="setup-pane is-active" id="pane-1">
+          <div class="pane-heading">
+            <h1 class="pane-title">Pick your framework</h1>
+            <p class="pane-sub">EAP sets up the hierarchy, PI cadence, and terminology automatically.</p>
+          </div>
+          <div class="fw-grid">
+            <div class="fw-card is-selected" data-fw="essential" tabindex="0">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Most common</div><div class="fw-name">Essential SAFe</div></div>
+                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">One ART, 50–125 people. Single programme, single PI cadence.</div>
+              <div class="fw-meta"><strong>2–12 teams</strong> · 2-week sprints · 10-week PIs</div>
+            </div>
+            <div class="fw-card" data-fw="portfolio" tabindex="0">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Large orgs</div><div class="fw-name">Portfolio SAFe</div></div>
+                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Multiple ARTs, Solution Trains, and portfolio-level budgeting.</div>
+              <div class="fw-meta"><strong>12+ teams</strong> · Multi-ART · LPM cadence</div>
+            </div>
+            <div class="fw-card" data-fw="kanban" tabindex="0">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Flow-based</div><div class="fw-name">Lean Kanban</div></div>
+                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Continuous flow, no fixed sprints. For ops, support, or mixed teams.</div>
+              <div class="fw-meta"><strong>No sprint cadence</strong> · Pull-based · WIP limits</div>
+            </div>
+            <div class="fw-card" data-fw="blank" tabindex="0">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Custom</div><div class="fw-name">Blank</div></div>
+                <div class="fw-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">EAP makes no assumptions. Define hierarchy and terminology from scratch.</div>
+              <div class="fw-meta" style="color:var(--muted)">Full flexibility</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PANE 2 — Method -->
+        <section class="setup-pane" id="pane-2">
+          <div class="pane-heading">
+            <h1 class="pane-title">How do you want to start?</h1>
+            <p class="pane-sub">All three paths reach the same result. Pick what fits your situation.</p>
+          </div>
+          <div class="method-list">
+            <div class="method-card is-hero is-selected" data-method="ai" tabindex="0">
+              <div class="method-badge">Fastest</div>
+              <div class="method-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/></svg></div>
+              <div class="method-info">
+                <div class="method-name">✦ Describe your team — Otto builds the ART</div>
+                <div class="method-desc">Write a plain-language description: team names, size, PI length, tools. Otto generates the full configuration. You review before anything is saved.</div>
+              </div>
+              <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <div class="method-card" data-method="template" tabindex="0">
+              <div class="method-icon">📋</div>
+              <div class="method-info">
+                <div class="method-name">Start from an industry template</div>
+                <div class="method-desc">Pre-built for Digital Banking, Insurance, Retail Technology, and Healthcare IT. Teams, PI calendars, and feature categories already defined. Edit anything before launch.</div>
+              </div>
+              <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <div class="method-card" data-method="import" tabindex="0">
+              <div class="method-icon">📥</div>
+              <div class="method-info">
+                <div class="method-name">Import from Jira or Rally</div>
+                <div class="method-desc">Connect your project and EAP maps epics, stories, and sprints to the SAFe hierarchy. Review the mapping before anything is imported.</div>
+              </div>
+              <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PANE 3 — AI / Review -->
+        <section class="setup-pane" id="pane-3">
+          <div class="pane-heading">
+            <h1 class="pane-title">Tell Otto about your team</h1>
+            <p class="pane-sub">Team names, size, PI length, tools you use. The preview updates as Otto works.</p>
+          </div>
+          <div class="ai-input-card" id="ai-input-card">
+            <div class="ai-card-hd">
+              <div class="ai-otto"><svg viewBox="0 0 24 24" fill="none"><path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/></svg></div>
+              <span class="ai-card-label">Otto is ready</span>
+            </div>
+            <textarea class="ai-textarea" id="ai-textarea" rows="4" placeholder="e.g. We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd."></textarea>
+            <div class="ai-chips">
+              <button class="ai-chip" data-add="4 squads, ~80 engineers">4 teams · 80 engineers</button>
+              <button class="ai-chip" data-add="12-week PIs, 2-week sprints">12-week PIs</button>
+              <button class="ai-chip" data-add="connected to Jira project DBKG">Connected to Jira</button>
+              <button class="ai-chip" data-add="PI 26 starts June 2nd">PI starts June 2</button>
+            </div>
+          </div>
+          <div class="gen-card" id="gen-card">
+            <div class="gen-status-row">
+              <div class="gen-spinner" id="gen-spinner"></div>
+              <span class="gen-txt" id="gen-txt">Reading your description…</span>
+            </div>
+            <div class="gen-items" id="gen-items"></div>
+          </div>
+        </section>
+
+        <!-- PANE 4 — Invite -->
+        <section class="setup-pane" id="pane-4">
+          <div class="pane-heading">
+            <h1 class="pane-title">Invite your team</h1>
+            <p class="pane-sub">Add people to each team. We found some from your Jira project — confirm or add others.</p>
+          </div>
+          <div id="invite-teams" style="display:flex;flex-direction:column;gap:10px;">
+            <!-- populated by JS from generated teams -->
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">
+            Roles and permissions can be changed any time in Settings.
+          </div>
+        </section>
+
+        <!-- PANE 5 — Done -->
+        <section class="setup-pane" id="pane-5">
+          <div class="done-wrap">
+            <div class="done-ring" id="done-ring">
+              <svg viewBox="0 0 28 28" fill="none"><path d="M6 14l5.5 5.5 11-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="done-title">Digital Banking ART is live</div>
+            <p class="done-sub">PI 26 is running, Sprint 2 is active. Your team can open the board and start working right now.</p>
+            <div class="done-actions">
+              <a href="home.html?p=ananya" class="btn-ghost">Back to home</a>
+              <a href="index.html?p=ananya&visit=new" class="btn-open">Open EAP workspace</a>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /setup-body -->
+    </div><!-- /setup-wizard -->
+
+
+    <!-- ═══════════════════════════════════════════════
+         RIGHT PANEL — live preview
+    ════════════════════════════════════════════════ -->
+    <div class="setup-preview" id="setup-preview">
+
+      <div class="prev-hd">
+        <span class="prev-hd-title">Preview</span>
+        <span class="prev-hd-sub" id="prev-hd-sub">Essential SAFe hierarchy</span>
+      </div>
+
+      <div class="prev-scroll" id="prev-scroll">
+
+        <!-- Step 1: Hierarchy diagram -->
+        <div class="prev-pane is-active" id="prev-p1">
+          <div class="hier-diagram" id="hier-diagram"><!-- populated by JS --></div>
+        </div>
+
+        <!-- Step 2: Method detail -->
+        <div class="prev-pane" id="prev-p2">
+          <div id="method-detail"><!-- populated by JS --></div>
+        </div>
+
+        <!-- Step 3: Progressive ART build -->
+        <div class="prev-pane" id="prev-p3">
+          <!-- Placeholder before generation -->
+          <div class="art-placeholder" id="art-placeholder">
+            <div class="art-build-label">Teams</div>
+            <div class="art-teams-grid">
+              <div class="placeholder-row" style="height:72px"></div>
+              <div class="placeholder-row" style="height:72px"></div>
+              <div class="placeholder-row" style="height:72px"></div>
+              <div class="placeholder-row" style="height:72px"></div>
+            </div>
+            <div class="art-build-label" style="margin-top:4px">PI Calendar</div>
+            <div class="placeholder-row" style="height:56px"></div>
+            <div class="art-build-label" style="margin-top:4px">Integrations</div>
+            <div class="placeholder-row" style="height:44px"></div>
+            <div class="placeholder-row" style="height:44px"></div>
+            <div class="placeholder-label">Describe your team and Otto will fill this in</div>
+          </div>
+          <!-- Built progressively during generation -->
+          <div class="art-build" id="art-build" style="display:none">
+            <div class="edit-mode-hint" id="edit-hint">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Click any team name or date to edit
+            </div>
+            <div class="art-build-section">
+              <div class="art-build-label">Teams</div>
+              <div class="art-teams-grid" id="art-teams-grid"><!-- teams added by JS --></div>
+            </div>
+            <div class="art-build-section" id="art-pi-section" style="display:none">
+              <div class="art-build-label">PI Calendar</div>
+              <div id="art-pi-rows"><!-- PI rows added by JS --></div>
+            </div>
+            <div class="art-build-section" id="art-conn-section" style="display:none">
+              <div class="art-build-label">Integrations</div>
+              <div class="art-connections" id="art-conn-rows"><!-- connections added by JS --></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Invite (preview shows team member count updating) -->
+        <div class="prev-pane" id="prev-p4">
+          <div id="invite-preview" style="display:flex;flex-direction:column;gap:10px;"><!-- populated by JS --></div>
+        </div>
+
+        <!-- Step 5: Readiness score -->
+        <div class="prev-pane" id="prev-p5">
+          <div class="readiness-score">
+            <div class="readiness-header">
+              <div class="readiness-ring-wrap">
+                <svg viewBox="0 0 64 64">
+                  <circle class="readiness-ring-bg" cx="32" cy="32" r="26"/>
+                  <circle class="readiness-ring-fill" id="readiness-arc" cx="32" cy="32" r="26"/>
+                </svg>
+                <div class="readiness-ring-center"><span class="readiness-pct">86%</span></div>
+              </div>
+              <div class="readiness-text">
+                <div class="readiness-title">ART Readiness</div>
+                <div class="readiness-sub">86% ready for PI Planning. 2 items to complete first.</div>
+              </div>
+            </div>
+            <div class="readiness-checklist">
+              <div class="checklist-item done"><span class="ci-icon">✓</span><div class="ci-body"><div class="ci-name">4 teams configured</div><div class="ci-note">Auth · Payments · Mobile · Data &amp; Analytics</div></div></div>
+              <div class="checklist-item done"><span class="ci-icon">✓</span><div class="ci-body"><div class="ci-name">PI 26 scheduled</div><div class="ci-note">Jun 2 – Aug 10 · Sprint 2 active</div></div></div>
+              <div class="checklist-item done"><span class="ci-icon">✓</span><div class="ci-body"><div class="ci-name">47 features from Jira</div><div class="ci-note">DBKG project connected · features mapped</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon">⚠</span><div class="ci-body"><div class="ci-name">PI Planning session not scheduled</div><div class="ci-note">Add PI Planning to the team calendar before Sprint 4</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon">⚠</span><div class="ci-body"><div class="ci-name">Team capacity not set for Sprint 1</div><div class="ci-note">Needed for accurate velocity forecasting</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prev-scroll -->
+    </div><!-- /setup-preview -->
+
+    </div><!-- /setup-split -->
+
+    <!-- ═══════════════════════════════════════════════
+         FOOTER — full-width, spans both panels
+    ════════════════════════════════════════════════ -->
+    <div class="setup-footer" id="setup-footer">
+      <button class="btn-back" id="btn-back" onclick="prevStep()">Back</button>
+      <button class="btn-continue" id="btn-continue" onclick="nextStep()">Continue</button>
+    </div>
+
+  </main>
+</div>
+
+<script src="../shared/nav.js"></script>
+<script src="js/data.js?v=20"></script>
+<script>
+(function() {
+
+  // ── Nav ──────────────────────────────────────────────────────────
+  renderNav('setup', {
+    avatar: '../../assets/images/SN Avatar-4.png',
+    name: 'Ananya Krishnan',
+    links: { 0: 'home.html?p=ananya', 2: 'setup.html', 3: 'index.html?p=ananya&tab=backlog', 4: 'index.html?p=ananya&tab=board' },
+    theme: 'sand'
+  });
+
+  // ── State ────────────────────────────────────────────────────────
+  var step       = 1;
+  var totalSteps = 5;
+  var aiDone     = false;
+  var selectedFw = 'essential';
+  var selectedMethod = 'ai';
+  var genTimers  = [];
+  var generatedTeams = [
+    { name: 'Auth Team',          count: 5 },
+    { name: 'Payments Team',      count: 6 },
+    { name: 'Mobile Team',        count: 5 },
+    { name: 'Data & Analytics',   count: 4 }
+  ];
+
+  // ── Framework data ───────────────────────────────────────────────
+  var fwData = {
+    essential: {
+      label: 'Essential SAFe hierarchy',
+      tiers: [
+        { label: 'Portfolio', dot: '#383733', note: 'Strategic investment', entities: [{ name: 'Epic', primary: false }] },
+        { label: 'ART', dot: '#585753', note: '50–125 people', entities: [{ name: 'Capability', primary: false }, { name: 'Feature', primary: true }], connector: { before: 'Manages' } },
+        { label: 'Team', dot: '#999995', note: '2-week sprints', entities: [{ name: 'Story', primary: true }, { name: 'Work Item', primary: false }], connector: { before: 'Delivers' } }
+      ]
+    },
+    portfolio: {
+      label: 'Portfolio SAFe hierarchy',
+      tiers: [
+        { label: 'Portfolio', dot: '#383733', note: 'Strategic investment', entities: [{ name: 'Epic', primary: false }] },
+        { label: 'Solution Train', dot: '#4A4946', note: 'Cross-ART delivery', entities: [{ name: 'Capability', primary: true }], connector: { before: 'Funds' } },
+        { label: 'ART', dot: '#585753', note: 'Program increment', entities: [{ name: 'Feature', primary: true }], connector: { before: 'Delivers' } },
+        { label: 'Team', dot: '#999995', note: '2-week sprints', entities: [{ name: 'Story', primary: true }, { name: 'Work Item', primary: false }], connector: { before: 'Builds' } }
+      ]
+    },
+    kanban: {
+      label: 'Lean Kanban flow',
+      tiers: [
+        { label: 'Value Stream', dot: '#383733', note: 'End-to-end flow', entities: [{ name: 'Work Item Types', primary: false }] },
+        { label: 'Flow', dot: '#585753', note: 'Pull-based delivery', entities: [{ name: 'WIP Limits', primary: true }, { name: 'Pull Policy', primary: false }], connector: { before: 'Governed by' } },
+        { label: 'Analytics', dot: '#999995', note: 'Continuous improvement', entities: [{ name: 'CFD', primary: false }, { name: 'Cycle Time', primary: false }, { name: 'Throughput', primary: false }], connector: { before: 'Measured by' } }
+      ]
+    },
+    blank: {
+      label: 'Custom — no preset structure',
+      tiers: [
+        { label: 'Level 1', dot: '#CCCBC8', note: 'Define your own', entities: [{ name: 'Custom entity', primary: false }], custom: true },
+        { label: 'Level 2', dot: '#CCCBC8', note: 'Add entities', entities: [{ name: 'Custom entity', primary: false }], custom: true, connector: { before: 'Contains' } },
+        { label: 'Level 3', dot: '#CCCBC8', note: 'No constraints', entities: [{ name: 'Custom entity', primary: false }], custom: true, connector: { before: 'Contains' } }
+      ]
+    }
+  };
+
+  // ── Method preview data ──────────────────────────────────────────
+  var methodData = {
+    ai: {
+      icon: '✦', title: 'What Otto will configure',
+      sub: 'Otto reads your description and generates a complete ART configuration in about 5 seconds.',
+      items: [
+        { icon: '👥', name: 'Teams', note: 'Names, sizes, and sprint calendars for each team' },
+        { icon: '📅', name: 'PI Calendar', note: 'PI dates, sprint boundaries, and IP sprint for the next 4 PIs' },
+        { icon: 'J',  name: 'Jira Integration', note: 'Maps your Jira epics and stories to the SAFe hierarchy' },
+        { icon: '💬', name: 'Slack notifications', note: 'ART-level channel connected for sprint and PI updates' },
+        { icon: '✏',  name: 'Everything editable', note: 'Click any field in the preview to rename or adjust' }
+      ]
+    },
+    template: {
+      icon: '📋', title: 'Digital Banking template',
+      sub: 'Pre-built for teams building digital banking and financial services products.',
+      items: [
+        { icon: '👥', name: '4 teams pre-configured', note: 'Auth · Payments · Mobile · Data & Analytics' },
+        { icon: '📅', name: 'PI cadence set', note: '12-week PIs · 2-week sprints · Starts next Monday' },
+        { icon: '⚡', name: '32 feature categories', note: 'Authentication, Payments, Regulatory, Mobile, Reporting' },
+        { icon: '📊', name: 'Velocity baselines', note: 'Realistic starting-point estimates from similar teams' }
+      ]
+    },
+    import: {
+      icon: '📥', title: 'Jira import mapping',
+      sub: 'EAP reads your Jira project and maps the existing hierarchy to SAFe. Review before importing.',
+      items: [
+        { icon: '⤵', name: 'Jira Epic → EAP Feature', note: 'Preserves titles, descriptions, and assignments' },
+        { icon: '⤵', name: 'Jira Story → EAP Story', note: 'Story points, status, and sprint history carried over' },
+        { icon: '⤵', name: 'Jira Sprint → EAP Sprint', note: 'Sprint dates and team assignment mapped automatically' },
+        { icon: '⚠', name: 'Custom fields reviewed', note: 'You confirm how custom fields map before importing' },
+        { icon: '↩', name: 'Bulk undo available', note: 'One click removes the entire import if something looks wrong' }
+      ]
+    }
+  };
+
+  // ── Render hierarchy diagram ─────────────────────────────────────
+  function renderHierarchy(fw) {
+    var data = fwData[fw] || fwData.essential;
+    document.getElementById('prev-hd-sub').textContent = data.label;
+    var diag = document.getElementById('hier-diagram');
+    diag.style.opacity = '0';
+    diag.style.transition = 'opacity 180ms ease';
+    setTimeout(function() {
+      var html = '';
+      data.tiers.forEach(function(tier, i) {
+        if (i > 0 && tier.connector) {
+          html += '<div class="hier-connector"><div class="hier-conn-line"></div>' +
+            '<div class="hier-conn-label">' + tier.connector.before + '</div>' +
+            '<div class="hier-conn-line-b"></div></div>';
+        }
+        var opacity = tier.custom ? 'opacity:0.45;' : '';
+        html += '<div class="hier-tier" style="' + opacity + 'animation-delay:' + (i * 80) + 'ms">' +
+          '<div class="hier-tier-hd">' +
+          '<div class="hier-tier-dot" style="background:' + tier.dot + '"></div>' +
+          '<span class="hier-tier-label" style="color:' + tier.dot + '">' + tier.label + '</span>' +
+          '<span class="hier-tier-note">' + tier.note + '</span>' +
+          '</div>' +
+          '<div class="hier-entities">' +
+          tier.entities.map(function(e) {
+            return '<span class="hier-entity' + (e.primary ? ' primary' : '') + '">' + e.name + '</span>';
+          }).join('') +
+          '</div></div>';
+      });
+      diag.innerHTML = html;
+      diag.style.opacity = '1';
+    }, 160);
+  }
+
+  // ── Render method preview ────────────────────────────────────────
+  function renderMethodPreview(method) {
+    var data = methodData[method] || methodData.ai;
+    document.getElementById('prev-hd-sub').textContent = data.title;
+    var container = document.getElementById('method-detail');
+    container.innerHTML = '<div class="method-prev-card">' +
+      '<div class="method-prev-icon">' + data.icon + '</div>' +
+      '<div>' +
+        '<div class="method-prev-title">' + data.title + '</div>' +
+        '<div class="method-prev-sub">' + data.sub + '</div>' +
+      '</div>' +
+      '<div class="method-prev-items">' +
+      data.items.map(function(item) {
+        return '<div class="method-prev-item">' +
+          '<span class="mpi-icon">' + item.icon + '</span>' +
+          '<div class="mpi-body"><div class="mpi-name">' + item.name + '</div>' +
+          '<div class="mpi-note">' + item.note + '</div></div>' +
+          '</div>';
+      }).join('') +
+      '</div></div>';
+  }
+
+  // ── Render invite preview ────────────────────────────────────────
+  function renderInvitePreview() {
+    var prev = document.getElementById('invite-preview');
+    prev.innerHTML = generatedTeams.map(function(team) {
+      return '<div style="background:var(--raised);border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;">' +
+        '<div style="width:8px;height:8px;border-radius:50%;background:var(--charcoal);flex-shrink:0;"></div>' +
+        '<div style="flex:1;"><div style="font-size:12.5px;font-weight:600;color:var(--ink);">' + team.name + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);">' + team.count + ' members</div></div>' +
+        '<div style="font-size:11px;color:var(--ai-accent-deep);font-weight:600;">✓ Invited</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // ── Build invite pane ────────────────────────────────────────────
+  function buildInvitePane() {
+    var container = document.getElementById('invite-teams');
+    container.innerHTML = generatedTeams.map(function(team, i) {
+      return '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<div style="width:7px;height:7px;border-radius:50%;background:var(--charcoal);flex-shrink:0;"></div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--ink);">' + team.name + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-left:auto;">' + team.count + ' members</div>' +
+        '</div>' +
+        '<input type="email" placeholder="Add email address…" style="width:100%;border:1px solid #E1E0DD;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--raised);outline:none;transition:border-color 160ms;" ' +
+        'onfocus="this.style.borderColor=\'rgba(56,55,51,0.32)\';this.style.background=\'#fff\'" ' +
+        'onblur="this.style.borderColor=\'#E1E0DD\';this.style.background=\'var(--raised)\'">' +
+        '</div>';
+    }).join('') +
+    '<button style="font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;padding:2px 0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;">I\'ll invite people later</button>';
+    renderInvitePreview();
+  }
+
+  // ── Progressive ART build in preview ────────────────────────────
+  function buildArtPreview() {
+    document.getElementById('art-placeholder').style.display = 'none';
+    var build = document.getElementById('art-build');
+    build.style.display = 'flex';
+
+    var teamsGrid = document.getElementById('art-teams-grid');
+    teamsGrid.innerHTML = '';
+
+    // Teams appear at t=500ms
+    generatedTeams.forEach(function(team, i) {
+      var t = 500 + i * 120;
+      genTimers.push(setTimeout(function() {
+        var card = document.createElement('div');
+        card.className = 'art-team-card';
+        card.style.animationDelay = '0ms';
+        card.innerHTML =
+          '<div class="edit-hint"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+          '<div class="art-team-name" contenteditable="false" spellcheck="false">' + team.name + '</div>' +
+          '<div class="art-team-count">' + team.count + ' members</div>' +
+          '<div class="art-team-sprints" id="sprints-' + i + '">2-week sprints · PI 26</div>';
+
+        // Click to edit
+        var nameEl = card.querySelector('.art-team-name');
+        nameEl.addEventListener('click', function() {
+          nameEl.contentEditable = 'true';
+          nameEl.focus();
+          // select all
+          var range = document.createRange();
+          range.selectNodeContents(nameEl);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        });
+        nameEl.addEventListener('blur', function() { nameEl.contentEditable = 'false'; });
+        nameEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } });
+
+        teamsGrid.appendChild(card);
+      }, t));
+    });
+
+    // PI row appears at t=1850ms
+    genTimers.push(setTimeout(function() {
+      var piSection = document.getElementById('art-pi-section');
+      piSection.style.display = 'flex';
+      var piRows = document.getElementById('art-pi-rows');
+      var piRow = document.createElement('div');
+      piRow.className = 'art-pi-row';
+      piRow.style.animationDelay = '0ms';
+      piRow.innerHTML =
+        '<span class="art-pi-pill active">● Active</span>' +
+        '<div class="art-pi-body">' +
+          '<div class="art-pi-name">PI 26 — 4 sprints + IP sprint</div>' +
+          '<div class="art-pi-dates" contenteditable="false" spellcheck="false">Jun 2 – Aug 10, 2025</div>' +
+        '</div>';
+
+      var datesEl = piRow.querySelector('.art-pi-dates');
+      datesEl.addEventListener('click', function() {
+        datesEl.contentEditable = 'true'; datesEl.focus();
+        var r = document.createRange(); r.selectNodeContents(datesEl);
+        window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+      });
+      datesEl.addEventListener('blur', function() { datesEl.contentEditable = 'false'; });
+      datesEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); datesEl.blur(); } });
+
+      piRows.appendChild(piRow);
+
+      // Sprint dots appear on team cards
+      generatedTeams.forEach(function(_, i) {
+        var el = document.getElementById('sprints-' + i);
+        if (el) el.classList.add('visible');
+      });
+    }, 1850));
+
+    // Jira connection at t=1400ms
+    genTimers.push(setTimeout(function() {
+      var connSection = document.getElementById('art-conn-section');
+      connSection.style.display = 'flex';
+      var connRows = document.getElementById('art-conn-rows');
+      var jira = document.createElement('div');
+      jira.className = 'art-conn-badge';
+      jira.style.animationDelay = '0ms';
+      jira.innerHTML = '<div class="conn-icon">J</div><span class="conn-name">Jira · DBKG</span><span class="conn-note">47 features mapped</span>';
+      connRows.appendChild(jira);
+    }, 1400));
+
+    // Slack connection at t=2750ms
+    genTimers.push(setTimeout(function() {
+      var connRows = document.getElementById('art-conn-rows');
+      var slack = document.createElement('div');
+      slack.className = 'art-conn-badge';
+      slack.style.animationDelay = '0ms';
+      slack.innerHTML = '<div class="conn-icon" style="font-size:10px">Sl</div><span class="conn-name">Slack · #dbkg-art</span><span class="conn-note">Ready</span>';
+      connRows.appendChild(slack);
+    }, 2750));
+
+    // Edit hint appears after all elements loaded
+    genTimers.push(setTimeout(function() {
+      document.getElementById('edit-hint').classList.add('visible');
+    }, 3600));
+  }
+
+  // ── Left-panel generation sequence ──────────────────────────────
+  function runGeneration() {
+    var ta = document.getElementById('ai-textarea');
+    if (!ta.value.trim()) {
+      ta.value = 'We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd.';
+    }
+    document.getElementById('ai-input-card').style.display = 'none';
+    document.getElementById('gen-card').classList.add('is-visible');
+    document.getElementById('btn-continue').disabled = true;
+
+    // Update preview header
+    document.getElementById('prev-hd-sub').textContent = 'Building your ART…';
+
+    // Start progressive preview build in RIGHT panel
+    buildArtPreview();
+
+    var statuses = [
+      [0,    'Reading your description…'],
+      [600,  'Identifying <strong>team structure…</strong>'],
+      [1300, 'Mapping <strong>PI calendar…</strong>'],
+      [2100, 'Setting up <strong>integrations…</strong>'],
+      [3100, '✦ <strong>Everything looks good</strong> — review and confirm']
+    ];
+    var items = [
+      [500,  '4 teams',           'Auth · Payments · Mobile · Data & Analytics'],
+      [950,  'Framework',         'Essential SAFe — 10-week PI, 2-week sprints'],
+      [1400, 'Jira project DBKG', '47 features mapped to EAP Feature hierarchy'],
+      [1850, 'PI 26',             'Starts Jun 2 — Sprint 2 currently active'],
+      [2300, 'Sprint calendars',  '4 teams × 4 sprints + IP sprint per PI'],
+      [2750, 'Slack',             '#dbkg-art channel linked for notifications']
+    ];
+
+    statuses.forEach(function(s) {
+      genTimers.push(setTimeout(function() { document.getElementById('gen-txt').innerHTML = s[1]; }, s[0]));
+    });
+
+    var genItems = document.getElementById('gen-items');
+    items.forEach(function(item) {
+      genTimers.push(setTimeout(function() {
+        var el = document.createElement('div');
+        el.className = 'gen-item'; el.style.animationDelay = '0ms';
+        el.innerHTML = '<span class="gen-tick">✓</span><span><span class="gen-key">' + item[1] + '</span> — ' + item[2] + '</span>';
+        genItems.appendChild(el);
+      }, item[0]));
+    });
+
+    genTimers.push(setTimeout(function() {
+      document.getElementById('gen-spinner').className = 'gen-spinner done';
+      document.getElementById('prev-hd-sub').textContent = 'Digital Banking ART';
+      aiDone = true;
+      var btn = document.getElementById('btn-continue');
+      btn.disabled = false;
+      btn.textContent = 'Looks good — continue';
+    }, 3500));
+  }
+
+  // ── Step update logic ────────────────────────────────────────────
+  function updateUI() {
+    // Wizard panes
+    document.querySelectorAll('.setup-pane').forEach(function(p, i) {
+      p.classList.toggle('is-active', i + 1 === step);
+    });
+    // Preview panes
+    document.querySelectorAll('.prev-pane').forEach(function(p, i) {
+      p.classList.toggle('is-active', i + 1 === step);
+    });
+    // Step tabs
+    document.querySelectorAll('.setup-step-btn').forEach(function(b) {
+      var s = parseInt(b.dataset.step);
+      b.classList.remove('active','done');
+      if (s === step) b.classList.add('active');
+      if (s < step)  b.classList.add('done');
+    });
+    // Back btn
+    document.getElementById('btn-back').style.visibility = step > 1 ? 'visible' : 'hidden';
+    // Continue btn
+    var cont = document.getElementById('btn-continue');
+    var footer = document.getElementById('setup-footer');
+    if (step === totalSteps) {
+      footer.style.display = 'none';
+      setTimeout(function() {
+        var ring = document.getElementById('done-ring');
+        if (ring) ring.classList.add('glowed');
+      }, 500);
+    } else {
+      footer.style.display = '';
+      if (step === 3 && !aiDone)      cont.textContent = 'Generate ART';
+      else if (step === 3 && aiDone)  cont.textContent = 'Looks good — continue';
+      else if (step === 4)            cont.textContent = 'Finish setup';
+      else                            cont.textContent = 'Continue';
+      cont.disabled = false;
+    }
+
+    // Preview-specific renders
+    if (step === 1) renderHierarchy(selectedFw);
+    if (step === 2) renderMethodPreview(selectedMethod);
+    if (step === 4) { buildInvitePane(); renderInvitePreview(); }
+
+    document.querySelector('.setup-wizard').scrollTop = 0;
+    document.getElementById('prev-scroll').scrollTop = 0;
+  }
+
+  // ── Navigation ───────────────────────────────────────────────────
+  window.nextStep = function() {
+    if (step === 3 && !aiDone) { runGeneration(); return; }
+    if (step < totalSteps) { step++; updateUI(); }
+  };
+
+  window.prevStep = function() {
+    if (step > 1) {
+      if (step === 3) {
+        genTimers.forEach(clearTimeout); genTimers = [];
+        aiDone = false;
+        document.getElementById('gen-card').classList.remove('is-visible');
+        document.getElementById('ai-input-card').style.display = '';
+        document.getElementById('gen-items').innerHTML = '';
+        document.getElementById('gen-spinner').className = 'gen-spinner';
+        // Reset ART preview
+        document.getElementById('art-placeholder').style.display = 'flex';
+        document.getElementById('art-build').style.display = 'none';
+        document.getElementById('art-teams-grid').innerHTML = '';
+        document.getElementById('art-pi-rows').innerHTML = '';
+        document.getElementById('art-conn-rows').innerHTML = '';
+        document.getElementById('art-pi-section').style.display = 'none';
+        document.getElementById('art-conn-section').style.display = 'none';
+        document.getElementById('edit-hint').classList.remove('visible');
+      }
+      step--;
+      updateUI();
+    }
+  };
+
+  window.goStep = function(n) {
+    if (n <= step) { step = n; updateUI(); }
+  };
+
+  // ── Framework card interaction ───────────────────────────────────
+  document.querySelectorAll('.fw-card').forEach(function(c) {
+    c.addEventListener('click', function() {
+      document.querySelectorAll('.fw-card').forEach(function(x) { x.classList.remove('is-selected'); });
+      c.classList.add('is-selected');
+      selectedFw = c.dataset.fw;
+      if (step === 1) renderHierarchy(selectedFw);
+    });
+    c.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.click(); } });
+  });
+
+  // ── Method card interaction ──────────────────────────────────────
+  document.querySelectorAll('.method-card').forEach(function(c) {
+    c.addEventListener('click', function() {
+      document.querySelectorAll('.method-card').forEach(function(x) { x.classList.remove('is-selected'); });
+      c.classList.add('is-selected');
+      selectedMethod = c.dataset.method;
+      if (step === 2) renderMethodPreview(selectedMethod);
+    });
+  });
+
+  // ── Prompt chips ─────────────────────────────────────────────────
+  document.querySelectorAll('.ai-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var ta = document.getElementById('ai-textarea');
+      if (ta.value && !ta.value.trim().endsWith('.')) ta.value = ta.value.trimEnd() + '. ';
+      ta.value += chip.dataset.add + '. ';
+      ta.focus();
+    });
+  });
+
+  // ── Boot ─────────────────────────────────────────────────────────
+  renderHierarchy('essential');
+  updateUI();
+
+})();
+</script>
+</body>
+</html>
