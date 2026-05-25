@@ -129,7 +129,7 @@ body {
   flex-shrink: 0;
 }
 .setup-step-btn:hover { color: var(--sub); background: rgba(0,0,0,0.06); }
-.setup-step-btn.active { background: var(--charcoal); color: #fff; font-weight: 500; }
+.setup-step-btn.active { background: var(--charcoal); color: #fff; font-weight: 600; }
 .setup-step-btn.done { color: var(--sub); }
 /* On very narrow viewports only: collapse to number-only tabs */
 @media (max-width: 720px) {
@@ -137,13 +137,13 @@ body {
   .setup-step-btn { padding: 0 8px; }
 }
 .step-num {
-  width: 17px; height: 17px; border-radius: 50%;
+  width: 19px; height: 19px; border-radius: 50%;
   background: rgba(0,0,0,0.09); color: inherit;
   font-size: 9.5px; font-weight: 700;
   display: inline-flex; align-items: center; justify-content: center;
   flex-shrink: 0; transition: background 200ms;
 }
-.setup-step-btn.active .step-num { background: rgba(255,255,255,0.20); }
+.setup-step-btn.active .step-num { background: rgba(255,255,255,0.26); }
 .setup-step-btn.done .step-num {
   background: var(--ai-accent); color: #fff;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.5 9l3 3 6-6' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -156,14 +156,14 @@ body {
 .setup-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .setup-pane {
   display: none; flex-direction: column; gap: 20px;
-  padding: 8px 20px 20px 16px; flex: 1;
+  padding: 20px 20px 20px 20px; flex: 1;
 }
 .setup-pane.is-active { display: flex; animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both; }
 @keyframes pane-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
 .pane-heading { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
-.pane-title { font-size: 32px; font-weight: 600; color: var(--ink); letter-spacing:-0.024em; line-height:1.1; margin:0; }
-.pane-sub   { font-size: 14px; color: var(--sub); line-height:1.6; margin:0; max-width:52ch; }
+.pane-title { font-size: 38px; font-weight: 600; color: var(--ink); letter-spacing:-0.028em; line-height:1.06; margin:0; }
+.pane-sub   { font-size: 13px; color: var(--muted); line-height:1.6; margin:0; max-width:52ch; }
 
 /* Framework grid */
 .fw-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
@@ -172,7 +172,7 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
   border-radius: 16px; padding: 18px 18px 16px;
   cursor: pointer; user-select: none; outline: none;
-  transition: box-shadow 220ms ease, transform 220ms ease, border-color 160ms ease;
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 200ms ease, background 200ms ease, color 200ms ease;
   display: flex; flex-direction: column; gap: 10px;
 }
 .fw-card:hover {
@@ -180,14 +180,19 @@ body {
   transform: translateY(-2px);
 }
 .fw-card.is-selected {
+  background: var(--charcoal);
   border-color: var(--charcoal);
-  box-shadow: 0 0 0 4px rgba(56,55,51,0.10), 0 4px 16px rgba(0,0,0,0.08);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(56,55,51,0.12), 0 6px 20px rgba(0,0,0,0.14);
   transform: translateY(-1px);
 }
+.fw-card.is-selected:hover { background: #262521; }
 .fw-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .fw-hd-left { display: flex; flex-direction: column; gap: 3px; }
 .fw-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
+.fw-card.is-selected .fw-eyebrow { color: rgba(255,255,255,0.50); }
 .fw-name { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing:-0.012em; line-height:1.2; }
+.fw-card.is-selected .fw-name { color: #fff; }
 .fw-check {
   width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
   border: 1.5px solid var(--border); background: var(--surface);
@@ -195,11 +200,14 @@ body {
   transition: all 180ms cubic-bezier(0.22,1,0.36,1);
 }
 .fw-check svg { opacity: 0; transition: opacity 160ms; }
-.fw-card.is-selected .fw-check { background: var(--charcoal); border-color: var(--charcoal); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
+.fw-card.is-selected .fw-check { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.32); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
 .fw-card.is-selected .fw-check svg { opacity: 1; }
 .fw-desc { font-size: 13px; color: var(--sub); line-height: 1.55; }
+.fw-card.is-selected .fw-desc { color: rgba(255,255,255,0.68); }
 .fw-meta { font-size: 11px; color: var(--muted); }
 .fw-meta strong { color: var(--sub); font-weight: 600; }
+.fw-card.is-selected .fw-meta { color: rgba(255,255,255,0.50); }
+.fw-card.is-selected .fw-meta strong { color: rgba(255,255,255,0.82); }
 
 /* Method cards */
 .method-list { display: flex; flex-direction: column; gap: 8px; }
@@ -213,7 +221,7 @@ body {
 }
 .method-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); transform: translateY(-2px); }
 .method-card.is-selected { border-color: var(--charcoal); box-shadow: 0 0 0 4px rgba(56,55,51,0.10); transform:translateY(-1px); }
-.method-card.is-hero { border-color: rgba(22,163,74,0.32); background: rgba(22,163,74,0.06); }
+.method-card.is-hero { border-color: rgba(22,163,74,0.45); background: rgba(22,163,74,0.09); }
 .method-card.is-hero:hover { border-color: rgba(22,163,74,0.55); }
 .method-card.is-hero.is-selected { border-color: var(--ai-accent); box-shadow: 0 0 0 4px rgba(22,163,74,0.12); }
 .method-badge {
@@ -290,12 +298,12 @@ body {
 
 /* Done screen */
 .done-wrap { display: flex; flex-direction: column; align-items: center; padding: 24px 0 20px; text-align: center; flex: 1; }
-.done-ring { width: 68px; height: 68px; border-radius: 50%; background: rgba(22,163,74,0.10); border: 2px solid rgba(22,163,74,0.25); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; color: var(--ai-accent); animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both; }
+.done-ring { width: 80px; height: 80px; border-radius: 50%; background: rgba(22,163,74,0.10); border: 2px solid rgba(22,163,74,0.28); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--ai-accent); animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both; }
 @keyframes done-pop { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
 .done-ring.glowed { animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both, done-glow 600ms ease-out 500ms both; }
 @keyframes done-glow { from{box-shadow:0 0 0 0 rgba(22,163,74,0.30)} to{box-shadow:0 0 0 16px rgba(22,163,74,0)} }
-.done-ring svg { width: 28px; height: 28px; }
-.done-title { font-size: 32px; font-weight: 600; color: var(--ink); letter-spacing: -0.024em; line-height: 1.1; margin-bottom: 6px; animation: pane-in 260ms ease 300ms both; }
+.done-ring svg { width: 34px; height: 34px; }
+.done-title { font-size: 36px; font-weight: 600; color: var(--ink); letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 6px; animation: pane-in 260ms ease 300ms both; }
 .done-sub { font-size: 14px; color: var(--sub); line-height: 1.6; max-width: 40ch; margin-bottom: 24px; animation: pane-in 260ms ease 360ms both; }
 .done-actions { display: flex; gap: 10px; align-items: center; animation: pane-in 260ms ease 420ms both; }
 
@@ -332,16 +340,16 @@ body {
 
 .prev-hd {
   flex-shrink: 0;
-  padding: 20px 28px 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  display: flex; align-items: baseline; gap: 10px;
+  padding: 13px 24px 11px;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  display: flex; align-items: center; gap: 10px;
 }
 .prev-hd-title {
   font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.10em; color: var(--muted);
+  letter-spacing: 0.11em; color: var(--muted);
 }
 .prev-hd-sub {
-  font-size: 13px; font-weight: 500; color: var(--ink);
+  font-size: 12px; font-weight: 500; color: var(--ink);
   transition: opacity 200ms ease;
 }
 
@@ -524,7 +532,7 @@ body {
 .readiness-ring-bg { fill: none; stroke: rgba(0,0,0,0.08); stroke-width: 6; }
 .readiness-ring-fill { fill: none; stroke: var(--ai-accent); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 164; stroke-dashoffset: 23; transition: stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1) 400ms; }
 .readiness-ring-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-.readiness-pct { font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.readiness-pct { font-size: 18px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .readiness-text { flex: 1; }
 .readiness-title { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 2px; }
 .readiness-sub { font-size: 13px; color: var(--sub); line-height: 1.5; }
@@ -765,6 +773,11 @@ body {
     ════════════════════════════════════════════════ -->
     <div class="setup-preview" id="setup-preview">
 
+      <div class="prev-hd">
+        <span class="prev-hd-title">Live Preview</span>
+        <span class="prev-hd-sub" id="prev-hd-sub-panel">Essential SAFe hierarchy</span>
+      </div>
+
       <div class="prev-scroll" id="prev-scroll">
 
         <!-- Step 1: Hierarchy diagram + auto-configured items -->
@@ -1000,6 +1013,8 @@ body {
   function renderHierarchy(fw) {
     var data = fwData[fw] || fwData.essential;
     document.getElementById('prev-hd-sub').textContent = data.label;
+    var panelSub = document.getElementById('prev-hd-sub-panel');
+    if (panelSub) panelSub.textContent = data.label;
     var diag = document.getElementById('hier-diagram');
     diag.style.opacity = '0';
     diag.style.transition = 'opacity 180ms ease';
@@ -1052,6 +1067,8 @@ body {
   function renderMethodPreview(method) {
     var data = methodData[method] || methodData.ai;
     document.getElementById('prev-hd-sub').textContent = data.title;
+    var _pm = document.getElementById('prev-hd-sub-panel');
+    if (_pm) _pm.textContent = data.title;
     var container = document.getElementById('method-detail');
     container.innerHTML = '<div class="method-prev-card">' +
       '<div class="method-prev-icon">' + data.icon + '</div>' +
@@ -1215,6 +1232,8 @@ body {
 
     // Update preview header
     document.getElementById('prev-hd-sub').textContent = 'Building your ART…';
+    var _p = document.getElementById('prev-hd-sub-panel');
+    if (_p) _p.textContent = 'Building your ART…';
 
     // Start progressive preview build in RIGHT panel
     buildArtPreview();
@@ -1252,6 +1271,8 @@ body {
     genTimers.push(setTimeout(function() {
       document.getElementById('gen-spinner').className = 'gen-spinner done';
       document.getElementById('prev-hd-sub').textContent = 'Digital Banking ART';
+      var _p2 = document.getElementById('prev-hd-sub-panel');
+      if (_p2) _p2.textContent = 'Digital Banking ART';
       aiDone = true;
       var btn = document.getElementById('btn-continue');
       btn.disabled = false;
