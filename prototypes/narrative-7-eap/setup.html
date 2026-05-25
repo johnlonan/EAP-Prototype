@@ -665,23 +665,23 @@ body {
         <!-- PANE 2 — Method -->
         <section class="setup-pane" id="pane-2">
           <div class="pane-heading">
-            <h1 class="pane-title">How do you want to start?</h1>
-            <p class="pane-sub">All three paths reach the same result. Pick what fits your situation.</p>
+            <h1 class="pane-title">How should Otto set up your ART?</h1>
+            <p class="pane-sub">Choose the approach that fits your team. You review everything before it's saved.</p>
           </div>
           <div class="method-list">
             <div class="method-card is-hero is-selected" data-method="ai" tabindex="0">
               <div class="method-badge">Fastest</div>
               <div class="method-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/></svg></div>
               <div class="method-info">
-                <div class="method-name">✦ Describe your team — Otto builds the ART</div>
-                <div class="method-desc">Write a plain-language description: team names, size, PI length, tools. Otto generates the full configuration. You review before anything is saved.</div>
+                <div class="method-name">✦ Describe your team: Otto builds the ART</div>
+                <div class="method-desc">Write a plain-language description: team names, size, PI length, tools. Otto generates the full configuration in seconds. Review before anything is saved.</div>
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
             <div class="method-card" data-method="template" tabindex="0">
               <div class="method-icon">📋</div>
               <div class="method-info">
-                <div class="method-name">Start from an industry template</div>
+                <div class="method-name">Use an industry template</div>
                 <div class="method-desc">Pre-built for Digital Banking, Insurance, Retail Technology, and Healthcare IT. Teams, PI calendars, and feature categories already defined. Edit anything before launch.</div>
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -706,7 +706,7 @@ body {
           <div class="ai-input-card" id="ai-input-card">
             <div class="ai-card-hd">
               <div class="ai-otto"><svg viewBox="0 0 24 24" fill="none"><path d="M10 5.5L11 9.5C11.5 11.5 13 13 15 13.5L19 14.5L15 15.5C13 16 11.5 17.5 11 19.5L10 23.5L9 19.5C8.5 17.5 7 16 5 15.5L1 14.5L5 13.5C7 13 8.5 11.5 9 9.5L10 5.5Z" fill="currentColor"/></svg></div>
-              <span class="ai-card-label">Otto is ready</span>
+              <span class="ai-card-label">Otto</span>
             </div>
             <textarea class="ai-textarea" id="ai-textarea" rows="4" placeholder="e.g. We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd."></textarea>
             <div class="ai-chips">
@@ -729,7 +729,7 @@ body {
         <section class="setup-pane" id="pane-4">
           <div class="pane-heading">
             <h1 class="pane-title">Invite your team</h1>
-            <p class="pane-sub">Add people to each team. We found some from your Jira project — confirm or add others.</p>
+            <p class="pane-sub">EAP found members from your Jira project. Confirm who's on each team, or add more.</p>
           </div>
           <div id="invite-teams" style="display:flex;flex-direction:column;gap:10px;">
             <!-- populated by JS from generated teams -->
@@ -746,7 +746,7 @@ body {
               <svg viewBox="0 0 28 28" fill="none"><path d="M6 14l5.5 5.5 11-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div class="done-title">Digital Banking ART is live</div>
-            <p class="done-sub">PI 26 is running, Sprint 2 is active. Your team can open the board and start working right now.</p>
+            <p class="done-sub">PI 26 is running, Sprint 2 is active. Open the board and start planning.</p>
             <div class="done-actions">
               <a href="home.html?p=ananya" class="btn-ghost">Back to home</a>
               <a href="index.html?p=ananya&visit=new" class="btn-open">Open EAP workspace</a>
@@ -792,7 +792,7 @@ body {
             <div class="art-build-label" style="margin-top:4px">Integrations</div>
             <div class="placeholder-row" style="height:44px"></div>
             <div class="placeholder-row" style="height:44px"></div>
-            <div class="placeholder-label">Describe your team and Otto will fill this in</div>
+            <div class="placeholder-label">Describe your team and Otto builds this out</div>
           </div>
           <!-- Built progressively during generation -->
           <div class="art-build" id="art-build" style="display:none">
@@ -917,7 +917,7 @@ body {
       { key: 'Cadence',       val: 'Configure from scratch' },
       { key: 'Views',         val: 'All views available to enable' },
       { key: 'Roles',         val: 'No defaults — assign as needed' },
-      { key: 'Metrics',       val: 'No defaults — add what you need' }
+      { key: 'Metrics',       val: 'No defaults. Add what you need.' }
     ]
   };
 
@@ -1222,7 +1222,7 @@ body {
       [600,  'Identifying <strong>team structure…</strong>'],
       [1300, 'Mapping <strong>PI calendar…</strong>'],
       [2100, 'Setting up <strong>integrations…</strong>'],
-      [3100, '✦ <strong>Everything looks good</strong> — review and confirm']
+      [3100, '✦ <strong>ART configured.</strong> Review before saving']
     ];
     var items = [
       [500,  '4 teams',           'Auth · Payments · Mobile · Data & Analytics'],
@@ -1253,7 +1253,7 @@ body {
       aiDone = true;
       var btn = document.getElementById('btn-continue');
       btn.disabled = false;
-      btn.textContent = 'Looks good — continue';
+      btn.textContent = 'Confirm and continue';
     }, 3500));
   }
 
@@ -1288,8 +1288,8 @@ body {
     } else {
       footer.style.display = '';
       if (step === 3 && !aiDone)      cont.textContent = 'Generate ART';
-      else if (step === 3 && aiDone)  cont.textContent = 'Looks good — continue';
-      else if (step === 4)            cont.textContent = 'Finish setup';
+      else if (step === 3 && aiDone)  cont.textContent = 'Confirm and continue';
+      else if (step === 4)            cont.textContent = 'Send invites';
       else                            cont.textContent = 'Continue';
       cont.disabled = false;
     }
