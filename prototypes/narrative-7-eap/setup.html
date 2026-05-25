@@ -322,12 +322,13 @@ body {
 .btn-ghost:hover { background: var(--raised); color: var(--ink); }
 
 /* ─────── RIGHT: PREVIEW PANEL ─────── */
-/* Uses the Sand app page background (#E1E0DD) so white cards read as
-   elevated surfaces — a faithful simulation of the app itself */
+/* Sand page background — white cards inside read as elevated surfaces,
+   faithfully simulating the live app. Intentionally darker than the
+   wizard panel (#F1F0ED) to give the split screen a clear left/right read. */
 .setup-preview {
   flex: 1; min-width: 0;
   display: flex; flex-direction: column;
-  background: var(--bg);
+  background: #E1E0DD;
   overflow: hidden;
 }
 
@@ -996,7 +997,8 @@ body {
   // ── Method preview data ──────────────────────────────────────────
   var methodData = {
     ai: {
-      icon: '✦', title: 'What Otto will configure',
+      icon: '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>',
+      title: 'What Otto will configure',
       sub: 'Otto reads your description and generates a complete ART configuration in about 5 seconds.',
       items: [
         { icon: '👥', name: 'Teams', note: 'Names, sizes, and sprint calendars for each team' },
