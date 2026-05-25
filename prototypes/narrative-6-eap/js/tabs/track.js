@@ -59,7 +59,10 @@ function traceRing(item, size) {
        : (item.dod.filter(function(d) { return d.done; }).length + '/' + item.dod.length))
     : 'none';
 
-  var svg = '<svg class="bcard-trace-ring" width="' + size + '" height="' + size + '" viewBox="0 0 16 16"' +
+  // Completion glow — all 4 segments green earns the drop-shadow
+  var isComplete = codeColor === GRN && testsColor === GRN && dodColor === GRN && deployColor === GRN;
+
+  var svg = '<svg class="bcard-trace-ring' + (isComplete ? ' bcard-trace-ring--complete' : '') + '" width="' + size + '" height="' + size + '" viewBox="0 0 16 16"' +
     ' data-code="' + codeColor + '" data-tests="' + testsColor + '" data-dod="' + dodColor + '" data-deploy="' + deployColor + '"' +
     ' data-test-str="' + testStr + '" data-env-str="' + envStr + '" data-dod-str="' + dodStr + '"' +
     ' data-pr-status="' + (item.pr ? item.pr.status : '') + '">';
@@ -132,9 +135,12 @@ EAP.initTracePopovers = function() {
       { lbl: envLbl, color: colors[3] }
     ];
 
+    // Popover mini-ring: arcs draw themselves in clockwise, staggered 55ms apart.
+    // stroke-dasharray:8 approximates each 80° arc's length at r=5.5.
     var svgStr = '<svg width="52" height="52" viewBox="0 0 16 16" style="display:block;flex-shrink:0;">';
     ARCS.forEach(function(a, i) {
-      svgStr += '<path d="' + a.d + '" fill="none" stroke="' + colors[i] + '" stroke-width="2" stroke-linecap="round"/>';
+      svgStr += '<path d="' + a.d + '" fill="none" stroke="' + colors[i] + '" stroke-width="2" stroke-linecap="round"' +
+        ' style="stroke-dasharray:8;stroke-dashoffset:8;animation:arc-draw 0.3s cubic-bezier(0.16,1,0.3,1) ' + (i * 55) + 'ms forwards;"/>';
     });
     svgStr += '</svg>';
 

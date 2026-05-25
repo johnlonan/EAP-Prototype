@@ -1326,8 +1326,8 @@ body { background: #F1F0ED !important; }
 .bcard-pr-ci { cursor: default; }
 /* CI dot cursor */
 /* Trace ring popover */
-#trace-pop { position: fixed; z-index: 9997; background: #FFFFFF; border: 1px solid #E1E0DD; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06); padding: 14px 16px; width: 230px; pointer-events: none; opacity: 0; transition: opacity 100ms ease; font-family: var(--font-sans); }
-#trace-pop.trace-pop-visible { opacity: 1; }
+#trace-pop { position: fixed; z-index: 9997; background: #FFFFFF; border: 1px solid #E1E0DD; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06); padding: 14px 16px; width: 230px; pointer-events: none; opacity: 0; transform: translateX(-5px); transition: opacity 150ms cubic-bezier(0.16,1,0.3,1), transform 150ms cubic-bezier(0.16,1,0.3,1); font-family: var(--font-sans); }
+#trace-pop.trace-pop-visible { opacity: 1; transform: translateX(0); }
 .trace-pop-hd { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); margin-bottom: 12px; }
 .trace-pop-body { display: flex; align-items: flex-start; gap: 14px; }
 .trace-pop-segs { display: flex; flex-direction: column; gap: 7px; flex: 1; }
@@ -1356,7 +1356,42 @@ body { background: #F1F0ED !important; }
 .dp-pr-dot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
 /* Blockers callout: full width, no label column */
 .dp-pr-blockers { font-size: 11px; color: #DC2626; background: rgba(220,38,38,0.09); border: 1px solid rgba(220,38,38,0.20); border-radius: 6px; padding: 6px 10px; line-height: 1.4; }
-.dp-pr-gate { font-size: 11px; color: #92400E; background: rgba(217,119,6,0.10); border: 1px solid rgba(217,119,6,0.25); border-radius: 6px; padding: 6px 10px; line-height: 1.4; margin-top: 2px; }
+.dp-pr-gate { font-size: 11px; color: #92400E; background: rgba(217,119,6,0.10); border: 1px solid rgba(217,119,6,0.25); border-radius: 6px; padding: 6px 10px; line-height: 1.4; margin-top: 2px; animation: gate-breathe 2.4s ease-in-out infinite; }
+
+/* ── Delight: traceability ring arc draw-in ── */
+/* Popover mini-ring arcs animate in clockwise, staggered.
+   Each path gets stroke-dasharray:8 + stroke-dashoffset:8 inline,
+   then this keyframe draws them to 0. */
+@keyframes arc-draw { to { stroke-dashoffset: 0; } }
+
+/* ── Delight: full green ring — completion presence ── */
+/* A faint glow when all 4 segments are green. No animation — just weight. */
+.bcard-trace-ring--complete { filter: drop-shadow(0 0 3.5px rgba(22,163,74,0.40)); }
+
+/* ── Delight: CI running — live pulse ── */
+/* A running pipeline is an active state. The dot breathes to communicate it. */
+@keyframes ci-pulse {
+  0%, 100% { opacity: 1;    transform: scale(1); }
+  50%       { opacity: 0.48; transform: scale(0.78); }
+}
+.bcard-ci-running    { animation: ci-pulse 1.8s ease-in-out infinite; }
+.ls-vcs-ci--running  { animation: ci-pulse 1.8s ease-in-out infinite; }
+
+/* ── Delight: gate-pending — patient breathe ── */
+/* Slower cadence than CI (2.4s vs 1.8s) — waiting, not active. */
+@keyframes gate-breathe {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.62; }
+}
+.ls-vcs-env--gate { animation: gate-breathe 2.4s ease-in-out infinite; }
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .bcard-ci-running, .ls-vcs-ci--running,
+  .dp-pr-gate, .ls-vcs-env--gate { animation: none; }
+  #trace-pop { transition: opacity 100ms ease; transform: none; }
+  #trace-pop.trace-pop-visible { transform: none; }
+}
 /* ── Detail panel: DoD section ── */
 .dp-dod-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .dp-dod-progress { font-size: 12px; font-weight: 500; color: var(--text-tertiary); font-family: var(--font-mono); }

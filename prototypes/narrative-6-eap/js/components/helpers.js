@@ -512,7 +512,8 @@ EAP.lsVcsCell = function(i) {
   var ciTip = i.ci
     ? ({ passing:'CI passing', failing:'CI failing', running:'CI running' }[i.ci.status] || 'CI')
     : '';
-  var ciDot = '<span class="ls-vcs-ci" style="background:' + ciColor + ';" title="' + ciTip + '"></span>';
+  var ciRunning = (i.ci && i.ci.status === 'running');
+  var ciDot = '<span class="ls-vcs-ci' + (ciRunning ? ' ls-vcs-ci--running' : '') + '" style="background:' + ciColor + ';" title="' + ciTip + '"></span>';
 
   // PR label — single word, compact pill
   var prLbl = { draft:'Draft', open:'Open', 'in-review':'Review', merged:'Merged' }[i.pr.status] || i.pr.status;
@@ -548,7 +549,8 @@ EAP.lsVcsCell = function(i) {
     } else {
       envLabel = i.env.target; envColor = DIM;
     }
-    envHtml = '<span class="ls-vcs-env" style="color:' + envColor + ';">' + envLabel + '</span>';
+    var envClass = 'ls-vcs-env' + (i.env.status === 'gate-pending' ? ' ls-vcs-env--gate' : '');
+    envHtml = '<span class="' + envClass + '" style="color:' + envColor + ';">' + envLabel + '</span>';
   }
 
   return '<td class="ls-vcs-cell">' + ciDot + prPill + tstHtml + envHtml + '</td>';
