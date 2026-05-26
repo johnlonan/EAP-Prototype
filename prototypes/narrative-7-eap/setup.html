@@ -23,6 +23,9 @@
   --raised: #F8F7F4;
   --bg:     #F1F0ED;
   --charcoal:#383733;
+  --warning: #D97706;
+  --warning-bg: rgba(217,119,6,0.09);
+  --warning-border: rgba(217,119,6,0.22);
 }
 
 html, body { height: 100%; margin: 0; padding: 0; }
@@ -153,13 +156,13 @@ body {
 .pane-sub   { font-size: 13px; color: var(--muted); line-height:1.6; margin:0; max-width:52ch; }
 
 /* Framework grid */
-.fw-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.fw-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
 .fw-card {
   background: var(--surface); border: 1.5px solid transparent;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
   border-radius: 16px; padding: 18px;
   cursor: pointer; user-select: none; outline: none;
-  transition: box-shadow 220ms ease, transform 220ms ease, border-color 200ms ease, background 200ms ease, color 200ms ease;
+  transition: box-shadow 220ms cubic-bezier(0.22,1,0.36,1), transform 220ms cubic-bezier(0.22,1,0.36,1), border-color 180ms ease, background 180ms ease, color 180ms ease;
   display: flex; flex-direction: column; gap: 10px;
 }
 .fw-card:hover {
@@ -176,7 +179,7 @@ body {
 .fw-card.is-selected:hover { background: #262521; }
 .fw-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .fw-hd-left { display: flex; flex-direction: column; gap: 3px; }
-.fw-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
+.fw-eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
 .fw-card.is-selected .fw-eyebrow { color: rgba(255,255,255,0.62); }
 .fw-name { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing:-0.012em; line-height:1.2; }
 .fw-card.is-selected .fw-name { color: #fff; }
@@ -202,13 +205,13 @@ body {
 .fw-card.is-selected:focus-visible { outline: 2px solid rgba(255,255,255,0.55); outline-offset: 2px; }
 
 /* Method cards */
-.method-list { display: flex; flex-direction: column; gap: 8px; }
+.method-list { display: flex; flex-direction: column; gap: 10px; }
 .method-card {
   background: var(--surface); border: 1.5px solid transparent;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
   border-radius: 14px; padding: 16px 18px;
   cursor: pointer; user-select: none; outline: none;
-  transition: box-shadow 220ms ease, transform 220ms ease, border-color 160ms ease;
+  transition: box-shadow 220ms cubic-bezier(0.22,1,0.36,1), transform 220ms cubic-bezier(0.22,1,0.36,1), border-color 160ms ease;
   display: flex; gap: 14px; align-items: flex-start; position: relative;
 }
 .method-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); transform: translateY(-2px); }
@@ -229,7 +232,7 @@ body {
 }
 .method-card:hover .method-icon { transform: scale(1.08); }
 .method-card.is-hero .method-icon { background: rgba(22,163,74,0.12); color: var(--ai-accent); }
-.method-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 3px; line-height: 1.25; letter-spacing: -0.012em; }
+.method-name { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 3px; line-height: 1.25; letter-spacing: -0.014em; }
 .method-card.is-hero .method-name { color: var(--ai-accent-deep); }
 .method-desc { font-size: 13px; color: var(--sub); line-height: 1.55; }
 .method-check {
@@ -264,14 +267,14 @@ body {
   min-height: 88px;
 }
 .ai-textarea:focus { border-color: rgba(56,55,51,0.32); background: var(--surface); box-shadow: 0 0 0 3px rgba(56,55,51,0.08); }
-.ai-textarea::placeholder { color: #BBBBB7; }
+.ai-textarea::placeholder { color: var(--muted); }
 .ai-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 9px; }
 .ai-chip {
   font-family: inherit; cursor: pointer; font-size: 11px; font-weight: 500; color: var(--sub);
   background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
   padding: 4px 11px; transition: background 140ms, color 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms;
 }
-.ai-chip:hover { background: var(--raised); color: var(--ink); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.ai-chip:hover { background: var(--raised); color: var(--ink); transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.10); }
 
 /* Gen card — same AI green territory as the input card it replaces */
 .gen-card { background: rgba(22,163,74,0.04); border: 1px solid rgba(22,163,74,0.14); border-radius: 14px; padding: 18px 20px; display: none; flex-direction: column; gap: 12px; }
@@ -293,12 +296,12 @@ body {
 .done-wrap { display: flex; flex-direction: column; align-items: center; padding: 24px 0 20px; text-align: center; flex: 1; }
 .done-ring { width: 80px; height: 80px; border-radius: 50%; background: rgba(22,163,74,0.10); border: 2px solid rgba(22,163,74,0.28); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--ai-accent); animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both; }
 @keyframes done-pop { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
-.done-ring.glowed { animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both, done-glow 600ms ease-out 500ms both; }
+.done-ring.glowed { animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both, done-glow 700ms cubic-bezier(0.22,1,0.36,1) 500ms both; }
 @keyframes done-glow { from{box-shadow:0 0 0 0 rgba(22,163,74,0.30)} to{box-shadow:0 0 0 16px rgba(22,163,74,0)} }
 .done-ring svg { width: 34px; height: 34px; }
-.done-title { font-size: 36px; font-weight: 600; color: var(--ink); letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 6px; animation: pane-in 260ms ease 300ms both; }
-.done-sub { font-size: 14px; color: var(--sub); line-height: 1.6; max-width: 40ch; margin-bottom: 24px; animation: pane-in 260ms ease 360ms both; }
-.done-actions { display: flex; gap: 10px; align-items: center; animation: pane-in 260ms ease 420ms both; }
+.done-title { font-size: 36px; font-weight: 600; color: var(--ink); letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 6px; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 300ms both; }
+.done-sub { font-size: 14px; color: var(--sub); line-height: 1.6; max-width: 44ch; margin-bottom: 24px; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 360ms both; }
+.done-actions { display: flex; gap: 10px; align-items: center; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 420ms both; }
 
 /* Footer — full-width, card rising from the bottom */
 .setup-footer {
@@ -306,20 +309,23 @@ body {
   background: var(--surface);
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -2px 12px rgba(0,0,0,0.06), 0 -1px 3px rgba(0,0,0,0.04);
-  padding: 12px 24px;
+  padding: 14px 24px;
   display: flex; align-items: center; gap: 10px;
-  /* Ensure it sits flush — no gap below */
-  margin-top: -1px;
+  border-top: 1px solid rgba(0,0,0,0.06);
 }
 .btn-back { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background 140ms, color 140ms; visibility: hidden; }
 .btn-back:hover { background: var(--raised); color: var(--ink); }
-.btn-continue { margin-left: auto; font-family: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 8px 20px; cursor: pointer; transition: background 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms; }
-.btn-continue:hover:not(:disabled) { background: #262521; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.20); }
+.btn-back:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 2px; }
+.btn-continue { margin-left: auto; font-family: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 8px 22px; cursor: pointer; transition: background 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms; }
+.btn-continue:hover:not(:disabled) { background: #262521; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
 .btn-continue:disabled { background: #CCCBC8; cursor: not-allowed; }
-.btn-open { font-family: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 10px 22px; cursor: pointer; transition: background 140ms, transform 160ms; text-decoration: none; display: inline-flex; align-items: center; }
-.btn-open:hover { background: #262521; transform: translateY(-1px); }
-.btn-ghost { font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: background 140ms; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-continue:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
+.btn-open { font-family: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 10px 24px; cursor: pointer; transition: background 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-open:hover { background: #262521; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
+.btn-open:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
+.btn-ghost { font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 8px 18px; cursor: pointer; transition: background 140ms, color 140ms; text-decoration: none; display: inline-flex; align-items: center; }
 .btn-ghost:hover { background: var(--raised); color: var(--ink); }
+.btn-ghost:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 2px; }
 
 /* ─────── RIGHT: PREVIEW PANEL ─────── */
 /* Sand background wrapping the preview card — creates a shallow inset
@@ -348,8 +354,8 @@ body {
   background: transparent; /* inherits white from .preview-card */
 }
 .prev-hd-title {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.11em; color: var(--muted);
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--muted);
 }
 .prev-hd-sub {
   font-size: 12px; font-weight: 500; color: var(--ink);
@@ -402,7 +408,7 @@ body {
 .hier-connector {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   padding: 4px 0; width: 100%;
-  animation: pane-in 200ms ease both;
+  animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both;
 }
 .hier-conn-line { width: 1.5px; height: 10px; background: rgba(0,0,0,0.14); }
 .hier-conn-label { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); background: var(--surface); padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.08); }
@@ -423,7 +429,7 @@ body {
   display: flex; align-items: flex-start; gap: 10px;
   padding: 10px 12px; background: var(--raised); border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.05);
-  animation: gen-in 240ms cubic-bezier(0.22,1,0.36,1) both;
+  animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
 }
 .method-prev-item:nth-child(1) { animation-delay: 30ms; }
 .method-prev-item:nth-child(2) { animation-delay: 90ms; }
@@ -450,7 +456,7 @@ body {
   background: var(--surface); border: 1px solid rgba(0,0,0,0.07);
   border-radius: 12px; padding: 12px 14px;
   opacity: 0; transform: translateY(6px);
-  animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+  animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
   position: relative;
 }
 .art-team-name {
@@ -458,7 +464,7 @@ body {
   margin-bottom: 3px; line-height: 1.3;
   /* EDITABLE: click to rename */
   cursor: text; border-radius: 4px;
-  transition: background 120ms;
+  transition: background 160ms;
 }
 .art-team-name:hover { background: rgba(56,55,51,0.06); }
 .art-team-name[contenteditable="true"] {
@@ -467,7 +473,7 @@ body {
 }
 .art-team-count { font-size: 11px; color: var(--muted); }
 .art-team-sprints { font-size: 10.5px; color: var(--muted); margin-top: 6px; display: none; }
-.art-team-sprints.visible { display: block; animation: gen-in 200ms ease both; }
+.art-team-sprints.visible { display: block; animation: gen-in 200ms cubic-bezier(0.22,1,0.36,1) both; }
 .edit-hint {
   position: absolute; top: 8px; right: 8px;
   width: 20px; height: 20px; border-radius: 6px;
@@ -482,9 +488,9 @@ body {
   background: var(--surface); border: 1px solid rgba(0,0,0,0.07);
   border-radius: 12px; padding: 12px 14px;
   display: flex; align-items: center; gap: 10px;
-  opacity: 0; animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+  opacity: 0; animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
 }
-.art-pi-pill { font-size: 9.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.art-pi-pill { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
 .art-pi-pill.active { background: rgba(22,163,74,0.10); color: var(--ai-accent-deep); }
 .art-pi-body { flex: 1; }
 .art-pi-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
@@ -502,7 +508,7 @@ body {
   display: flex; align-items: center; gap: 10px;
   background: var(--surface); border: 1px solid rgba(0,0,0,0.07);
   border-radius: 10px; padding: 9px 12px;
-  opacity: 0; animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+  opacity: 0; animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
 }
 .conn-icon { width: 26px; height: 26px; border-radius: 7px; background: var(--raised); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--sub); flex-shrink: 0; }
 .conn-name { font-size: 13px; font-weight: 500; color: var(--ink); flex: 1; }
@@ -510,7 +516,7 @@ body {
 
 /* Placeholder state (before generation) */
 .art-placeholder { display: flex; flex-direction: column; gap: 16px; opacity: 0.45; pointer-events: none; }
-.placeholder-row { height: 60px; background: var(--surface); border-radius: 12px; border: 1px dashed rgba(0,0,0,0.15); }
+.placeholder-row { height: 60px; background: var(--surface); border-radius: 12px; border: 1px solid rgba(0,0,0,0.09); }
 .placeholder-label { font-size: 11px; color: var(--muted); text-align: center; padding-top: 8px; }
 
 /* Edit mode CTA */
@@ -520,7 +526,7 @@ body {
   border: 1px solid rgba(56,55,51,0.12); border-radius: 10px;
   font-size: 11px; color: var(--sub);
 }
-.edit-mode-hint.visible { display: flex; animation: gen-in 300ms ease 400ms both; }
+.edit-mode-hint.visible { display: flex; animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) 400ms both; }
 .edit-mode-hint svg { width: 14px; height: 14px; color: var(--charcoal); flex-shrink: 0; }
 
 /* ── READINESS (Step 4) ── */
@@ -546,8 +552,8 @@ body {
   padding: 8px 10px; border-radius: 9px;
   animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
 }
-.checklist-item.done  { background: rgba(22,163,74,0.06); }
-.checklist-item.warn  { background: rgba(217,119,6,0.06); }
+.checklist-item.done  { background: rgba(22,163,74,0.08); }
+.checklist-item.warn  { background: var(--warning-bg); }
 .checklist-item:nth-child(1){animation-delay:300ms}
 .checklist-item:nth-child(2){animation-delay:380ms}
 .checklist-item:nth-child(3){animation-delay:460ms}
@@ -584,7 +590,7 @@ body {
 .auto-config-row {
   display: flex; align-items: baseline; gap: 12px;
   padding: 9px 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.07);
   animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
 }
 .auto-config-row:last-child { border-bottom: none; }
@@ -669,7 +675,7 @@ body {
           <div class="fw-grid" role="radiogroup" aria-label="Framework selection">
             <div class="fw-card is-selected" data-fw="essential" tabindex="0" role="radio" aria-checked="true">
               <div class="fw-hd">
-                <div class="fw-hd-left"><div class="fw-eyebrow">Most common</div><div class="fw-name">Essential SAFe</div></div>
+                <div class="fw-hd-left"><div class="fw-eyebrow">Recommended</div><div class="fw-name">Essential SAFe</div></div>
                 <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               </div>
               <div class="fw-desc">One ART, 50–125 people. Single program, single PI cadence.</div>
@@ -705,13 +711,13 @@ body {
         <!-- PANE 2 — Method -->
         <section class="setup-pane" id="pane-2">
           <div class="pane-heading">
-            <h1 class="pane-title">How should Otto set up your ART?</h1>
-            <p class="pane-sub">Choose the approach that fits your team. You review everything before it's saved.</p>
+            <h1 class="pane-title">How should we set up your ART?</h1>
+            <p class="pane-sub">Choose an approach. Nothing is saved until you review and confirm.</p>
           </div>
           <div class="method-list" role="radiogroup" aria-label="Setup method selection">
             <div class="method-card is-hero is-selected" data-method="ai" tabindex="0" role="radio" aria-checked="true">
               <div class="method-badge">Fastest</div>
-              <div class="method-icon"><svg width="17" height="17" viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
+              <div class="method-icon"><svg width="18" height="18" viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
               <div class="method-info">
                 <div class="method-name">Describe your team: Otto builds the ART</div>
                 <div class="method-desc">Write a plain-language description: team names, size, PI length, tools. Otto generates the full configuration in seconds. Review before anything is saved.</div>
@@ -741,14 +747,14 @@ body {
         <section class="setup-pane" id="pane-3">
           <div class="pane-heading">
             <h1 class="pane-title">Tell Otto about your team</h1>
-            <p class="pane-sub">Team names, size, PI length, tools you use. The preview updates as Otto works.</p>
+            <p class="pane-sub">Describe your team in plain language. The preview builds in real time as Otto reads your input.</p>
           </div>
           <div class="ai-input-card" id="ai-input-card">
             <div class="ai-card-hd">
               <div class="ai-otto"><svg viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
               <span class="ai-card-label">Otto</span>
             </div>
-            <textarea class="ai-textarea" id="ai-textarea" rows="4" placeholder="e.g. We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd."></textarea>
+            <textarea class="ai-textarea" id="ai-textarea" rows="4" placeholder="e.g. 4 teams (Auth, Payments, Mobile, Data), ~80 engineers, 12-week PIs, 2-week sprints, Jira project DBKG, PI 26 starts June 2nd."></textarea>
             <div class="ai-chips">
               <button class="ai-chip" data-add="4 squads, ~80 engineers">4 teams · 80 engineers</button>
               <button class="ai-chip" data-add="12-week PIs, 2-week sprints">12-week PIs</button>
@@ -769,7 +775,7 @@ body {
         <section class="setup-pane" id="pane-4">
           <div class="pane-heading">
             <h1 class="pane-title">Invite your team</h1>
-            <p class="pane-sub">EAP found members from your Jira project. Confirm who's on each team, or add more.</p>
+            <p class="pane-sub">Add email addresses for each team. You can import from Jira or add more members in Settings after setup.</p>
           </div>
           <div id="invite-teams" style="display:flex;flex-direction:column;gap:10px;">
             <!-- populated by JS from generated teams -->
@@ -785,8 +791,8 @@ body {
             <div class="done-ring" id="done-ring">
               <svg viewBox="0 0 28 28" fill="none"><path d="M6 14l5.5 5.5 11-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="done-title">Digital Banking ART is live</div>
-            <p class="done-sub">PI 26 is running, Sprint 2 is active. Open the board and start planning.</p>
+            <div class="done-title" id="done-title">Your ART is live</div>
+            <p class="done-sub" id="done-sub">Your first PI is scheduled. Open the board and start planning.</p>
             <div class="done-actions">
               <a href="home.html?p=ananya" class="btn-ghost">Back to home</a>
               <a href="index.html?p=ananya&visit=new" class="btn-open">Open EAP workspace</a>
@@ -886,8 +892,8 @@ body {
               <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">4 teams configured</div><div class="ci-note">Auth · Payments · Mobile · Data &amp; Analytics</div></div></div>
               <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">PI 26 scheduled</div><div class="ci-note">Jun 2 – Aug 10 · Sprint 2 active</div></div></div>
               <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">47 features from Jira</div><div class="ci-note">DBKG project connected · features mapped</div></div></div>
-              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">PI Planning session not scheduled</div><div class="ci-note">Add PI Planning to the team calendar before Sprint 4</div></div></div>
-              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">Team capacity not set for Sprint 1</div><div class="ci-note">Needed for accurate velocity forecasting</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">PI Planning session not scheduled</div><div class="ci-note">Add PI Planning to the team calendar before Sprint 4</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">Team capacity not set for Sprint 1</div><div class="ci-note">Needed for accurate velocity forecasting</div></div></div>
             </div>
           </div>
         </div>
@@ -1506,6 +1512,25 @@ body {
     var footer = document.getElementById('setup-footer');
     if (step === totalSteps) {
       footer.style.display = 'none';
+      // Populate done screen with framework-appropriate copy
+      var doneTitle = document.getElementById('done-title');
+      var doneSub   = document.getElementById('done-sub');
+      if (doneTitle && doneSub) {
+        var fwTitles = {
+          essential: generatedTeams.length ? generatedTeams[0].name.replace(/ Team$/i,'') + ' ART is live' : 'Your ART is live',
+          portfolio: 'Portfolio is configured',
+          kanban:    'Kanban board is live',
+          blank:     'Workspace is ready'
+        };
+        var fwSubs = {
+          essential: 'Your first PI is scheduled and teams are configured. Open the board and start planning.',
+          portfolio: 'ARTs and Solution Train are configured. Open the portfolio view to begin.',
+          kanban:    'Value streams and WIP limits are active. Open the board and pull in work.',
+          blank:     'Your blank workspace is ready. Add teams, define hierarchy, and configure as you go.'
+        };
+        doneTitle.textContent = fwTitles[selectedFw] || fwTitles.essential;
+        doneSub.textContent   = fwSubs[selectedFw]   || fwSubs.essential;
+      }
       setTimeout(function() {
         var ring = document.getElementById('done-ring');
         if (ring) ring.classList.add('glowed');
