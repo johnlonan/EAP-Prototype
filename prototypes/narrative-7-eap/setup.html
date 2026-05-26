@@ -956,16 +956,16 @@ body {
           </div>
           <!-- Placeholder before generation -->
           <div class="art-placeholder" id="art-placeholder">
-            <div class="art-build-label">Teams</div>
+            <div class="art-build-label" id="plabel-teams">Teams</div>
             <div class="art-teams-grid">
               <div class="placeholder-row" style="height:72px"></div>
               <div class="placeholder-row" style="height:72px"></div>
               <div class="placeholder-row" style="height:72px"></div>
               <div class="placeholder-row" style="height:72px"></div>
             </div>
-            <div class="art-build-label" style="margin-top:4px">PI Calendar</div>
+            <div class="art-build-label" id="plabel-pi" style="margin-top:4px">PI Calendar</div>
             <div class="placeholder-row" style="height:56px"></div>
-            <div class="art-build-label" style="margin-top:4px">Integrations</div>
+            <div class="art-build-label" id="plabel-conn" style="margin-top:4px">Integrations</div>
             <div class="placeholder-row" style="height:44px"></div>
             <div class="placeholder-row" style="height:44px"></div>
             <div class="placeholder-label">Describe your team and Otto builds this out</div>
@@ -1209,21 +1209,33 @@ body {
     }
 
     var pane3Title = { essential:'Configure your ART', portfolio:'Configure your Portfolio', kanban:'Configure your Kanban board', blank:'Set up your workspace' };
-    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Otto creates a blank workspace. You define everything in settings after setup.' };
+    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Answer a few basics. Your hierarchy, terminology, and structure are fully customisable in settings after setup.' };
     var t = document.getElementById('pane3-title'); if (t) t.textContent = pane3Title[fw] || pane3Title.essential;
     var s = document.getElementById('pane3-sub');   if (s) s.textContent = pane3Sub[fw]   || pane3Sub.essential;
 
-    if (fw === 'blank') {
-      form.innerHTML = ottoQCard('Otto will create a blank workspace with no preset structure.',
-        '<p style="font-size:13px;color:var(--sub);line-height:1.6;margin:0;">You\'ll define teams, hierarchy, cadence, and terminology in workspace settings after setup. Nothing is assumed.</p>');
-      updateOttoSummary();
-      return;
-    }
+    // Update placeholder labels to match framework language
+    var plabelMap = {
+      essential: ['Teams', 'PI Calendar', 'Integrations'],
+      portfolio: ['ARTs', 'PI Calendar', 'Integrations'],
+      kanban:    ['Value Streams', 'Flow Policy', 'Integrations'],
+      blank:     ['Teams', 'Cadence', 'Integrations']
+    };
+    var plabels = plabelMap[fw] || plabelMap.essential;
+    ['plabel-teams','plabel-pi','plabel-conn'].forEach(function(id, i) {
+      var el = document.getElementById(id); if (el) el.textContent = plabels[i];
+    });
 
-    var countLabel   = fw === 'kanban' ? 'How many value streams?' : fw === 'portfolio' ? 'How many ARTs?' : 'How many teams are in your ART?';
-    var nameLabel    = fw === 'kanban' ? 'What are your value streams called?' : fw === 'portfolio' ? 'What are your ARTs called?' : 'What are they called?';
+    var countLabel   = fw === 'blank'    ? 'How many teams do you have?'       :
+                       fw === 'kanban'   ? 'How many value streams?'            :
+                       fw === 'portfolio'? 'How many ARTs will you configure?'  :
+                                          'How many teams are in your ART?';
+    var nameLabel    = fw === 'blank'    ? 'What are they called?'              :
+                       fw === 'kanban'   ? 'What are your value streams called?' :
+                       fw === 'portfolio'? 'What are your ARTs called?'         :
+                                          'What are they called?';
     var nameSuffix   = fw === 'kanban' ? 'Stream' : fw === 'portfolio' ? 'ART' : 'Team';
-    var countOptions = fw === 'portfolio' ? [2,3,4,5,6] : [2,3,4,5,6,8];
+    // All frameworks get a full range of count options; blank includes 1
+    var countOptions = fw === 'blank' ? [1,2,3,4,5,6,8,10] : fw === 'portfolio' ? [2,3,4,5,6] : [2,3,4,5,6,8,10];
 
     var html = '';
 
@@ -1233,14 +1245,23 @@ body {
     // Q2: Names
     html += ottoQCard(nameLabel, '<div id="otto-name-inputs-wrap">' + renderNameRows(ottoState.teamCount, nameSuffix) + '</div>');
 
-    // Q3: Cadence or WIP
+    // Q3: Cadence — always shown; language adapts to framework
+    var cadenceTitle = fw === 'kanban' ? 'What is your WIP limit per column?' :
+                       fw === 'blank'  ? 'What is your work cadence?' :
+                                         'What is your PI and sprint cadence?';
     if (fw === 'kanban') {
-      html += ottoQCard('WIP limit per column',
+      html += ottoQCard(cadenceTitle,
         ottoPillRow([2,3,4,5,6], ottoState.wipLimit, 'setOttoWip'));
-    } else {
-      html += ottoQCard('PI and sprint cadence',
+    } else if (fw === 'blank') {
+      html += ottoQCard(cadenceTitle,
         '<div style="display:flex;flex-direction:column;gap:10px;">' +
-        '<div><div class="otto-sub-label">PI length</div>' + ottoPillRow([8,10,12], ottoState.piWeeks, 'setOttoPi') + '</div>' +
+        '<div><div class="otto-sub-label">Iteration length</div>' + ottoPillRow([1,2,3,4], ottoState.sprintWeeks, 'setOttoSprint') + '</div>' +
+        '<div><div class="otto-sub-label">Planning cycle</div>'   + ottoPillRow([4,6,8,10,12], ottoState.piWeeks, 'setOttoPi') + '</div>' +
+        '</div>');
+    } else {
+      html += ottoQCard(cadenceTitle,
+        '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div><div class="otto-sub-label">PI length</div>'     + ottoPillRow([8,10,12], ottoState.piWeeks, 'setOttoPi') + '</div>' +
         '<div><div class="otto-sub-label">Sprint length</div>' + ottoPillRow([1,2,3], ottoState.sprintWeeks, 'setOttoSprint') + '</div>' +
         '</div>');
     }
@@ -1294,10 +1315,6 @@ body {
     if (!card || !rows) return;
 
     var fw = selectedFw;
-    if (fw === 'blank') {
-      card.style.display = 'none';
-      return;
-    }
     card.style.display = '';
 
     var teamKey = fw === 'kanban' ? 'Streams' : fw === 'portfolio' ? 'ARTs' : 'Teams';
@@ -1306,14 +1323,17 @@ body {
     var names = ottoState.teamNames.slice(0, ottoState.teamCount).filter(Boolean);
     var namesStr = names.length ? names.join(' · ') : '—';
     var toolsStr = ottoState.tools.map(function(k) {
-      var t = OTTO_TOOL_LIST.filter(function(x){ return x.key === k; })[0];
-      return t ? t.label : k;
+      var tl = OTTO_TOOL_LIST.filter(function(x){ return x.key === k; })[0];
+      return tl ? tl.label : k;
     }).join(' · ') || 'None selected';
 
     var rowData = [];
     rowData.push([teamKey, ottoState.teamCount + ' · ' + namesStr]);
     if (fw === 'kanban') {
       rowData.push(['WIP limit', ottoState.wipLimit + ' per column']);
+    } else if (fw === 'blank') {
+      rowData.push(['Iteration', ottoState.sprintWeeks + '-week']);
+      rowData.push(['Cycle', ottoState.piWeeks + '-week planning cycle']);
     } else {
       rowData.push(['PI', ottoState.piWeeks + '-week · ' + (Math.floor(ottoState.piWeeks / ottoState.sprintWeeks) - 1) + ' sprints + IP']);
       rowData.push(['Sprint', ottoState.sprintWeeks + '-week']);
@@ -1935,7 +1955,7 @@ body {
       }, 500);
     } else {
       footer.style.display = '';
-      if (step === 3 && !aiDone)      cont.textContent = 'Generate ART';
+      if (step === 3 && !aiDone)      cont.textContent = selectedFw === 'blank' ? 'Set up workspace' : selectedFw === 'kanban' ? 'Configure board' : 'Generate ART';
       else if (step === 3 && aiDone)  cont.textContent = 'Confirm and continue';
       else if (step === 4)            cont.textContent = 'Send invites';
       else                            cont.textContent = 'Continue';
