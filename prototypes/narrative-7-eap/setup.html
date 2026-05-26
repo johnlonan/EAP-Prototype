@@ -863,17 +863,17 @@ body {
         <div class="stepper-line"></div>
         <div class="stepper-item" data-step="2" tabindex="0" onclick="goStep(2)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(2)">
           <div class="stepper-node">2</div>
-          <span class="stepper-label">Configure</span>
+          <span class="stepper-label" id="slabel-2">Configure</span>
         </div>
         <div class="stepper-line"></div>
         <div class="stepper-item" data-step="3" tabindex="0" onclick="goStep(3)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(3)">
           <div class="stepper-node">3</div>
-          <span class="stepper-label">Review</span>
+          <span class="stepper-label" id="slabel-3">Review</span>
         </div>
         <div class="stepper-line"></div>
         <div class="stepper-item" data-step="4" tabindex="0" onclick="goStep(4)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(4)">
           <div class="stepper-node">4</div>
-          <span class="stepper-label">Invite</span>
+          <span class="stepper-label" id="slabel-4">Invite</span>
         </div>
         <div class="stepper-line"></div>
         <div class="stepper-item" data-step="5" tabindex="0" onclick="goStep(5)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(5)">
@@ -1340,6 +1340,25 @@ body {
   };
   var OTTO_ICON_SM = '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
 
+  // ── Framework step labels ────────────────────────────────────────
+  // Each framework has different step names that reflect its own logic.
+  // Step 1 is always "Framework"; step 5 is always "Ready".
+  var fwStepLabels = {
+    essential: ['ART',       'Teams',       'Roles'],
+    portfolio: ['Portfolio', 'Cadence',     'Governance'],
+    kanban:    ['System',    'Workflow',    'Policies'],
+    scrum:     ['Team',      'Sprint',      'Roles'],
+    blank:     ['Model',     'Terminology', 'People']
+  };
+
+  function updateStepperLabels(fw) {
+    var labels = fwStepLabels[fw] || ['Configure', 'Review', 'Invite'];
+    [['slabel-2', labels[0]], ['slabel-3', labels[1]], ['slabel-4', labels[2]]].forEach(function(pair) {
+      var el = document.getElementById(pair[0]);
+      if (el) el.textContent = pair[1];
+    });
+  }
+
   // ── Scrum state ──────────────────────────────────────────────────
   var scrumState = {
     teamName: 'Digital Banking Team',
@@ -1361,11 +1380,11 @@ body {
   var DEL_SVG  = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>';
   var PLUS_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>';
 
-  // Work item types available for Scrum boards.
-  // Sub-task omitted — it's a child item created from within Tasks, not a standalone board type.
-  var ALL_SCRUM_WORK_TYPES = ['Epic', 'Story', 'Task', 'Bug', 'Feature'];
-  // Workflow statuses. Cancelled omitted — it's an item-level status, not a board column in Scrum.
-  var ALL_SCRUM_STATUSES   = ['To Do', 'In Progress', 'In Review', 'Done', 'Blocked'];
+  // These are Scrum defaults — applied silently. Users don't choose them; Scrum already did.
+  var SCRUM_DEFAULT_WORK_TYPES = ['Story', 'Task', 'Bug'];
+  var SCRUM_DEFAULT_STATUSES   = ['To Do', 'In Progress', 'Done'];
+  // Extended options if the team wants more columns (shown as optional extras in step 2)
+  var SCRUM_EXTRA_STATUSES     = ['In Review', 'Blocked'];
 
   function renderScrumDetail() {
     var ml = document.getElementById('method-list-section');
@@ -1373,66 +1392,64 @@ body {
     var ph2 = document.querySelector('#pane-2 .pane-heading h1');
     var ps2 = document.querySelector('#pane-2 .pane-heading p');
     if (ml) ml.style.display = 'none';
-    if (ph2) ph2.textContent = 'Set up your Scrum board';
-    if (ps2) ps2.textContent = 'Name your team and choose what to include. The preview updates as you select.';
+    if (ph2) ph2.textContent = 'Tell us about your team';
+    // Explain WHY we ask what we ask — the rest is Scrum-prescribed
+    if (ps2) ps2.textContent = 'We need two things: who you are, and how big you are. Everything else — board columns, work items, ceremonies — comes with Scrum.';
 
     if (!sd) return;
     sd.style.display = '';
-
-    // Build dynamic content — team name + multi-select chips + feature overview
     var html = '';
 
-    // 1. Team name — primary question, always first
+    // Q1: Team name — primary identity. The board is named after this.
     html += ottoQCard('What is this team called?',
       '<input class="scrum-name-input" id="scrum-team-name-p2" type="text" value="' + (scrumState.teamName||'').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
 
-    // 2. Work item types — what the team tracks on the board
-    var wtDesc = { Epic: 'Large feature or goal — contains Stories', Story: 'User-facing work — the most common board item', Task: 'Technical or operational work item', Bug: 'Defect to investigate and resolve', Feature: 'Product capability spanning multiple stories' };
-    html += ottoQCard('What types of work will this team track?',
-      '<div class="scrum-meta-chips">' +
-      ALL_SCRUM_WORK_TYPES.map(function(wt) {
-        var sel = scrumState.workTypes.indexOf(wt) >= 0;
-        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumWorkType(\'' + wt + '\')" title="' + (wtDesc[wt]||wt) + '" type="button">' + wt + '</button>';
-      }).join('') +
-      '</div>' +
-      '<div class="otto-pill-help">Story and Task are selected for most teams. Add Bug if you manage defects here.</div>');
+    // Q2: Team size — not decoration. Scrum recommends 3–9.
+    // >9 is a recognised anti-pattern (communication overhead grows, consider splitting).
+    var sizeOpts = ['3', '4', '5', '6', '7', '8', '9', '10+'];
+    html += ottoQCard('How many people are on the team?',
+      ottoPillRow(sizeOpts, String(scrumState.teamSize || '6'), 'setScrumTeamCount') +
+      '<div class="otto-pill-help" id="help-scrum-size">Scrum works best with 3–9 people. Include the Product Owner and Scrum Master in this count.</div>');
 
-    // 3. Workflow stages — left to right on the board
-    html += ottoQCard('What stages does work move through?',
-      '<div class="scrum-meta-chips">' +
-      ALL_SCRUM_STATUSES.map(function(st) {
-        var sel = scrumState.statuses.indexOf(st) >= 0;
-        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumStatus2(\'' + st + '\')" type="button">' + st + '</button>';
+    // Informational: what ships with every Scrum workspace (not selectable — Scrum defines these)
+    html += '<div class="otto-q-card" style="background:rgba(22,163,74,0.05);border-color:rgba(22,163,74,0.18);">' +
+      '<div class="otto-q-hd"><div class="otto-q-icon">' + OTTO_Q_SVG + '</div>' +
+      '<span class="otto-q-label" style="color:var(--ai-accent-deep)">What comes with every Scrum workspace</span></div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;margin-top:2px;">' +
+      [['Board', 'To Do · In Progress · Done'], ['Work items', 'Story · Task · Bug'], ['Ceremonies', 'Planning · Daily Standup · Review · Retrospective']].map(function(r) {
+        return '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<span style="font-size:11px;font-weight:500;color:var(--muted);min-width:72px;">' + r[0] + '</span>' +
+          '<span style="font-size:12.5px;color:var(--sub);">' + r[1] + '</span></div>';
       }).join('') +
-      '</div>' +
-      '<div class="otto-pill-help">Each stage becomes a column on your board, left to right. Keep it simple — 3 to 5 stages works best for most teams.</div>');
-
-    // 4. Views — what the team needs access to
-    var viewDesc = { board: 'Kanban-style board — work in flight', backlog: 'Ordered list of planned work and sprint items', timeline: 'Roadmap and sprint calendar view', reports: 'Velocity charts, burndown, and sprint history' };
-    html += ottoQCard('Which views does your team need?',
-      '<div class="scrum-view-chips">' +
-      SCRUM_VIEW_OPTIONS.map(function(v) {
-        var active = scrumState.views.indexOf(v.key) >= 0;
-        return '<button class="scrum-view-chip' + (active ? ' ssel' : '') + '" onclick="toggleScrumView(\'' + v.key + '\')" title="' + (viewDesc[v.key]||v.label) + '" type="button">' + v.label + '</button>';
-      }).join('') +
-      '</div>' +
-      '<div class="otto-pill-help">Board and Backlog are standard for all Scrum teams. Add Timeline for roadmap planning and Reports for retrospectives.</div>');
-
-    // 5. Feature overview — purely informational, collapsed at bottom
-    html += '<div class="scrum-feature-card" style="opacity:0.8">' +
-      '<div class="scrum-feature"><div class="scrum-feature-icon">' + icon(IC.cal) + '</div><div><div class="scrum-feature-title">Backlog + sprint planning</div><div class="scrum-feature-desc">Order your backlog, estimate stories, and drag items into sprints when you\'re ready to commit.</div></div></div>' +
-      '<div class="scrum-feature"><div class="scrum-feature-icon">' + icon(IC.chart) + '</div><div><div class="scrum-feature-title">Velocity and burndown</div><div class="scrum-feature-desc">Built-in sprint reports and velocity charts help teams forecast and improve each iteration.</div></div></div>' +
-      '</div>';
+      '<div style="font-size:11px;color:var(--muted);margin-top:2px;">All of these are configurable in workspace settings after setup.</div>' +
+      '</div></div>';
 
     sd.innerHTML = html;
 
-    // Wire team name
+    // Wire team name input
     var tn = document.getElementById('scrum-team-name-p2');
     if (tn) tn.addEventListener('input', function() { scrumState.teamName = tn.value; updateScrumPreview(); });
 
-    // Populate right preview
+    // Wire size to show warning if >9
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamCount') >= 0 && p.textContent === '10+') {
+        p.addEventListener('click', function() {
+          var h = document.getElementById('help-scrum-size');
+          if (h) h.innerHTML = '<span style="color:#D97706;font-weight:600;">⚠ Teams over 9 often struggle with communication overhead.</span> Scrum recommends splitting into two teams rather than growing one team larger.';
+        });
+      }
+    });
+
     updateScrumPreview();
   }
+
+  window.setScrumTeamCount = function(s) {
+    scrumState.teamSize = s;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamCount') >= 0)
+        p.classList.toggle('osel', p.textContent === s);
+    });
+  };
 
   function updateScrumPreview() {
     // Populate method-detail (right panel prev-p2) with a live mini board
@@ -1511,30 +1528,25 @@ body {
 
     var html = '';
 
-    // Summary card showing what was configured in step 2
-    html += '<div style="background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.20);border-radius:11px;padding:12px 15px;display:flex;align-items:center;gap:10px;">' +
+    // Step-2 confirmation: show what was decided (team name, size)
+    html += '<div style="background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.18);border-radius:11px;padding:12px 15px;display:flex;align-items:center;gap:10px;">' +
       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ai-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
       '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">' + (scrumState.teamName || 'Scrum Team') + '</div>' +
-      '<div style="font-size:11px;color:var(--sub);margin-top:1px;">' + scrumState.workTypes.join(' · ') + ' &nbsp;·&nbsp; ' + scrumState.statuses.join(' → ') + '</div></div>' +
+      '<div style="font-size:11px;color:var(--sub);margin-top:1px;">' + (scrumState.teamSize || '6') + ' people &nbsp;·&nbsp; Scrum</div></div>' +
       '</div>';
 
-    // Sprint length
+    // Sprint length — THE key Scrum decision. Determines every ceremony date.
+    // 4-week is excluded: it's a recognised anti-pattern (planning overhead outweighs benefit).
     html += ottoQCard('How long are your sprints?',
-      ottoPillRow([1,2,3,4], scrumState.sprintWeeks, 'setScrumSprint', '-week', 'help-scrum-sprint') +
+      ottoPillRow([1,2,3], scrumState.sprintWeeks, 'setScrumSprint', '-week', 'help-scrum-sprint') +
       '<div class="otto-pill-help" id="help-scrum-sprint">' + (OTTO_SPRINT_HELP[scrumState.sprintWeeks] || '') + '</div>');
 
-    // Team size
-    var tsOpts = ['1–3', '4–6', '6–8', '9–12', '13+'];
-    html += ottoQCard('Roughly how many people on the team?',
-      ottoPillRow(tsOpts, scrumState.teamSize || '6–8', 'setScrumTeamSize') +
-      '<div class="otto-pill-help">Used for capacity planning. Exact members are invited in the next step.</div>');
+    // Sprint start date — determines the sprint calendar going forward
+    html += ottoQCard('When does Sprint 1 start?',
+      '<input class="otto-date-input" id="scrum-start-date" type="text" placeholder="e.g. Jun 2, 2025" value="' + (scrumState.startDate || '') + '">' +
+      '<div class="otto-pill-help" style="margin-top:6px;">This sets your sprint boundaries. Your first Sprint Planning meeting should happen on this day.</div>');
 
-    // Start date
-    html += ottoQCard('When does your first sprint start?',
-      '<input class="otto-date-input" id="scrum-start-date" type="text" placeholder="e.g. Jun 2, 2025" value="' + (scrumState.startDate || '') + '">',
-      'optional');
-
-    // Tools
+    // Tools — practical question: what's already in use?
     html += ottoQCard('Which tools does your team use?',
       '<div class="otto-tools">' +
       OTTO_TOOL_LIST.map(function(t) {
@@ -1728,7 +1740,7 @@ body {
     }
 
     var pane3Title = { essential:'Configure your ART', portfolio:'Configure your Portfolio', kanban:'Configure your Kanban board', blank:'Set up your workspace', scrum:'Configure your Scrum board' };
-    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Answer a few basics. Your hierarchy, terminology, and structure are fully customisable in settings after setup.', scrum:'Set up your board — work types, statuses, and sprint length. Customise any time in settings.' };
+    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Choose how work moves through your team. This shapes everything: your board, your cadence, your terminology.', scrum:'Set up your board — work types, statuses, and sprint length. Customise any time in settings.' };
     var t = document.getElementById('pane3-title'); if (t) t.textContent = pane3Title[fw] || pane3Title.essential;
     var s = document.getElementById('pane3-sub');   if (s) s.textContent = pane3Sub[fw]   || pane3Sub.essential;
 
@@ -1776,9 +1788,31 @@ body {
                        fw === 'blank'  ? 'What is your work cadence?' :
                                          'What is your PI and sprint cadence?';
     if (fw === 'kanban') {
-      html += ottoQCard(cadenceTitle,
-        ottoPillRow([2,3,4,5,6], ottoState.wipLimit, 'setOttoWip') +
-        '<div class="otto-pill-help">Maximum work items allowed in a column at once. Prevents bottlenecks.</div>');
+      // Per-stage WIP limits — each stage has its own limit.
+      // This is the correct Kanban model: limits reveal bottlenecks stage by stage.
+      // A single global limit is not meaningful and misrepresents how Kanban works.
+      var kanbanStages = ottoState.teamNames.length >= 2 ? ottoState.teamNames : ['Options', 'Committed', 'In Progress', 'In Review', 'Done'];
+      var kanbanWips   = ottoState.kanbanWips || [0, 10, 4, 2, 0]; // 0 = no limit
+      ottoState.kanbanWips = kanbanWips;
+
+      var wipsHtml = '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        kanbanStages.map(function(stage, i) {
+          var wip = kanbanWips[i] !== undefined ? kanbanWips[i] : 4;
+          var isUnlimited = wip === 0;
+          return '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span style="font-size:12.5px;font-weight:500;color:var(--ink);min-width:90px;flex-shrink:0;">' + (stage || 'Stage ' + (i+1)) + '</span>' +
+            '<div style="display:flex;gap:4px;">' +
+            [1,2,3,4,5,6,8,10,'∞'].map(function(n) {
+              var val = n === '∞' ? 0 : n;
+              var sel = (isUnlimited && n === '∞') || (!isUnlimited && val === wip);
+              return '<button class="otto-pill' + (sel ? ' osel' : '') + '" style="padding:3px 9px;font-size:11px;" onclick="setKanbanWip(' + i + ',' + val + ')" type="button">' + n + '</button>';
+            }).join('') +
+            '</div></div>';
+        }).join('') +
+        '</div>' +
+        '<div class="otto-pill-help">∞ = no limit. Set Options and Done to ∞ — they\'re not bottlenecks. Start conservative for In Progress (3–4) — you can always increase.</div>';
+
+      html += ottoQCard(cadenceTitle, wipsHtml);
     } else if (fw === 'blank') {
       html += ottoQCard(cadenceTitle,
         '<div style="display:flex;flex-direction:column;gap:10px;">' +
@@ -1866,7 +1900,11 @@ body {
     rowData.push([teamKey, ottoState.teamCount + ' · ' + namesStr]);
     if (ottoState.teamSize) rowData.push(['~Size', ottoState.teamSize + ' people each']);
     if (fw === 'kanban') {
-      rowData.push(['WIP limit', ottoState.wipLimit + ' per column']);
+      var wipSummary = (ottoState.kanbanWips || []).map(function(w, i) {
+        var names = ottoState.teamNames.length >= 2 ? ottoState.teamNames : ['Options','Committed','In Progress','In Review','Done'];
+        return (names[i] || ('Stage ' + (i+1))) + ':' + (w === 0 ? '∞' : w);
+      }).join(' · ');
+      rowData.push(['WIP', wipSummary || ottoState.wipLimit + ' per column']);
     } else if (fw === 'blank') {
       rowData.push(['Iteration', ottoState.sprintWeeks + '-week']);
       rowData.push(['Cycle', ottoState.piWeeks + '-week planning cycle']);
@@ -1947,6 +1985,14 @@ body {
         p.classList.toggle('osel', parseInt(p.textContent) === w);
       }
     });
+    updateOttoSummary();
+  };
+
+  window.setKanbanWip = function(stageIdx, wip) {
+    if (!ottoState.kanbanWips) ottoState.kanbanWips = [0,10,4,2,0];
+    ottoState.kanbanWips[stageIdx] = wip;
+    // Re-render just the WIP section to update active states
+    renderOttoQuestions();
     updateOttoSummary();
   };
 
@@ -2106,6 +2152,7 @@ body {
     var data = fwData[fw] || fwData.essential;
     var panelSub = document.getElementById('prev-hd-sub-panel');
     if (panelSub) panelSub.textContent = data.label;
+    updateStepperLabels(fw);
     var diag = document.getElementById('hier-diagram');
     diag.style.opacity = '0';
     diag.style.transition = 'opacity 180ms ease';
@@ -2205,6 +2252,13 @@ body {
     var focusIn  = "this.style.borderColor='rgba(56,55,51,0.32)';this.style.background='#fff'";
     var focusOut = "this.style.borderColor='#E1E0DD';this.style.background='var(--raised)'";
 
+    // For Scrum: show role-specific fields instead of generic email inputs
+    if (selectedFw === 'scrum') {
+      buildScrumRolesPane(container);
+      renderInvitePreview();
+      return;
+    }
+
     if (!generatedTeams.length) {
       // Blank framework: no teams yet — show two manual invite rows so the user can still send invites
       var rows = ['Team 1', 'Team 2'].map(function(name) {
@@ -2235,6 +2289,153 @@ body {
     }).join('') +
     '<button style="font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;padding:2px 0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;">I\'ll invite people later</button>';
     renderInvitePreview();
+  }
+
+  function renderEssentialArtIdentity() {
+    // Step 2 for Essential SAFe: ART name + PI length + start date.
+    // These are the decisions that define the ART's structure and calendar.
+    // Sprint length is NOT asked — SAFe prescribes 2-week sprints.
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    if (ml) ml.style.display = 'none';
+    if (sd) sd.style.display = 'none';
+
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ph2) ph2.textContent = 'Define your ART';
+    if (ps2) ps2.textContent = 'The ART (Agile Release Train) is your unit of delivery. Its name and PI cadence define how the whole programme operates.';
+
+    // Render into method-detail (right panel) and the method-list area (left)
+    // We repurpose the method-list area to show the ART form
+    var methodListEl = document.getElementById('method-list-section');
+    if (!methodListEl) return;
+    methodListEl.style.display = '';
+
+    // Build form — ART name, PI length, start date
+    var piHelpTexts = {
+      8:  '8-week PI — 3 sprints + IP sprint. Faster cadence, less planning overhead. Suits mature ARTs that plan quickly.',
+      10: '10-week PI — 4 sprints + IP sprint. The most common choice. Balances planning depth with delivery speed.',
+      12: '12-week PI — 5 sprints + IP sprint. More capacity per PI. Suits larger ARTs or complex programmes.'
+    };
+
+    var html = ottoQCard('What is this ART called?',
+      '<input class="scrum-name-input" id="art-name-input" type="text" value="' + (ottoState.teamNames[0] || '').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking ART">' +
+      '<div class="otto-pill-help">The ART name is your programme identity — it appears in PI Planning, the board, and all team dashboards.</div>');
+
+    html += ottoQCard('How long are your PIs?',
+      ottoPillRow([8,10,12], ottoState.piWeeks, 'setOttoPi', '-week', 'help-art-pi') +
+      '<div class="otto-pill-help" id="help-art-pi">' + (piHelpTexts[ottoState.piWeeks] || '') + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Sprint length is always 2 weeks in SAFe — this is one of the framework\'s core constraints.</div>');
+
+    html += ottoQCard('When does PI 1 start?',
+      '<input class="otto-date-input" id="art-pi-start" type="text" placeholder="e.g. Sep 1, 2025" value="' + (ottoState.piStart || '') + '">' +
+      '<div class="otto-pill-help" style="margin-top:6px;">PI Planning — a 2-day event — typically happens 1–2 weeks before this date. All teams attend.</div>');
+
+    methodListEl.innerHTML = html;
+
+    var nameEl = document.getElementById('art-name-input');
+    if (nameEl) nameEl.addEventListener('input', function() {
+      if (!ottoState.teamNames.length) ottoState.teamNames = [''];
+      ottoState.teamNames[0] = nameEl.value;
+      var p = document.getElementById('prev-hd-sub-panel');
+      if (p) p.textContent = nameEl.value || 'Essential SAFe hierarchy';
+    });
+
+    var startEl = document.getElementById('art-pi-start');
+    if (startEl) startEl.addEventListener('input', function() { ottoState.piStart = startEl.value; });
+
+    // Right panel: show SAFe hierarchy diagram
+    renderHierarchy('essential');
+  }
+
+  function renderPortfolioIdentity() {
+    // Step 2 for Portfolio SAFe: portfolio name + ARTs.
+    // Portfolio SAFe is NOT "Essential SAFe with more ARTs" — it adds a funded governance layer.
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    if (ml) { ml.style.display = ''; }
+    if (sd) sd.style.display = 'none';
+
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ph2) ph2.textContent = 'Define your Portfolio';
+    if (ps2) ps2.textContent = 'A Portfolio in SAFe is a business unit with its own funding, strategy, and delivery trains. Unlike a single ART, the Portfolio layer adds investment governance and strategic alignment.';
+
+    var countOptions = [2,3,4,5,6,7];
+    var html = ottoQCard('What is this portfolio called?',
+      '<input class="scrum-name-input" id="portfolio-name-input" type="text" value="" placeholder="e.g. Enterprise Technology Portfolio">');
+
+    html += ottoQCard('How many ARTs are in this portfolio?',
+      ottoPillRow(countOptions, ottoState.teamCount, 'setOttoCount') +
+      '<div class="otto-pill-help">Each ART is a self-managing delivery team of 50–125 people. Name them in the next step.</div>');
+
+    html += '<div style="background:rgba(56,55,51,0.04);border:1px solid rgba(56,55,51,0.10);border-radius:11px;padding:14px 16px;margin-top:2px;">' +
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;">What Portfolio SAFe adds on top of Essential</div>' +
+      [['Portfolio Kanban', 'Epics flow through a funnel before entering any ART backlog'],
+       ['Lean Budgeting', 'Budget follows value streams and ARTs — not individual projects'],
+       ['LPM Sync', 'Monthly or bi-monthly portfolio governance meeting for investment decisions'],
+       ['Strategic Themes', 'Business outcomes that guide which Epics get funded']
+      ].map(function(r) {
+        return '<div style="display:flex;gap:10px;margin-bottom:5px;"><span style="font-size:12px;font-weight:500;color:var(--sub);min-width:100px;">' + r[0] + '</span><span style="font-size:12px;color:var(--muted);">' + r[1] + '</span></div>';
+      }).join('') +
+      '</div>';
+
+    ml.innerHTML = html;
+
+    renderHierarchy('portfolio');
+  }
+
+  function buildScrumRolesPane(container) {
+    // Step 4 for Scrum is about roles, not generic invites.
+    // PO and SM are not optional — they are the framework.
+    var ph4 = document.querySelector('#pane-4 .pane-heading h1');
+    var ps4 = document.querySelector('#pane-4 .pane-heading p');
+    if (ph4) ph4.textContent = 'Assign your Scrum roles';
+    if (ps4) ps4.textContent = 'Scrum has three roles. Product Owner and Scrum Master are required for the framework to work — the team can only function when both are in place.';
+
+    var inputStyle = 'width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-family:inherit;font-size:13px;color:var(--ink);background:var(--raised);outline:none;transition:border-color 160ms;box-sizing:border-box;';
+    var focusIn  = "this.style.borderColor='rgba(56,55,51,0.32)';this.style.background='#fff'";
+    var focusOut = "this.style.borderColor='var(--border)';this.style.background='var(--raised)'";
+
+    var roles = [
+      {
+        title: 'Product Owner',
+        desc: 'Owns and orders the product backlog. Makes final decisions on what gets built and in what priority. The PO is accountable for product value.',
+        placeholder: 'Name or email address',
+        required: true,
+        note: 'Required — without a PO, priorities are unclear and the backlog has no single owner.'
+      },
+      {
+        title: 'Scrum Master',
+        desc: 'Facilitates Sprint Planning, Daily Standup, Sprint Review, and Retrospective. Removes blockers. Coaches the team on Scrum practice.',
+        placeholder: 'Name or email address',
+        required: true,
+        note: 'Required — without a SM, ceremonies don\'t happen and impediments pile up.'
+      }
+    ];
+
+    var html = roles.map(function(role) {
+      return '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">' +
+        '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">' + role.title +
+          (role.required ? ' <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ai-accent);background:rgba(22,163,74,0.08);padding:2px 7px;border-radius:999px;margin-left:4px;">Required</span>' : '') +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--sub);line-height:1.55;">' + role.desc + '</div></div>' +
+        '<input type="email" placeholder="' + role.placeholder + '" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
+        '<div style="font-size:11px;color:var(--muted);">' + role.note + '</div>' +
+        '</div>';
+    }).join('');
+
+    // Developers — the rest of the team
+    html += '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">' +
+      '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">Development Team</div>' +
+      '<div style="font-size:12px;color:var(--sub);line-height:1.55;">Cross-functional team members who deliver the sprint increment. In Scrum, everyone on the development team is equal — there are no sub-titles or seniority levels on the Scrum board.</div></div>' +
+      '<input type="email" placeholder="Add email addresses…" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
+      '<div style="font-size:11px;color:var(--muted);">Add more members in workspace settings after setup. The team size from step 2 (' + (scrumState.teamSize || '6') + ' people) is used for initial capacity planning.</div>' +
+      '</div>';
+
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.6;">One practical note: the Product Owner and Scrum Master should be different people. Having the same person in both roles creates a conflict of interest — the PO sets direction, the SM serves the team.</div>';
+
+    container.innerHTML = html;
   }
 
   // ── Editable field helper ────────────────────────────────────────
@@ -2531,7 +2732,12 @@ body {
 
     // Preview-specific renders
     if (step === 1) renderHierarchy(selectedFw);
-    if (step === 2) { if (selectedFw === 'scrum') { renderScrumDetail(); } else { hideScrumDetail(); renderMethodPreview(selectedMethod); } }
+    if (step === 2) {
+      if (selectedFw === 'scrum') { renderScrumDetail(); }
+      else if (selectedFw === 'essential') { hideScrumDetail(); renderEssentialArtIdentity(); }
+      else if (selectedFw === 'portfolio') { hideScrumDetail(); renderPortfolioIdentity(); }
+      else { hideScrumDetail(); renderMethodPreview(selectedMethod); }
+    }
     if (step === 3) { if (selectedFw === 'scrum') { renderScrumConfig(); } else { renderOttoQuestions(); } }
     if (step === 4) { buildInvitePane(); renderInvitePreview(); }
 
