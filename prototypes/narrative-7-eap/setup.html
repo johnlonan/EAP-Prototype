@@ -1411,14 +1411,33 @@ body {
 
     // Q3: Board columns (swimlanes). Scrum defaults pre-selected.
     // In Review and Blocked are optional extras — not all teams need them.
-    var scrumColOpts = ['To Do', 'In Progress', 'In Review', 'Done', 'Blocked'];
-    html += ottoQCard('What are your board columns?',
-      '<div class="scrum-meta-chips">' +
-      scrumColOpts.map(function(st) {
-        var sel = scrumState.statuses.indexOf(st) >= 0;
-        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumStatus2(\'' + st + '\')" type="button">' + st + '</button>';
-      }).join('') + '</div>' +
-      '<div class="otto-pill-help">To Do → In Progress → Done is the standard Scrum board. Add In Review if code review is a distinct step for your team. Blocked is a visual flag, not a workflow stage.</div>');
+    // Board columns — editable list so teams can rename, reorder, add, or remove.
+    // Chips were replaced: users need to customise names (e.g. "Building" instead of "In Progress").
+    var scrumColPresetsAvailable = ['To Do','In Progress','In Review','Done','Blocked','Testing','Ready for QA','Deployed'];
+    var scrumColQuickAdd = scrumColPresetsAvailable.filter(function(p) { return scrumState.statuses.indexOf(p) < 0; });
+    var colListHtml = '<div class="scrum-list" id="scrum-col-list">' +
+      scrumState.statuses.map(function(st, i) {
+        return '<div class="scrum-list-item">' +
+          '<span class="scrum-drag">' + DRAG_SVG + '</span>' +
+          '<input class="scrum-list-input" type="text" value="' + st.replace(/"/g,'&quot;') + '" data-col-idx="' + i + '" placeholder="Column name">' +
+          '<button class="scrum-del" onclick="delScrumCol(' + i + ')" type="button">' + DEL_SVG + '</button>' +
+          '</div>';
+      }).join('') +
+      '</div>' +
+      '<button class="scrum-add-btn" id="scrum-add-col" onclick="addScrumCol()" type="button">' + PLUS_SVG + 'Add column</button>';
+
+    // Quick-add presets: show common columns not already in the list as one-click adds
+    if (scrumColQuickAdd.length) {
+      colListHtml += '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">' +
+        '<span style="font-size:11px;color:var(--muted);align-self:center;">Quick add:</span>' +
+        scrumColQuickAdd.slice(0, 4).map(function(p) {
+          return '<button style="font-family:inherit;font-size:11.5px;font-weight:500;color:var(--sub);background:transparent;border:1.5px solid var(--border);border-radius:999px;padding:3px 10px;cursor:pointer;" onclick="quickAddScrumCol(\'' + p + '\')" type="button">+ ' + p + '</button>';
+        }).join('') +
+        '</div>';
+    }
+    colListHtml += '<div class="otto-pill-help">Drag to reorder. Columns appear left to right on your board. Rename any column to match your team's language — "Building" works just as well as "In Progress".</div>';
+
+    html += ottoQCard('What are your board columns?', colListHtml);
 
     // Q4: Work item types. Story is the primary Scrum work item.
     // Task breaks stories down within a sprint. Spike is a time-boxed investigation.
@@ -1447,6 +1466,9 @@ body {
     // Wire team name
     var tn = document.getElementById('scrum-team-name-p2');
     if (tn) tn.addEventListener('input', function() { scrumState.teamName = tn.value; updateScrumPreview(); });
+
+    // Wire column name inputs
+    wireScrumColInputs();
 
     // Warn on >9
     setTimeout(function() {
@@ -1508,6 +1530,39 @@ body {
     });
     updateScrumPreview();
   };
+
+  window.delScrumCol = function(i) {
+    if (scrumState.statuses.length <= 1) return; // always keep at least one column
+    scrumState.statuses.splice(i, 1);
+    renderScrumDetail();
+    updateScrumPreview();
+  };
+
+  window.addScrumCol = function() {
+    scrumState.statuses.push('New column');
+    renderScrumDetail();
+    setTimeout(function() {
+      var inputs = document.querySelectorAll('.scrum-list-input[data-col-idx]');
+      var last = inputs[inputs.length - 1];
+      if (last) { last.focus(); last.select(); }
+    }, 50);
+  };
+
+  window.quickAddScrumCol = function(name) {
+    scrumState.statuses.push(name);
+    renderScrumDetail();
+    updateScrumPreview();
+  };
+
+  function wireScrumColInputs() {
+    document.querySelectorAll('.scrum-list-input[data-col-idx]').forEach(function(inp) {
+      var idx = parseInt(inp.dataset.colIdx);
+      inp.addEventListener('input', function() {
+        scrumState.statuses[idx] = inp.value;
+        updateScrumPreview();
+      });
+    });
+  }
 
   window.toggleScrumStatus2 = function(st) {
     // Step-2 version: updates the master statuses array
@@ -2627,7 +2682,14 @@ body {
     // prev-hd-sub-panel not updated — framework label stays throughout
 
     // Start progressive preview in right panel
-    buildArtPreview(parsed);
+    if (fw === 'scrum') {
+      // Scrum has one team and uses a board preview, not SAFe team cards
+      var artPhEl = document.getElementById('art-placeholder');
+      if (artPhEl) artPhEl.style.display = 'none';
+      renderScrumBoardPreview();
+    } else {
+      buildArtPreview(parsed);
+    }
 
     // Framework-specific status messages
     var statuses = [
@@ -2670,6 +2732,24 @@ body {
         [2300, 'Flow board',               'Kanban columns mapped to your value streams']
       ];
       if (parsed.hasJira) items.push([2750, 'Jira', (parsed.jiraKey || 'PROJ') + ' → Kanban board synced']);
+    } else if (fw === 'scrum') {
+      // Scrum gen-items reflect what was configured in the wizard
+      var sprintHelp = OTTO_SPRINT_HELP[scrumState.sprintWeeks] || (scrumState.sprintWeeks + '-week sprints');
+      items = [
+        [500,  scrumState.teamName || 'Scrum Team',
+               (scrumState.teamSize || '6') + ' people'],
+        [950,  scrumState.sprintWeeks + '-week sprints',
+               sprintHelp],
+        [1400, 'Board',
+               scrumState.statuses.join(' → ')],
+        [1850, 'Work items',
+               scrumState.workTypes.join(' · ')],
+        [2300, 'Ceremonies',
+               'Sprint Planning · Daily Standup · Sprint Review · Retrospective']
+      ];
+      if (scrumState.tools.indexOf('jira') >= 0) {
+        items.push([2750, 'Jira', (parsed.jiraKey ? parsed.jiraKey + ' project' : 'connected') + ' — backlog ready to import']);
+      }
     } else {
       items = [
         [500,  'Blank workspace',   'No assumptions — full control'],
