@@ -728,6 +728,104 @@ body {
 .otto-config-key { font-size: 11px; color: var(--muted); min-width: 62px; flex-shrink: 0; }
 .otto-config-val { font-size: 13px; color: var(--ink); font-weight: 500; line-height: 1.4; }
 
+/* ── SCRUM FRAMEWORK FLOW ─────────────────────────────────── */
+/* Scrum template detail (pane 2 when scrum selected) */
+.scrum-detail { display: flex; flex-direction: column; gap: 12px; }
+.scrum-feature-card {
+  background: var(--surface); border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 13px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.scrum-feature {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 18px; border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+.scrum-feature:last-child { border-bottom: none; }
+.scrum-feature-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  background: var(--raised); display: flex; align-items: center; justify-content: center;
+  color: var(--sub);
+}
+.scrum-feature-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.scrum-feature-desc { font-size: 12px; color: var(--sub); line-height: 1.55; }
+.scrum-meta-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.scrum-meta-card {
+  flex: 1; min-width: 130px; background: var(--surface);
+  border: 1px solid rgba(0,0,0,0.08); border-radius: 11px; padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.scrum-meta-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+.scrum-meta-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.scrum-meta-chip { font-size: 11px; font-weight: 500; color: var(--sub); background: var(--raised); border: 1px solid rgba(0,0,0,0.09); border-radius: 999px; padding: 2px 9px; }
+.scrum-meta-chip.primary { background: var(--charcoal); color: #fff; border-color: var(--charcoal); }
+
+/* Scrum config form (pane 3) */
+.scrum-name-input {
+  width: 100%; border: 1px solid var(--border); border-radius: 9px;
+  padding: 10px 13px; font-family: inherit; font-size: 14px; color: var(--ink);
+  background: var(--raised); outline: none; transition: border-color 160ms, background 160ms;
+  box-sizing: border-box; font-weight: 500;
+}
+.scrum-name-input:focus { border-color: rgba(56,55,51,0.32); background: var(--surface); box-shadow: 0 0 0 3px rgba(56,55,51,0.07); }
+.scrum-list { display: flex; flex-direction: column; gap: 5px; }
+.scrum-list-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--raised); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 10px; transition: background 140ms;
+}
+.scrum-drag { cursor: grab; color: var(--muted); flex-shrink: 0; }
+.scrum-list-input {
+  flex: 1; border: none; background: transparent; outline: none;
+  font-family: inherit; font-size: 13px; color: var(--ink); padding: 0;
+}
+.scrum-del {
+  width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;
+  background: none; border: none; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 120ms, color 120ms;
+}
+.scrum-del:hover { background: rgba(220,38,38,0.08); color: #DC2626; }
+.scrum-add-btn {
+  display: flex; align-items: center; gap: 6px;
+  font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub);
+  background: none; border: 1.5px dashed rgba(0,0,0,0.18); border-radius: 8px;
+  padding: 7px 12px; cursor: pointer; width: 100%; text-align: left;
+  transition: all 140ms ease;
+}
+.scrum-add-btn:hover { background: var(--raised); color: var(--ink); border-color: rgba(0,0,0,0.28); }
+.scrum-view-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.scrum-view-chip {
+  font-family: inherit; font-size: 12px; font-weight: 500;
+  background: var(--raised); border: 1.5px solid var(--border);
+  color: var(--muted); border-radius: 8px; padding: 5px 12px;
+  cursor: pointer; transition: all 140ms ease;
+}
+.scrum-view-chip:hover { background: var(--bg); color: var(--sub); }
+.scrum-view-chip.ssel { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+
+/* Mini Scrum board in right preview */
+.scrum-board-preview { display: flex; flex-direction: column; gap: 10px; }
+.scrum-board { display: flex; gap: 6px; }
+.scrum-col {
+  flex: 1; min-width: 0; background: var(--surface);
+  border: 1px solid rgba(0,0,0,0.09); border-radius: 10px; padding: 9px 9px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.scrum-col-hd {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--muted); margin-bottom: 7px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.scrum-card-ph {
+  height: 30px; background: var(--raised); border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 6px; margin-bottom: 5px;
+  animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.scrum-board-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--muted); margin-bottom: 6px;
+}
+
 /* Reduced motion — disable all decorative animations */
 @media (prefers-reduced-motion: reduce) {
   .setup-pane.is-active, .prev-pane.is-active { animation: none; }
@@ -823,6 +921,14 @@ body {
               <div class="fw-desc">Continuous flow, no fixed sprints. For ops, support, or mixed teams.</div>
               <div class="fw-meta"><strong>No sprint cadence</strong> · Pull-based · WIP limits</div>
             </div>
+            <div class="fw-card" data-fw="scrum" tabindex="0" role="radio" aria-checked="false">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Sprint-based</div><div class="fw-name">Scrum</div></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Iterative delivery with time-boxed sprints, a prioritised backlog, and daily standups. The most widely adopted agile framework.</div>
+              <div class="fw-meta"><strong>1–4 week sprints</strong> · Backlog · Velocity tracking</div>
+            </div>
             <div class="fw-card" data-fw="blank" tabindex="0" role="radio" aria-checked="false">
               <div class="fw-hd">
                 <div class="fw-hd-left"><div class="fw-eyebrow">Custom</div><div class="fw-name">Blank</div></div>
@@ -840,7 +946,7 @@ body {
             <h1 class="pane-title">How should we set up your ART?</h1>
             <p class="pane-sub">Choose an approach. Nothing is saved until you review and confirm.</p>
           </div>
-          <div class="method-list" role="radiogroup" aria-label="Setup method selection">
+          <div class="method-list" id="method-list-section" role="radiogroup" aria-label="Setup method selection">
             <div class="method-card is-hero is-selected" data-method="ai" tabindex="0" role="radio" aria-checked="true">
               <div class="method-badge">Fastest</div>
               <div class="method-icon"><svg width="18" height="18" viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
@@ -865,6 +971,62 @@ body {
                 <div class="method-desc">Connect your project and EAP maps epics, stories, and sprints to the SAFe hierarchy. Review the mapping before anything is imported.</div>
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+
+          <!-- Scrum template detail — shown instead of method cards when Scrum is selected -->
+          <div class="scrum-detail" id="scrum-detail" style="display:none">
+            <div class="scrum-feature-card">
+              <div class="scrum-feature">
+                <div class="scrum-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg></div>
+                <div>
+                  <div class="scrum-feature-title">Plan work in a prioritised backlog</div>
+                  <div class="scrum-feature-desc">Create epics and stories, estimate effort, and order your backlog so your team always knows what to build next. Drag items into sprints when you're ready to commit.</div>
+                </div>
+              </div>
+              <div class="scrum-feature">
+                <div class="scrum-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
+                <div>
+                  <div class="scrum-feature-title">Run focused, time-boxed sprints</div>
+                  <div class="scrum-feature-desc">Sprint planning, daily standups, reviews, and retrospectives all have a natural home. The board shows work in flight; the backlog shows what's coming next.</div>
+                </div>
+              </div>
+              <div class="scrum-feature">
+                <div class="scrum-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <div>
+                  <div class="scrum-feature-title">Track velocity and improve over time</div>
+                  <div class="scrum-feature-desc">Built-in burndown, sprint reports, and velocity charts let teams understand their capacity, forecast delivery, and iterate on their process each sprint.</div>
+                </div>
+              </div>
+            </div>
+            <div class="scrum-meta-row">
+              <div class="scrum-meta-card">
+                <div class="scrum-meta-label">Work items</div>
+                <div class="scrum-meta-chips">
+                  <span class="scrum-meta-chip primary">Story</span>
+                  <span class="scrum-meta-chip">Epic</span>
+                  <span class="scrum-meta-chip">Task</span>
+                  <span class="scrum-meta-chip">Bug</span>
+                </div>
+              </div>
+              <div class="scrum-meta-card">
+                <div class="scrum-meta-label">Workflow</div>
+                <div class="scrum-meta-chips">
+                  <span class="scrum-meta-chip">To Do</span>
+                  <span class="scrum-meta-chip primary">In Progress</span>
+                  <span class="scrum-meta-chip">In Review</span>
+                  <span class="scrum-meta-chip">Done</span>
+                </div>
+              </div>
+              <div class="scrum-meta-card">
+                <div class="scrum-meta-label">Views</div>
+                <div class="scrum-meta-chips">
+                  <span class="scrum-meta-chip">Board</span>
+                  <span class="scrum-meta-chip">Backlog</span>
+                  <span class="scrum-meta-chip">Timeline</span>
+                  <span class="scrum-meta-chip">Reports</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -946,6 +1108,13 @@ body {
 
         <!-- Step 3: Progressive ART build -->
         <div class="prev-pane" id="prev-p3">
+          <!-- Scrum board preview — shown when Scrum selected -->
+          <div id="scrum-board-container" style="display:none;margin-bottom:16px;">
+            <div class="scrum-board-label">Board preview</div>
+            <div class="scrum-board" id="scrum-board-cols">
+              <!-- populated by renderScrumBoardPreview() -->
+            </div>
+          </div>
           <!-- Live config summary — updates as user answers Otto questions -->
           <div class="otto-config-card" id="otto-config-card">
             <div class="otto-config-hd">
@@ -1086,6 +1255,13 @@ body {
       { key: 'Roles',         val: 'Flow manager · Work item owners' },
       { key: 'Metrics',       val: 'Cycle time · Throughput · Queue length' }
     ],
+    scrum: [
+      { key: 'Sprint',        val: '2-week sprints (configurable)' },
+      { key: 'Work items',    val: 'Epic · Story · Task · Bug' },
+      { key: 'Board columns', val: 'To Do · In Progress · In Review · Done' },
+      { key: 'Views',         val: 'Board · Backlog · Timeline · Reports' },
+      { key: 'Metrics',       val: 'Velocity · Burndown · Sprint report' }
+    ],
     blank: [
       { key: 'Hierarchy',     val: 'No preset — define your own levels' },
       { key: 'Cadence',       val: 'Configure from scratch' },
@@ -1122,6 +1298,14 @@ body {
         { label: 'Analytics', dot: '#999995', note: 'Continuous improvement', entities: [{ name: 'CFD', primary: false }, { name: 'Cycle Time', primary: false }, { name: 'Throughput', primary: false }], connector: { before: 'Measured by' } }
       ]
     },
+    scrum: {
+      label: 'Scrum framework',
+      tiers: [
+        { label: 'Backlog', dot: '#383733', note: 'Prioritised work', entities: [{ name: 'Epic', primary: false }, { name: 'Story', primary: true }, { name: 'Task', primary: false }, { name: 'Bug', primary: false }] },
+        { label: 'Sprint', dot: '#585753', note: '1–4 week iteration', entities: [{ name: 'Sprint Goal', primary: true }, { name: 'Commitment', primary: false }], connector: { before: 'Pulls from' } },
+        { label: 'Board', dot: '#999995', note: 'In-flight work', entities: [{ name: 'To Do', primary: false }, { name: 'In Progress', primary: true }, { name: 'Done', primary: false }], connector: { before: 'Tracks' } }
+      ]
+    },
     blank: {
       label: 'Custom — no preset structure',
       tiers: [
@@ -1151,6 +1335,206 @@ body {
     jira:     '<rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/>'
   };
   var OTTO_ICON_SM = '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
+  // ── Scrum state ──────────────────────────────────────────────────
+  var scrumState = {
+    teamName: 'Digital Banking Team',
+    sprintWeeks: 2,
+    workTypes: ['Epic', 'Story', 'Task', 'Bug'],
+    statuses: ['To Do', 'In Progress', 'In Review', 'Done'],
+    views: ['board', 'backlog', 'timeline'],
+    tools: ['jira']
+  };
+
+  var SCRUM_VIEW_OPTIONS = [
+    { key: 'board',    label: 'Board' },
+    { key: 'backlog',  label: 'Backlog' },
+    { key: 'timeline', label: 'Timeline' },
+    { key: 'reports',  label: 'Reports' }
+  ];
+
+  var DRAG_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="4" r="1.2" fill="currentColor"/><circle cx="5" cy="8" r="1.2" fill="currentColor"/><circle cx="5" cy="12" r="1.2" fill="currentColor"/><circle cx="10" cy="4" r="1.2" fill="currentColor"/><circle cx="10" cy="8" r="1.2" fill="currentColor"/><circle cx="10" cy="12" r="1.2" fill="currentColor"/></svg>';
+  var DEL_SVG  = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>';
+  var PLUS_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>';
+
+  function renderScrumDetail() {
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ml) ml.style.display = 'none';
+    if (sd) sd.style.display = '';
+    if (ph2) ph2.textContent = 'What Scrum gives you';
+    if (ps2) ps2.textContent = 'A complete sprint-based workflow. Customise work types, statuses, and views in the next step.';
+  }
+
+  function hideScrumDetail() {
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ml) ml.style.display = '';
+    if (sd) sd.style.display = 'none';
+    if (ph2) ph2.textContent = 'How should we set up your ART?';
+    if (ps2) ps2.textContent = 'Choose an approach. Nothing is saved until you review and confirm.';
+  }
+
+  function renderScrumConfig() {
+    var form = document.getElementById('otto-qa-form');
+    if (!form) return;
+
+    var t = document.getElementById('pane3-title'); if (t) t.textContent = 'Configure your Scrum board';
+    var s = document.getElementById('pane3-sub');   if (s) s.textContent = 'Set up your team name, sprint length, work items, and statuses. You can change any of these later.';
+
+    var pl = ['plabel-teams','plabel-pi','plabel-conn'];
+    ['Team', 'Sprint', 'Tools'].forEach(function(lbl, i) {
+      var el = document.getElementById(pl[i]); if (el) el.textContent = lbl;
+    });
+
+    var html = '';
+
+    html += ottoQCard('What is this team called?',
+      '<input class="scrum-name-input" id="scrum-team-name" type="text" value="' + scrumState.teamName.replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
+
+    html += ottoQCard('How long are your sprints?',
+      ottoPillRow([1,2,3,4], scrumState.sprintWeeks, 'setScrumSprint', '-week', 'help-scrum-sprint') +
+      '<div class="otto-pill-help" id="help-scrum-sprint">' + (OTTO_SPRINT_HELP[scrumState.sprintWeeks] || '') + '</div>');
+
+    html += ottoQCard('Work item types',
+      '<div class="scrum-list" id="scrum-work-types">' + scrumState.workTypes.map(function(wt, i) {
+        return '<div class="scrum-list-item">' +
+          '<span class="scrum-drag">' + DRAG_SVG + '</span>' +
+          '<input class="scrum-list-input" type="text" value="' + wt + '" data-wt="' + i + '">' +
+          '<button class="scrum-del" onclick="delScrumWorkType(' + i + ')" type="button">' + DEL_SVG + '</button>' +
+          '</div>';
+      }).join('') +
+      '</div>' +
+      '<button class="scrum-add-btn" onclick="addScrumWorkType()" type="button">' + PLUS_SVG + 'Add work type</button>');
+
+    html += ottoQCard('Board statuses',
+      '<div class="scrum-list" id="scrum-statuses">' + scrumState.statuses.map(function(st, i) {
+        return '<div class="scrum-list-item">' +
+          '<span class="scrum-drag">' + DRAG_SVG + '</span>' +
+          '<input class="scrum-list-input" type="text" value="' + st + '" data-st="' + i + '">' +
+          '<button class="scrum-del" onclick="delScrumStatus(' + i + ')" type="button">' + DEL_SVG + '</button>' +
+          '</div>';
+      }).join('') +
+      '</div>' +
+      '<button class="scrum-add-btn" onclick="addScrumStatus()" type="button">' + PLUS_SVG + 'Add status</button>');
+
+    html += ottoQCard('Views to enable',
+      '<div class="scrum-view-chips">' +
+      SCRUM_VIEW_OPTIONS.map(function(v) {
+        var active = scrumState.views.indexOf(v.key) >= 0;
+        return '<button class="scrum-view-chip' + (active ? ' ssel' : '') + '" onclick="toggleScrumView(\'' + v.key + '\')" type="button">' + v.label + '</button>';
+      }).join('') + '</div>');
+
+    scrumState.tools = ottoState.tools;
+    html += ottoQCard('Which tools does your team use?',
+      '<div class="otto-tools">' +
+      OTTO_TOOL_LIST.map(function(t) {
+        var active = scrumState.tools.indexOf(t.key) >= 0;
+        var check = active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+        return '<button class="otto-tool' + (active ? ' osel' : '') + '" onclick="toggleScrumTool(\'' + t.key + '\')" type="button">' + check + t.label + '</button>';
+      }).join('') + '</div>');
+
+    form.innerHTML = html;
+    wireScrumInputs();
+    renderScrumBoardPreview();
+  }
+
+  function wireScrumInputs() {
+    var nameEl = document.getElementById('scrum-team-name');
+    if (nameEl) nameEl.addEventListener('input', function() { scrumState.teamName = nameEl.value; renderScrumBoardPreview(); });
+    document.querySelectorAll('.scrum-list-input[data-wt]').forEach(function(inp) {
+      var i = parseInt(inp.dataset.wt);
+      inp.addEventListener('input', function() { scrumState.workTypes[i] = inp.value; });
+    });
+    document.querySelectorAll('.scrum-list-input[data-st]').forEach(function(inp) {
+      var i = parseInt(inp.dataset.st);
+      inp.addEventListener('input', function() { scrumState.statuses[i] = inp.value; renderScrumBoardPreview(); });
+    });
+  }
+
+  function renderScrumBoardPreview() {
+    var container = document.getElementById('scrum-board-container');
+    var board = document.getElementById('scrum-board-cols');
+    if (!container || !board) return;
+    if (selectedFw !== 'scrum') { container.style.display = 'none'; return; }
+    container.style.display = '';
+    var statuses = scrumState.statuses.slice(0, 5);
+    board.innerHTML = statuses.map(function(st) {
+      return '<div class="scrum-col">' +
+        '<div class="scrum-col-hd">' + (st || 'Column') + '</div>' +
+        '<div class="scrum-card-ph"></div>' +
+        '<div class="scrum-card-ph" style="opacity:0.5;animation-delay:60ms"></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  window.setScrumSprint = function(w, helpId) {
+    scrumState.sprintWeeks = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumSprint') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    var h = document.getElementById(helpId || 'help-scrum-sprint');
+    if (h) h.textContent = OTTO_SPRINT_HELP[w] || '';
+  };
+
+  window.delScrumWorkType = function(i) {
+    scrumState.workTypes.splice(i, 1);
+    renderScrumConfig();
+  };
+
+  window.addScrumWorkType = function() {
+    scrumState.workTypes.push('New type');
+    renderScrumConfig();
+    var inputs = document.querySelectorAll('.scrum-list-input[data-wt]');
+    var last = inputs[inputs.length - 1];
+    if (last) { last.focus(); last.select(); }
+  };
+
+  window.delScrumStatus = function(i) {
+    if (scrumState.statuses.length <= 1) return;
+    scrumState.statuses.splice(i, 1);
+    renderScrumConfig();
+    renderScrumBoardPreview();
+  };
+
+  window.addScrumStatus = function() {
+    scrumState.statuses.push('New status');
+    renderScrumConfig();
+    renderScrumBoardPreview();
+    var inputs = document.querySelectorAll('.scrum-list-input[data-st]');
+    var last = inputs[inputs.length - 1];
+    if (last) { last.focus(); last.select(); }
+  };
+
+  window.toggleScrumView = function(key) {
+    var idx = scrumState.views.indexOf(key);
+    if (idx >= 0) { if (scrumState.views.length > 1) scrumState.views.splice(idx, 1); }
+    else { scrumState.views.push(key); }
+    document.querySelectorAll('.scrum-view-chip').forEach(function(btn) {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(key) >= 0) {
+        btn.classList.toggle('ssel', scrumState.views.indexOf(key) >= 0);
+      }
+    });
+  };
+
+  window.toggleScrumTool = function(key) {
+    var idx = scrumState.tools.indexOf(key);
+    if (idx >= 0) { scrumState.tools.splice(idx, 1); } else { scrumState.tools.push(key); }
+    document.querySelectorAll('.otto-tool').forEach(function(btn) {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(key) >= 0) {
+        var active = scrumState.tools.indexOf(key) >= 0;
+        btn.classList.toggle('osel', active);
+        btn.innerHTML = (active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') +
+          OTTO_TOOL_LIST.filter(function(t){ return t.key === key; }).map(function(t){ return t.label; })[0];
+      }
+    });
+  };
 
   // ── Otto QA state ───────────────────────────────────────────────
   var OTTO_Q_SVG = '<svg viewBox="0 0 118 118" fill="currentColor" width="12" height="12" style="display:block"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
@@ -1191,7 +1575,8 @@ body {
   var OTTO_NAME_DEFAULTS = {
     essential: ['Auth Team','Payments Team','Mobile Team','Data & Analytics','Platform Team','DevOps Team','QA Team','API Team'],
     portfolio: ['Core Platform ART','Customer Experience ART','Data & Analytics ART','Infrastructure ART','Innovation ART'],
-    kanban:    ['Discovery Stream','Delivery Stream','Operations Stream','Support Stream','Platform Stream']
+    kanban:    ['Discovery Stream','Delivery Stream','Operations Stream','Support Stream','Platform Stream'],
+    scrum:     ['Digital Banking Team','Payments Team','Auth Team','Platform Team','Mobile Team']
   };
 
   // suffix: unit label appended to each pill (e.g. '-week', ' people')
@@ -1235,8 +1620,8 @@ body {
       ottoState.teamNames = defs.slice(0, ottoState.teamCount);
     }
 
-    var pane3Title = { essential:'Configure your ART', portfolio:'Configure your Portfolio', kanban:'Configure your Kanban board', blank:'Set up your workspace' };
-    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Answer a few basics. Your hierarchy, terminology, and structure are fully customisable in settings after setup.' };
+    var pane3Title = { essential:'Configure your ART', portfolio:'Configure your Portfolio', kanban:'Configure your Kanban board', blank:'Set up your workspace', scrum:'Configure your Scrum board' };
+    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Answer a few basics. Your hierarchy, terminology, and structure are fully customisable in settings after setup.', scrum:'Set up your board — work types, statuses, and sprint length. Customise any time in settings.' };
     var t = document.getElementById('pane3-title'); if (t) t.textContent = pane3Title[fw] || pane3Title.essential;
     var s = document.getElementById('pane3-sub');   if (s) s.textContent = pane3Sub[fw]   || pane3Sub.essential;
 
@@ -1549,6 +1934,15 @@ body {
       doneLabel: function(){ return 'Lean Kanban Board'; },
       teamsLabel: 'Value Streams', piLabel: 'Flow Policy', connLabel: 'Integrations',
       hintText: 'Click any stream name to edit'
+    },
+    scrum: {
+      phase1: 'Setting up <strong>sprint board…</strong>',
+      phase2: 'Configuring <strong>work item types…</strong>',
+      phase3: 'Applying <strong>workflow statuses…</strong>',
+      doneMsg: '<strong>Scrum board ready.</strong> Review before saving',
+      doneLabel: function(){ return scrumState.teamName || 'Scrum Team'; },
+      teamsLabel: 'Team', piLabel: 'Sprint', connLabel: 'Tools',
+      hintText: 'Click any status or team name to rename'
     },
     blank: {
       phase1: 'Creating <strong>blank workspace…</strong>',
@@ -1876,9 +2270,17 @@ body {
     var fw = selectedFw;
     var prof = fwProfiles[fw] || fwProfiles.essential;
 
-    var parsed = buildParsedFromOtto();
+    var parsed = selectedFw === 'scrum'
+      ? { teams: [scrumState.teamName], teamCount: 1, piWeeks: scrumState.sprintWeeks, sprintWeeks: scrumState.sprintWeeks, piLabel: 'Sprint 1', piStart: null, jiraKey: scrumState.tools.indexOf('jira') >= 0 ? 'PROJ' : null, hasJira: scrumState.tools.indexOf('jira') >= 0, hasSlack: scrumState.tools.indexOf('slack') >= 0, peopleCount: 8 }
+      : buildParsedFromOtto();
 
-    document.getElementById('otto-qa-form').style.display = 'none';
+    if (selectedFw === 'scrum') {
+      document.getElementById('otto-qa-form').style.display = 'none';
+      var sb = document.getElementById('scrum-board-container');
+      if (sb) sb.style.display = 'none';
+    } else {
+      document.getElementById('otto-qa-form').style.display = 'none';
+    }
     var cfgCard = document.getElementById('otto-config-card');
     if (cfgCard) cfgCard.style.display = 'none';
     document.getElementById('gen-card').classList.add('is-visible');
@@ -2013,7 +2415,7 @@ body {
       }, 500);
     } else {
       footer.style.display = '';
-      if (step === 3 && !aiDone)      cont.textContent = selectedFw === 'blank' ? 'Set up workspace' : selectedFw === 'kanban' ? 'Configure board' : 'Generate ART';
+      if (step === 3 && !aiDone)      cont.textContent = selectedFw === 'blank' ? 'Set up workspace' : selectedFw === 'kanban' ? 'Configure board' : selectedFw === 'scrum' ? 'Create Scrum board' : 'Generate ART';
       else if (step === 3 && aiDone)  cont.textContent = 'Confirm and continue';
       else if (step === 4)            cont.textContent = 'Send invites';
       else                            cont.textContent = 'Continue';
@@ -2022,8 +2424,8 @@ body {
 
     // Preview-specific renders
     if (step === 1) renderHierarchy(selectedFw);
-    if (step === 2) renderMethodPreview(selectedMethod);
-    if (step === 3) renderOttoQuestions();
+    if (step === 2) { if (selectedFw === 'scrum') { renderScrumDetail(); } else { hideScrumDetail(); renderMethodPreview(selectedMethod); } }
+    if (step === 3) { if (selectedFw === 'scrum') { renderScrumConfig(); } else { renderOttoQuestions(); } }
     if (step === 4) { buildInvitePane(); renderInvitePreview(); }
 
     document.querySelector('.setup-wizard').scrollTop = 0;
@@ -2045,6 +2447,11 @@ body {
         document.getElementById('otto-qa-form').style.display = '';
         var cfgCard = document.getElementById('otto-config-card');
         if (cfgCard) cfgCard.style.display = '';
+        if (selectedFw === 'scrum') {
+          var sb = document.getElementById('scrum-board-container');
+          if (sb) sb.style.display = '';
+          renderScrumBoardPreview();
+        }
         document.getElementById('gen-items').innerHTML = '';
         document.getElementById('gen-spinner').className = 'gen-spinner';
         // Reset ART preview
