@@ -755,9 +755,13 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .scrum-meta-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
-.scrum-meta-chips { display: flex; flex-wrap: wrap; gap: 4px; }
-.scrum-meta-chip { font-size: 11px; font-weight: 500; color: var(--sub); background: var(--raised); border: 1px solid rgba(0,0,0,0.09); border-radius: 999px; padding: 2px 9px; }
+.scrum-meta-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.scrum-meta-chip { font-size: 12px; font-weight: 500; color: var(--sub); background: var(--raised); border: 1.5px solid var(--border); border-radius: 999px; padding: 4px 12px; }
 .scrum-meta-chip.primary { background: var(--charcoal); color: #fff; border-color: var(--charcoal); }
+.scrum-meta-chip[onclick] { cursor: pointer; transition: all 140ms ease; }
+.scrum-meta-chip[onclick]:hover { background: var(--bg); color: var(--ink); border-color: rgba(0,0,0,0.22); }
+.scrum-meta-chip.smc-sel { background: var(--charcoal); color: #fff; border-color: var(--charcoal); font-weight: 600; }
+.scrum-meta-chip.smc-sel:hover { background: #262521; }
 
 /* Scrum config form (pane 3) */
 .scrum-name-input {
@@ -1357,16 +1361,123 @@ body {
   var DEL_SVG  = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>';
   var PLUS_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>';
 
+  var ALL_SCRUM_WORK_TYPES = ['Epic', 'Story', 'Task', 'Bug', 'Sub-task'];
+  var ALL_SCRUM_STATUSES   = ['To Do', 'In Progress', 'In Review', 'Done', 'Blocked', 'Cancelled'];
+
   function renderScrumDetail() {
     var ml = document.getElementById('method-list-section');
     var sd = document.getElementById('scrum-detail');
     var ph2 = document.querySelector('#pane-2 .pane-heading h1');
     var ps2 = document.querySelector('#pane-2 .pane-heading p');
     if (ml) ml.style.display = 'none';
-    if (sd) sd.style.display = '';
-    if (ph2) ph2.textContent = 'What Scrum gives you';
-    if (ps2) ps2.textContent = 'A complete sprint-based workflow. Customise work types, statuses, and views in the next step.';
+    if (ph2) ph2.textContent = 'Set up your Scrum board';
+    if (ps2) ps2.textContent = 'Name your team and choose what to include. The preview updates as you select.';
+
+    if (!sd) return;
+    sd.style.display = '';
+
+    // Build dynamic content — team name + multi-select chips + feature overview
+    var html = '';
+
+    // 1. Team name — primary question, always first
+    html += ottoQCard('What is this team called?',
+      '<input class="scrum-name-input" id="scrum-team-name-p2" type="text" value="' + (scrumState.teamName||'').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
+
+    // 2. Work item types — multi-select
+    html += ottoQCard('Which work item types do you need?',
+      '<div class="scrum-meta-chips">' +
+      ALL_SCRUM_WORK_TYPES.map(function(wt) {
+        var sel = scrumState.workTypes.indexOf(wt) >= 0;
+        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumWorkType(\'' + wt + '\')" type="button">' + wt + '</button>';
+      }).join('') +
+      '</div>');
+
+    // 3. Board columns — multi-select; note about order
+    html += ottoQCard('What are your board columns?',
+      '<div class="scrum-meta-chips">' +
+      ALL_SCRUM_STATUSES.map(function(st) {
+        var sel = scrumState.statuses.indexOf(st) >= 0;
+        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumStatus2(\'' + st + '\')" type="button">' + st + '</button>';
+      }).join('') +
+      '</div>' +
+      '<div class="otto-pill-help">Selected columns appear left to right on your board. At least one required.</div>');
+
+    // 4. Views — multi-select
+    html += ottoQCard('Which views do you want?',
+      '<div class="scrum-view-chips">' +
+      SCRUM_VIEW_OPTIONS.map(function(v) {
+        var active = scrumState.views.indexOf(v.key) >= 0;
+        return '<button class="scrum-view-chip' + (active ? ' ssel' : '') + '" onclick="toggleScrumView(\'' + v.key + '\')" type="button">' + v.label + '</button>';
+      }).join('') + '</div>');
+
+    // 5. Feature overview — purely informational, collapsed at bottom
+    html += '<div class="scrum-feature-card" style="opacity:0.8">' +
+      '<div class="scrum-feature"><div class="scrum-feature-icon">' + icon(IC.cal) + '</div><div><div class="scrum-feature-title">Backlog + sprint planning</div><div class="scrum-feature-desc">Order your backlog, estimate stories, and drag items into sprints when you\'re ready to commit.</div></div></div>' +
+      '<div class="scrum-feature"><div class="scrum-feature-icon">' + icon(IC.chart) + '</div><div><div class="scrum-feature-title">Velocity and burndown</div><div class="scrum-feature-desc">Built-in sprint reports and velocity charts help teams forecast and improve each iteration.</div></div></div>' +
+      '</div>';
+
+    sd.innerHTML = html;
+
+    // Wire team name
+    var tn = document.getElementById('scrum-team-name-p2');
+    if (tn) tn.addEventListener('input', function() { scrumState.teamName = tn.value; updateScrumPreview(); });
+
+    // Populate right preview
+    updateScrumPreview();
   }
+
+  function updateScrumPreview() {
+    // Populate method-detail (right panel prev-p2) with a live mini board
+    var md = document.getElementById('method-detail');
+    if (!md) return;
+    var statuses = scrumState.statuses.slice(0, 5);
+    var teamName = scrumState.teamName || 'Your team';
+    md.innerHTML =
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);">' + teamName + ' · Board</div>' +
+        '<div class="scrum-board">' +
+        statuses.map(function(st, i) {
+          return '<div class="scrum-col" style="animation-delay:' + (i*50) + 'ms">' +
+            '<div class="scrum-col-hd">' + (st || 'Column') + '</div>' +
+            '<div class="scrum-card-ph"></div>' +
+            '<div class="scrum-card-ph" style="opacity:0.4;animation-delay:' + (i*50+60) + 'ms"></div>' +
+            '</div>';
+        }).join('') +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--muted);line-height:1.5;">' +
+          '<strong style="color:var(--sub)">Work items:</strong> ' + (scrumState.workTypes.join(' · ') || 'None selected') +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--muted);">' +
+          '<strong style="color:var(--sub)">Views:</strong> ' + scrumState.views.map(function(k) { return k.charAt(0).toUpperCase()+k.slice(1); }).join(' · ') +
+        '</div>' +
+      '</div>';
+  }
+
+  window.toggleScrumWorkType = function(wt) {
+    var idx = scrumState.workTypes.indexOf(wt);
+    if (idx >= 0 && scrumState.workTypes.length > 1) scrumState.workTypes.splice(idx, 1);
+    else if (idx < 0) scrumState.workTypes.push(wt);
+    document.querySelectorAll('.scrum-meta-chip').forEach(function(c) {
+      var oc = c.getAttribute('onclick') || '';
+      if (oc.indexOf('toggleScrumWorkType(\'' + wt + '\')') >= 0)
+        c.classList.toggle('smc-sel', scrumState.workTypes.indexOf(wt) >= 0);
+    });
+    updateScrumPreview();
+  };
+
+  window.toggleScrumStatus2 = function(st) {
+    // Step-2 version: updates the master statuses array
+    var idx = scrumState.statuses.indexOf(st);
+    if (idx >= 0 && scrumState.statuses.length > 1) scrumState.statuses.splice(idx, 1);
+    else if (idx < 0) scrumState.statuses.push(st);
+    document.querySelectorAll('.scrum-meta-chip').forEach(function(c) {
+      var oc = c.getAttribute('onclick') || '';
+      if (oc.indexOf('toggleScrumStatus2(\'' + st + '\')') >= 0)
+        c.classList.toggle('smc-sel', scrumState.statuses.indexOf(st) >= 0);
+    });
+    renderScrumBoardPreview(); // keep step-3 board in sync
+    updateScrumPreview();
+  };
 
   function hideScrumDetail() {
     var ml = document.getElementById('method-list-section');
@@ -1393,43 +1504,30 @@ body {
 
     var html = '';
 
-    html += ottoQCard('What is this team called?',
-      '<input class="scrum-name-input" id="scrum-team-name" type="text" value="' + scrumState.teamName.replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
+    // Summary card showing what was configured in step 2
+    html += '<div style="background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.20);border-radius:11px;padding:12px 15px;display:flex;align-items:center;gap:10px;">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ai-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">' + (scrumState.teamName || 'Scrum Team') + '</div>' +
+      '<div style="font-size:11px;color:var(--sub);margin-top:1px;">' + scrumState.workTypes.join(' · ') + ' &nbsp;·&nbsp; ' + scrumState.statuses.join(' → ') + '</div></div>' +
+      '</div>';
 
+    // Sprint length
     html += ottoQCard('How long are your sprints?',
       ottoPillRow([1,2,3,4], scrumState.sprintWeeks, 'setScrumSprint', '-week', 'help-scrum-sprint') +
       '<div class="otto-pill-help" id="help-scrum-sprint">' + (OTTO_SPRINT_HELP[scrumState.sprintWeeks] || '') + '</div>');
 
-    html += ottoQCard('Work item types',
-      '<div class="scrum-list" id="scrum-work-types">' + scrumState.workTypes.map(function(wt, i) {
-        return '<div class="scrum-list-item">' +
-          '<span class="scrum-drag">' + DRAG_SVG + '</span>' +
-          '<input class="scrum-list-input" type="text" value="' + wt + '" data-wt="' + i + '">' +
-          '<button class="scrum-del" onclick="delScrumWorkType(' + i + ')" type="button">' + DEL_SVG + '</button>' +
-          '</div>';
-      }).join('') +
-      '</div>' +
-      '<button class="scrum-add-btn" onclick="addScrumWorkType()" type="button">' + PLUS_SVG + 'Add work type</button>');
+    // Team size
+    var tsOpts = ['1–3', '4–6', '6–8', '9–12', '13+'];
+    html += ottoQCard('Roughly how many people on the team?',
+      ottoPillRow(tsOpts, scrumState.teamSize || '6–8', 'setScrumTeamSize') +
+      '<div class="otto-pill-help">Used for capacity planning. Exact members are invited in the next step.</div>');
 
-    html += ottoQCard('Board statuses',
-      '<div class="scrum-list" id="scrum-statuses">' + scrumState.statuses.map(function(st, i) {
-        return '<div class="scrum-list-item">' +
-          '<span class="scrum-drag">' + DRAG_SVG + '</span>' +
-          '<input class="scrum-list-input" type="text" value="' + st + '" data-st="' + i + '">' +
-          '<button class="scrum-del" onclick="delScrumStatus(' + i + ')" type="button">' + DEL_SVG + '</button>' +
-          '</div>';
-      }).join('') +
-      '</div>' +
-      '<button class="scrum-add-btn" onclick="addScrumStatus()" type="button">' + PLUS_SVG + 'Add status</button>');
+    // Start date
+    html += ottoQCard('When does your first sprint start?',
+      '<input class="otto-date-input" id="scrum-start-date" type="text" placeholder="e.g. Jun 2, 2025" value="' + (scrumState.startDate || '') + '">',
+      'optional');
 
-    html += ottoQCard('Views to enable',
-      '<div class="scrum-view-chips">' +
-      SCRUM_VIEW_OPTIONS.map(function(v) {
-        var active = scrumState.views.indexOf(v.key) >= 0;
-        return '<button class="scrum-view-chip' + (active ? ' ssel' : '') + '" onclick="toggleScrumView(\'' + v.key + '\')" type="button">' + v.label + '</button>';
-      }).join('') + '</div>');
-
-    scrumState.tools = ottoState.tools;
+    // Tools
     html += ottoQCard('Which tools does your team use?',
       '<div class="otto-tools">' +
       OTTO_TOOL_LIST.map(function(t) {
@@ -1444,17 +1542,19 @@ body {
   }
 
   function wireScrumInputs() {
-    var nameEl = document.getElementById('scrum-team-name');
-    if (nameEl) nameEl.addEventListener('input', function() { scrumState.teamName = nameEl.value; renderScrumBoardPreview(); });
-    document.querySelectorAll('.scrum-list-input[data-wt]').forEach(function(inp) {
-      var i = parseInt(inp.dataset.wt);
-      inp.addEventListener('input', function() { scrumState.workTypes[i] = inp.value; });
-    });
-    document.querySelectorAll('.scrum-list-input[data-st]').forEach(function(inp) {
-      var i = parseInt(inp.dataset.st);
-      inp.addEventListener('input', function() { scrumState.statuses[i] = inp.value; renderScrumBoardPreview(); });
-    });
+    var dateEl = document.getElementById('scrum-start-date');
+    if (dateEl) dateEl.addEventListener('input', function() { scrumState.startDate = dateEl.value; });
+    var tn = document.getElementById('scrum-team-name-p2');
+    if (tn) tn.addEventListener('input', function() { scrumState.teamName = tn.value; updateScrumPreview(); });
   }
+
+  window.setScrumTeamSize = function(s) {
+    scrumState.teamSize = s;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamSize') >= 0)
+        p.classList.toggle('osel', p.textContent === s);
+    });
+  };
 
   function renderScrumBoardPreview() {
     var container = document.getElementById('scrum-board-container');
