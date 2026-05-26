@@ -654,6 +654,78 @@ body {
   font-size: 13px; color: var(--ink); line-height: 1.4; flex: 1;
 }
 
+/* ── OTTO QA FORM ─────────────────────────────────── */
+.otto-qa-form { display: flex; flex-direction: column; gap: 10px; }
+.otto-q-card {
+  background: var(--surface); border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 13px; padding: 15px 17px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  animation: pane-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.otto-q-hd { display: flex; align-items: center; gap: 8px; }
+.otto-q-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--ai-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ai-accent); }
+.otto-q-label { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+.otto-q-note { font-size: 11px; color: var(--muted); font-weight: 400; }
+.otto-sub-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px; }
+
+.otto-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.otto-pill {
+  font-family: inherit; font-size: 12px; font-weight: 500;
+  background: var(--raised); border: 1.5px solid var(--border);
+  color: var(--sub); border-radius: 999px; padding: 5px 14px;
+  cursor: pointer; transition: all 140ms ease; outline: none;
+}
+.otto-pill:hover { background: var(--bg); color: var(--ink); border-color: rgba(0,0,0,0.20); }
+.otto-pill.osel { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+
+.otto-name-inputs { display: flex; flex-direction: column; gap: 6px; }
+.otto-name-row { display: flex; align-items: center; gap: 8px; }
+.otto-name-num { font-size: 11px; color: var(--muted); min-width: 14px; text-align: right; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.otto-name-input {
+  flex: 1; border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 11px; font-family: inherit; font-size: 13px; color: var(--ink);
+  background: var(--raised); outline: none; transition: border-color 160ms, background 160ms;
+}
+.otto-name-input:focus { border-color: rgba(56,55,51,0.30); background: var(--surface); box-shadow: 0 0 0 3px rgba(56,55,51,0.07); }
+
+.otto-tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.otto-tool {
+  font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub);
+  background: var(--raised); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  transition: all 140ms ease; display: flex; align-items: center; gap: 5px; outline: none;
+}
+.otto-tool:hover { background: var(--bg); color: var(--ink); }
+.otto-tool.osel { background: rgba(22,163,74,0.09); border-color: rgba(22,163,74,0.32); color: var(--ai-accent-deep); }
+
+.otto-date-input {
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 11px; font-family: inherit; font-size: 13px; color: var(--ink);
+  background: var(--raised); outline: none; transition: border-color 160ms; width: 100%; box-sizing: border-box;
+}
+.otto-date-input:focus { border-color: rgba(56,55,51,0.30); background: var(--surface); }
+
+/* Config summary card shown in right preview during step 3 */
+.otto-config-card {
+  background: var(--surface); border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  margin-bottom: 16px;
+  animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.otto-config-hd {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-bottom: 1px solid rgba(0,0,0,0.07);
+  background: rgba(22,163,74,0.05);
+}
+.otto-config-hd-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--ai-accent-deep); }
+.otto-config-rows { display: flex; flex-direction: column; }
+.otto-config-row { display: flex; align-items: baseline; gap: 10px; padding: 8px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.otto-config-row:last-child { border-bottom: none; }
+.otto-config-key { font-size: 11px; color: var(--muted); min-width: 62px; flex-shrink: 0; }
+.otto-config-val { font-size: 13px; color: var(--ink); font-weight: 500; line-height: 1.4; }
+
 /* Reduced motion — disable all decorative animations */
 @media (prefers-reduced-motion: reduce) {
   .setup-pane.is-active, .prev-pane.is-active { animation: none; }
@@ -795,29 +867,19 @@ body {
           </div>
         </section>
 
-        <!-- PANE 3 — AI / Review -->
+        <!-- PANE 3 — Otto Q&A -->
         <section class="setup-pane" id="pane-3">
           <div class="pane-heading">
-            <h1 class="pane-title">Tell Otto about your team</h1>
-            <p class="pane-sub">Describe your team in plain language. The preview builds in real time as Otto reads your input.</p>
+            <h1 class="pane-title" id="pane3-title">Configure your ART</h1>
+            <p class="pane-sub" id="pane3-sub">Answer Otto's questions. The preview updates in real time and you review everything before it's saved.</p>
           </div>
-          <div class="ai-input-card" id="ai-input-card">
-            <div class="ai-card-hd">
-              <div class="ai-otto"><svg viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
-              <span class="ai-card-label">Otto</span>
-            </div>
-            <textarea class="ai-textarea" id="ai-textarea" rows="4" placeholder="e.g. 4 teams (Auth, Payments, Mobile, Data), ~80 engineers, 12-week PIs, 2-week sprints, Jira project DBKG, PI 26 starts June 2nd."></textarea>
-            <div class="ai-chips">
-              <button class="ai-chip" data-add="4 squads, ~80 engineers">4 teams · 80 engineers</button>
-              <button class="ai-chip" data-add="12-week PIs, 2-week sprints">12-week PIs</button>
-              <button class="ai-chip" data-add="connected to Jira project DBKG">Connected to Jira</button>
-              <button class="ai-chip" data-add="PI 26 starts June 2nd">PI starts June 2</button>
-            </div>
+          <div class="otto-qa-form" id="otto-qa-form">
+            <!-- rendered by renderOttoQuestions() when step 3 activates -->
           </div>
           <div class="gen-card" id="gen-card">
             <div class="gen-status-row">
               <div class="gen-spinner" id="gen-spinner"></div>
-              <span class="gen-txt" id="gen-txt">Reading your description…</span>
+              <span class="gen-txt" id="gen-txt">Configuring…</span>
             </div>
             <div class="gen-items" id="gen-items"></div>
           </div>
@@ -882,6 +944,16 @@ body {
 
         <!-- Step 3: Progressive ART build -->
         <div class="prev-pane" id="prev-p3">
+          <!-- Live config summary — updates as user answers Otto questions -->
+          <div class="otto-config-card" id="otto-config-card">
+            <div class="otto-config-hd">
+              <svg width="12" height="12" viewBox="0 0 118 118" fill="currentColor" style="color:var(--ai-accent);flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>
+              <span class="otto-config-hd-label" id="otto-config-hd-label">Otto configuring</span>
+            </div>
+            <div class="otto-config-rows" id="otto-config-rows">
+              <!-- populated by updateOttoSummary() -->
+            </div>
+          </div>
           <!-- Placeholder before generation -->
           <div class="art-placeholder" id="art-placeholder">
             <div class="art-build-label">Teams</div>
@@ -1077,6 +1149,264 @@ body {
     jira:     '<rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/>'
   };
   var OTTO_ICON_SM = '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
+  // ── Otto QA state ───────────────────────────────────────────────
+  var OTTO_Q_SVG = '<svg viewBox="0 0 118 118" fill="currentColor" width="12" height="12" style="display:block"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
+  var ottoState = {
+    teamCount: 4,
+    teamNames: ['Auth Team', 'Payments Team', 'Mobile Team', 'Data & Analytics'],
+    piWeeks: 10, sprintWeeks: 2,
+    tools: ['jira'], piStart: '', wipLimit: 4
+  };
+
+  var OTTO_TOOL_LIST = [
+    { key: 'jira', label: 'Jira' }, { key: 'slack', label: 'Slack' },
+    { key: 'rally', label: 'Rally' }, { key: 'azure', label: 'Azure DevOps' },
+    { key: 'confluence', label: 'Confluence' }
+  ];
+
+  var OTTO_NAME_DEFAULTS = {
+    essential: ['Auth Team','Payments Team','Mobile Team','Data & Analytics','Platform Team','DevOps Team','QA Team','API Team'],
+    portfolio: ['Core Platform ART','Customer Experience ART','Data & Analytics ART','Infrastructure ART','Innovation ART'],
+    kanban:    ['Discovery Stream','Delivery Stream','Operations Stream','Support Stream','Platform Stream']
+  };
+
+  function ottoPillRow(values, selected, handler) {
+    return '<div class="otto-pills">' + values.map(function(v) {
+      return '<button class="otto-pill' + (v === selected ? ' osel' : '') + '" onclick="' + handler + '(' + (typeof v === 'string' ? '"' + v + '"' : v) + ')" type="button">' + v + (typeof v === 'number' ? '' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+
+  function ottoQCard(label, content, noteText) {
+    var note = noteText ? ' <span class="otto-q-note">— ' + noteText + '</span>' : '';
+    return '<div class="otto-q-card">' +
+      '<div class="otto-q-hd"><div class="otto-q-icon">' + OTTO_Q_SVG + '</div>' +
+      '<span class="otto-q-label">' + label + note + '</span></div>' +
+      content + '</div>';
+  }
+
+  function renderNameRows(count, suffix) {
+    var defs = OTTO_NAME_DEFAULTS[selectedFw] || OTTO_NAME_DEFAULTS.essential;
+    var html = '<div class="otto-name-inputs">';
+    for (var i = 0; i < count; i++) {
+      var val = ottoState.teamNames[i] || defs[i] || (suffix + ' ' + (i + 1));
+      html += '<div class="otto-name-row"><span class="otto-name-num">' + (i + 1) + '</span>' +
+        '<input class="otto-name-input" type="text" value="' + val.replace(/"/g, '&quot;') + '" placeholder="' + (defs[i] || suffix + ' ' + (i+1)) + '" data-idx="' + i + '"></div>';
+    }
+    return html + '</div>';
+  }
+
+  function renderOttoQuestions() {
+    var fw = selectedFw;
+    var form = document.getElementById('otto-qa-form');
+    if (!form) return;
+
+    // Reset defaults per framework
+    var defs = OTTO_NAME_DEFAULTS[fw] || OTTO_NAME_DEFAULTS.essential;
+    if (!ottoState.teamNames.length || ottoState.teamNames[0] === defs[0]) {
+      ottoState.teamNames = defs.slice(0, ottoState.teamCount);
+    }
+
+    var pane3Title = { essential:'Configure your ART', portfolio:'Configure your Portfolio', kanban:'Configure your Kanban board', blank:'Set up your workspace' };
+    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Otto creates a blank workspace. You define everything in settings after setup.' };
+    var t = document.getElementById('pane3-title'); if (t) t.textContent = pane3Title[fw] || pane3Title.essential;
+    var s = document.getElementById('pane3-sub');   if (s) s.textContent = pane3Sub[fw]   || pane3Sub.essential;
+
+    if (fw === 'blank') {
+      form.innerHTML = ottoQCard('Otto will create a blank workspace with no preset structure.',
+        '<p style="font-size:13px;color:var(--sub);line-height:1.6;margin:0;">You\'ll define teams, hierarchy, cadence, and terminology in workspace settings after setup. Nothing is assumed.</p>');
+      updateOttoSummary();
+      return;
+    }
+
+    var countLabel   = fw === 'kanban' ? 'How many value streams?' : fw === 'portfolio' ? 'How many ARTs?' : 'How many teams are in your ART?';
+    var nameLabel    = fw === 'kanban' ? 'What are your value streams called?' : fw === 'portfolio' ? 'What are your ARTs called?' : 'What are they called?';
+    var nameSuffix   = fw === 'kanban' ? 'Stream' : fw === 'portfolio' ? 'ART' : 'Team';
+    var countOptions = fw === 'portfolio' ? [2,3,4,5,6] : [2,3,4,5,6,8];
+
+    var html = '';
+
+    // Q1: Count
+    html += ottoQCard(countLabel, ottoPillRow(countOptions, ottoState.teamCount, 'setOttoCount'));
+
+    // Q2: Names
+    html += ottoQCard(nameLabel, '<div id="otto-name-inputs-wrap">' + renderNameRows(ottoState.teamCount, nameSuffix) + '</div>');
+
+    // Q3: Cadence or WIP
+    if (fw === 'kanban') {
+      html += ottoQCard('WIP limit per column',
+        ottoPillRow([2,3,4,5,6], ottoState.wipLimit, 'setOttoWip'));
+    } else {
+      html += ottoQCard('PI and sprint cadence',
+        '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div><div class="otto-sub-label">PI length</div>' + ottoPillRow([8,10,12], ottoState.piWeeks, 'setOttoPi') + '</div>' +
+        '<div><div class="otto-sub-label">Sprint length</div>' + ottoPillRow([1,2,3], ottoState.sprintWeeks, 'setOttoSprint') + '</div>' +
+        '</div>');
+    }
+
+    // Q4: Tools
+    html += ottoQCard('Which tools does your team use?',
+      '<div class="otto-tools">' +
+      OTTO_TOOL_LIST.map(function(t) {
+        var active = ottoState.tools.indexOf(t.key) >= 0;
+        var check = active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+        return '<button class="otto-tool' + (active ? ' osel' : '') + '" onclick="toggleOttoTool(\'' + t.key + '\')" type="button">' + check + t.label + '</button>';
+      }).join('') +
+      '</div>');
+
+    // Q5: PI start (optional, not kanban)
+    if (fw !== 'kanban') {
+      html += ottoQCard('When does your next PI kick off?',
+        '<input class="otto-date-input" id="otto-pi-start" type="text" placeholder="e.g. Jun 2, 2025" value="' + ottoState.piStart + '">',
+        'optional');
+    }
+
+    form.innerHTML = html;
+    wireOttoInputs();
+    updateOttoSummary();
+  }
+
+  function wireOttoInputs() {
+    var wrap = document.getElementById('otto-name-inputs-wrap');
+    if (wrap) {
+      wrap.querySelectorAll('.otto-name-input').forEach(function(input) {
+        var i = parseInt(input.dataset.idx);
+        input.addEventListener('input', function() {
+          ottoState.teamNames[i] = input.value;
+          updateOttoSummary();
+        });
+      });
+    }
+    var dateEl = document.getElementById('otto-pi-start');
+    if (dateEl) {
+      dateEl.addEventListener('input', function() {
+        ottoState.piStart = dateEl.value;
+        updateOttoSummary();
+      });
+    }
+  }
+
+  function updateOttoSummary() {
+    var card = document.getElementById('otto-config-card');
+    var rows = document.getElementById('otto-config-rows');
+    var hdLabel = document.getElementById('otto-config-hd-label');
+    if (!card || !rows) return;
+
+    var fw = selectedFw;
+    if (fw === 'blank') {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
+
+    var teamKey = fw === 'kanban' ? 'Streams' : fw === 'portfolio' ? 'ARTs' : 'Teams';
+    if (hdLabel) hdLabel.textContent = 'Otto is configuring';
+
+    var names = ottoState.teamNames.slice(0, ottoState.teamCount).filter(Boolean);
+    var namesStr = names.length ? names.join(' · ') : '—';
+    var toolsStr = ottoState.tools.map(function(k) {
+      var t = OTTO_TOOL_LIST.filter(function(x){ return x.key === k; })[0];
+      return t ? t.label : k;
+    }).join(' · ') || 'None selected';
+
+    var rowData = [];
+    rowData.push([teamKey, ottoState.teamCount + ' · ' + namesStr]);
+    if (fw === 'kanban') {
+      rowData.push(['WIP limit', ottoState.wipLimit + ' per column']);
+    } else {
+      rowData.push(['PI', ottoState.piWeeks + '-week · ' + (Math.floor(ottoState.piWeeks / ottoState.sprintWeeks) - 1) + ' sprints + IP']);
+      rowData.push(['Sprint', ottoState.sprintWeeks + '-week']);
+    }
+    rowData.push(['Tools', toolsStr]);
+    if (ottoState.piStart) rowData.push(['Starts', ottoState.piStart]);
+
+    rows.innerHTML = rowData.map(function(r) {
+      return '<div class="otto-config-row"><span class="otto-config-key">' + r[0] + '</span><span class="otto-config-val">' + r[1] + '</span></div>';
+    }).join('');
+  }
+
+  // Otto answer setters
+  window.setOttoCount = function(n) {
+    ottoState.teamCount = n;
+    var fw = selectedFw;
+    var defs = OTTO_NAME_DEFAULTS[fw] || OTTO_NAME_DEFAULTS.essential;
+    var suffix = fw === 'kanban' ? 'Stream' : fw === 'portfolio' ? 'ART' : 'Team';
+    while (ottoState.teamNames.length < n) {
+      ottoState.teamNames.push(defs[ottoState.teamNames.length] || suffix + ' ' + (ottoState.teamNames.length + 1));
+    }
+    // Update pill active states
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoCount') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === n);
+      }
+    });
+    // Re-render name inputs
+    var wrap = document.getElementById('otto-name-inputs-wrap');
+    if (wrap) {
+      wrap.innerHTML = renderNameRows(n, suffix);
+      wireOttoInputs();
+    }
+    updateOttoSummary();
+  };
+
+  window.setOttoPi = function(w) {
+    ottoState.piWeeks = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoPi') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    updateOttoSummary();
+  };
+
+  window.setOttoSprint = function(w) {
+    ottoState.sprintWeeks = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoSprint') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    updateOttoSummary();
+  };
+
+  window.setOttoWip = function(w) {
+    ottoState.wipLimit = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoWip') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    updateOttoSummary();
+  };
+
+  window.toggleOttoTool = function(key) {
+    var idx = ottoState.tools.indexOf(key);
+    if (idx >= 0) { ottoState.tools.splice(idx, 1); } else { ottoState.tools.push(key); }
+    // Re-render tool buttons
+    document.querySelectorAll('.otto-tool').forEach(function(btn) {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(key) >= 0) {
+        var active = ottoState.tools.indexOf(key) >= 0;
+        btn.classList.toggle('osel', active);
+        btn.innerHTML = (active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') +
+          OTTO_TOOL_LIST.filter(function(t){ return t.key === key; }).map(function(t){ return t.label; })[0];
+      }
+    });
+    updateOttoSummary();
+  };
+
+  function buildParsedFromOtto() {
+    var names = ottoState.teamNames.slice(0, ottoState.teamCount).filter(Boolean);
+    return {
+      teams: names, teamCount: ottoState.teamCount,
+      piWeeks: ottoState.piWeeks, sprintWeeks: ottoState.sprintWeeks,
+      piLabel: 'PI 1', piStart: ottoState.piStart || null,
+      jiraKey: ottoState.tools.indexOf('jira') >= 0 ? 'PROJ' : null,
+      hasJira: ottoState.tools.indexOf('jira') >= 0,
+      hasSlack: ottoState.tools.indexOf('slack') >= 0,
+      peopleCount: ottoState.teamCount * 6
+    };
+  }
 
   // ── Input parser — extracts team names, PI info, integrations ────
   function parseInput(text) {
@@ -1465,24 +1795,14 @@ body {
 
   // ── Left-panel generation sequence — adapts to framework + input ─
   function runGeneration() {
-    var ta = document.getElementById('ai-textarea');
     var fw = selectedFw;
     var prof = fwProfiles[fw] || fwProfiles.essential;
 
-    // Default placeholder if blank
-    if (!ta.value.trim()) {
-      var defaults = {
-        essential: 'We have 4 engineering squads — Auth, Payments, Mobile, and Data — about 80 people total. 12-week PIs with 2-week sprints. We use Jira (project key: DBKG) and Slack. PI 26 kicks off June 2nd.',
-        portfolio: 'We have 3 ARTs — Core Platform, Customer Experience, and Data & Analytics — about 300 people total. 10-week PIs. We use Jira and Slack.',
-        kanban:    'We have 3 value streams — Discovery, Delivery, and Operations. Pull-based, no fixed sprints. WIP limits per column. Jira for tracking.',
-        blank:     'Custom structure — no preset framework. Define hierarchy and cadence from scratch.'
-      };
-      ta.value = defaults[fw] || defaults.essential;
-    }
+    var parsed = buildParsedFromOtto();
 
-    var parsed = parseInput(ta.value);
-
-    document.getElementById('ai-input-card').style.display = 'none';
+    document.getElementById('otto-qa-form').style.display = 'none';
+    var cfgCard = document.getElementById('otto-config-card');
+    if (cfgCard) cfgCard.style.display = 'none';
     document.getElementById('gen-card').classList.add('is-visible');
     document.getElementById('btn-continue').disabled = true;
     // prev-hd-sub-panel not updated — framework label stays throughout
@@ -1625,6 +1945,7 @@ body {
     // Preview-specific renders
     if (step === 1) renderHierarchy(selectedFw);
     if (step === 2) renderMethodPreview(selectedMethod);
+    if (step === 3) renderOttoQuestions();
     if (step === 4) { buildInvitePane(); renderInvitePreview(); }
 
     document.querySelector('.setup-wizard').scrollTop = 0;
@@ -1643,7 +1964,9 @@ body {
         genTimers.forEach(clearTimeout); genTimers = [];
         aiDone = false;
         document.getElementById('gen-card').classList.remove('is-visible');
-        document.getElementById('ai-input-card').style.display = '';
+        document.getElementById('otto-qa-form').style.display = '';
+        var cfgCard = document.getElementById('otto-config-card');
+        if (cfgCard) cfgCard.style.display = '';
         document.getElementById('gen-items').innerHTML = '';
         document.getElementById('gen-spinner').className = 'gen-spinner';
         // Reset ART preview
