@@ -1393,52 +1393,72 @@ body {
     var ps2 = document.querySelector('#pane-2 .pane-heading p');
     if (ml) ml.style.display = 'none';
     if (ph2) ph2.textContent = 'Tell us about your team';
-    // Explain WHY we ask what we ask — the rest is Scrum-prescribed
-    if (ps2) ps2.textContent = 'We need two things: who you are, and how big you are. Everything else — board columns, work items, ceremonies — comes with Scrum.';
+    if (ps2) ps2.textContent = 'Name your team, set its size, and choose your board columns and work item types. The preview updates as you make changes.';
 
     if (!sd) return;
     sd.style.display = '';
     var html = '';
 
-    // Q1: Team name — primary identity. The board is named after this.
+    // Q1: Team name — the board takes its name from here.
     html += ottoQCard('What is this team called?',
       '<input class="scrum-name-input" id="scrum-team-name-p2" type="text" value="' + (scrumState.teamName||'').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
 
-    // Q2: Team size — not decoration. Scrum recommends 3–9.
-    // >9 is a recognised anti-pattern (communication overhead grows, consider splitting).
-    var sizeOpts = ['3', '4', '5', '6', '7', '8', '9', '10+'];
+    // Q2: Team size. Scrum recommends 3–9. >9 is a documented anti-pattern.
+    var sizeOpts = ['3','4','5','6','7','8','9','10+'];
     html += ottoQCard('How many people are on the team?',
       ottoPillRow(sizeOpts, String(scrumState.teamSize || '6'), 'setScrumTeamCount') +
-      '<div class="otto-pill-help" id="help-scrum-size">Scrum works best with 3–9 people. Include the Product Owner and Scrum Master in this count.</div>');
+      '<div class="otto-pill-help" id="help-scrum-size">Include the Product Owner and Scrum Master. Scrum recommends 3–9 people total.</div>');
 
-    // Informational: what ships with every Scrum workspace (not selectable — Scrum defines these)
+    // Q3: Board columns (swimlanes). Scrum defaults pre-selected.
+    // In Review and Blocked are optional extras — not all teams need them.
+    var scrumColOpts = ['To Do', 'In Progress', 'In Review', 'Done', 'Blocked'];
+    html += ottoQCard('What are your board columns?',
+      '<div class="scrum-meta-chips">' +
+      scrumColOpts.map(function(st) {
+        var sel = scrumState.statuses.indexOf(st) >= 0;
+        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumStatus2(\'' + st + '\')" type="button">' + st + '</button>';
+      }).join('') + '</div>' +
+      '<div class="otto-pill-help">To Do → In Progress → Done is the standard Scrum board. Add In Review if code review is a distinct step for your team. Blocked is a visual flag, not a workflow stage.</div>');
+
+    // Q4: Work item types. Story is the primary Scrum work item.
+    // Task breaks stories down within a sprint. Spike is a time-boxed investigation.
+    var scrumItemOpts = ['Story', 'Task', 'Bug', 'Epic', 'Spike'];
+    html += ottoQCard('What types of work will this team track?',
+      '<div class="scrum-meta-chips">' +
+      scrumItemOpts.map(function(wt) {
+        var sel = scrumState.workTypes.indexOf(wt) >= 0;
+        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumWorkType(\'' + wt + '\')" type="button">' + wt + '</button>';
+      }).join('') + '</div>' +
+      '<div class="otto-pill-help">Story is your primary item — it represents user-facing value. Task breaks a story into sub-work within a sprint. Spike is for research that has no direct deliverable.</div>');
+
+    // Informational only: ceremonies are Scrum-prescribed, not configurable here.
     html += '<div class="otto-q-card" style="background:rgba(22,163,74,0.05);border-color:rgba(22,163,74,0.18);">' +
       '<div class="otto-q-hd"><div class="otto-q-icon">' + OTTO_Q_SVG + '</div>' +
-      '<span class="otto-q-label" style="color:var(--ai-accent-deep)">What comes with every Scrum workspace</span></div>' +
-      '<div style="display:flex;flex-direction:column;gap:8px;margin-top:2px;">' +
-      [['Board', 'To Do · In Progress · Done'], ['Work items', 'Story · Task · Bug'], ['Ceremonies', 'Planning · Daily Standup · Review · Retrospective']].map(function(r) {
-        return '<div style="display:flex;align-items:center;gap:10px;">' +
-          '<span style="font-size:11px;font-weight:500;color:var(--muted);min-width:72px;">' + r[0] + '</span>' +
-          '<span style="font-size:12.5px;color:var(--sub);">' + r[1] + '</span></div>';
+      '<span class="otto-q-label" style="color:var(--ai-accent-deep)">Ceremonies — included automatically</span></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">' +
+      ['Sprint Planning', 'Daily Standup', 'Sprint Review', 'Retrospective'].map(function(c) {
+        return '<span style="font-size:11.5px;font-weight:500;color:var(--sub);background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.18);border-radius:999px;padding:3px 10px;">' + c + '</span>';
       }).join('') +
-      '<div style="font-size:11px;color:var(--muted);margin-top:2px;">All of these are configurable in workspace settings after setup.</div>' +
+      '<div style="font-size:11px;color:var(--muted);width:100%;margin-top:4px;">All four ceremonies are created with your workspace. Cadence and duration are set in the next step.</div>' +
       '</div></div>';
 
     sd.innerHTML = html;
 
-    // Wire team name input
+    // Wire team name
     var tn = document.getElementById('scrum-team-name-p2');
     if (tn) tn.addEventListener('input', function() { scrumState.teamName = tn.value; updateScrumPreview(); });
 
-    // Wire size to show warning if >9
-    document.querySelectorAll('.otto-pill').forEach(function(p) {
-      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamCount') >= 0 && p.textContent === '10+') {
-        p.addEventListener('click', function() {
-          var h = document.getElementById('help-scrum-size');
-          if (h) h.innerHTML = '<span style="color:#D97706;font-weight:600;">⚠ Teams over 9 often struggle with communication overhead.</span> Scrum recommends splitting into two teams rather than growing one team larger.';
-        });
-      }
-    });
+    // Warn on >9
+    setTimeout(function() {
+      document.querySelectorAll('.otto-pill').forEach(function(p) {
+        if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamCount') >= 0 && p.textContent === '10+') {
+          p.addEventListener('click', function() {
+            var h = document.getElementById('help-scrum-size');
+            if (h) h.innerHTML = '<span style="color:#D97706;font-weight:600;">⚠ Teams over 9 struggle with coordination.</span> Scrum recommends splitting into two smaller teams rather than scaling one.';
+          });
+        }
+      });
+    }, 50);
 
     updateScrumPreview();
   }
@@ -1528,11 +1548,22 @@ body {
 
     var html = '';
 
-    // Step-2 confirmation: show what was decided (team name, size)
-    html += '<div style="background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.18);border-radius:11px;padding:12px 15px;display:flex;align-items:center;gap:10px;">' +
+    // Hide SAFe panels — they don't apply to Scrum
+    var ottoCfg = document.getElementById('otto-config-card');
+    if (ottoCfg) ottoCfg.style.display = 'none';
+    var artPh = document.getElementById('art-placeholder');
+    if (artPh) artPh.style.display = 'none';
+
+    // Step-2 confirmation: show what was chosen for this team
+    var colSummary = scrumState.statuses.join(' → ');
+    var itemSummary = scrumState.workTypes.join(' · ');
+    html += '<div style="background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.18);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ai-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-      '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">' + (scrumState.teamName || 'Scrum Team') + '</div>' +
-      '<div style="font-size:11px;color:var(--sub);margin-top:1px;">' + (scrumState.teamSize || '6') + ' people &nbsp;·&nbsp; Scrum</div></div>' +
+      '<span style="font-size:13px;font-weight:600;color:var(--ink);">' + (scrumState.teamName || 'Scrum Team') + '</span>' +
+      '<span style="font-size:11px;color:var(--muted);">' + (scrumState.teamSize || '6') + ' people</span></div>' +
+      '<div style="font-size:11.5px;color:var(--sub);">Board: ' + colSummary + '</div>' +
+      '<div style="font-size:11.5px;color:var(--sub);">Tracking: ' + itemSummary + '</div>' +
       '</div>';
 
     // Sprint length — THE key Scrum decision. Determines every ceremony date.
