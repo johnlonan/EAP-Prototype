@@ -1119,7 +1119,7 @@ body {
       phase1: 'Identifying <strong>team structure…</strong>',
       phase2: 'Mapping <strong>PI calendar…</strong>',
       phase3: 'Setting up <strong>integrations…</strong>',
-      doneMsg: '✓ <strong>ART configured.</strong> Review before saving',
+      doneMsg: '<strong>ART configured.</strong> Review before saving',
       doneLabel: function(p){ return (p.jiraKey ? p.jiraKey + ' ART' : 'Your ART'); },
       teamsLabel: 'Teams', piLabel: 'PI Calendar', connLabel: 'Integrations',
       hintText: 'Click any team name or date to edit'
@@ -1128,7 +1128,7 @@ body {
       phase1: 'Identifying <strong>ART structure…</strong>',
       phase2: 'Mapping <strong>Solution Train…</strong>',
       phase3: 'Building <strong>portfolio layer…</strong>',
-      doneMsg: '✓ <strong>Portfolio configured.</strong> Review before saving',
+      doneMsg: '<strong>Portfolio configured.</strong> Review before saving',
       doneLabel: function(){ return 'Multi-ART Portfolio'; },
       teamsLabel: 'ARTs', piLabel: 'PI Calendar', connLabel: 'Integrations',
       hintText: 'Click any ART name or date to edit'
@@ -1137,7 +1137,7 @@ body {
       phase1: 'Mapping <strong>value streams…</strong>',
       phase2: 'Configuring <strong>WIP limits…</strong>',
       phase3: 'Setting up <strong>flow metrics…</strong>',
-      doneMsg: '✓ <strong>Kanban board configured.</strong> Review before saving',
+      doneMsg: '<strong>Kanban board configured.</strong> Review before saving',
       doneLabel: function(){ return 'Lean Kanban Board'; },
       teamsLabel: 'Value Streams', piLabel: 'Flow Policy', connLabel: 'Integrations',
       hintText: 'Click any stream name to edit'
@@ -1146,7 +1146,7 @@ body {
       phase1: 'Creating <strong>blank workspace…</strong>',
       phase2: 'Preparing <strong>custom structure…</strong>',
       phase3: 'Finalising <strong>configuration…</strong>',
-      doneMsg: '✓ <strong>Workspace ready.</strong> Configure as you go',
+      doneMsg: '<strong>Workspace ready.</strong> Configure as you go',
       doneLabel: function(){ return 'Custom Workspace'; },
       teamsLabel: 'Structure', piLabel: 'Cadence', connLabel: 'Integrations',
       hintText: 'Tap any label to configure'
@@ -1271,6 +1271,15 @@ body {
   // ── Render invite preview ────────────────────────────────────────
   function renderInvitePreview() {
     var prev = document.getElementById('invite-preview');
+    if (!generatedTeams.length) {
+      prev.innerHTML =
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:32px 20px;text-align:center;">' +
+          '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#BBBBB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' +
+          '<div style="font-size:12.5px;font-weight:600;color:var(--sub);">No teams configured yet</div>' +
+          '<div style="font-size:11.5px;color:var(--muted);max-width:22ch;line-height:1.5;">Invite by email below or set up teams in workspace settings after setup.</div>' +
+        '</div>';
+      return;
+    }
     prev.innerHTML = generatedTeams.map(function(team) {
       return '<div style="background:var(--raised);border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;">' +
         '<div style="width:8px;height:8px;border-radius:50%;background:var(--charcoal);flex-shrink:0;"></div>' +
@@ -1284,16 +1293,36 @@ body {
   // ── Build invite pane ────────────────────────────────────────────
   function buildInvitePane() {
     var container = document.getElementById('invite-teams');
-    container.innerHTML = generatedTeams.map(function(team, i) {
+    var inputStyle = 'width:100%;border:1px solid #E1E0DD;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--raised);outline:none;transition:border-color 160ms;box-sizing:border-box;';
+    var focusIn  = "this.style.borderColor='rgba(56,55,51,0.32)';this.style.background='#fff'";
+    var focusOut = "this.style.borderColor='#E1E0DD';this.style.background='var(--raised)'";
+
+    if (!generatedTeams.length) {
+      // Blank framework: no teams yet — show two manual invite rows so the user can still send invites
+      var rows = ['Team 1', 'Team 2'].map(function(name) {
+        return '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<div style="font-size:13px;font-weight:600;color:var(--muted);">' + name + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-left:auto;font-style:italic;">Define in settings</div>' +
+          '</div>' +
+          '<input type="email" placeholder="Add email address…" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
+          '</div>';
+      }).join('');
+      container.innerHTML = rows +
+        '<div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;">Teams are set up in workspace settings. Invite collaborators now or skip this step.</div>' +
+        '<button style="font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;padding:2px 0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;">Skip for now</button>';
+      renderInvitePreview();
+      return;
+    }
+
+    container.innerHTML = generatedTeams.map(function(team) {
       return '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
         '<div style="display:flex;align-items:center;gap:8px;">' +
         '<div style="width:7px;height:7px;border-radius:50%;background:var(--charcoal);flex-shrink:0;"></div>' +
         '<div style="font-size:13px;font-weight:600;color:var(--ink);">' + team.name + '</div>' +
         '<div style="font-size:11px;color:var(--muted);margin-left:auto;">' + team.count + ' members</div>' +
         '</div>' +
-        '<input type="email" placeholder="Add email address…" style="width:100%;border:1px solid #E1E0DD;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--raised);outline:none;transition:border-color 160ms;" ' +
-        'onfocus="this.style.borderColor=\'rgba(56,55,51,0.32)\';this.style.background=\'#fff\'" ' +
-        'onblur="this.style.borderColor=\'#E1E0DD\';this.style.background=\'var(--raised)\'">' +
+        '<input type="email" placeholder="Add email address…" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
         '</div>';
     }).join('') +
     '<button style="font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;padding:2px 0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;">I\'ll invite people later</button>';
