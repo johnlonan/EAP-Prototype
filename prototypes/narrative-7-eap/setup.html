@@ -49,6 +49,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-bottom: 10px; /* lifts footer so its bottom corners are visible */
   background: transparent;
   border: none; box-shadow: none; border-radius: 0;
 }
@@ -307,11 +308,11 @@ body {
 .setup-footer {
   flex-shrink: 0;
   background: var(--surface);
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -2px 12px rgba(0,0,0,0.06), 0 -1px 3px rgba(0,0,0,0.04);
+  border-radius: 16px; /* all four corners — bottom radius visible since content-viewport has padding-bottom */
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.04);
   padding: 14px 24px;
   display: flex; align-items: center; gap: 10px;
-  border-top: 1px solid rgba(0,0,0,0.06);
+  margin: 0 0 0 0;
 }
 .btn-back { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background 140ms, color 140ms; visibility: hidden; }
 .btn-back:hover { background: var(--raised); color: var(--ink); }
@@ -335,15 +336,15 @@ body {
   display: flex; flex-direction: column;
   background: #E1E0DD;
   overflow: hidden;
-  padding: 12px 14px 0 0; /* top + right breathing room; no left (separator already there); no bottom (footer provides its own) */
+  padding: 0 14px 8px 0; /* no top gap; 14px right; 8px bottom gap before footer; no left (border serves as separator) */
 }
 .preview-card {
   flex: 1; display: flex; flex-direction: column;
   background: #FFFFFF;
-  border-radius: 14px 14px 0 0; /* rounds top two corners — bottom flush with footer */
+  border-radius: 14px; /* all four corners — top flush with chrome border-bottom, bottom sits 8px above footer */
   overflow: hidden;
   min-height: 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
 }
 
 .prev-hd {
@@ -426,7 +427,7 @@ body {
 .method-prev-sub { font-size: 13px; color: var(--sub); line-height: 1.55; }
 .method-prev-items { display: flex; flex-direction: column; gap: 8px; }
 .method-prev-item {
-  display: flex; align-items: flex-start; gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; background: var(--raised); border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.05);
   animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
@@ -436,7 +437,7 @@ body {
 .method-prev-item:nth-child(3) { animation-delay: 150ms; }
 .method-prev-item:nth-child(4) { animation-delay: 210ms; }
 .method-prev-item:nth-child(5) { animation-delay: 270ms; }
-.mpi-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; display: inline-flex; align-items: center; justify-content: center; width: 16px; color: var(--sub); }
+.mpi-icon { font-size: 14px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 16px; color: var(--sub); }
 .mpi-body { flex: 1; }
 .mpi-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
 .mpi-note { font-size: 11px; color: var(--sub); line-height: 1.45; }
@@ -515,7 +516,7 @@ body {
 .conn-note { font-size: 11px; color: var(--ai-accent-deep); font-weight: 600; }
 
 /* Placeholder state (before generation) */
-.art-placeholder { display: flex; flex-direction: column; gap: 16px; opacity: 0.45; pointer-events: none; }
+.art-placeholder { display: flex; flex-direction: column; gap: 16px; opacity: 0.70; pointer-events: none; }
 .placeholder-row { height: 60px; background: var(--surface); border-radius: 12px; border: 1px solid rgba(0,0,0,0.09); }
 .placeholder-label { font-size: 11px; color: var(--muted); text-align: center; padding-top: 8px; }
 
