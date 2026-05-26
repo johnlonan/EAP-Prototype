@@ -1361,8 +1361,11 @@ body {
   var DEL_SVG  = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>';
   var PLUS_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>';
 
-  var ALL_SCRUM_WORK_TYPES = ['Epic', 'Story', 'Task', 'Bug', 'Sub-task'];
-  var ALL_SCRUM_STATUSES   = ['To Do', 'In Progress', 'In Review', 'Done', 'Blocked', 'Cancelled'];
+  // Work item types available for Scrum boards.
+  // Sub-task omitted — it's a child item created from within Tasks, not a standalone board type.
+  var ALL_SCRUM_WORK_TYPES = ['Epic', 'Story', 'Task', 'Bug', 'Feature'];
+  // Workflow statuses. Cancelled omitted — it's an item-level status, not a board column in Scrum.
+  var ALL_SCRUM_STATUSES   = ['To Do', 'In Progress', 'In Review', 'Done', 'Blocked'];
 
   function renderScrumDetail() {
     var ml = document.getElementById('method-list-section');
@@ -1383,32 +1386,37 @@ body {
     html += ottoQCard('What is this team called?',
       '<input class="scrum-name-input" id="scrum-team-name-p2" type="text" value="' + (scrumState.teamName||'').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
 
-    // 2. Work item types — multi-select
-    html += ottoQCard('Which work item types do you need?',
+    // 2. Work item types — what the team tracks on the board
+    var wtDesc = { Epic: 'Large feature or goal — contains Stories', Story: 'User-facing work — the most common board item', Task: 'Technical or operational work item', Bug: 'Defect to investigate and resolve', Feature: 'Product capability spanning multiple stories' };
+    html += ottoQCard('What types of work will this team track?',
       '<div class="scrum-meta-chips">' +
       ALL_SCRUM_WORK_TYPES.map(function(wt) {
         var sel = scrumState.workTypes.indexOf(wt) >= 0;
-        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumWorkType(\'' + wt + '\')" type="button">' + wt + '</button>';
+        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumWorkType(\'' + wt + '\')" title="' + (wtDesc[wt]||wt) + '" type="button">' + wt + '</button>';
       }).join('') +
-      '</div>');
+      '</div>' +
+      '<div class="otto-pill-help">Story and Task are selected for most teams. Add Bug if you manage defects here.</div>');
 
-    // 3. Board columns — multi-select; note about order
-    html += ottoQCard('What are your board columns?',
+    // 3. Workflow stages — left to right on the board
+    html += ottoQCard('What stages does work move through?',
       '<div class="scrum-meta-chips">' +
       ALL_SCRUM_STATUSES.map(function(st) {
         var sel = scrumState.statuses.indexOf(st) >= 0;
         return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumStatus2(\'' + st + '\')" type="button">' + st + '</button>';
       }).join('') +
       '</div>' +
-      '<div class="otto-pill-help">Selected columns appear left to right on your board. At least one required.</div>');
+      '<div class="otto-pill-help">Each stage becomes a column on your board, left to right. Keep it simple — 3 to 5 stages works best for most teams.</div>');
 
-    // 4. Views — multi-select
-    html += ottoQCard('Which views do you want?',
+    // 4. Views — what the team needs access to
+    var viewDesc = { board: 'Kanban-style board — work in flight', backlog: 'Ordered list of planned work and sprint items', timeline: 'Roadmap and sprint calendar view', reports: 'Velocity charts, burndown, and sprint history' };
+    html += ottoQCard('Which views does your team need?',
       '<div class="scrum-view-chips">' +
       SCRUM_VIEW_OPTIONS.map(function(v) {
         var active = scrumState.views.indexOf(v.key) >= 0;
-        return '<button class="scrum-view-chip' + (active ? ' ssel' : '') + '" onclick="toggleScrumView(\'' + v.key + '\')" type="button">' + v.label + '</button>';
-      }).join('') + '</div>');
+        return '<button class="scrum-view-chip' + (active ? ' ssel' : '') + '" onclick="toggleScrumView(\'' + v.key + '\')" title="' + (viewDesc[v.key]||v.label) + '" type="button">' + v.label + '</button>';
+      }).join('') +
+      '</div>' +
+      '<div class="otto-pill-help">Board and Backlog are standard for all Scrum teams. Add Timeline for roadmap planning and Reports for retrospectives.</div>');
 
     // 5. Feature overview — purely informational, collapsed at bottom
     html += '<div class="scrum-feature-card" style="opacity:0.8">' +
@@ -1444,12 +1452,11 @@ body {
             '</div>';
         }).join('') +
         '</div>' +
-        '<div style="font-size:11px;color:var(--muted);line-height:1.5;">' +
-          '<strong style="color:var(--sub)">Work items:</strong> ' + (scrumState.workTypes.join(' · ') || 'None selected') +
-        '</div>' +
-        '<div style="font-size:11px;color:var(--muted);">' +
-          '<strong style="color:var(--sub)">Views:</strong> ' + scrumState.views.map(function(k) { return k.charAt(0).toUpperCase()+k.slice(1); }).join(' · ') +
-        '</div>' +
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">' +
+        scrumState.workTypes.map(function(wt) {
+          return '<span style="font-size:10px;font-weight:500;color:var(--muted);background:var(--raised);border:1px solid rgba(0,0,0,0.09);border-radius:999px;padding:2px 8px;">' + wt + '</span>';
+        }).join('') +
+      '</div>' +
       '</div>';
   }
 
