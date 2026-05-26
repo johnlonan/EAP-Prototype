@@ -1248,8 +1248,7 @@ body {
   // ── Render method preview ────────────────────────────────────────
   function renderMethodPreview(method) {
     var data = methodData[method] || methodData.ai;
-    var _pm = document.getElementById('prev-hd-sub-panel');
-    if (_pm) _pm.textContent = data.title;
+    // prev-hd-sub-panel intentionally not updated here — framework label stays throughout
     var container = document.getElementById('method-detail');
     container.innerHTML = '<div class="method-prev-card">' +
       '<div class="method-prev-icon">' + data.icon + '</div>' +
@@ -1486,8 +1485,7 @@ body {
     document.getElementById('ai-input-card').style.display = 'none';
     document.getElementById('gen-card').classList.add('is-visible');
     document.getElementById('btn-continue').disabled = true;
-    var _p = document.getElementById('prev-hd-sub-panel');
-    if (_p) _p.textContent = 'Configuring…';
+    // prev-hd-sub-panel not updated — framework label stays throughout
 
     // Start progressive preview in right panel
     buildArtPreview(parsed);
@@ -1556,8 +1554,7 @@ body {
 
     genTimers.push(setTimeout(function() {
       document.getElementById('gen-spinner').className = 'gen-spinner done';
-      var _p2 = document.getElementById('prev-hd-sub-panel');
-      if (_p2) _p2.textContent = prof.doneLabel(parsed);
+      // prev-hd-sub-panel not updated — framework label stays throughout
       aiDone = true;
       var btn = document.getElementById('btn-continue');
       btn.disabled = false;
