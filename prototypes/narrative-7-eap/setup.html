@@ -334,17 +334,17 @@ body {
 .setup-preview {
   flex: 1; min-width: 0;
   display: flex; flex-direction: column;
-  background: transparent; /* page bg shows through any gap — no visible colour strip */
+  background: transparent;
   overflow: hidden;
-  padding: 12px 14px 12px 0; /* 12px top gap from chrome; 14px right; 12px bottom gap before footer */
+  padding: 12px 14px 12px 10px; /* 10px left gives the card shadow room on that edge */
 }
 .preview-card {
   flex: 1; display: flex; flex-direction: column;
-  background: #F1F0ED; /* Sand page-bg — white cards inside read as elevated surfaces */
+  background: #E1E0DD; /* Sand/200 — canonical Sand page-bg; one step darker */
   border-radius: 14px;
   overflow: hidden;
   min-height: 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+  box-shadow: -3px 0 10px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.07), 0 4px 20px rgba(0,0,0,0.07);
 }
 
 .prev-hd {
@@ -361,6 +361,7 @@ body {
 .prev-hd-sub {
   font-size: 13px; font-weight: 600; color: var(--ink);
   transition: opacity 200ms ease;
+  margin-left: auto; /* push to right — balances 'LIVE PREVIEW' label on the left */
 }
 
 .prev-scroll {
