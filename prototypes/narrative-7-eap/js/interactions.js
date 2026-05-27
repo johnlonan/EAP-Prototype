@@ -65,16 +65,19 @@ EAP.buildContextTree = function(query) {
     var spacesBadge = '';
     if (type === 'team' && spaceIds && spaceIds.length && !ql) {
       var expanded = EAP._spacesExpanded[id];
-      // Lucide chevron-right, rotated 90deg when expanded
       var chevSvg = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"' +
         (expanded ? ' style="transform:rotate(90deg);transition:transform 150ms ease;"' : ' style="transition:transform 150ms ease;"') +
         '><polyline points="9 18 15 12 9 6"></polyline></svg>';
+      // When the row is active (dark bg), flip badge to white-on-dark so it stays visible
+      var badgeBg     = isActive ? 'rgba(255,255,255,0.16)' : 'rgba(99,102,241,0.10)';
+      var badgeColor  = isActive ? 'rgba(255,255,255,0.90)' : '#4338CA';
+      var badgeBorder = isActive ? 'rgba(255,255,255,0.28)' : 'rgba(99,102,241,0.20)';
       spacesBadge =
         '<span class="ctx-spaces-toggle" data-team-id="' + id + '" ' +
         'style="display:inline-flex;align-items:center;gap:4px;' +
         'font-size:10px;padding:2px 6px 2px 8px;border-radius:10px;' +
-        'background:rgba(99,102,241,0.10);color:#4338CA;' +
-        'border:1px solid rgba(99,102,241,0.20);' +
+        'background:' + badgeBg + ';color:' + badgeColor + ';' +
+        'border:1px solid ' + badgeBorder + ';' +
         'cursor:pointer;flex-shrink:0;white-space:nowrap;' +
         'transition:background 120ms ease;letter-spacing:0.01em;">' +
         spaceIds.length + ' space' + (spaceIds.length > 1 ? 's' : '') +

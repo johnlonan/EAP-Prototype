@@ -332,8 +332,9 @@ EAP.renderContent = function() {
     el.innerHTML = h;
     el.classList.remove('tab-enter'); void el.offsetWidth; el.classList.add('tab-enter');
     // Wire interactive elements post-render
-    if (s.tab === 'docs'  && EAP.wireSpaceDocClicks)   EAP.wireSpaceDocClicks();
-    if (s.tab === 'list'  && EAP.wireSpaceListFilters) EAP.wireSpaceListFilters();
+    if (s.tab === 'docs' && EAP.wireSpaceDocClicks)    EAP.wireSpaceDocClicks();
+    if (s.tab === 'list' && EAP.wireSpaceListFilters)  EAP.wireSpaceListFilters();
+    if (s.tab === 'list' && EAP.pgWire)                EAP.pgWire();
     return;
   }
 

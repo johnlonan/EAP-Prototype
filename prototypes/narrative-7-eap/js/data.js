@@ -1383,7 +1383,17 @@ EAP.spaces = {
         { id: 'b17', bug: 'Stale session check fails under 200ms latency conditions',                   severity: 'Medium',   component: 'Session Mgmt',  owner: 'James',  status: 'Open',        logged: 'May 13' },
         { id: 'b18', bug: 'Session timeout warning not shown on mobile web',                            severity: 'Low',      component: 'Session Mgmt',  owner: 'Kiran',  status: 'Open',        logged: 'May 22' },
         { id: 'b19', bug: 'Concurrent login detection sends duplicate push notifications',              severity: 'Low',      component: 'Auth Service',  owner: 'Sana',   status: 'Open',        logged: 'May 18' },
-        { id: 'b20', bug: 'Login page flashes briefly on successful biometric auth (iOS)',              severity: 'Low',      component: 'Mobile Auth',   owner: 'Sana',   status: 'Open',        logged: 'May 20' }
+        { id: 'b20', bug: 'Login page flashes briefly on successful biometric auth (iOS)',              severity: 'Low',      component: 'Mobile Auth',   owner: 'Sana',   status: 'Open',        logged: 'May 20' },
+        { id: 'b21', bug: 'Refresh token rotation not triggered on concurrent requests',                severity: 'Critical', component: 'Auth Service',  owner: 'James',  status: 'Open',        logged: 'May 27' },
+        { id: 'b22', bug: 'Device fingerprint mismatch on OS upgrade invalidates active sessions',      severity: 'High',     component: 'Session Mgmt',  owner: 'Kiran',  status: 'Open',        logged: 'May 26' },
+        { id: 'b23', bug: 'Silent token renewal fails when third-party cookies are blocked',            severity: 'High',     component: 'OAuth',         owner: 'James',  status: 'In Progress', logged: 'May 25' },
+        { id: 'b24', bug: 'Auth service health check endpoint leaks internal stack trace on 500',       severity: 'High',     component: 'Auth Service',  owner: 'Kiran',  status: 'In Review',   logged: 'May 24' },
+        { id: 'b25', bug: 'SAML assertion replay attack possible — missing NotOnOrAfter enforcement',   severity: 'Critical', component: 'SSO',           owner: 'Sana',   status: 'Open',        logged: 'May 23' },
+        { id: 'b26', bug: 'Passkey registration fails when user has existing TOTP enrolled',            severity: 'Medium',   component: 'MFA',           owner: 'Sana',   status: 'Open',        logged: 'May 22' },
+        { id: 'b27', bug: 'Auth token cache not invalidated after password change',                     severity: 'High',     component: 'Auth Service',  owner: 'James',  status: 'Done',        logged: 'May 10' },
+        { id: 'b28', bug: 'OAuth implicit grant still accessible despite deprecation policy',           severity: 'Medium',   component: 'OAuth',         owner: 'James',  status: 'In Review',   logged: 'May 21' },
+        { id: 'b29', bug: 'Account lockout not applied to passwordless login attempts',                 severity: 'Medium',   component: 'Auth Service',  owner: 'Kiran',  status: 'Open',        logged: 'May 19' },
+        { id: 'b30', bug: 'WebAuthn credential ID stored unencrypted in local storage',                 severity: 'High',     component: 'Mobile Auth',   owner: 'Sana',   status: 'Open',        logged: 'May 27' }
       ]
     }
   },

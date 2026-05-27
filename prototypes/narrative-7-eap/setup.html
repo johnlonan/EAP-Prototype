@@ -979,14 +979,6 @@ body {
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <div class="method-card" data-method="import" tabindex="0" role="radio" aria-checked="false">
-              <div class="method-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-              <div class="method-info">
-                <div class="method-name">Import from Jira or Rally</div>
-                <div class="method-desc">Connect your project and we map your epics, stories, and sprints to the hierarchy. Review the mapping before anything is imported.</div>
-              </div>
-              <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            </div>
           </div>
 
           <!-- Scrum template detail — shown instead of method cards when Scrum is selected -->
@@ -1068,7 +1060,7 @@ body {
         <section class="setup-pane" id="pane-4">
           <div class="pane-heading">
             <h1 class="pane-title">Invite your team</h1>
-            <p class="pane-sub">Add email addresses for each team. You can import from Jira or add more members in Settings after setup.</p>
+            <p class="pane-sub">Add team members. You can add more or adjust roles in Settings after setup.</p>
           </div>
           <div id="invite-teams" style="display:flex;flex-direction:column;gap:10px;">
             <!-- populated by JS from generated teams -->
@@ -1207,7 +1199,6 @@ body {
             <div class="readiness-checklist">
               <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">4 teams configured</div><div class="ci-note">Auth · Payments · Mobile · Data &amp; Analytics</div></div></div>
               <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">PI 26 scheduled</div><div class="ci-note">Jun 2 – Aug 10 · Sprint 2 active</div></div></div>
-              <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">47 features from Jira</div><div class="ci-note">DBKG project connected · features mapped</div></div></div>
               <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">PI Planning session not scheduled</div><div class="ci-note">Add PI Planning to the team calendar before Sprint 4</div></div></div>
               <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">Team capacity not set for Sprint 1</div><div class="ci-note">Needed for accurate velocity forecasting</div></div></div>
             </div>
@@ -1881,10 +1872,10 @@ body {
 
     // Update placeholder labels to match framework language
     var plabelMap = {
-      essential: ['Teams', 'PI Calendar', 'Integrations'],
-      portfolio: ['ARTs', 'PI Calendar', 'Integrations'],
-      kanban:    ['Value Streams', 'Flow Policy', 'Integrations'],
-      blank:     ['Teams', 'Cadence', 'Integrations']
+      essential: ['Teams', 'PI Calendar', 'Configuration'],
+      portfolio: ['ARTs', 'PI Calendar', 'Configuration'],
+      kanban:    ['Value Streams', 'Flow Policy', 'Configuration'],
+      blank:     ['Teams', 'Cadence', 'Configuration']
     };
     var plabels = plabelMap[fw] || plabelMap.essential;
     ['plabel-teams','plabel-pi','plabel-conn'].forEach(function(id, i) {
@@ -2195,10 +2186,10 @@ body {
     essential: {
       phase1: 'Identifying <strong>team structure…</strong>',
       phase2: 'Mapping <strong>PI calendar…</strong>',
-      phase3: 'Setting up <strong>integrations…</strong>',
+      phase3: 'Finalising <strong>configuration…</strong>',
       doneMsg: '<strong>ART configured.</strong> Review before saving',
-      doneLabel: function(p){ return (p.jiraKey ? p.jiraKey + ' ART' : 'Your ART'); },
-      teamsLabel: 'Teams', piLabel: 'PI Calendar', connLabel: 'Integrations',
+      doneLabel: function(){ return 'Your ART'; },
+      teamsLabel: 'Teams', piLabel: 'PI Calendar', connLabel: 'Configuration',
       hintText: 'Click any team name or date to edit'
     },
     portfolio: {
@@ -2207,7 +2198,7 @@ body {
       phase3: 'Building <strong>portfolio layer…</strong>',
       doneMsg: '<strong>Portfolio configured.</strong> Review before saving',
       doneLabel: function(){ return 'Multi-ART Portfolio'; },
-      teamsLabel: 'ARTs', piLabel: 'PI Calendar', connLabel: 'Integrations',
+      teamsLabel: 'ARTs', piLabel: 'PI Calendar', connLabel: 'Configuration',
       hintText: 'Click any ART name or date to edit'
     },
     kanban: {
@@ -2216,7 +2207,7 @@ body {
       phase3: 'Setting up <strong>flow metrics…</strong>',
       doneMsg: '<strong>Kanban board configured.</strong> Review before saving',
       doneLabel: function(){ return 'Lean Kanban Board'; },
-      teamsLabel: 'Value Streams', piLabel: 'Flow Policy', connLabel: 'Integrations',
+      teamsLabel: 'Value Streams', piLabel: 'Flow Policy', connLabel: 'Configuration',
       hintText: 'Click any stream name to edit'
     },
     scrum: {
@@ -2234,7 +2225,7 @@ body {
       phase3: 'Finalising <strong>configuration…</strong>',
       doneMsg: '<strong>Workspace ready.</strong> Configure as you go',
       doneLabel: function(){ return 'Custom Workspace'; },
-      teamsLabel: 'Structure', piLabel: 'Cadence', connLabel: 'Integrations',
+      teamsLabel: 'Structure', piLabel: 'Cadence', connLabel: 'Configuration',
       hintText: 'Tap any label to configure'
     }
   };
@@ -2248,8 +2239,6 @@ body {
       items: [
         { icon: icon(IC.users),  name: 'Teams', note: 'Names, sizes, and sprint calendars for each team' },
         { icon: icon(IC.cal),    name: 'PI Calendar', note: 'PI dates, sprint boundaries, and IP sprint for the next 4 PIs' },
-        { icon: icon(IC.jira),   name: 'Jira Integration', note: 'Maps your Jira epics and stories to the SAFe hierarchy' },
-        { icon: icon(IC.msg),    name: 'Slack notifications', note: 'ART-level channel connected for sprint and PI updates' },
         { icon: icon(IC.pencil), name: 'Everything editable', note: 'Click any field in the preview to rename or adjust' }
       ]
     },
@@ -2266,25 +2255,26 @@ body {
     },
     import: {
       icon: icon(IC.download, 28),
-      title: 'Jira import mapping',
-      sub: 'We read your Jira project and map the existing hierarchy to your structure. Review before importing.',
+      title: 'Data import',
+      sub: 'Bring in existing work items from a spreadsheet or CSV. Review the mapping before anything is imported.',
       items: [
-        { icon: icon(IC.arrowR), name: 'Jira Epic → Feature', note: 'Preserves titles, descriptions, and assignments' },
-        { icon: icon(IC.arrowR), name: 'Jira Story → Story', note: 'Story points, status, and sprint history carried over' },
-        { icon: icon(IC.arrowR), name: 'Jira Sprint → Sprint', note: 'Sprint dates and team assignment mapped automatically' },
-        { icon: icon(IC.warn),   name: 'Custom fields reviewed', note: 'You confirm how custom fields map before importing' },
+        { icon: icon(IC.arrowR), name: 'Epics → Features', note: 'Titles, descriptions, and owners carried over' },
+        { icon: icon(IC.arrowR), name: 'Stories', note: 'Estimates, status, and sprint history mapped automatically' },
+        { icon: icon(IC.warn),   name: 'Review before import', note: 'You confirm how fields map before anything is saved' },
         { icon: icon(IC.undo),   name: 'Bulk undo available', note: 'One click removes the entire import if something looks wrong' }
       ]
     }
   };
 
   // ── Render hierarchy diagram ─────────────────────────────────────
-  function renderHierarchy(fw) {
+  // targetId: optional — defaults to 'hier-diagram' (step 1, prev-p1).
+  // Pass 'method-detail' for step-2 renders (prev-p2) to avoid writing into a hidden pane.
+  function renderHierarchy(fw, targetId) {
     var data = fwData[fw] || fwData.essential;
     var panelSub = document.getElementById('prev-hd-sub-panel');
     if (panelSub) panelSub.textContent = data.label;
     updateStepperLabels(fw);
-    var diag = document.getElementById('hier-diagram');
+    var diag = document.getElementById(targetId || 'hier-diagram');
     if (!diag) return;
 
     // Render synchronously — no opacity fade, no setTimeout.
@@ -2314,25 +2304,27 @@ body {
     diag.style.opacity = '1';
     diag.style.transition = '';
 
-    // Auto-configured section
-    var acData = autoConfigData[fw] || autoConfigData.essential;
-    var acEl = document.getElementById('auto-config-section');
-    if (acEl) {
-      acEl.innerHTML =
-        '<div class="auto-config-hd">' +
-          '<span class="auto-config-label">Auto-configured</span>' +
-          '<span class="auto-config-ai-tag">AI</span>' +
-        '</div>' +
-        '<div class="auto-config-rows">' +
-        acData.map(function(row, i) {
-          return '<div class="auto-config-row" style="animation-delay:' + (360 + i * 55) + 'ms">' +
-            '<span class="acr-key">' + row.key + '</span>' +
-            '<span class="acr-val">' + row.val + '</span>' +
-            '</div>';
-        }).join('') +
-        '</div>';
-      var legend = document.getElementById('hier-legend');
-      if (legend) legend.style.display = '';
+    // Auto-configured section and legend — only relevant when rendering into step-1 pane
+    if (!targetId || targetId === 'hier-diagram') {
+      var acData = autoConfigData[fw] || autoConfigData.essential;
+      var acEl = document.getElementById('auto-config-section');
+      if (acEl) {
+        acEl.innerHTML =
+          '<div class="auto-config-hd">' +
+            '<span class="auto-config-label">Auto-configured</span>' +
+            '<span class="auto-config-ai-tag">AI</span>' +
+          '</div>' +
+          '<div class="auto-config-rows">' +
+          acData.map(function(row, i) {
+            return '<div class="auto-config-row" style="animation-delay:' + (360 + i * 55) + 'ms">' +
+              '<span class="acr-key">' + row.key + '</span>' +
+              '<span class="acr-val">' + row.val + '</span>' +
+              '</div>';
+          }).join('') +
+          '</div>';
+        var legend = document.getElementById('hier-legend');
+        if (legend) legend.style.display = '';
+      }
     }
   }
 
@@ -2603,8 +2595,8 @@ body {
     var startEl = document.getElementById('art-pi-start');
     if (startEl) startEl.addEventListener('input', function() { ottoState.piStart = startEl.value; });
 
-    // Right panel: show SAFe hierarchy diagram
-    renderHierarchy('essential');
+    // Right panel at step 2: write into method-detail (prev-p2), not hier-diagram (prev-p1)
+    renderHierarchy('essential', 'method-detail');
   }
 
   function renderPortfolioIdentity() {
@@ -2641,7 +2633,8 @@ body {
 
     ml.innerHTML = html;
 
-    renderHierarchy('portfolio');
+    // Right panel at step 2: write into method-detail (prev-p2), not hier-diagram (prev-p1)
+    renderHierarchy('portfolio', 'method-detail');
   }
 
   function buildScrumRolesPane(container) {
