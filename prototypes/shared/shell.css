@@ -95,7 +95,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 12px 0 20px;
   z-index: 10;
   box-sizing: border-box;
 }
@@ -123,17 +123,11 @@ body {
 }
 
 #left-nav .app-badge {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: #003B54;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
   user-select: none;
   flex-shrink: 0;
 }

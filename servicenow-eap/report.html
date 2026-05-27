@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ServiceNow EAP — Competitive Analysis</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #111;
+    background: #f5f4f1;
+    padding: 32px 16px;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 48px 56px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  }
+  h1 { font-size: 26px; font-weight: 700; margin-bottom: 12px; color: #111; }
+  h2 { font-size: 20px; font-weight: 600; margin-top: 40px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #e5e5e2; color: #111; }
+  h3 { font-size: 14px; font-weight: 600; margin-top: 24px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; color: #797874; }
+  p { margin-bottom: 12px; color: #333; }
+  blockquote {
+    border-left: 3px solid #ccc;
+    padding: 8px 16px;
+    margin: 16px 0;
+    background: #f8f7f4;
+    border-radius: 0 4px 4px 0;
+    color: #555;
+    font-size: 13px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  th {
+    background: #f1f0ed;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 2px solid #e1e0dd;
+    color: #585753;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0efec;
+    vertical-align: top;
+  }
+  tr:hover td { background: #fafaf8; }
+  a { color: #1a6e3c; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: #f1f0ed; padding: 2px 5px; border-radius: 3px; font-size: 12px; font-family: ui-monospace, monospace; }
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 4px; color: #333; }
+  strong { font-weight: 600; color: #111; }
+  hr { border: none; border-top: 1px solid #e5e5e2; margin: 40px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+<h1 id="servicenow-eap-competitive-analysis-report">ServiceNow EAP — Competitive Analysis Report</h1>
+<blockquote>
+<p><strong>Research focus:</strong> Why ServiceNow EAP is not a market leader and what it needs to become a full solution — with emphasis on team-member daily experience and execution gaps.
+<strong>Date:</strong> 2026-05-20 | <strong>Items researched:</strong> 18 | <strong>Fields per item:</strong> 24</p>
+</blockquote>
+<h2 id="table-of-contents">Table of Contents</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Tool</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="#servicenow-cwm-collaborative-work-management">ServiceNow CWM (Collaborative Work Management)</a></td>
+<td>🔴 Critical</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="#servicenow-eap">ServiceNow EAP</a></td>
+<td>🔴 Critical</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="#azure-devops">Azure DevOps</a></td>
+<td>🟠 High</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="#gitlab">GitLab</a></td>
+<td>🟠 High</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="#jira-jira-align">Jira + Jira Align</a></td>
+<td>🟠 High</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="#linear">Linear</a></td>
+<td>🟠 High</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="#aha">Aha!</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a href="#asana-asana-intelligence">Asana / Asana Intelligence</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>9</td>
+<td><a href="#clickup">ClickUp</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="#monday-dev">Monday Dev</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="#planview-leankit">Planview / LeanKit</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a href="#productboard">Productboard</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="#rally-broadcom">Rally (Broadcom)</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="#shortcut-formerly-clubhouse">Shortcut (formerly Clubhouse)</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="#targetprocess-ibmapptio">Targetprocess (IBM/Apptio)</a></td>
+<td>🟡 Medium</td>
+</tr>
+<tr>
+<td>16</td>
+<td><a href="#height">Height</a></td>
+<td>🔵 Low</td>
+</tr>
+<tr>
+<td>17</td>
+<td><a href="#notion-notion-projects">Notion / Notion Projects</a></td>
+<td>🔵 Low</td>
+</tr>
+<tr>
+<td>18</td>
+<td><a href="#plane-open-source">Plane (open-source)</a></td>
+<td>🔵 Low</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="servicenow-eap-consolidated-gap-analysis">ServiceNow EAP — Consolidated Gap Analysis</h2>
+<p><em>What the research says EAP must build to become a full solution.</em></p>
+<h3 id="servicenow-cwm-collaborative-work-management">ServiceNow CWM (Collaborative Work Management)</h3>
+<p><strong>What EAP must build:</strong></p>
+<p>Prioritised by impact-to-effort for the CWM execution layer specifically: (1) Cmd+K command palette in CWM Workspace with status/assignment/navigation/Now-Assist invocation — fastest perceptible parity. (2) Native VCS state on CWM story cards (PR open → status; merge → close) using DevOps Change Velocity plumbing. (3) Ship sprint velocity, burndown and CFD as GA in H2 2026 with quality matching Jira out-of-the-box reports. (4) IDE plugin (VS Code + JetBrains) showing assigned CWM stories. (5) Native mobile experience for CWM Boards: drag-to-status, comment, time log, daily stand-up summary. (6) Named autonomous CWM agents (Sprint Triage, Backlog Groomer, Story Decomposer, Acceptance-Criteria Generator) exposed via MCP and Rovo-Studio-equivalent no-code builder. (7) Turnkey Agile 2.0 → CWM data migration tooling with confidence indicators, not partner-led services. (8) Story-level WIP enforcement and Definition-of-Done checklists as first-class primitives on Boards. (9) Live co-editing on Board cards and Sprint Planning views (Collaborative Docs primitive extended to cards). (10) GitHub/GitLab/Bitbucket Marketplace listings for CWM, mirroring the GitHub-for-Jira app pattern. (11) Sub-hour self-serve onboarding for a single CWM team (no admin/PS dependency). (12) Customer-signal ingestion: CSM case → CWM Space backlog with AI clustering and prioritisation.</p>
+<p><strong>Gaps vs. market leader:</strong></p>
+<p>Concrete gaps versus Jira (market share leader) and Linear (team-experience leader): (1) No command palette / sub-100ms keyboard UX. (2) No native VCS sync at story-card level (PR↔status state machine). (3) No IDE plugins for VS Code / JetBrains. (4) No local-first / sub-100ms board interactions. (5) Sprint velocity and burndown not GA until H2 2026 — operational showstopper for scrum teams today. (6) No flow metrics (lead time, cycle time, CFD) first-class. (7) No meaningful native mobile sprint-board parity. (8) Limited named autonomous agents inside CWM (versus Rovo Studio in Jira, mcp.linear.app in Linear). (9) Marketplace ecosystem 30-50x smaller than Atlassian's. (10) No customer-signal ingestion pipeline. (11) Migration from Agile 2.0 is replatforming, not upgrade. (12) Cultural / developer-mindshare gap — CWM is unknown outside the ServiceNow customer base.</p>
+<h3 id="servicenow-eap">ServiceNow EAP</h3>
+<p><strong>What EAP must build:</strong></p>
+<p>Prioritised by impact-to-effort: (1) Command palette (Cmd+K) across SPW with status, assignment, navigation and Now Assist invocation — fastest visible parity win. (2) Native PR/branch/commit affordances on Feature and Story cards via DevOps Change Velocity, with automatic status transitions (PR open → Code Review; merge → Done). (3) Sprint board parity with Jira/Linear: drag-to-status, inline edit, story-point estimation, WIP enforcement — likely lives in CWM but must be EAP-aware. (4) Resolve overlapping-sprints-under-one-PI constraint to make heterogeneous-cadence ARTs viable. (5) First-class EAP MCP endpoint + named EAP agents (PI Planner agent, WSJF Recompute agent, Dependency Triage agent) usable from Claude/Cursor — matches Atlassian Rovo Studio. (6) IDE plugin (VS Code + JetBrains) showing assigned stories with status changes. (7) Native bi-directional Jira↔EAP sync including sprints, not interim two-step. (8) Mobile parity for daily stand-up: sprint board view, status changes, comments. (9) Live co-editing on PI Board and Planning Calendar (Collaborative Docs primitive extended into EAP). (10) Customer-signal ingestion: ITSM/CSM ticket → Feature backlog with AI clustering. (11) First-class flow metrics (lead time, cycle time, CFD, throughput) without Performance Analytics dependency. (12) Self-serve onboarding template library and a sub-hour first-PI path for new ARTs.</p>
+<p><strong>Gaps vs. market leader:</strong></p>
+<p>Concrete gaps versus Jira and Linear: (1) No command palette / sub-100ms keyboard UX — showstopper for developer fluency. (2) No native two-way VCS sync at story level (PR↔story state machine) — showstopper for developer retention. (3) No native IDE plugins for VS Code / JetBrains targeted at EAP work items — friction. (4) No local-first / sub-100ms board interaction — friction that compounds over a sprint. (5) No meaningful mobile sprint-board experience — friction. (6) No live co-editing on planning artefacts — friction. (7) Overlapping sprints under one PI not supported — operational showstopper for heterogeneous-cadence ARTs. (8) No epic-dependency sync in existing EAP plugins — operational gap. (9) Jira↔EAP integration is interim/two-step with no sprint sync — adoption friction. (10) Marketplace ecosystem ~30-50x smaller than Atlassian's. (11) Customer-signal ingestion entirely absent. (12) Time-to-first-sprint measured in weeks, not hours.</p>
+<hr />
+<h2 id="detailed-tool-profiles">Detailed Tool Profiles</h2>
+<hr />
+<h2 id="servicenow-cwm-collaborative-work-management_1">ServiceNow CWM (Collaborative Work Management)</h2>
+<p><strong>Priority:</strong> 🔴 Critical</p>
+<h3 id="team-experience">Team Experience</h3>
+<p><strong>Real Time Collaboration</strong></p>
+<p>This is CWM's strongest single capability versus EAP and against Agile 2.0. Collaborative Docs offers real-time multi-user document editing inside Spaces with Now Assist for summarisation and task generation. Spaces act as cross-functional hubs with shared context. Board-level automations handle notifications and reassignment without manual ceremony. @mentions, comments and activity streams are present. The product genuinely reduces some Slack-switching for documentation and planning, though for ad-hoc decision conversations Slack/Teams remain dominant.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Collaborative Docs is the headline differentiator here and is CWM's strongest answer to the 'Jira + Confluence' two-tab pattern. Teams can write decision logs, meeting notes, and acceptance criteria inside the same Space that holds their boards. Now Assist can draft content from open prompts, summarise meetings and generate tasks from notes. This is a genuine closure of the docs-execution loop within CWM Spaces — a meaningful capability versus Jira+Confluence integration.</p>
+<h3 id="developer-experience">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>CWM is not developer-first. There are no first-party IDE plugins for VS Code or JetBrains scoped to CWM work items, no CLI, no commit/branch/PR affordances on story cards out of the box. ServiceNow Build Agent and the broader DevOps Change Velocity product offer Git-aware capabilities at the platform level, but they do not natively decorate CWM story cards with PR state or deployment status in the way Jira's GitHub for Jira app does. A developer must context-switch to their Git provider and IDE; nothing pulls CWM story state back into the editor.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Native two-way VCS sync at story-card level (PR open → status; merge → close; branch naming enforcement; deployment status visible) is not a documented CWM capability. ServiceNow DevOps Change Velocity provides GitHub/GitLab/Bitbucket/Jenkins integration at the platform level for change records and DORA metrics, but the story-card-level affordances that Jira+GitHub has had for a decade are not part of the CWM feature set today. This is the largest single gap CWM must close to be developer-credible. [uncertain on any May 2026 Australia-release VCS additions]</p>
+<h3 id="onboarding-adoption">Onboarding &amp; Adoption</h3>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>CWM itself is the forward-going product, but it exists <em>because</em> of a major deprecation. Agile Development 2.0 deprecation (April 2026 End-of-Sale, September 2026 End-of-Renewal) forces every existing ServiceNow Agile customer onto CWM, and the SAFe application was already deprecated with Zurich (Fall 2025). Concurrent sprint velocity / burndown reporting won't land until H2 2026, and Scrum Tasks on CWM Boards only arrived in March 2026 — meaning customers who migrated early have lived through several months of feature gaps. The risk to a buyer is twofold: (a) migrating from a legacy product still under active customer pressure, (b) onto a CWM surface that is itself completing its capability set through 2026. This is a documented, real, buyer-facing transition risk.</p>
+<h3 id="framework-portfolio">Framework &amp; Portfolio</h3>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>No first-class customer-feedback ingestion in CWM. Spaces can reference records across the Now Platform (including CSM cases, ITSM tickets), but there is no built-in NPS / feature-vote / signal-clustering pipeline that turns customer voice into prioritised backlog items. Productboard-style capabilities are absent.</p>
+<h3 id="integrations-ecosystem">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>CWM benefits from broader Now Platform integrations: Slack (ServiceNow for Slack), Microsoft Teams, Figma (May 2026 strategic collaboration with Build Agent), and the ServiceNow Store catalog. EAP↔Jira integration (December 2025 OOTB) carries some value through to CWM but is not CWM-specific. The CWM-specific integration set (e.g. GitHub-on-CWM-story) is materially thinner than Jira's marketplace. Connector quality is highly dependent on the broader Now Platform store rather than a CWM-native marketplace.</p>
+<p><strong>Community Vitality</strong></p>
+<p>CWM is too new (broadly available since the 2024 Washington DC release window with monthly capability additions) to have built developer community depth. The ServiceNow CWM community forum and migration articles are active and well-curated by ServiceNow product marketing and partners, but third-party templates, plugins and community shortcuts are sparse. Stack Overflow <code>servicenow-cwm</code> tag activity is minimal. The cultural reputation among IC developers is essentially undefined.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>Same posture as the broader Now Platform: SaaS / managed-instance with regional data residency, FedRAMP and EU government cloud options. No fully on-premises CWM. Data sovereignty is acceptable for regulated buyers via certified regional clouds.</p>
+<p><strong>Customization</strong></p>
+<p>CWM inherits Now Platform extensibility: custom tables, App Engine Studio, Flow Designer, UI Builder. Admins can configure Boards, automations and Spaces without code. The maintenance-burden trade-off is the same as for the rest of the Now Platform — heavy customisation is technically possible and operationally risky over upgrades.</p>
+<h3 id="commercial">Commercial</h3>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>3-year TCO mirrors the broader ServiceNow profile: high implementation cost, high admin overhead (1-3 FTE for a mid-size deployment), Now Assist uplift, training and partner-led rollouts. CWM is positioned as 'modern' and somewhat lower-friction than legacy Agile 2.0, but it does not change the structural TCO equation versus Atlassian or Linear. Migration projects from Agile 2.0 add a meaningful one-time cost.</p>
+<h3 id="market-position">Market Position</h3>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Concrete gaps versus Jira (market share leader) and Linear (team-experience leader): (1) No command palette / sub-100ms keyboard UX. (2) No native VCS sync at story-card level (PR↔status state machine). (3) No IDE plugins for VS Code / JetBrains. (4) No local-first / sub-100ms board interactions. (5) Sprint velocity and burndown not GA until H2 2026 — operational showstopper for scrum teams today. (6) No flow metrics (lead time, cycle time, CFD) first-class. (7) No meaningful native mobile sprint-board parity. (8) Limited named autonomous agents inside CWM (versus Rovo Studio in Jira, mcp.linear.app in Linear). (9) Marketplace ecosystem 30-50x smaller than Atlassian's. (10) No customer-signal ingestion pipeline. (11) Migration from Agile 2.0 is replatforming, not upgrade. (12) Cultural / developer-mindshare gap — CWM is unknown outside the ServiceNow customer base.</p>
+<p><strong>What Eap Must Build</strong></p>
+<p>Prioritised by impact-to-effort for the CWM execution layer specifically: (1) Cmd+K command palette in CWM Workspace with status/assignment/navigation/Now-Assist invocation — fastest perceptible parity. (2) Native VCS state on CWM story cards (PR open → status; merge → close) using DevOps Change Velocity plumbing. (3) Ship sprint velocity, burndown and CFD as GA in H2 2026 with quality matching Jira out-of-the-box reports. (4) IDE plugin (VS Code + JetBrains) showing assigned CWM stories. (5) Native mobile experience for CWM Boards: drag-to-status, comment, time log, daily stand-up summary. (6) Named autonomous CWM agents (Sprint Triage, Backlog Groomer, Story Decomposer, Acceptance-Criteria Generator) exposed via MCP and Rovo-Studio-equivalent no-code builder. (7) Turnkey Agile 2.0 → CWM data migration tooling with confidence indicators, not partner-led services. (8) Story-level WIP enforcement and Definition-of-Done checklists as first-class primitives on Boards. (9) Live co-editing on Board cards and Sprint Planning views (Collaborative Docs primitive extended to cards). (10) GitHub/GitLab/Bitbucket Marketplace listings for CWM, mirroring the GitHub-for-Jira app pattern. (11) Sub-hour self-serve onboarding for a single CWM team (no admin/PS dependency). (12) Customer-signal ingestion: CSM case → CWM Space backlog with AI clustering and prioritisation.</p>
+<hr />
+<h2 id="servicenow-eap_1">ServiceNow EAP</h2>
+<p><strong>Priority:</strong> 🔴 Critical</p>
+<h3 id="team-experience_1">Team Experience</h3>
+<p><strong>Real Time Collaboration</strong></p>
+<p>EAP relies on the broader Now Platform collaboration primitives — record-level activity streams, Watch lists, and @mentions inside Journal/Comment fields. There is no live multi-cursor co-editing on Planning Interval boards equivalent to Figma or Linear. Collaborative Docs (a CWM capability) introduces real-time documentation editing but is scoped to CWM Spaces, not EAP planning artefacts. Slack and Teams integration exists via ServiceNow for Slack / Teams apps for notifications and record sharing, but the day-to-day pattern remains: open EAP, comment, wait for notification. The tool does not reduce the need to switch to Slack for quick coordination.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Collaborative Docs (introduced via CWM, available in EAP-adjacent Spaces) is ServiceNow's answer to inline documentation, with Now Assist able to summarise content and generate tasks from meeting notes. However, EAP planning artefacts themselves (Epics, Capabilities, Features) still rely on standard Journal fields and HTML description editors. The tool partially closes the Confluence loop within CWM Spaces but not within the EAP planning workspace itself.</p>
+<h3 id="developer-experience_1">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>EAP is not a developer-facing tool. There are no first-party IDE plugins for VS Code or JetBrains targeted at EAP work items, no CLI for issue management, no branch/PR/commit affordances on Feature or Story cards within EAP. ServiceNow's developer-facing surface is the Now Platform IDE and the new Build Agent (governed via MCP across major AI coding tools), but these are app-development tools, not agile-execution surfaces. A developer working on a story tracked in EAP must context-switch to a separate Git provider and a separate IDE; nothing pulls the story state back automatically. This is the single most cited gap against Jira and Linear.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Out-of-the-box two-way VCS sync at the level Jira+GitHub provides (PR opens → story moves to Code Review; merge → auto-close; branch naming enforcement; deployment status on cards) is not a native EAP capability. ServiceNow DevOps Change Velocity provides Git/Jenkins/GitHub integration but is positioned as a change-management/DORA-metrics product, not as story-card enrichment inside EAP. Smart-commit-style story key references do not natively flow back into EAP work items without custom integration. This is widely cited as the #1 developer-retention differentiator and EAP's most concrete gap versus Jira's decade-old GitHub for Jira app. [uncertain on exact 2026 EAP↔DevOps Change Velocity bridging]</p>
+<h3 id="onboarding-adoption_1">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Time-to-value is multi-week to multi-month, not hours. EAP requires SAFe teams to be configured under an ART before Planning Intervals can be created, and the Planning Calendar hierarchy is widely reported as confusing on first contact. The legacy SAFe application was deprecated with Zurich (Fall 2025) and customers had to migrate to EAP, which itself required guided-setup workflows. Implementation typically involves ServiceNow Professional Services or a partner. There is no self-serve, swipe-a-credit-card, first-sprint-in-an-hour path equivalent to Jira Cloud Free or Linear's onboarding.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>EAP itself is the forward-going strategic product, but it sits in the middle of a major ServiceNow transition: Agile Development 2.0 deprecation milestones are April 2026 End-of-Sale, September 2026 End-of-Renewal for the Agile Teams SKU, and TBD 2029+ End-of-Support. Customers running Agile 2.0 today must plan migration to CWM (team execution) and EAP (program/portfolio). The previous SAFe application was already deprecated with Zurich (Fall 2025). For a buyer, this means EAP is the right destination, but reaching it requires migrating off two legacy layers, and any custom Agile 2.0 configuration is at risk. This is a real, documented, buyer-facing transition risk.</p>
+<h3 id="framework-portfolio_1">Framework &amp; Portfolio</h3>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>EAP has no first-class customer-feedback ingestion or signal-to-roadmap pipeline equivalent to Productboard. Customer feedback can theoretically flow through ServiceNow Customer Service Management or ITSM and be linked to Demands, but there is no built-in clustering, scoring or AI-prioritisation surface that turns NPS/support tickets/feature requests into ranked Features inside EAP. This is a structural gap for product-led orgs.</p>
+<h3 id="integrations-ecosystem_1">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Native integrations include Jira (out-of-the-box from December 2025, two-step), Azure DevOps (Q4 2026 target), Slack (ServiceNow for Slack app), Microsoft Teams, and Figma (the May 2026 strategic collaboration that turns Figma designs into ServiceNow applications via Build Agent). The ServiceNow Store hosts thousands of certified apps across the broader Now Platform, but the EAP-specific integration set is materially thinner than Jira's 5,000+ Atlassian Marketplace apps. Community-built connector quality and depth lag the Atlassian ecosystem by a wide margin.</p>
+<p><strong>Community Vitality</strong></p>
+<p>The Now Community (developer.servicenow.com, community.servicenow.com) is large but oriented around ITSM, ITOM and the broader platform rather than EAP specifically. EAP-tagged community threads are modest in volume. Stack Overflow <code>servicenow</code> tag activity is dwarfed by <code>jira</code>. There are very few third-party SAFe-template libraries for EAP. The partner/consultant network (Devoteam, ZeTechno, etc.) is strong for implementation but does not constitute a vibrant developer community. Versus Jira's marketplace moat, EAP's ecosystem vitality is weak.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>ServiceNow is SaaS / managed-instance. Regional data residency options exist on the Now Platform (multiple geographic regions including EU and government clouds), and FedRAMP / regulated-industry compliance is a Now Platform strength. Self-hosting / fully on-premises is not generally available; this differs from Plane (open-source self-host) but is acceptable for most regulated buyers because of ServiceNow's certified government and EU regional clouds.</p>
+<p><strong>Customization</strong></p>
+<p>Customisation is a Now Platform superpower and a TCO trap. Flow Designer, App Engine Studio, custom tables, ACLs, UI Builder, Scripted REST APIs, and business rules give admins effectively unlimited extensibility. Work item types, screen layouts, and workflows can be configured to fit any operating model. The cost is maintenance burden: customisations carry through upgrades, require regression testing, and frequently become consulting engagements. EAP inherits this double-edged sword — endlessly configurable, but configuration drift is a real long-term liability.</p>
+<h3 id="commercial_1">Commercial</h3>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>3-year TCO is consistently characterised as high relative to Atlassian or Linear. Drivers: implementation consulting (six- to seven-figure partner engagements for enterprise EAP rollouts), platform admin FTEs (1-3 dedicated admins for a mid-size deployment), Now Assist uplift, custom integration maintenance, and version-upgrade regression testing. Training requirements are non-trivial — partner-led classroom training (ITCE and similar) is standard for the RTE/ART PM persona. Buyers should expect TCO multiples of license fees over three years.</p>
+<h3 id="market-position_1">Market Position</h3>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Concrete gaps versus Jira and Linear: (1) No command palette / sub-100ms keyboard UX — showstopper for developer fluency. (2) No native two-way VCS sync at story level (PR↔story state machine) — showstopper for developer retention. (3) No native IDE plugins for VS Code / JetBrains targeted at EAP work items — friction. (4) No local-first / sub-100ms board interaction — friction that compounds over a sprint. (5) No meaningful mobile sprint-board experience — friction. (6) No live co-editing on planning artefacts — friction. (7) Overlapping sprints under one PI not supported — operational showstopper for heterogeneous-cadence ARTs. (8) No epic-dependency sync in existing EAP plugins — operational gap. (9) Jira↔EAP integration is interim/two-step with no sprint sync — adoption friction. (10) Marketplace ecosystem ~30-50x smaller than Atlassian's. (11) Customer-signal ingestion entirely absent. (12) Time-to-first-sprint measured in weeks, not hours.</p>
+<p><strong>What Eap Must Build</strong></p>
+<p>Prioritised by impact-to-effort: (1) Command palette (Cmd+K) across SPW with status, assignment, navigation and Now Assist invocation — fastest visible parity win. (2) Native PR/branch/commit affordances on Feature and Story cards via DevOps Change Velocity, with automatic status transitions (PR open → Code Review; merge → Done). (3) Sprint board parity with Jira/Linear: drag-to-status, inline edit, story-point estimation, WIP enforcement — likely lives in CWM but must be EAP-aware. (4) Resolve overlapping-sprints-under-one-PI constraint to make heterogeneous-cadence ARTs viable. (5) First-class EAP MCP endpoint + named EAP agents (PI Planner agent, WSJF Recompute agent, Dependency Triage agent) usable from Claude/Cursor — matches Atlassian Rovo Studio. (6) IDE plugin (VS Code + JetBrains) showing assigned stories with status changes. (7) Native bi-directional Jira↔EAP sync including sprints, not interim two-step. (8) Mobile parity for daily stand-up: sprint board view, status changes, comments. (9) Live co-editing on PI Board and Planning Calendar (Collaborative Docs primitive extended into EAP). (10) Customer-signal ingestion: ITSM/CSM ticket → Feature backlog with AI clustering. (11) First-class flow metrics (lead time, cycle time, CFD, throughput) without Performance Analytics dependency. (12) Self-serve onboarding template library and a sub-hour first-PI path for new ARTs.</p>
+<hr />
+<h2 id="azure-devops">Azure DevOps</h2>
+<p><strong>Priority:</strong> 🟠 High</p>
+<h3 id="team-experience_2">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Mature, customizable, and capable — but the daily IC experience feels dated. Native work-item types (Epic, Feature, User Story/Product Backlog Item, Task, Bug) align cleanly with Agile/Scrum/CMMI process templates. Sprint backlogs include capacity planning per team member with hour-based remaining-work tracking — uncommon in modern tools and prized by some scrum masters. Kanban boards support WIP limits (enforced with visual overflow), swimlanes, split columns (doing/done), card customization, and rollup of child items. Definition of Done is editable per column. Acceptance criteria are a first-class rich-text field on User Stories. Reviews consistently note the board UI 'feels a bit forgotten/sunsetting' — the visual language has not materially advanced since 2018, while underlying capability remains broad. Best-fit for teams that value configurability and process rigor over UI delight.</p>
+<p><strong>Keyboard Command Ux</strong></p>
+<p>Functional but not category-leading. Pressing '?' on any page surfaces context-specific shortcuts; global shortcuts include 'g w' (go to Boards), 'g r' (Repos), 'g p' (Pipelines), '/' or 's' (search), 'n' (new work item), Ctrl+Shift+f (filter). No command palette in the Linear/VS Code sense — the search box is the closest analog, and it is server-round-tripped rather than instant. Status changes on the board require drag-and-drop or opening the work item; no single-key status flip. Power users can be efficient, but the tool does not reward keyboard fluency the way Linear does.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Comments with @mentions on work items and pull requests trigger email notifications. @mention people picker is inline in both work-item discussions and code comments. No live presence indicators or simultaneous editing on work items — concurrent edits produce a stale-data warning rather than CRDT merge. Microsoft Teams integration is deep: Azure Boards app for Teams supports work-item previews on URL paste, channel subscriptions for work-item events, in-channel work-item creation, and messaging-extension search. Real-time alerts for build failures, code review comments, and deployment errors. Slack integration exists but is materially less polished than the Teams story.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Azure DevOps Wiki is built in — markdown-based, project-scoped, supports code wikis (Markdown stored in a Git repo) and provisioned wikis. Adequate for project-level documentation but not a Confluence/Notion replacement. Work-item descriptions support rich text but do not link inline to wiki pages elegantly. Most enterprises pair ADO with Confluence or SharePoint for knowledge management.</p>
+<h3 id="developer-experience_2">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Strong for Microsoft-stack developers. Visual Studio and VS Code extensions surface assigned work items, allow status changes, and link commits/PRs. Git CLI commits referencing work item IDs (e.g. '#1234') auto-link. Azure Repos and Azure Pipelines tabs live alongside Boards in the same project — code review, build status, and deployment status are one-tab-away rather than integrated-via-app. The full developer surface (boards + repos + pipelines + artifacts + test plans) in one product is the platform's defining strength for .NET shops and regulated enterprises. For non-Microsoft stacks, the gravitational pull toward GitHub + GitHub Issues is increasing as Microsoft consolidates investment there.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Native and deep when using Azure Repos. Commit messages with '#1234' auto-link to work items; PR creation from a work item is one-click; PR completion auto-resolves the linked work item (configurable). Branch policies can require linked work items. Build/release status surfaces on work items via the Development control. GitHub integration is also strong (since Microsoft owns both): a 2025 update brought work-item-to-GitHub-Copilot-coding-agent integration, with custom Copilot agents selectable when creating a PR from a work item (code must be in GitHub, requires GitHub Copilot Pro/Business/Enterprise subscription). GitLab/Bitbucket integration is community-built and shallower.</p>
+<h3 id="onboarding-adoption_2">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Moderate. Free for first 5 users (Basic plan) makes account creation trivial. Default process templates (Agile/Scrum/Basic/CMMI) work out of the box. However, customizing to a team's actual workflow — adding states, fields, area paths, iteration paths — is admin work that takes hours-to-days. Area/Iteration Path setup is mandatory for backlog hierarchy to function correctly and trips up new admins. Onboarding individual ICs is quick; onboarding an organization typically requires a project administrator who knows ADO's quirks.</p>
+<p><strong>Migration Story</strong></p>
+<p>Mature ecosystem. Solidify's open-source jira-azuredevops-migrator is the de facto Jira → ADO tool — exports Jira issues to file, imports into ADO with configurable field-mapping (System.Title prefix configurable, MapArray for dropdowns, user-mapping text file). Microsoft also provides commercial migration partners. Field mapping is comprehensive for standard Jira fields; custom Jira workflows often require ADO process customization in parallel. For ADO Server → ADO Services there is a first-party data migration tool. Rollback safety depends on the migrator; the Solidify tool is one-way.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Moderate and rising. Microsoft has not formally deprecated Azure DevOps and explicitly states it is not being sunset, but feature investment has visibly slowed since ~2022 as effort consolidated into GitHub. Microsoft Q&amp;A threads continue to ask about Azure Repos' future. Visual Studio App Center's 2025 retirement is a parallel-product signal. Reviewers explicitly call out the perception that 'Azure DevOps Boards seems a bit forgotten/sunsetting'. Buyers should expect ADO to be maintained but not materially advanced; agentic AI investment is routing through GitHub.</p>
+<h3 id="framework-portfolio_2">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Supports SAFe with caveats. Microsoft publishes a detailed SAFe-in-Azure-Boards guide. Native hierarchy goes up to 7 levels (default Epic → Feature → User Story → Task; portfolio backlogs add up to 3 more). However, adding a Solution (Capabilities) Backlog as parent of Program (Features) Backlog is not achievable via the standard Backlog Levels page — requires disabling the inherited Epic and recreating as a custom WIT (a documented less-than-ideal workaround). Area Paths model ARTs and teams; Iteration Paths model PIs and sprints. No native PI Planning event UX — third-party extensions (Kendis, @Scale by Solidify) fill this gap. WSJF is implemented via custom fields. Dependency mapping is functional but not visual at scale. Adequate for SAFe-light implementations; SAFe-heavy programs typically add Jira Align or a SAFe-specific extension.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Strong configurable analytics. Built-in: velocity, burndown, CFD (cumulative flow), sprint burndown, lead time, cycle time. Analytics service powers Power BI integration — any reporting question Power BI can answer, ADO can feed. Dashboards are widget-based and per-project. Reporting depth exceeds Linear materially; configurability exceeds Jira-without-EazyBI. Weakness: reporting UI itself feels dated, and creating non-standard reports often pushes admins to Power BI or OData rather than staying in-app.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>No native customer-feedback ingestion. No Productboard-style request capture or NPS linkage. Integrations with Zendesk/ServiceNow exist via marketplace but require setup; this is not a first-class capability.</p>
+<h3 id="integrations-ecosystem_2">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Visual Studio Marketplace hosts roughly 1,000+ Azure DevOps extensions, materially smaller than Jira's 5,000+ but covering most enterprise needs (Slack, Teams, GitHub, Jenkins, SonarQube, Snyk, ServiceNow, Jira sync). First-party Microsoft integrations (Teams, Power BI, Azure, GitHub) are deep and well-maintained. Slack integration exists but lags Teams. Figma, Notion, Confluence integrations are community-built. The platform's biggest integration story is that Boards/Repos/Pipelines/Artifacts/Test Plans are themselves integrated — fewer external integrations needed for the Microsoft-stack lifecycle.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Large but aging. Stack Overflow azure-devops tag has tens of thousands of questions. Microsoft Q&amp;A is active. Reddit r/azuredevops is moderately active. Partner/consultant network is broad and enterprise-grade. However, developer-cultural buzz is materially lower than GitHub, Linear, or even Jira — fewer blog posts, fewer YouTube tutorials per month, fewer indie tools being built against the API in 2025–2026. Marketplace growth has plateaued.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>Azure DevOps Server (formerly TFS) is the on-premises product — still maintained, still receiving updates, with Server 2022 the current generation. Azure DevOps Services (SaaS) offers data residency in multiple Azure regions selectable at organization creation (US, EU, UK, Australia, Brazil, Canada, India, Asia Pacific). This is a meaningful differentiator vs. Linear (SaaS-only) and Jira (limited residency). Strong fit for government, defense, and regulated EU buyers.</p>
+<p><strong>Customization</strong></p>
+<p>Deep. Inherited process model allows custom work item types, custom fields (multiple types), custom states, custom rules (conditional behavior), and custom forms per WIT. No-code customization for most needs; XML process template customization available for advanced scenarios. Workflow rules support things like 'when state changes to Resolved, require Resolved Reason'. Admin burden grows with customization — a heavily customized process becomes a long-term maintenance artifact. More configurable than Linear; comparable to Jira but with a less developer-friendly admin UX.</p>
+<h3 id="commercial_2">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Per-user, transparent, materially cheaper than Jira and ServiceNow EAP. First 5 users free on Basic plan. Basic: $6/user/month (Boards + Repos + Pipelines + Artifacts). Basic + Test Plans: $52/user/month (advanced testing). Stakeholder: free unlimited (view/comment only, restricted edit). Pipelines and Artifacts have additional consumption-based charges (parallel jobs, storage) that can surprise large teams. Visual Studio subscribers get Basic included. Cited by reviewers as 'one of the best values in DevOps platforms thanks to its generous free tier'.</p>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>Low per-seat, moderate at scale. 3-year TCO for a 200-seat team at Basic: roughly $43K licensing (assuming no Test Plans). Implementation: typically 0.5–1 FTE for initial setup at a mid-sized enterprise. Ongoing admin: 0.25–0.5 FTE for process maintenance, area/iteration path hygiene, custom WIT updates. Pipeline parallel-job costs can add materially for high-CI-volume teams. Training: process-template-aware ICs onboard in days; admins require deeper training. Significantly cheaper TCO than ServiceNow EAP or Jira Premium for equivalent functionality.</p>
+<h3 id="market-position_2">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Stable, respected, and increasingly seen as legacy. Gartner positions Microsoft as a Leader in DevOps Platforms Magic Quadrant (via GitHub) but Azure DevOps specifically receives lower marketing visibility. G2/TrustRadius/Capterra reviews are largely positive on capability and value, mixed on UX and product velocity. Common themes: 'great integration with Microsoft stack', 'feels dated', 'reporting could be more intuitive', 'automation lags Jira', 'we use it because we already pay for it'. Developer-cultural reputation is neutral-to-mildly-negative; it is not a tool engineers brag about choosing. Strong with .NET shops, regulated enterprises, and government — exactly the segments where 'reliable' beats 'delightful'.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Vs. Jira: (1) Smaller marketplace (~1,000 vs 5,000+). (2) Weaker native automation — webhooks or third-party tools required for what Jira Automation does natively (cited as a top developer complaint). (3) Less polished mobile (no native app vs. Jira's iOS/Android apps). (4) Slower pace of UI evolution. Vs. Linear: (1) ~10–20x perceived latency on common actions. (2) No command palette / keyboard-first UX. (3) No local-first sync. (4) UX 'feels dated'. (5) No first-class agent integration in the product (agent story is via GitHub Copilot, not native MCP). (6) No first-party mobile app. Severity: missing mobile + slow UI evolution are friction (not showstoppers) for existing customers; for net-new evaluators against Linear or modern Jira Cloud, the UX gap is the dominant losing-criterion.</p>
+<hr />
+<h2 id="gitlab">GitLab</h2>
+<p><strong>Priority:</strong> 🟠 High</p>
+<h3 id="team-experience_3">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Strong if the team's center of gravity is the repo, weaker if it is the sprint board. Issues, Issue Boards (multiple per project/group), Milestones (used as sprints), and Iterations (true time-boxed sprints) cover the agile primitives. Issue boards support assignee/label/milestone lists and WIP limits. Work-item types (Epic, Issue, Task, Objective, Key Result, Test Case, Requirement) are now unified in the work-items hierarchy (rolled out through 2024–2025). Acceptance criteria are typically task-list checkboxes in the issue description. Definition of Done is convention. The execution experience is functional but feels engineered-by-engineers — dense UI, many options, less of the curated daily-flow Linear offers. Best-fit for teams that already live in MRs and want planning to sit beside the code rather than in a separate tool.</p>
+<p><strong>Keyboard Command Ux</strong></p>
+<p>Decent breadth, modest polish. Pressing '?' opens the shortcut help dialog. Shortcuts cover global navigation (g + letter to jump sections), issue actions (e to edit, l to label, m to milestone, c to comment), and MR navigation. Quick Actions in issue comments (slash commands like /assign, /label, /milestone, /due) are powerful and well-loved — closest thing to a command palette, executed inside the comment box. No system-wide Cmd+K palette as of research date. Power users on the issue/MR pages can be efficient; navigation across the broader app is slower. Browser shortcut conflicts are an open issue (gitlab-org/gitlab#386209).</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Threaded discussions on issues, MRs, and epics with @mentions, emoji reactions, and Markdown editing. No live presence indicators on issues or MRs (no cursor co-presence). Concurrent edits to issue descriptions can produce conflicts surfaced as a 'someone else updated this' notice. To-Do list consolidates assigned items, mentions, and review requests. Slack/Teams integrations are bidirectional for notifications but less polished than GitHub's. The DevSecOps-in-one-tool story reduces context-switches between code review and issue updates more than it reduces Slack reliance.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Strong. Wikis are first-class per project and per group, markdown-based, stored in a Git repo (every wiki is itself a Git repo). Pages can cross-link to issues/MRs/epics; issues can embed wiki pages. GitLab Pages turns repo content into hosted docs sites. The 'docs live with the code' philosophy is materially closer to Notion/Confluence replacement than ADO Wiki or Linear Documents — particularly for engineering knowledge bases. Not as featureful for non-engineering teams (no databases-as-pages a la Notion).</p>
+<h3 id="developer-experience_3">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Best-in-class for repo-centric teams. JetBrains plugin (Merge Request Integration EE/CE) brings MR review into IntelliJ, GoLand, PyCharm, etc. VS Code extension (GitLab Workflow) plus dedicated GitLab Duo for VS Code and JetBrains. Web IDE and remote dev environments are native. Branch policies, MR approvals, code owners, draft MRs all built-in. Pipeline status, deployment status, security scan results all surface on the MR itself. A developer's primary GitLab surface is the MR, and Issues sit one tab over — closer than ADO's Boards-vs-Repos split. CLI (glab) is well-maintained. For developers, GitLab is one of the lowest-context-switch environments available.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>This is the home advantage. Code and issues live in the same product — there is no integration to maintain, no API glue, no auth-token rotation between systems. Branch names can auto-prefix issue ID via 'Create branch' from the issue. MRs link to issues via 'Closes #123' / 'Fixes #123' magic words and auto-close on merge. MR status surfaces on the issue; pipeline status surfaces on the MR; deployment environment surfaces on the issue. Code-to-issue traceability is automatic and bidirectional without third-party connectors — a defining differentiator versus Jira+GitHub or ADO+external repo setups.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>Aggressive 2025–2026 push. GitLab Duo Agent Platform reached GA on January 15, 2026 — included free with Premium (12 credits/user/month) and Ultimate (24 credits/user/month) for a limited time. MCP Client is GA: Duo Agent Platform in IDEs can securely connect to external MCP-compatible tools (Jira, Slack, Confluence) to pull context and take actions across the DevSecOps toolchain. The reverse — a GitLab MCP server letting external agents push into GitLab — is in beta with more features planned. Native agentic flows shipping at GA: Developer (Issue→MR) flow, Convert to GitLab CI/CD flow, Fix CI/CD pipeline flow, Code Review flow. Model Selection went GA in 18.4, letting admins choose model vendors across GitLab.com, self-managed, and Dedicated — a meaningful enterprise-control differentiator versus single-vendor AI tools. AI Impact analytics (renamed 'GitLab Duo and SDLC trends' in 18.4, with the Duo+SDLC trends dashboard in 18.7) measures AI ROI in the Value Stream Dashboard — uncommon among competitors. Agentic Chat (Duo Chat in agentic mode) extends beyond suggestions to multi-step task execution.</p>
+<h3 id="onboarding-adoption_3">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Moderate. SaaS account creation is fast and the Free tier is generous (5 users, core features). First issue and first MR happen within minutes. However, configuring a productive team workflow — labels, milestones, iteration cadences, approval rules, CI templates, security policies — is non-trivial, and self-managed installations add infrastructure setup time (Kubernetes Helm chart, Omnibus package). Group/subgroup hierarchy must be planned early to avoid restructuring later. Onboarding individual developers is quick because the MR surface is familiar; onboarding a team to GitLab's particular DevSecOps opinions takes longer.</p>
+<p><strong>Migration Story</strong></p>
+<p>Native Jira issue importer exists (per docs.gitlab.com Jira migration options): pulls issues, comments, attachments, assignees, statuses with field mapping. CSV import as fallback. Third-party tools (Getint, OpsHub) for bidirectional sync during parallel-run. GitLab Professional Services offers managed migration. GitLab's own migration blog acknowledges that the move is also an opportunity to rethink processes — practical advice that flags the cultural change required. Field-mapping coverage is reasonable for standard Jira fields; custom Jira workflows often need to be re-implemented as GitLab labels and quick actions. Rollback safety depends on tool used; native importer is one-way.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low. No layer being sunset. Steady release cadence (monthly). Strong financial position post-IPO. Some long-running feature requests remain open for years (mobile app, real-time presence), which surfaces as community frustration but not platform risk. The Duo Agent Platform GA represents a major bet that AI features will retain users — successful execution will reinforce the platform; under-delivery would erode the premium tier value proposition.</p>
+<h3 id="framework-portfolio_3">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Improved meaningfully in 2025. Work-item hierarchy now supports up to seven levels of nested epics on Ultimate, aligning with SAFe's Strategic Theme → Portfolio Epic → Program Epic → Capability → Feature → Story → Task. April 2025 GitLab blog ('SAFe without silos in GitLab') maps top-level groups → Portfolio, subgroups → Programs/ARTs, projects → Teams. Milestones assigned to epics (GitLab 18.2) model Program Increments. Iterations model sprints inside an ART. No native PI Planning event UX (no PI Planning board widget); ART-level dependency visualization exists at the epic level but is less mature than Jira Align. WSJF via custom fields/labels. Value Stream Dashboard provides flow metrics at scale. Adequate-to-good for SAFe Essential and Large Solution configurations; full SAFe portfolios may still pair with a dedicated SAFe tool.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Strong and increasingly first-class. Value Streams Dashboard (Ultimate) shows DORA metrics, flow metrics (lead time, cycle time, deployment frequency, MTTR), and now AI Impact / Duo + SDLC trends. Per-issue/MR analytics include cycle time and time-in-state. Burndown/burnup charts for milestones and iterations. CI/CD analytics for pipeline success rate and duration. CFD is not native — typically a community-maintained pattern. Reporting is configurable via Insights (YAML-defined dashboards) and Value Streams Dashboard. Flow metrics are first-class in a way they are not in Jira-without-third-party-apps.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Limited native capability. Service Desk turns inbound emails into GitLab issues (good for small-scale customer support flows). No NPS, no feature-voting, no Productboard-style request capture. Integrations with Zendesk and others exist via webhooks but require setup.</p>
+<h3 id="integrations-ecosystem_3">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Solid but smaller than Jira's marketplace. Native integrations with Slack, Microsoft Teams, Jira (bidirectional issue sync), Jenkins, Mattermost, Asana, Trello, Discord, Kubernetes, Prometheus, Sentry, JetBrains/VS Code, and major cloud providers. Webhooks and the comprehensive GraphQL/REST API are the integration backbone. No formal marketplace storefront equivalent to Atlassian Marketplace or Visual Studio Marketplace — integrations are documented inside the product Settings rather than purchased from a marketplace, which keeps quality high but discoverability lower.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Healthy. r/gitlab is active. GitLab's own Forum is well-trafficked. Stack Overflow gitlab tag is large. The product itself is built in GitLab on GitLab, and gitlab.com/gitlab-org/gitlab is one of the largest open public repos — issues and merge requests are public, which is unusually transparent for an enterprise tool. Partner/SI network is meaningful but smaller than Atlassian's. Open-core model attracts an engaged contributor community.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>First-class self-hosting is GitLab's historic differentiator. Self-Managed (Omnibus, Helm chart, source install) supports any infrastructure including air-gapped environments. GitLab Dedicated is single-tenant SaaS in a customer-chosen region (US, EU, Canada, Australia, etc.). GitLab.com (multi-tenant SaaS) is primarily US-hosted. Strong fit for regulated, government, defense, and EU sovereignty buyers — arguably the best self-hosting story among the tools in this study, comparable to (and arguably broader than) Azure DevOps Server.</p>
+<p><strong>Customization</strong></p>
+<p>Deep. Custom labels, custom issue/MR templates (markdown files in the repo), custom CI/CD templates, custom fields are emerging via work-items refactor. Quick Actions are extensible via project rules. Webhooks plus the API allow nearly any automation. Group-level settings cascade to subgroups and projects with override controls. Process customization is generally code/config-as-data (in repos and YAML) rather than admin-UI-clicky — a benefit for GitOps shops, friction for non-technical admins.</p>
+<h3 id="commercial_3">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Per-user tiers plus Duo add-ons. Free: limited features, public/internal projects friendly. Premium: $29/user/month (billed annually, ~$348/user/year) — adds advanced CI/CD, code quality, MR approvals, 10,000 CI/CD minutes/month, basic portfolio planning. Ultimate: $99/user/month — adds security scanning (SAST/DAST/dependency/container), compliance, advanced portfolio planning, 50,000 CI/CD minutes/month. Duo Pro: $19/user/month add-on for Premium and Ultimate. Duo Enterprise: $39/user/month, Ultimate-only, includes root cause analysis, vulnerability explanation, AI code review. Materially more expensive per seat than Azure DevOps and Jira Premium, but bundles capabilities (CI/CD, security scanning, container registry) that would otherwise be separate tools.</p>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>Higher per-seat licensing than ADO or Jira but lower aggregate TCO when it replaces separate CI, SAST/DAST, container registry, and artifact tools. 3-year TCO for a 200-seat Premium team: roughly $210K licensing. Ultimate at 200 seats: roughly $720K. Self-managed installations add infrastructure (compute, storage, backup) and ops FTE; SaaS removes that. Implementation typically 1–2 FTE-months at mid-size enterprises; ongoing admin 0.5–1 FTE depending on customization. Training: developers familiar with GitHub onboard quickly; the SAFe/portfolio surface needs dedicated training.</p>
+<h3 id="market-position_3">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>GitLab is a Leader in the 2025 Gartner Magic Quadrant for DevOps Platforms. G2/Capterra/TrustRadius scores are solidly positive on capability and value, with consistent themes of 'everything in one place' and 'dense/cluttered UI'. Developer-cultural reputation is positive among DevOps and platform engineering communities, mixed among pure-PM communities (who often note the UI is engineered-for-engineers). The 2025–2026 Duo Agent Platform investment is being well-received but the AI race with GitHub Copilot is an open competitive front.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Vs. Jira (planning depth): (1) Smaller integration marketplace and no marketplace storefront. (2) Weaker non-engineering team support — Jira Work Management/JSM serve marketing, HR, IT support; GitLab does not. (3) PI Planning UX less mature than Jira Align. Vs. Linear (team experience): (1) ~5–10x slower perceived latency. (2) No command palette / sub-100ms responsiveness. (3) UI density and cognitive load are higher. (4) No first-party native mobile app. (5) No real-time presence on issues. (6) Onboarding friction higher because the product surface is broader. Severity: missing mobile app + UI density are friction for IC daily experience; smaller marketplace and no native non-engineering support are limiters for org-wide adoption beyond engineering. The unique advantages — native code-to-issue, GA agent platform with model choice, Value Stream Dashboard with AI Impact — are not replicable without owning both the repo and the planner.</p>
+<hr />
+<h2 id="jira-jira-align">Jira + Jira Align</h2>
+<p><strong>Priority:</strong> 🟠 High</p>
+<h3 id="team-experience_4">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Jira is the category-defining team execution surface and the implicit benchmark every other tool is measured against. Scrum and Kanban boards, backlog grooming, story-card UX, story-point estimation, sprint planning, sprint reports, WIP limits, swimlanes, sub-tasks, epics, components and custom workflows are all first-class primitives. The active sprint view is a swimlane Kanban where stories, tasks and bugs flow through To Do → In Progress → Done with rich filter chips and quick filters; 2025 reviews repeatedly describe the board system as 'legitimately best-in-class'. Acceptance criteria typically live in description or custom fields rather than a dedicated structured field (a minor friction). The backlog view is dense and can feel clumsy on first encounter but is unmatched in depth. Jira Align then sits <em>above</em> Jira at the program/portfolio tier with PI Planning, ART boards, dependency maps, capability/feature/epic roll-up and OKR linkage. The combined surface is genuinely team-to-portfolio.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Real-time presence, simultaneous editing on issue descriptions and comments, @mentions, threaded comments, activity feeds, and rich notification controls are all present. Confluence pairing handles documentation co-editing. Slack and Teams integrations are deep (status notifications, slash commands, issue creation from a message). Jira does not eliminate Slack for ad-hoc conversation, but the in-product collaboration primitives are strong and reduce coordination friction meaningfully.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>Native iOS and Android apps for Jira are available. 2025 reviews characterise the mobile experience as functional for triage and triage-adjacent tasks — viewing issues, commenting, assigning — but limited for issue creation and modification at parity with desktop. A team member can run a passable daily stand-up update flow on mobile, but full backlog grooming or sprint planning remains a desktop activity. This is a structural limitation industry-wide; Jira mobile is best-in-class among enterprise tools but still not full parity. Jira Align does not ship a native mobile app focused on portfolio planning.</p>
+<h3 id="developer-experience_4">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Best-in-class developer experience among enterprise planning tools. First-party VS Code extension (Atlassian for VS Code), JetBrains plugin, GitHub for Jira app (the canonical reference for this category), Bitbucket-native integration, smart-commits (<code>PROJ-123 #comment #time 2h</code>), branch creation from issue, PR-to-issue linking, deployment status on cards via Jira's deployments feature, and code-review-state visible on boards. Developers can interact with Jira inside their editor and inside their pull request without round-tripping through the web UI. This is the single largest delta versus ServiceNow EAP/CWM and the largest single reason Jira retains developer mindshare.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>GitHub for Jira app has been the category reference implementation for a decade. PR opens → story moves to Code Review (configurable). Merge → story can auto-close (configurable). Branch naming convention enforcement is conventional (<code>feature/PROJ-123-user-login</code>). Deployment status from CI/CD pipelines (Jenkins, GitHub Actions, GitLab, Bitbucket Pipelines, CircleCI) is visible on cards. Smart commits update issues from commit messages. Webhooks deliver near-real-time updates. GitLab and Bitbucket equivalents exist. Compass + DevOps insights extend this into service-catalog and deployment-frequency telemetry. This is the field where every competitor is measured against Jira.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>Atlassian's Rovo is the most aggressively productised agentic surface in enterprise planning as of Team '26 (May 2026). Headlines: (1) Teamwork Graph opened with 150B+ connections across people/projects/documents/decisions/third-party tools; 44% more accurate AI answers using 48% fewer tokens via deep relationship traversal. (2) Agents in Jira GA — agents can be assigned work items with full audit logging. (3) Rovo Studio for no-code agent building combining Atlassian and third-party skills. (4) Rovo MCP Server (OAuth 2.1, hosted) lets Claude, ChatGPT, Cursor and Azure SRE Agent read/write Jira/Confluence/Compass. (5) ~90% of Atlassian enterprise cloud customers using Rovo. (6) Max — a reasoning mode in Rovo Chat that decomposes multi-step tasks. Generative capabilities (acceptance criteria, decomposition, sprint summaries) are mature. Atlassian and Linear set the 2026 agentic benchmark.</p>
+<h3 id="onboarding-adoption_4">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Best-in-class for a credit-card swipe self-serve start: a single developer can sign up for Jira Cloud Free, create a project from a template (Scrum, Kanban, Bug Tracking, Product Discovery) and have a working board in minutes. The Free tier (10 users) and Standard tier ($7.91-$8.15/user/month) carry no implementation requirement. Jira Align is the opposite — it is an enterprise procurement (50-user minimum, six-figure entry, multi-month implementation) and time-to-value is measured in weeks-to-months. The Jira-tier time-to-value is essentially the floor every competitor is measured against.</p>
+<p><strong>Migration Story</strong></p>
+<p>Atlassian provides Jira Cloud Migration Assistant for Jira Server/Data Center → Cloud, and there are mature third-party migration tools for ServiceNow→Jira (Exalate, ZigiOps, Getint, Visor) and Rally→Jira / Azure DevOps→Jira paths. Field mapping covers summary, description, priority, status, attachments, comments, custom fields, statuses, assignee/reporter, labels and linked records. Jira Align migration into Jira Premium Advanced Roadmaps is a documented path Atlassian itself recommends for organisations that don't need full enterprise-portfolio depth — a notable self-cannibalisation that hints at long-term Jira Align position. Migration is well-trodden, well-tooled, and well-documented relative to any competitor.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Two transition risks specific to the Atlassian stack: (1) Atlassian Server end-of-support (already past, February 2024) — any laggard on Server has been forced to Cloud or Data Center. (2) Jira Align's legacy Roadmaps experience is being deprecated in favour of the new GA Roadmaps as the FY26 flagship investment; from version 11.19 the new Roadmaps become the default and only experience for cloud, with a three-release extension available to 11.22.X (March 2026). Customers heavily customised on legacy Roadmaps must replan. The broader question of whether Atlassian eventually consolidates Jira Align into Jira Premium / Atlassian Align is an open strategic question — Atlassian already actively compares the two in marketing, suggesting overlap rationalisation is a multi-year possibility. Lower risk than ServiceNow's Agile 2.0 deprecation but non-zero.</p>
+<h3 id="framework-portfolio_4">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Jira Align is purpose-built for SAFe, LeSS and Scrum-at-Scale. PI Planning UX, ART boards, Solution Train roll-up, Capability/Feature/Story hierarchy, cross-ART dependency mapping, WSJF prioritisation, Inspect &amp; Adapt, PI burndown, and program/team predictability metrics are all first-class. The new Roadmaps experience (FY26 GA) is the major usability investment. SAFe practitioners consistently rank Jira Align alongside Rally and Targetprocess as the SAFe-capable enterprise tools. Heterogeneous-cadence ARTs are supported. The combined Jira + Jira Align surface is the most complete SAFe-aligned team-to-portfolio offering in the market.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Jira ships out-of-the-box velocity, burndown, burnup, sprint report, control chart, cumulative flow diagram, version report and epic report. Flow metrics (lead time, cycle time, throughput) are accessible via control chart and CFD but third-party apps (eazyBI, Time in Status, Velocity) significantly extend depth — Planview and Linear ship deeper flow metrics natively. Jira Align adds program-tier and portfolio-tier reporting: predictability, PI health, dependency reports, OKR linkage and Rovo-Insights AI summaries. Reports are configurable but the most sophisticated views typically still require Marketplace apps — an honest weakness versus Planview/LeanKit's first-class flow metrics.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Jira Product Discovery (Enterprise GA at Team '26) plus the new Feedback capability (early access at Team '26) explicitly ingest customer signals into the discovery-to-delivery pipeline. Atlassian Analytics and Teamwork Graph allow AI clustering of customer voice across CSM tickets, support cases and feedback sources. This is a genuine and growing capability — not as deep as Productboard's specialised offering, but materially better than EAP/CWM/Rally on this dimension and improving with every release.</p>
+<h3 id="integrations-ecosystem_4">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>The Atlassian Marketplace hosts 5,000+ apps and is a structural moat. Native integrations span Slack, Teams, GitHub, GitLab, Bitbucket, Figma, Confluence, Notion (limited), Salesforce, Zendesk, Intercom, PagerDuty, Datadog, New Relic, Sentry and hundreds more. The Rovo MCP Server adds gateway integrations across Amplitude, Box, Canva, Figma, Gamma, GitHub, Intercom, New Relic, Replit and growing. Connector quality is generally high. This ecosystem is the single largest commercial moat in the category.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Best-in-class. Atlassian Community has hundreds of thousands of members; Stack Overflow <code>jira</code> tag volume dwarfs every competitor; r/jira and r/agile have active daily traffic; Marketplace partner network is global; consultant/Solution Partner network is large and credentialed. Conference cadence (Team '26 is the canonical event) and community days drive ongoing momentum. Ecosystem health as a long-term-viability signal is unambiguously strong.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>Atlassian Cloud offers Cloud Premium and Cloud Enterprise tiers with data residency controls across multiple regions (US, EU, Australia, Germany, India, Japan, Singapore, UK, Canada, Switzerland) and Bring Your Own Key encryption on Cloud Enterprise. Data Center (self-hosted) remains available for Jira and Confluence (not Jira Align — Jira Align is cloud-only). For regulated EU/government buyers, Cloud Enterprise with regional residency is generally acceptable; for true air-gap self-host, Data Center remains the answer for the Jira tier specifically.</p>
+<p><strong>Customization</strong></p>
+<p>Custom workflows, custom fields, screen schemes, custom issue types, automation rules (Jira Automation, GA, no-code rule builder), Forge platform for custom apps, scripted fields via ScriptRunner (Marketplace). Highly configurable; admins can self-serve significant changes without developer involvement. Over-customisation is a documented anti-pattern (workflow sprawl, field bloat) but the tooling supports both lean and heavy operating models. Less extreme configurability than ServiceNow's Now Platform but materially more developer-ergonomic.</p>
+<h3 id="commercial_4">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Transparent published pricing. Jira Cloud Free (10 users), Standard (~$7.91-$8.15/user/month), Premium (~$15.25/user/month, includes Advanced Roadmaps), Enterprise (custom). Jira Align is enterprise-only with a 50-user minimum starting at $100/user/month list, with edition pricing reportedly spanning $27,000 to $3,987,600 across customer sizes. The Jira-tier pricing is one of the lowest barriers to entry in the category; the Jira Align tier is one of the highest. The combined per-user-only model with no per-portfolio fee is a structural commercial advantage over ServiceNow EAP.</p>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>3-year TCO at the Jira tier is widely considered low-to-moderate: Cloud removes server infrastructure, automation reduces admin overhead, Marketplace apps add incremental cost. Typical large-org TCO is dominated by Marketplace app sprawl (eazyBI, ScriptRunner, Tempo Timesheets, BigPicture) and Premium/Enterprise license uplifts. At the Jira Align tier, TCO climbs dramatically — implementation consulting, training, ART configuration and ongoing tuning push to six-to-seven figures over three years. Combined Jira + Jira Align TCO is still generally lower than equivalent ServiceNow SPM + EAP at comparable scope.</p>
+<h3 id="market-position_4">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Atlassian holds 2,708 reviews on Gartner Peer Insights in the Enterprise Agile Planning Tools market — roughly 30x ServiceNow's review volume and the largest sample in the category. Jira is consistently a Leader in Gartner's analyst reports and a perennial Forrester Wave Leader. Jira Align is also recognised in the EAP Market Guide. Developer cultural reputation is strong: Jira is the default ('we use Jira' is the unmarked statement in most engineering orgs), with Linear as the cool challenger and ServiceNow as the enterprise-buyer choice. Reddit/HN sentiment toward Jira is mixed (heavy customisation can produce slow, confusing instances) but the depth and ubiquity are uncontested.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Linear specifically (the team-experience leader): (1) Jira is not local-first / sub-100ms on board interactions. (2) Jira's command palette is good but slower than Linear's. (3) Visual density and 'noise' on boards is higher than Linear's calm design. (4) Mobile sprint-board parity not as clean as Linear's native apps. (5) Onboarding 'time-to-first-issue' is fast but the initial board can feel overwhelming versus Linear's minimal default. (6) Marketplace dependency for advanced flow metrics versus Linear's built-in equivalents. These are friction-level gaps, not showstoppers — Jira's structural advantages (ecosystem, integrations, Jira Align portfolio tier, Rovo agents) decisively outweigh them at enterprise scale.</p>
+<p><strong>What Eap Must Build</strong></p>
+<p>Not applicable — this field is eap-only.</p>
+<hr />
+<h2 id="linear">Linear</h2>
+<p><strong>Priority:</strong> 🟠 High</p>
+<h3 id="team-experience_5">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Built explicitly for engineering ICs and small-team scrum masters. Issues are first-class with status, priority, estimate, labels, cycle (sprint), and project assignment. Cycles are time-boxed sprints with automatic rollover of incomplete work — no manual sprint admin overhead. Triage inbox replaces backlog grooming for inbound work. Acceptance criteria are written as native sub-issues or task lists inside an issue rather than free-text body — task lists render as inline checkboxes that flip status independently. WIP limits exist on workflow states but are advisory rather than enforced (a frequent enterprise complaint). Definition of Done lives by convention; there is no first-class DoD object. Time tracking is delegated to integrations (Toggl, Tempo). The execution layer feels designed by people who use it daily — every interaction collapses 3–4 Jira clicks into 1–2 keystrokes.</p>
+<p><strong>Keyboard Command Ux</strong></p>
+<p>Industry benchmark. Cmd+K opens the command palette; nearly every action — assign, change status, change priority, label, move to project, create sub-issue, copy issue ID — is single-keystroke discoverable from the palette. Status changes via single letters (e.g. 'Y' for In Progress, 'V' for Done) without modifiers. The full keyboard map is browsable in-app via '?'. Customer testimonials specifically cite 'the command palette and keyboard shortcuts make it way faster to move around and do things'. Linear's keyboard-first ethos is the explicit reference point competitors are now benchmarked against.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Live presence indicators on issues; cursor-position awareness in shared documents/specs. Threaded comments with @mentions, emoji reactions, and rich-text editing. Activity feed on every issue captures status changes, assignments, and PR links automatically. Slack integration is bidirectional — comments thread back into Linear, and unfurled issue links show live status. Native Notification Inbox consolidates triage, mentions, and assigned-to-you items; many teams report this materially reduces Slack DM volume for coordination.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>Native iOS and Android apps (Linear Mobile, App Store ID 1645587184). Covers core daily-execution flows: viewing assigned issues, status changes, commenting, triaging the inbox, capturing new issues with voice/photo. Sprint board ('Cycle' view) is present on mobile but with reduced filtering. Feature parity gaps vs. desktop are explicit — complex operations like building automations, configuring custom fields, or editing roadmaps require the web app. Offline mode is limited; most features need an active connection and offline-made changes can produce sync conflicts. Adequate for daily standup and quick status hygiene; not a substitute for desktop for planning.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Project Documents are native — markdown-rich docs live inside Projects alongside the issue list, intended for specs, PRDs, and status updates. Initiatives also have an attached document. This closes a meaningful portion of the 'open Jira + open Confluence' loop for engineering specs, though it is not a full wiki replacement (no nested doc trees, no fine-grained permissions per doc, limited templating). Adequate for one-spec-per-project use cases; teams with org-wide knowledge bases still pair Linear with Notion/Confluence.</p>
+<h3 id="developer-experience_5">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Best-in-class for engineering ICs. CLI is community-maintained but actively used. VS Code extension surfaces assigned issues and lets you change status without leaving the editor. Branch names auto-generate from issue ID (e.g. ENG-1234-feature-name) via 'copy branch name' palette command. PRs and commits referencing the issue ID auto-link and drive workflow transitions. Deployment status surfaces on issues via Vercel/Netlify/CI integrations. The defining experience is that a developer never opens a browser tab to update Linear during a workday — the IDE plus the PR description does it.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Two-way sync with GitHub, GitLab, Bitbucket is mature and per-team configurable. Magic words ('Closes', 'Fixes', 'Resolves') plus issue ID in PR description, branch name, or commit message auto-link and drive workflow transitions. PR draft → issue moves to 'In Progress'; PR open → 'In Review'; PR merged → 'Done'. Per-team workflow automations let admins map specific GitHub states to specific Linear states. Personal git automations let individual developers customize their own automation. Branch name enforcement is supported by convention (the copy-branch-name action) rather than hard policy. Considered category-leading alongside Jira's GitHub app — the reference implementation for VCS↔planning sync.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>2026 benchmark. MCP server at mcp.linear.app (OAuth 2.1 with dynamic client registration) exposes 25 tools for find/create/update of issues, projects, comments, initiatives, project milestones, and updates. Native MCP support in Claude, Cursor, and any MCP-compatible client. As of April 2026 Linear Agent can itself connect outbound to other tools via MCP — agents inside Linear can pull from external systems. Admin controls include allowlists and workspace-level MCP permissions. Penetration data published by Linear: 75% of enterprise workspaces have at least one agent installed, agent work volume grew 5x in three months, and 25% of new issues are now agent-created. CEO Karri Saarinen declared 'issue tracking is dead' on March 24, 2026, repositioning the product as an Agent Management surface. OpenAI's Symphony agent platform is built on top of Linear, providing concrete enterprise validation.</p>
+<h3 id="onboarding-adoption_5">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>First productive sprint typically within hours. No mandatory admin configuration: default workflow states, default cycle cadence, and default priority scale work out of the box. Templates exist for engineering, product, design, and QA teams. Self-serve onboarding — invite link, create team, start filing issues. The opinionated single workflow is the time-to-value engine: there is no choose-your-own-process configuration to complete before teams can ship. Customer reports of 'started using it in under a day' are routine.</p>
+<p><strong>Migration Story</strong></p>
+<p>Jira → Linear is well-trodden. Native CSV importer plus a Jira-specific importer that maps issue types, statuses, assignees, comments, attachments, and links. Field mapping coverage is good for standard Jira fields; custom Jira fields require manual mapping or are imported as Linear labels/custom fields. Rollback safety: original Jira workspace remains untouched, so a parallel-run period is the standard pattern. Community case studies (e.g. Cotera moving from GitHub Issues at 500 tickets) are abundant. The opinionated model means teams cannot fully replicate complex Jira workflows — this is presented as a benefit, not a gap.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low-to-moderate at the platform level but high at the conceptual level. No layer is being sunset. However, the March 2026 'issue tracking is dead' pivot signals an aggressive product reframing toward agent orchestration; buyers committing to Linear today are buying into the bet that the next 18 months of product investment shifts further from human-IC ergonomics to agent context-feeding. Some long-time users on HN expressed unease that the human-first UX investment may slow.</p>
+<h3 id="framework-portfolio_5">Framework &amp; Portfolio</h3>
+<p><strong>Reporting Metrics</strong></p>
+<p>Lightweight but well-designed. Native cycle burndown and progress charts, velocity per team, completion rate, and scope-change tracking. Insights dashboard offers cycle predictability and throughput. Triage queue size and aging are surfaced. Flow metrics (cycle time, lead time) are present for issues. OKR/initiative-level rollup via the Initiatives view. No CFD out of the box. Reporting is configurable but consciously bounded — Linear avoids the 'every metric Jira can compute' approach. Best-suited for engineering teams; less robust for program-level KPI reporting.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Native Customer Requests feature lets support/CS tag inbound Intercom/Zendesk/Front messages to Linear issues, with request counts surfacing on issues to inform prioritization. Not as deep as Productboard but materially closes the support→roadmap loop without a separate tool.</p>
+<h3 id="integrations-ecosystem_5">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Strong on the integrations developers actually use: GitHub, GitLab, Bitbucket, Slack, Discord, Figma, Notion, Sentry, Vercel, Netlify, Zendesk, Intercom, Front, Loom, Cursor, Claude, Cycle. Not as broad as Jira's 5,000+ marketplace. Public API and webhooks are well-documented; many integrations are first-party. Marketplace is curated rather than open — fewer apps, higher average quality.</p>
+<p><strong>Customization</strong></p>
+<p>Deliberately limited compared to Jira. Custom fields (added in 2024) on Business and Enterprise tiers. Custom workflow states per team. Custom views and saved filters. No custom screen layouts, no scripted automations beyond simple per-team rules, no custom work item types beyond Issue/Sub-issue/Project/Initiative. This is presented as a design value, not a gap — admins cannot create a maintenance burden. Enterprises wanting deep configurability bounce off Linear; that is intentional.</p>
+<h3 id="commercial_5">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Per-user, four tiers. Free: unlimited members, capped at 250 non-archived issues and 2 teams. Basic: $10/user/month billed annually. Business: $16/user/month (after aggressive cuts — was $50 in July 2025, $29 in January 2026, $16 in February 2026, a 68% reduction in seven months reflecting competitive pressure). Enterprise: custom pricing, estimated $250–$350/user/year at 100 seats, $230–$300 at 500+. Annual billing required for paid tiers (monthly available at higher rates). Pricing is straightforward — no per-portfolio or per-project add-ons.</p>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>Materially lower than ServiceNow EAP or Jira Premium+Align for equivalent-size teams. Implementation typically self-serve — no required SI consulting. Admin overhead is minimal (under 0.1 FTE for most workspaces) because configuration depth is bounded. Training is essentially nil — onboarding videos plus the in-app help are sufficient for most ICs. Integration maintenance is light because the integrations Linear ships are first-party. 3-year TCO for a 200-seat team at Business: roughly $115K with no implementation cost. The trade-off is functional ceiling, not cost.</p>
+<h3 id="market-position_5">Market Position</h3>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Vs. Jira: (1) No native Gantt/timeline at portfolio scale — Linear's Roadmaps view does not match Advanced Roadmaps' dependency mapping. (2) Workflow customization is intentionally bounded — enterprise PMOs that need bespoke per-project workflows hit a wall (showstopper for some). (3) No native SAFe artifacts — no PI, no ART, no Capability, no WSJF. (4) Marketplace is curated and small vs. Jira's 5,000+ apps. (5) No on-prem/government-cloud option (showstopper for regulated buyers). (6) Reporting depth is bounded — no CFD, lighter custom-report support. Vs. Linear's own benchmark: Linear is the leader, so the comparison reverses for everyone else. Severity ranking: SAFe absence (showstopper for SAFe enterprises), on-prem absence (showstopper for regulated), customization ceiling (friction for PMO-led orgs), Gantt depth (friction for executive reporting).</p>
+<hr />
+<h2 id="aha">Aha!</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<h3 id="team-experience_6">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Aha! has two surfaces: Aha! Roadmaps (strategy, portfolio, ideas) and Aha! Develop (the sprint execution layer added in 2021). Develop ships a real sprint board, kanban view, WIP limits, story points, burndown chart, capacity planning, and a developer-oriented record model (Features → Requirements). It is more credible as a daily execution tool than Asana or Productboard. However, Develop is a younger, less-adopted product than Roadmaps; reviews note text editing is 'clunky and unreliable' in places and the interface is dense. The story-card UX is functional but not as polished as Linear or as familiar as Jira. For scrum masters running SAFe, Aha! is the most internally-consistent vendor in this trio because Roadmaps + Develop covers strategy through execution, but adoption beyond product-managed teams is uncommon.</p>
+<p><strong>Keyboard Command Ux</strong></p>
+<p>Aha! has invested in keyboard shortcuts: launched workspace switching, quick search, record creation, status updates, and a collaborative text editor with extensive shortcut coverage. Aha! Develop is explicitly designed to be 'quick and intuitive to navigate' with keyboard/mouse fluency. No public Cmd+K command palette comparable to Linear's. Shortcut coverage is broad but discoverability is moderate — users need to know they exist. Better than Asana for keyboard navigation; behind Linear for sub-100ms command-bar fluency.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Mid-strength. Comments, @mentions, and a collaborative text editor exist across Notes, Whiteboards, and record descriptions. Aha! Whiteboards (acquired/built 2022) offers FigJam-style real-time co-editing for ideation and PI Planning sessions. Slack and Teams integrations push notifications and allow comment replies from chat. Live presence indicators exist but are not as fluid as Linear or Notion. The Whiteboards surface is a credible PI Planning room replacement and a differentiator.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>Functional but limited. Aha! supports iPhone, iPad, and Android with native apps. Mobile is described in reviews as 'a simplified experience suited to reviewing rather than editing roadmaps.' Status updates, comments, and basic record viewing work; complex roadmap edits, PI Planning, and prioritization are desktop-bound. Better than Productboard (which has no mobile app); behind Asana (which has high feature parity). For a developer needing to update a sprint card from a phone, Develop's mobile is usable but not delightful.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Strong. Aha! Knowledge (formerly Aha! Notebooks) is a first-class wiki product included in Roadmaps tiers — it offers Notion-style pages, embeds, and version history. Aha! Whiteboards integrates with Knowledge for visual artifacts. This closes the 'open Jira + open Confluence' loop better than most competitors. AI-assisted writing in Knowledge helps draft sections. This is one of Aha!'s underrated advantages — the in-tool docs surface is materially better than Asana, Productboard, Linear, or Jira (without Confluence).</p>
+<h3 id="developer-experience_6">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Moderate, via Aha! Develop. There is a GitHub extension that automatically links PRs to records when the PR title begins with the record reference, surfaces PR status checks and approvals on the record, and supports a full Pull Requests/Branches view. GitLab, Bitbucket, and Azure Repos integrations exist with similar mechanics. No official IDE plugin (no VS Code/JetBrains extension comparable to Jira's). No CLI. Aha! Develop's extension framework (aha-develop on GitHub) allows custom developer integrations. Developer-surface coverage is materially better than Asana or Productboard but behind Jira and far behind Linear's developer-native feel.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>The strongest VCS integration in this trio. GitHub integration v2 supports automatic PR linking via record reference in PR title, deployment status surfacing, branch and PR list views, status check/approval visibility on records, and webhook-driven sync. GitLab, Bitbucket, and Azure Repos receive comparable treatment. Branch-naming convention enforcement is supported. Two-way coverage (PR opens → record moves to Code Review; merge → record auto-closes) is configurable. Still not at Linear's automatic-branch-creation polish, but closes the canonical VCS gap. For ServiceNow EAP, this is a concrete reference implementation of what 'developer VCS linkage' looks like.</p>
+<h3 id="onboarding-adoption_6">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Slow. Aha! is the most configuration-heavy tool in this comparison. New customers typically engage Aha!'s customer success team for a 2-6 week guided onboarding to set up workspaces, products, releases, scorecards, ideas portals, and integrations. Self-serve trials exist but the product's depth means most teams underuse it without guidance. Reviews consistently cite 'overwhelming during onboarding, especially for smaller teams.' Develop alone is faster to start; the full Roadmaps + Ideas + Develop stack is a quarter-long rollout.</p>
+<p><strong>Migration Story</strong></p>
+<p>Stronger than Productboard, weaker than Jira's marketplace ecosystem. Aha! provides a Jira→Aha! Roadmaps importer, an Aha! Develop migration assistant from Jira, CSV imports, and a public REST API for custom migrations. Field mapping is configurable. There is no documented automated importer from ServiceNow EAP, Rally, or Azure DevOps — those are partner-led or DIY via API. For EAP organizations, Aha!'s strategic hierarchy (Goals → Initiatives → Releases → Features → Requirements) maps cleanly to SAFe semantics, which makes the conceptual migration tractable even where automation is missing.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low. Aha! is a privately-held, profitable, bootstrapped company (founded 2013) with a consistent product cadence and no announced deprecations. No platform transition in flight comparable to Productboard's. The risk is competitive, not transitional — Aha! is being squeezed by Atlassian (Jira Product Discovery), Productboard (discovery/AI), and Linear (developer experience), but its commercial fundamentals are stable.</p>
+<h3 id="framework-portfolio_6">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Strong — among the best in the market alongside Jira Align and Planview. Aha! ships explicit SAFe templates: SAFe PI Planning template in Roadmaps, SAFe Program Board in Develop and Whiteboards, color-coded dependency lines (gray feasible, red problematic) for visual dependency risk, Portfolio → Initiative → Release → Feature → Requirement hierarchy mapping to SAFe's Portfolio/Capability/Feature/Story, WSJF-capable scoring in Ideas, Inspect &amp; Adapt template support, and cross-ART dependency reporting. Plan Program Increments in Aha! Develop is a documented best-practice flow. For a buyer specifically choosing a tool to run SAFe at the portfolio-to-program level, Aha! is a top-three answer. This is Aha!'s strongest competitive position vs EAP.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Strong. Configurable dashboards, pivot reports, charts across Goals, Initiatives, Features, Releases, and Ideas. Portfolio-level rollups, capacity planning, velocity, burndown (in Develop), throughput, WIP. OKR linkage is first-class via Goals → Initiatives → Features. Flow metrics are present in Develop but not as deep as Planview LeanKit. Custom scorecards and prioritization frameworks (RICE, WSJF, value vs effort) are first-class. Cross-portfolio strategic alignment reports are an Aha! signature.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Strong via Aha! Ideas. Provides a customer-facing ideas portal with custom branding, unlimited submitters, voting, status feedback to voters, AI-powered theme discovery across submissions, prioritization by revenue (linking Ideas to Salesforce opportunities), and Empathy Sessions (AI-suggested interview prompts). Behind Productboard for raw-signal ingestion from Zendesk/Intercom/Gong, but stronger for community ideation and voting workflows. Aha!'s Ideas portal is a category-defining product.</p>
+<h3 id="integrations-ecosystem_6">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Broad: 30+ native integrations including Jira (deep two-way), Azure DevOps, GitHub, GitLab, Bitbucket, Salesforce, Slack, Teams, Zendesk, Intercom, Figma, Miro, Confluence, Notion, Box, Google Drive. Marketplace is smaller than Atlassian's 5,000+ but every integration is deliberate and well-maintained. Webhook and REST API are mature.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Moderate. The Roadmap.com community, regular product webinars, certified consultants partner network. Aha! Big Ideas (the customer-facing ideas portal for Aha! itself) shows active product engagement. Smaller than Atlassian or Asana but credible. Stack Overflow presence is low; product manager community presence is significant.</p>
+<p><strong>Customization</strong></p>
+<p>Industry-leading depth. Custom fields, custom record types, custom workflows per workspace, custom scorecards, custom roadmap views, custom layouts, automation rules. Reviews simultaneously praise and criticize this — 'super flexible' but 'endless dropdowns and boxes' that create maintenance burden and onboarding friction. Admin overhead is real. The customization ceiling is higher than Asana, Productboard, or Linear; the floor (out-of-box experience) is correspondingly more cluttered.</p>
+<h3 id="commercial_6">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Per-user, per-product, billed annually. Aha! Develop $9/user/mo (Essentials) or $18/user/mo (Advanced) — lowest-priced hub. Aha! Discovery $39/user/mo. Aha! Roadmaps Premium $59/user/mo. Aha! Roadmaps Enterprise $99/user/mo. Aha! Ideas Essentials $39/user/mo. Aha! Whiteboards and Knowledge bundled in higher tiers. Volume discounts modest (10-15% for multi-year). Pricing is consistently cited as the single biggest objection — 'competitors offer similar features for $40/mo or less.' Per-product (workspace) line items can multiply for portfolio buyers. EAP's per-user + per-portfolio model is structurally similar.</p>
+<h3 id="market-position_6">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Strong with product managers and portfolio leaders. Gartner Peer Insights and G2 ratings are solid (4.3-4.5 range across products with modest review counts). TrustRadius reviews trend positive on capability, negative on pricing and UI density. Reputation as 'the premier roadmap-to-OKR tool' is well-earned. Developer sentiment is neutral-to-cool — Aha! Develop has not displaced Jira in developer culture. Premier reputation in product-ops circles; near-zero brand recall in engineering Reddit/HN threads.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: smaller marketplace, weaker developer culture, no equivalent of Jira Service Management, no Atlassian-scale community. Versus Linear: no command palette, no local-first responsiveness, no sub-100ms interactions, dated UI feel, weaker keyboard fluency, no agentic MCP server at Linear's depth. Versus Productboard: less powerful raw customer-signal ingestion (Pulse, Spark) from external feedback sources, no MCP-connected agent like Spark. Versus Asana: smaller integration ecosystem, weaker mobile, steeper onboarding, higher per-seat cost. Aha!'s structural gap is UI modernity and agentic AI; its structural strength is SAFe depth and strategy-to-execution traceability.</p>
+<hr />
+<h2 id="asana-asana-intelligence">Asana / Asana Intelligence</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<h3 id="team-experience_7">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Asana's daily execution layer is broad but not opinionated for software engineering. Sprint-like work is possible via list/board views with custom fields for story points, status, and acceptance criteria, but there is no first-class sprint object, no enforced WIP limit, no native burndown/CFD, and no built-in definition-of-done concept. Story-card UX is clean and reduces cognitive load for cross-functional teams, but scrum masters routinely build sprints with workarounds (sections, recurring projects, custom rules). The board feels designed for marketing, ops, and PMO users — not for developers. Compared to Jira or Linear, the absence of native story points, retrospective tooling, and sprint velocity makes it a poor fit as the system of record for a scrum team, even though many ARTs run their non-engineering tracks (UX, content, GTM) on Asana alongside Jira.</p>
+<p><strong>Keyboard Command Ux</strong></p>
+<p>Asana exposes a documented set of keyboard shortcuts (Tab+M to assign to me, Tab+D for due date, Tab+S to like/follow, etc.) and supports quick-add via Tab+Q. iOS gained keyboard shortcut support in v7.17+ (including iPad). However, Asana does not have a true Linear-style sub-100ms command palette (Cmd+K) that surfaces every object and action in one searchable input. Quick-navigation exists, but it is project- and task-name focused, not action-fluent. Power users report that bulk operations and status changes still require multiple clicks where Linear, Height, or Shortcut would accept a single keystroke. The system is competent but not designed to reward keyboard fluency at Linear's level.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Strong on async collaboration: task-level comments, @mentions across projects/teams, Messages object for conversations attached to projects, and a unified Inbox that aggregates mentions, status changes, and approvals. Slack integration is mature (slash commands, channel-to-project linking, AI-powered chat summaries inside Slack). Microsoft Teams integration is comparable. Live multi-user presence on a single task is limited compared to Notion/Linear — co-editing a description is possible but not as fluid. The Inbox is the durable advantage and is widely cited as a reason teams choose Asana over Jira for non-engineering work.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>Native iOS and Android apps with high feature parity for daily execution: create, assign, comment, change status, attach files, view My Tasks and Inbox. Recent updates added haptic feedback on task details and shortcuts inside mobile. Offline support is limited — most actions require connectivity. The mobile app is among the strongest in the category and significantly better than Aha! or Productboard for individual contributors who need to update a sprint from a phone. iPad gained dedicated keyboard shortcut support in 2025.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Asana has no first-class wiki or doc surface. Project briefs and task descriptions accept rich text and embeds, but there is no Notion/Confluence-class page object. Teams using Asana typically pair it with Confluence, Notion, or Coda for decision logs and knowledge. This is a documented friction point in the Asana-vs-ClickUp comparison — ClickUp Docs, Height Pages, and Notion erode this gap. AI-drafted project briefs partially close the loop for status writeups but not for durable knowledge.</p>
+<h3 id="developer-experience_7">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Weak by enterprise developer standards. No first-class IDE plugin (no VS Code or JetBrains extension comparable to Jira's). No Asana CLI for issue management. Branch/PR presence on cards is available only through third-party connectors (Unito, n8n, Appy Pie) or the official GitHub/GitLab integrations, which add comments and links but do not surface deployment status or code-review stages natively on the board. Developers who rely on Asana typically tab-switch to GitHub for code work and to Asana only for cross-functional visibility. This is the structural reason Asana competes with Jira on the PMO/strategy layer but not on the engineering execution layer.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Official GitHub and GitLab integrations exist and support linking PRs to tasks, posting PR status as comments, and (with configuration) auto-closing tasks on merge. However, two-way sync depth is shallow compared to Jira's GitHub app: no native branch-naming enforcement, no deployment status on cards, no built-in code-review column logic. Most teams that want deep VCS coupling rely on third-party iPaaS tools like Unito, getint.io, or n8n, which adds cost and maintenance burden. The Asana-GitLab integration documented on GitLab's side has remained largely unchanged in capability for several years. This is Asana's single largest gap for engineering teams.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>Strong and accelerating. Asana AI is included from Starter and above and offers Smart Status (auto-drafted project updates), Smart Fields (suggested custom field values), Words to Workflows (NL workflow creation), and Predict Delays. AI Studio adds builder-grade agent workflows priced via a credits model (Starter 50K/month, Plus 100K/month, Pro 5M/quarter); credit consumption varies by model and supports OpenAI and Anthropic. In 2026 Asana rolled out 21 prebuilt 'AI teammates' that behave like virtual collaborators participating in tasks and threads. The Asana MCP server V2 (mcp.asana.com/v2/mcp) launched February 2026 using streamable HTTP and exposes 30+ tools to external agents (Claude, Cursor, ChatGPT). V1 deprecated May 11, 2026. This MCP maturity is comparable to Atlassian Rovo and ahead of most enterprise PM tools.</p>
+<h3 id="onboarding-adoption_7">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Industry-leading. New users can create a workspace, invite collaborators, and run a useful project the same day with no admin training. G2 ease-of-use score 4.4/5; ease-of-use 8.6/10 on G2's PM grid vs Jira's 8.1. Template library is large and curated. Most teams reach productive use within hours, not days. The friction appears later — at Portfolio, Goals, and AI Studio configuration — but the on-ramp is the lowest among the tools in this comparison.</p>
+<p><strong>Migration Story</strong></p>
+<p>Asana provides CSV import and a Jira-to-Asana importer through the Asana for Jira Cloud app, plus partner-built migration services (Unito, Visor, Exalate). Migration coverage for fields, attachments, and links is acceptable for non-engineering work but loses agile semantics (sprints, story points, epics) on import. There is no first-class Rally or ServiceNow EAP migration path. For organizations migrating away from EAP, Asana would require manual remapping of Capability/Feature/WorkItem hierarchies into Asana's Portfolio→Project→Task model — a non-trivial information architecture exercise.</p>
+<h3 id="framework-portfolio_7">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Weak. Asana has no native SAFe support — no Program Increment object, no ART visibility, no Capability/Feature hierarchy, no Inspect &amp; Adapt template, no WSJF scoring. Portfolios and Goals can model strategic alignment loosely, but they do not enforce SAFe semantics. Organizations running SAFe on Asana do so via heavy customization (custom fields, sections, projects-as-sprints). For ART-level planning, Asana cannot replace Jira Align, Aha!, Planview, or ServiceNow EAP. This is a deliberate positioning choice — Asana targets enterprise work management, not Agile-at-scale frameworks.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Universal Reporting offers configurable dashboards, charts, and pivot tables across projects and portfolios. Goal progress, workload, and project status reports are first-class. However, agile flow metrics (cycle time, lead time, throughput, WIP) are not built in — they require custom field engineering or third-party tools. No native CFD or burndown. OKR linkage is strong via Goals and connects daily tasks to objectives. Smart Status auto-writes executive narratives. Best-in-class for portfolio and PMO reporting; weak for engineering flow analytics.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Limited. Asana offers intake forms, dynamic forms, and customer-feedback project templates, plus integrations with Usersnap, Zendesk, and Service Desk for Asana. It can act as a lightweight ticket queue but does not cluster, theme, or AI-prioritize raw customer signals into roadmap items in the way Productboard or Aha! Ideas do. Asana sees feedback as a request type, not as a signal stream feeding a discovery layer.</p>
+<h3 id="integrations-ecosystem_7">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Mature: 270+ native integrations including Slack, Teams, Salesforce, Zoom, Figma, GitHub, GitLab, Jira, Salesforce, Tableau, Power BI, Okta, Workday. Asana App Marketplace is well-stocked. Two-way Jira sync via official app (since 2024) is the most strategic addition. Salesforce integration is enterprise-grade and a key driver of the customer-facing teams adopting Asana alongside CRM.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Active. Asana Forum has tens of thousands of members; Asana Together user community runs regional events; certified solutions partner program is global. Stack Overflow tag volume is modest compared to Jira (Jira has 5,000+ marketplace apps and 80k+ Stack Overflow questions). Asana's developer ecosystem is smaller than Atlassian's but materially larger than Linear's or Productboard's.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>SaaS only. No on-prem option. Data residency is available on Enterprise+ tier for US and EU; additional regions are roadmap items. This is a gap for highly regulated EU, government, and defense buyers who require sovereign cloud.</p>
+<p><strong>Customization</strong></p>
+<p>Mid-strength. Custom fields (text, number, dropdown, formula, date, people), custom rules with up to 250 actions/month workspace-wide on most paid tiers, custom project templates, and the workflow builder are accessible to non-developers. Custom work item types are not supported in the way Jira issue types are — every record is a Task with custom fields. The 250-rule cap is a documented enterprise friction point: a single rule firing 10 times daily exhausts the cap before month-end. AI Studio adds no-code agent customization but at credit cost.</p>
+<h3 id="commercial_7">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Per-user, billed annually. Personal Free (limited seats); Starter $10.99/user/mo; Advanced $24.99/user/mo (adds Portfolios, Goals, Workload); Enterprise $35/user/mo; Enterprise+ $45/user/mo. AI Studio sold as add-on credits (Plus 100K/mo, Pro 5M/quarter). Pricing is transparent and competitive vs Aha! ($59-$99) but above Linear ($8-$16) and Jira Standard ($8.60). Bundled commercial model — no per-portfolio surcharge unlike ServiceNow EAP.</p>
+<h3 id="market-position_7">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Leader in Gartner Magic Quadrant for Collaborative Work Management three years running (through 2025). G2 #2 in project management behind Jira. SMB-heavy adoption (57% under 100 employees per G2 customer mix) but enterprise penetration growing via Goals and Portfolios. Developer sentiment on Reddit and Hacker News is mixed-to-cool — viewed as a marketing/ops tool, not an engineering tool. Strong reputation with PMs, ops, and cross-functional leaders. 100k+ paying customers; cross-functional enterprise presence often understated in agile comparisons because the engineering side runs on Jira.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: no native sprint/PI object, no story points first-class, no burndown/CFD, no SAFe hierarchy, shallow VCS two-way sync, weaker engineering workflows, smaller marketplace. Versus Linear: no command palette at Linear's speed, no local-first architecture, no native cycle/triage workflow, slower interactions, no built-in issue triage automations, no Linear-style keyboard fluency. Versus Productboard: no customer-signal clustering, no roadmap-from-feedback pipeline. Versus Aha!: no strategy-to-PI traceability, no Ideas portal with voting, no WSJF, no native PI Planning board. Common community complaint: 'Asana is great until engineering touches it.'</p>
+<hr />
+<h2 id="clickup">ClickUp</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<blockquote>
+<p>All-in-one challenger (docs, tasks, chat, whiteboards, agents); Super Agent AI; 800k+ teams; relentless feature velocity; low per-user cost</p>
+</blockquote>
+<h3 id="team-experience_8">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>ClickUp's sprint execution depth is broad but lacks developer focus. Sprint Lists, Sprint Points, Sprint Folders, and a recurring Sprint automation create the scrum primitives; story cards carry status, assignees, priority, sprint points, dependencies, custom fields, subtasks, checklists, time estimates and time tracking. Backlog grooming is supported but the underlying List view feels spreadsheet-first; sprint Board view is workable but not the native paradigm. G2/Capterra reviewers from technical teams explicitly note ClickUp 'was not built for software development — everything is based on lists.' Acceptance criteria typically lives in a description sub-doc or custom field rather than a first-class developer field; definition of done is conventionally a checklist. WIP limits exist per Status column on Board view. The depth is real but the experience is generalist, not developer-native.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Strong. Real-time multi-user editing on Docs, live cursors, @mentions, threaded comments on tasks, assigned comments (convert any comment into an actionable item), ClickUp Chat now lives inside the workspace alongside tasks and docs, and the Inbox unifies notifications. The bet here is explicit: replace Slack-for-coordination by keeping conversation next to the work. For pure dev teams the Slack pattern still dominates, but ClickUp Chat closes the loop more than monday Dev or Jira do natively.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>Native iOS and Android apps. Reviewers consistently rate mobile as adequate for triage, status updates, and quick edits — not for planning, configuration, or reporting. The desktop app remains the primary surface. Synchronisation between desktop and mobile is cited as unreliable in 2025 reviews. Push notifications, offline view of recent items, and basic creation work; complex workflows are noticeably slower or unavailable on mobile.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Strongest in class for this field. ClickUp Docs is a near-Notion-grade document surface with nested pages, /-menu blocks, embeds, live collaboration, and the ability to convert text into a task inline. Docs can be attached to tasks or stand alone in a hierarchy. This is one of the genuine reasons teams choose ClickUp over Jira+Confluence — it collapses two tools into one workspace.</p>
+<h3 id="onboarding-adoption_8">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Fast templates, slow mastery. Self-serve onboarding is genuinely easy — a team can be on a Sprint List inside a day. But ClickUp's 'all-in-one' positioning means the surface area is enormous; reviewers consistently flag a steep learning curve and feeling overwhelmed by the number of features and setup choices. Reaching a tuned, well-governed configuration typically takes weeks for a single space and months at org scale.</p>
+<h3 id="framework-portfolio_8">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Shallow. ClickUp supports the team-level scrum primitives (Sprints, Points, Velocity, Burndown, CFD as dashboard widgets) and offers Portfolios for cross-list roll-up. SAFe-specific constructs — PI Planning UX, ART boards, Capability/Feature/Story canonical hierarchy, WSJF prioritisation, cross-ART dependency mapping, Inspect &amp; Adapt — are not native and are typically modelled with Spaces/Folders/Lists and custom fields. Multiple analyst comparisons explicitly recommend Targetprocess or Jira Align for scaled SAFe and treat ClickUp as suitable for small-to-mid agile teams.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Built-in Agile Dashboards: Burnup, Burndown, Cumulative Flow, Velocity, Lead Time, Cycle Time. Sprint Point system is configurable. Custom dashboards can be assembled with no-code widgets. Reports are configurable rather than fixed — strong flexibility, but flow metrics are dashboard-widgets rather than canonical first-class objects the way they are in Jira's flow analytics or Planview. Cross-portfolio analytics at enterprise scale typically need supplementary tooling.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Limited natively. ClickUp Forms can capture feedback, and integrations to Intercom, Zendesk and similar exist, but there is no Productboard-style native ingestion of NPS, feature votes, or unified customer signal informing prioritisation. Workaround patterns rely on Forms + custom fields + automations.</p>
+<h3 id="integrations-ecosystem_8">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Broad: 1,000+ native integrations including Slack, Teams, GitHub, GitLab, Bitbucket, Figma, Salesforce, Hubspot, Google Workspace, Outlook, Zoom, Zapier, Make, plus a public API and webhooks. Marketplace size is smaller than Atlassian's but the integration coverage of common SaaS tools is competitive. Reviewers flag the Google Calendar/Drive integrations specifically as unreliable with frequent disconnections.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>SaaS-only. Regional data residency offered for Enterprise (US, EU) — no on-prem or private-cloud deployment. Not suitable for buyers with strict air-gap requirements.</p>
+<p><strong>Customization</strong></p>
+<p>Very high. Custom Task Types, custom statuses, custom fields, automation builder, conditional logic, custom views (List, Board, Calendar, Gantt, Timeline, Workload, Activity, Map, Mind Map), and a no-code workflow surface. This is the product's structural advantage. The recurring criticism is that the depth becomes a maintenance burden — configuration sprawl, inconsistent statuses across Spaces, and brittle automations are repeatedly cited.</p>
+<h3 id="market-position_8">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>G2 5,000+ reviews and consistently high CSAT (4.7/5 range) — a structural advantage versus ServiceNow's small review base. Gartner Magic Quadrant for Collaborative Work Management lists ClickUp as a Visionary/Challenger. Developer sentiment on Hacker News and Reddit is more critical: 'feature bloat,' 'not built for developers,' 'slow.' Business-side sentiment is much stronger than engineering sentiment.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>vs Jira: shallower SAFe and enterprise governance, smaller marketplace, weaker audit/compliance posture for the largest enterprises, less mature flow analytics, less developer-native ergonomics. vs Linear: not local-first, no Cmd+K command palette at Linear's response-time bar, no native MCP endpoint of equivalent maturity, slower interaction model, feature bloat that contradicts Linear's restraint. Across both: persistent performance complaints, mobile↔desktop sync issues, half-finished feature edges from a feature-velocity-first culture, no IDE plugin of substance, no first-party CLI.</p>
+<h3 id="sources">Sources</h3>
+<ul>
+<li>https://clickup.com/general-resources/agent-benchmark-report</li>
+<li>https://clickup.com/blog/hub/ai/agentic-ai/super-agents/</li>
+<li>https://clickup.com/brain/agents</li>
+<li>https://help.clickup.com/hc/en-us/articles/6310954639255-Import-from-Jira</li>
+<li>https://help.clickup.com/hc/en-us/articles/12224657564695-Import-from-Jira-legacy</li>
+<li>https://help.clickup.com/hc/en-us/articles/6305771568791-GitHub-integration</li>
+<li>https://help.clickup.com/hc/en-us/articles/6305774858263-GitLab-integration</li>
+<li>https://help.clickup.com/hc/en-us/articles/6309030550167-Use-keyboard-shortcuts</li>
+<li>https://www.g2.com/products/clickup/reviews?qs=pros-and-cons</li>
+<li>https://www.capterra.com/p/158833/ClickUp/reviews/</li>
+<li>https://clickup.com/teams/agile</li>
+<li>https://clickup.com/blog/agile-metrics/</li>
+<li>https://www.capterra.com/compare/19319-158833/JIRA-vs-ClickUp</li>
+<li>https://www.zenhub.com/blog-posts/9-best-clickup-alternatives-for-engineering-teams-in-2025</li>
+</ul>
+<hr />
+<h2 id="monday-dev">Monday Dev</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<blockquote>
+<p>Cross-functional Work OS; AI-analyzed velocity and risk; strong visual UX for non-technical stakeholders; growing enterprise presence</p>
+</blockquote>
+<h3 id="team-experience_9">Team Experience</h3>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Strong, native-feeling collaboration layer: live presence on items, @mentions, threaded item updates, activity log per item, real-time board updates, and an embedded Workdocs surface. Notifications can be tuned per board or per item. Reviewers frequently call out collaboration with non-engineering stakeholders (product, design, marketing) as a primary reason to choose Monday Dev over Jira. Slack/Teams integrations relay updates but the in-tool conversation often replaces the need to switch.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>Native iOS and Android apps with offline access, push notifications, camera capture, voice notes, and gesture-based status changes. Mobile board parity is high — sprint board, item updates, comments, and notifications all work — though heavy customization (custom views, complex automations, dashboards) is best done on desktop. Reviewers generally rate mobile as one of the stronger experiences in the category, ahead of Jira mobile and well ahead of Shortcut (which has no native mobile app).</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Monday Workdocs is built into the platform — collaborative docs that can be embedded on boards or linked to items, with live multi-user editing, /-menu blocks, and embeds. This meaningfully reduces the Jira+Confluence pattern for teams that adopt it, though Workdocs is shallower than Notion/Confluence for long-form knowledge architecture (no robust nested page hierarchy or wiki-grade permissions).</p>
+<h3 id="onboarding-adoption_9">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Fast for the Work OS layer — a team can stand up a sprint board from the Dev template in under an hour. Time to a tuned production setup is longer: G2 and Capterra reviewers consistently call out a learning curve around automations, custom columns, and dashboards. The visual nature of the product is a real onboarding asset for cross-functional stakeholders; engineering-only teams often find it slower to reach 'right' than Linear or Shortcut because there are more ways to configure the same outcome.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low. Monday.com is a profitable public company (NASDAQ: MNDY), Dev is an actively invested product line, and no deprecation announcements affect the dev workflow. Price increases at the Work OS layer in 2024–2025 have produced churn complaints but not platform risk.</p>
+<h3 id="framework-portfolio_9">Framework &amp; Portfolio</h3>
+<p><strong>Reporting Metrics</strong></p>
+<p>Built-in: velocity, sprint burndown, AI Sprint Summary, and customisable dashboards over board data. CFD and lead/cycle time are achievable via dashboard widgets but are not as canonical as in Jira or Linear. Reports are configurable rather than fixed — strong flexibility, but flow metrics are not first-class the way they are in Planview or LinearB.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Limited natively. Integrations to Intercom, Zendesk, Hubspot, Salesforce, and a growing set of feedback tools can pipe signal into a board, but there is no Productboard-style native ingestion of customer feedback, NPS, or feature votes informing prioritisation. Teams build it via automations; it is not a first-class capability.</p>
+<h3 id="integrations-ecosystem_9">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Broad. Slack, Teams, GitHub, GitLab, Bitbucket, Figma, Salesforce, Hubspot, Google Workspace, Outlook, Zoom, Zapier, Make, plus a marketplace of community apps. Strong on business-side integrations relative to Linear; weaker than Atlassian Marketplace at sheer count and at deep DevOps/observability tooling.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>SaaS-only. Regional data residency is offered for Enterprise customers (EU and selected regions) but no on-prem option. Not suitable for buyers with strict private-cloud or air-gap requirements.</p>
+<p><strong>Customization</strong></p>
+<p>Very high at the Work OS layer — custom columns, item types, views, automations, dashboards, and a no-code workflow builder. This is the product's structural advantage and structural weakness: configuration depth is a maintenance burden, and reviewers regularly cite the time required to keep automations and boards clean as the platform scales.</p>
+<h3 id="market-position_9">Market Position</h3>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>vs Jira: shallower SAFe/portfolio depth, smaller marketplace, weaker enterprise governance and audit, no first-class workflow schemes or screen schemes. vs Linear: not local-first, no Cmd+K command palette of comparable depth, no native MCP endpoint, slower on heavy boards, less developer-native. Across both: no IDE plugin of substance, no first-class CLI, weaker code-review-as-board-column abstraction, and no native customer-signal ingestion.</p>
+<h3 id="sources_1">Sources</h3>
+<ul>
+<li>https://www.g2.com/products/monday-dev/reviews</li>
+<li>https://monday.com/w/dev</li>
+<li>https://support.monday.com/hc/en-us/articles/360010646539-Sprint-management-with-monday-dev</li>
+<li>https://support.monday.com/hc/en-us/articles/4549340160658-Sprint-retrospectives-with-monday-dev</li>
+<li>https://support.monday.com/hc/en-us/articles/24047211522194-AI-Feature-Catalog</li>
+<li>https://till-freitag.com/en/blog/monday-integrations-devops-en</li>
+<li>https://community.monday.com/t/mondays-slow-page-load-and-similar-rendering-issues/59649</li>
+<li>https://www.capterra.com/p/10008569/monday-dev/pricing/</li>
+<li>https://monday.com/pricing</li>
+<li>https://work-management.org/software-development/monday-dev-review/</li>
+<li>https://thedigitalprojectmanager.com/tools/monday-dev-review/</li>
+</ul>
+<hr />
+<h2 id="planview-leankit">Planview / LeanKit</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<blockquote>
+<p>Portfolio + flow metrics depth; enterprise budgeting and capacity planning; first-class CFD, throughput, cycle time for Lean/Kanban management</p>
+</blockquote>
+<h3 id="team-experience_10">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Strong Kanban-first execution layer. Cards, lanes, swim lanes, WIP limits, card hierarchies, board templates, and customisable card fields are the core unit of daily work. Lane and card types are highly configurable per team — IT Ops, SAFe, software dev, and strategy teams can each shape the board to their flow without separate tools. The product was originally LeanKit (Kanban-native) and that lineage shows: it feels built for visual flow management more than for sprint-board scrum execution. Scrum-specific affordances (sprint capacity, story points as a first-class column, time-tracking) are recurring improvement requests in 2025 reviews.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Card descriptions support rich text and attachments. There is no embedded wiki or page hierarchy comparable to Confluence/Notion. Teams typically pair AgilePlace with a documentation tool. Documentation in-tool is a brief, not a depth, feature.</p>
+<h3 id="onboarding-adoption_10">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>AgilePlace is faster to stand up than Rally or Targetprocess thanks to its Kanban-first model and board template library (Portfolio, Program, Risks, Teams, Value, Objectives boards). A small team can have a usable board within an afternoon. Enterprise rollouts with Planview Hub bridges and SAFe portfolio configuration add weeks. Reviewers note the initial mental-model shift can be steep if teams come from scrum-first tools.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low. AgilePlace is an active product receiving incremental flow-metric and AI investment. No public sunset, no major architecture migration in flight. The LeanKit -&gt; AgilePlace rebrand is complete and stable. Planview-wide consolidation around the Copilot AI surface is an evolution rather than a deprecation event.</p>
+<h3 id="framework-portfolio_10">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Solid Portfolio-SAFe alignment. Templates for Objectives, Portfolio, Program, Risks, Teams, and Value boards. Velocity and story-point tracking across PI, team, and ART. WSJF prioritisation, epic-to-feature flow, and capacity planning at release-train level. PI Planning supported through dedicated board configurations. AgilePlace is generally regarded as stronger at the Portfolio/Program layer than at the team-sprint layer; teams running pure team-level scrum often pair it with Jira via Hub.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>AgilePlace's anchor strength. First-class CFD, cycle time, throughput, lead time, WIP, flow efficiency, and process control charts — pre-built, configurable, with adjustable start/end lane selection so cycle-time clocks reflect each team's actual definition of 'in progress' and 'done'. Predictability and risk reports feed off the same metric layer. Flow metrics here are deeper and more native than Jira (which needs eazyBI/third-party), Rally (which has them but less elegantly), and ServiceNow EAP. This is the single capability area where AgilePlace clearly leads the EAP field.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Not a core capability. Cards can be created from external systems via Hub or API, but Productboard-style customer feedback ingestion, NPS, or feature voting is not native. Most customers integrate Productboard, Aha!, or a CRM externally and let signals land in AgilePlace cards through Hub.</p>
+<h3 id="integrations-ecosystem_10">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Planview Hub (the Tasktop acquisition) is the integration backbone and remains best-in-class for enterprise tool-chain synchronisation — Jira, Azure DevOps, Rally, ServiceNow, GitHub Issues, GitLab, Digital.ai Agility, and others sync bidirectionally with field-level mapping. Native Slack and Microsoft Teams (with MS Teams board embedding). Salesforce, Jenkins, Zapier, and the rest of Planview's product family (Portfolios, AdaptiveWork, ProjectPlace, Viz) integrate first-class. Marketplace is smaller than Atlassian's but the Hub connector library is structurally differentiated.</p>
+<p><strong>Customization</strong></p>
+<p>Card field customisation, lane structure, swim lanes, board templates, card types, and visual styling are all configurable without code. Workflow rules and automations exist but are simpler than Jira automation. Admin burden is moderate — easier than Rally or Targetprocess, harder than Linear or Trello. The platform optimises for board flexibility rather than schema extensibility.</p>
+<h3 id="market-position_10">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Reputation: serious enterprise tool with strong flow metrics, Portfolio-SAFe credibility, and a respected integration backbone (Hub). G2 rates Planview overall at 4.1/5 across 1,140+ reviews; PeerSpot scores AgilePlace ~9.0/10. Recognised in Gartner EAP Market Guide and SPM Magic Quadrant. Weaknesses cited in 2025 reviews: scrum/sprint features lag the kanban side, native time-tracking is missing, Jira and Enterprise One integration polish needs work, analytics 'might not be as deep as some competitors' for data-heavy orgs, and the home/landing UX needs modernisation. Cultural reputation is 'mature, capable, slightly dated' — closer to enterprise-buyer-loved than developer-loved.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: smaller marketplace, weaker direct GitHub/GitLab/Bitbucket integration (Hub-mediated rather than native), no IDE plugin, smaller developer-individual mindshare. Versus Linear: no command palette, no local-first responsiveness, weaker keyboard fluency, no real-time co-editing of card descriptions, no native MCP endpoint, weaker mobile parity. Friction-level gaps: scrum/sprint depth lags kanban; no native time tracking; admin features for board management need 'beefing up' (per reviewers); landing/home UX feels older than the boards it contains. The board-and-metric layer itself is competitive — the gaps cluster around team-execution scrum ergonomics and modern developer-IDE surface.</p>
+<hr />
+<h2 id="productboard">Productboard</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<h3 id="team-experience_11">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Productboard is not a sprint execution tool — it is a product discovery and prioritization platform. There is no sprint board, no WIP limit, no burndown, no story-card UX for developers, no time tracking, no acceptance-criteria template designed for QA. The 'features' hierarchy is the closest analog to a backlog, but it represents roadmap candidates, not committed sprint work. Execution happens downstream in Jira, Azure DevOps, or Asana via two-way sync. For an individual contributor (developer or scrum master), Productboard is not the tool they live in daily — it is a tool their PM lives in. This is a deliberate positioning choice, not a defect.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Mid-strength. Comments and @mentions exist on features and notes. Real-time co-editing of feature descriptions is limited compared to Notion/Linear. The Slack integration pushes feedback notifications and lets users push feedback from Slack into Productboard. The Teams integration is comparable. The collaboration model assumes PMs work alone on a feature and bring stakeholders in via async comments — not live multiplayer editing.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>Weak. Productboard does not ship a dedicated native mobile app. The web app is mobile-responsive but not touch-optimized; feedback collection, board management, and roadmap editing are significantly degraded on phones. For PMs who need to capture customer feedback on the road, this is a documented friction point and a gap that Aha! (which has a functional mobile app) and Asana (which has native iOS/Android with strong parity) both close. Productboard's typical use is desk-bound.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Productboard's feature descriptions support rich text and AI-generated feature specs (drawing on linked customer insights), which partially serves as in-tool documentation for product requirements. There is no Confluence/Notion-class wiki. Teams typically pair Productboard with Notion or Confluence for broader documentation, and with Jira for engineering acceptance criteria. The AI spec generator is the strongest in-tool documentation play and is improving with Spark.</p>
+<h3 id="developer-experience_8">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Not designed for developers. No IDE plugin, no CLI, no branch/PR visibility on features, no deployment status. Developers interact with Productboard rarely and indirectly — they see a synced Jira ticket that was pushed from Productboard. This is consistent with Productboard's positioning as a PM tool. The lack of developer surface is not a defect for its intended buyer (the product manager) but excludes Productboard from any conversation about a full team-to-portfolio solution.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Effectively none directly. There is no native GitHub, GitLab, or Bitbucket integration that links commits, branches, or PRs to Productboard features. The VCS linkage happens indirectly: Productboard syncs to Jira; Jira has the GitHub/GitLab app; the developer's PR closes the Jira ticket; Productboard reflects the Jira status. Two hops of integration, two surfaces of latency, two places things can desync. For an EAP that wants direct developer linkage, Productboard is not the model.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>Strong and improving rapidly. Productboard Spark (public beta January 2026) is an agentic AI product management assistant that can read a problem brief, ingest customer feedback, query live data from Amplitude/Linear/Notion/Pendo via MCP connectors, draft full feature specs with tracked changes, and revise documents conversationally. Productboard AI also handles auto-clustering of feedback into themes, auto-linking insights to features, and prioritization suggestions. Pulse analyzes feedback from support tools, CRMs, and surveys to surface top-requested features. Productboard exposes an MCP server (zapier.com/mcp/productboard among others). For the discovery layer this is the strongest AI surface in the comparison; on the agentic-execution layer it is still behind Linear's and Atlassian's MCP-native depth.</p>
+<h3 id="onboarding-adoption_11">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Moderate. Asana and Linear are faster on-ramps. Productboard's user-friendly interface accepts new makers within a day, but 52% of reviewed organizations report 60-90 days to reach steady-state value due to integration setup (Jira mapping, feedback source connections, hierarchy modeling). The platform's extensive feature set creates confusion during onboarding. Quick-start value: small product teams can prioritize features in a week; enterprise discovery practices take a quarter.</p>
+<h3 id="framework-portfolio_11">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Weak. Productboard has no native SAFe support — no PI Planning board, no ART concept, no Capability/Feature/Story hierarchy, no WSJF (it offers RICE), no Inspect &amp; Adapt template, no cross-ART dependency view. The 'features' hierarchy is product-strategy-oriented, not framework-aligned. Enterprises running SAFe on Productboard treat it as an upstream discovery feeder to Jira Align or Aha! Roadmaps, where SAFe semantics are handled.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Discovery-layer reporting is strong: feedback coverage by source, theme volume trends, feature prioritization scores (RICE/WSJF/custom), insight-to-feature linkage rates, customer-segment-by-feature heatmaps. Engineering execution metrics (velocity, burndown, CFD, cycle time) are not in scope — those live in the downstream tool. Roadmap views are flexible and shareable as views or portals.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Best-in-class — this is Productboard's flagship capability. Ingests feedback from email, Slack, Intercom, Zendesk, Salesforce, Gong, support tickets, survey tools, and a Chrome extension. Pulse automatically clusters and themes signals. Spark drafts feature specs from linked insights. Automatic insight-to-feature linking removes manual triage. Reviews consistently cite this as the single reason teams choose Productboard over Aha! or Jira Product Discovery. This is the capability EAP entirely lacks and the strongest 'what should EAP build' signal in the research.</p>
+<h3 id="integrations-ecosystem_11">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>20+ native integrations focused on PM workflow: Jira (two-way), Azure DevOps, Asana, Linear, Slack, Teams, Salesforce, Intercom, Zendesk, Pendo, Amplitude, Gong, Notion, Figma, Chrome extension. Plan-gated: Starter/Essentials get 1 Jira integration; Pro 5; Enterprise unlimited. Smaller ecosystem than Asana or Jira but every integration is purposeful for product discovery.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Moderate. ProductMakers community, regional events, a published Product Excellence framework. Smaller than Jira or Asana but engaged. Stack Overflow tag volume is low (PMs don't ask on Stack Overflow). G2 review count 253, Gartner Peer Insights 30 — modest sample sizes vs Atlassian (2,708) but credible for the niche.</p>
+<p><strong>Customization</strong></p>
+<p>Mid-strength. Custom fields, custom prioritization frameworks, custom feature hierarchies, custom views, custom portal branding. The new board model added flexibility but customization is more limited than Aha! for power admins; reviews cite this as a friction point for 'niche use-cases.' Workflow automation is shallow vs Asana's rules engine.</p>
+<h3 id="commercial_8">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Per-maker, billed annually. Makers (active editors) pay; contributors and viewers are free — a flexible model for product orgs with broad stakeholder bases. Essentials $19/maker/mo; Pro $59/maker/mo; Enterprise contact sales. G2 reviews cite per-user fees jumping from $20 to $70/month as the top complaint; 68% of users seek alternatives at scaling cost. Enterprise hits $70k+ annually for 100-maker teams. Pricing is the #1 churn driver per cpoclub and rightfeature.com reviews.</p>
+<h3 id="market-position_11">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Niche leader in customer-feedback-driven product management. Gartner Peer Insights 4.4/5 (30 reviews); G2 4.3/5 (253 reviews). Strong reputation with product managers; near-zero brand awareness among developers and scrum masters. 6,000+ customers including Zoom, One Medical, Cartier, Microsoft, Korn Ferry. Frequently positioned alongside Aha! and Jira Product Discovery in evaluations. Cultural reputation: 'the PM's tool' — beloved by people who own product strategy, invisible to people who write code.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: no engineering execution layer, no sprints, no developer surface, no marketplace at Atlassian scale, two-way sync introduces latency and field-mapping pain. Versus Linear: no command palette, no local-first responsiveness, no native cycle/triage flow, no developer culture. Versus Aha!: no Ideas portal voting at Aha!'s polish, no native SAFe support, no portfolio strategy traceability, weaker customization. Versus Asana: no mobile app, smaller integration ecosystem, no general-purpose work management. Productboard's strategic gap is that it cannot become a team-to-portfolio solution — by design.</p>
+<hr />
+<h2 id="rally-broadcom">Rally (Broadcom)</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<blockquote>
+<p>Original enterprise agile planning leader for 6 consecutive Gartner cycles through 2022; deep SAFe alignment but aging UX and losing mindshare</p>
+</blockquote>
+<h3 id="team-experience_12">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Mature SAFe-first execution layer: Iteration Status, Iteration Tracking, Team Boards, backlog grooming, task-level breakdown, defects, test cases, and acceptance criteria are all first-class objects. Story cards expose tasks, owners, estimates, blocked flags, and discussion threads. WIP and capacity are explicit at team and PI level. The data model is comprehensive and reflects 15+ years of enterprise SAFe practice. However, contemporary reviews repeatedly describe the day-to-day execution UX as feeling dated: dense forms, modal-heavy interactions, and a card editor that feels like a 2014 enterprise web app rather than a tool built for developers and scrum masters in 2026.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Discussion threads, @mentions, watchers, and activity feeds exist on every work item. Email and in-app notifications are configurable. There is no live multi-cursor co-editing of a story card, no real-time presence indicators on a board, and no embedded chat. Most teams still bridge to Slack or Teams via Rally's notification connectors rather than collaborating inside Rally.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Rich-text description fields and attachments on every artifact, but no embedded wiki, no Confluence-style page hierarchy, and no inline doc surface. Teams still leave Rally for Confluence, SharePoint, or Notion to write decision logs, runbooks, or detailed acceptance criteria.</p>
+<h3 id="developer-experience_9">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Historically weak on IDE-native workflows. No first-party VS Code or JetBrains plugin equivalent to Jira's. CLI is limited to the public REST API. The signature 2025 improvement is the Rally MCP Server (GA Feb 25, 2025; OAuth added May 18, 2025) which lets Claude Code, Cursor, and other agents read and mutate Rally artifacts from the IDE. This is a meaningful catch-up move but the editor-side ergonomics still trail Jira's GitHub app and Linear's Git workflow.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Two named integration paths: (1) the legacy Rally VCS Connector for GitHub / GitHub Enterprise posts commits and links them to changesets and artifacts, and (2) the Rally Bot GitHub App connects user stories and defects to pull requests. GitLab has no native connector — users route through the generic Git VCS connector. Bidirectional state machines (PR opened -&gt; Code Review column, merge -&gt; auto-close) are configurable but not turnkey, and branch-naming enforcement requires custom rules. Depth is mid-tier: more than ServiceNow EAP, less than Jira+GitHub or Linear+GitHub.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>Generative AI features run on Google Gemini and include 'Advanced Add New with AI Assistant' (story generation and decomposition) and 'Chart Interpreter' (chart-to-insight summarisation). Subscription-admin controlled. The Rally MCP Server (GA Feb 25, 2025) is the most significant agentic move — it exposes Rally artifacts to external agents (Claude, Cursor) for read/create/update via a standard MCP endpoint. No no-code agent builder analogous to Rovo Studio; no autonomous in-product triage agent yet. Position: meaningful 2025 catch-up, still behind Linear's enterprise agent adoption and Atlassian Rovo.</p>
+<h3 id="onboarding-adoption_12">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Onboarding is slow by 2026 standards. Rally is an enterprise SaaS that assumes a SAFe configuration phase: workspaces, projects, releases, iterations, and team mappings before a sprint can run. Template library exists but is admin-oriented. Self-serve team onboarding without an internal Rally admin is uncommon. Time to first productive sprint is typically days-to-weeks rather than minutes-to-hours.</p>
+<p><strong>Migration Story</strong></p>
+<p>Jira &lt;-&gt; Rally is supported via the Rally-Jira Work Item Connector (WIC) with bi-directional sync of stories, defects, and tasks. Broadcom publishes a Jira-to-Rally migration playbook and partner consultancies (SPK, Ignite, ICON Agility) offer paid migration services. Field mapping is non-trivial because Jira's flat issue model does not align cleanly with Rally's SAFe hierarchy (Capability/Feature/Story). Customers leaving Rally for Jira report material data-shape friction. For ServiceNow EAP specifically, Rally-&gt;EAP would currently require custom ETL.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Multiple active deprecations create real buyer-facing risk: (1) Rally Software On Premise is End-of-Life — customers must move to Commercial SaaS or FedRAMP SaaS, with Broadcom funding one year of data migration; (2) the Rally App SDK and Custom Pages are deprecated, unsupported after Oct 31, 2026 — every customer with custom UI extensions must rebuild on Custom Views and Custom HTML widgets; (3) Rally Idea Manager will receive no further enhancements and support ends Mar 31, 2026. Broader post-Broadcom-acquisition trajectory has prompted ongoing customer concern about long-term roadmap investment.</p>
+<h3 id="framework-portfolio_12">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Best-in-class. Rally was built around SAFe and remains one of the most opinionated SAFe implementations on the market: Portfolio Kanban, Capability/Feature/Story hierarchy, PI Planning boards with team breakouts, capacity planning at team and PI level, ROAM risk boards, Plan Progression for in-flight PI changes, WSJF prioritisation, dependency mapping, and Inspect &amp; Adapt support. Federal SAFe and FedRAMP deployments are a stated focus. This remains Rally's strongest differentiator versus Jira and most modern entrants.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Wide built-in catalog: velocity, burndown, burnup, CFD, throughput, cycle time, lead time, sprint predictability, PI predictability, flow distribution, and program/team dashboards. Reports are configurable via Custom Views; advanced analytics typically extend through Broadcom Clarity or ValueOps Insights. Reports are functional but the visual presentation feels dated relative to modern dashboards. Flow metrics are first-class, though Planview AgilePlace is generally considered the stronger pure flow-metrics tool.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Limited. Rally Idea Manager existed but is being sunset (support ends Mar 31, 2026). Customer-feedback-to-roadmap pipelines (NPS, support ticket linkage, feature votes) typically require external tools (Productboard, Pendo) and a Broadcom Clarity bridge.</p>
+<h3 id="integrations-ecosystem_12">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Native Jira WIC, GitHub VCS Connector + Rally Bot, generic Git connector (covers GitLab indirectly), Microsoft Azure DevOps via partner connectors, ServiceNow ITSM bridges, Slack and Teams notifications, and Broadcom Clarity PPM tight coupling. The Rally MCP Server (2025) broadens the agent ecosystem materially. Marketplace breadth is far below Atlassian's 5,000+ apps; integrations are mostly first-party or partner-built rather than community.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Long-established but slowing. Broadcom Community hosts an active Rally forum with named product managers responding to threads. Stack Overflow tag volume is low. Reddit and Hacker News presence is minimal. Consultant/partner network remains healthy (ICON Agility, Rego, SPK, Ignite) but is concentrated among legacy enterprise SAFe shops rather than greenfield teams. Mindshare has clearly drifted to Atlassian and Linear among individual contributors.</p>
+<p><strong>Customization</strong></p>
+<p>Deep schema customisation: custom fields on every entity, custom states, custom workflows, page layouts, and (historically) the App SDK for custom apps and pages. The App SDK deprecation forces a migration to Custom Views + Custom HTML widgets, which are less powerful — a real regression for customers who built bespoke pages. Admin burden is significant; large Rally tenants often dedicate one or more FTEs to configuration upkeep.</p>
+<h3 id="market-position_12">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Six-time Gartner MQ Leader for EAP through 2022, but the cultural narrative has shifted decisively. Reviews consistently flag outdated UI, slow search, and waning developer enthusiasm. Gartner Peer Insights and SoftwareReviews mixed: strong on SAFe depth and enterprise governance, weak on UX, support responsiveness, and modern developer experience. Broadcom acquisition (post-CA) has prompted ongoing customer questions about investment pace and roadmap clarity. Reputation among individual contributors is weak; reputation among enterprise SAFe program offices remains stronger.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: no marketplace at meaningful scale (5,000+ apps vs Rally's small partner set); weaker GitHub/GitLab depth; no IDE-native plugin culture; dated UI; smaller community footprint. Versus Linear: no command palette; no local-first responsiveness; no native real-time presence/collaboration; mobile experience essentially absent at first-party level; AI feature surface still early. Showstoppers for greenfield teams: dated execution UX, mobile gap, and the looming App SDK deprecation forcing customers to choose between rebuilding or migrating. Friction-level for enterprise SAFe shops: per-seat cost, admin overhead, and slow modernisation.</p>
+<hr />
+<h2 id="shortcut-formerly-clubhouse">Shortcut (formerly Clubhouse)</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<blockquote>
+<p>Developer-flow focused; tight GitHub/GitLab/Bitbucket integration; built by ex-Linear engineers; Linear alternative for agile engineering teams</p>
+</blockquote>
+<h3 id="team-experience_13">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Shortcut is purpose-built for software teams and the daily execution layer reflects that. Story cards are first-class developer objects with workflow state, owner, requester, type (feature/bug/chore), estimate, epic, iteration, labels, branch/PR/commit links, blockers, relationships, and tasks (subtasks with own owners and completion). Iterations are time-boxed sprint primitives (with start/end and capacity), Epics group cross-iteration work, Objectives roll Epics into outcomes. Backlog grooming is well-supported via the Stories view with multi-select, bulk edit, and saved filters. Definition-of-done is conventionally a tasks checklist on the story; acceptance criteria lives in the description (markdown) or a dedicated section. WIP limits per workflow state are configurable. Reviewers consistently call this 'the simplest developer-first tracker after Linear.'</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Good for an engineering-focused tool. Story comments with @mentions and threading, activity feed per story, presence indicators on the story view, and notifications via the in-app inbox plus Slack/email. The collaboration surface is intentionally narrower than monday/ClickUp (no in-app chat product, lighter doc surface) — the bet is that engineering teams already coordinate in Slack and just need the tracker to feed it well.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Limited. Shortcut Docs and Notes exist but are shallow versus Notion/ClickUp/Confluence — sufficient for spec snippets, release notes, retro notes; not a knowledge base architecture with nested hierarchy and wiki-grade permissions. The product position is to integrate with Notion/Confluence rather than replace them. Markdown on story descriptions is solid.</p>
+<h3 id="developer-experience_10">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>High — this is Shortcut's defining strength. Branch naming convention ('/sc<id>/') is baked in; commit messages with formatted directives (e.g. 'fixes [sc123]') auto-link and move stories across workflow states; PR draft vs open vs merged drives story status; a Git Helper generates branch names from any story. Slack integration relays story events into channels. There is a public API and CLI-style tooling, and recent positioning explicitly markets connections to Cursor and Claude Code so coding agents can sync work to GitHub. No deep IDE panel of Jira-app caliber, but the friction surface inside a developer's day is genuinely low. Multiple Capterra reviewers cite ramp-up speed and 'works the way developers think' as primary buying reasons.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Best-in-peer-group for non-Linear tools. Native first-party integrations with GitHub, GitLab and Bitbucket (all three with similar feature parity): branches, commits and PRs link to stories, branch-name conventions auto-link, PR open moves stories to In Review, PR merge to Done (configurable per workflow), draft/WIP PRs are correctly ignored until promoted. The integrations are described in Shortcut docs as the canonical way to drive workflow — a 2026 differentiator vs ClickUp's still-maturing GitLab integration and monday's heavier-configuration model. Deployment status reporting is integration-dependent rather than first-class.</p>
+<h3 id="onboarding-adoption_13">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Fast. Reviewers repeatedly highlight first-day productivity — minimal mandatory setup, sensible defaults, opinionated structure (Iterations + Epics + Stories) that avoids the configuration sprawl of Jira/monday/ClickUp. Free tier up to 10 users lowers buying friction. The opinionated-but-customisable balance is the central reason engineering teams pick it.</p>
+<h3 id="framework-portfolio_13">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Shallow by design. Shortcut supports Epics → Iterations → Stories and Objectives → Epics for outcomes-based roll-up, which covers team-level scrum and lightweight program management. SAFe-specific constructs — PI Planning UX, ART boards, Capability/Feature/Story canonical hierarchy, WSJF, cross-ART dependency mapping, Inspect &amp; Adapt — are not native. For a single engineering org running disciplined scrum this is sufficient; for an enterprise running 50-team SAFe it is not the right tool. Shortcut's positioning explicitly targets the gap between Linear's opinionated simplicity and Jira's configurability — not Jira Align territory.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Built-in: velocity per iteration, burndown, cycle time, lead time, throughput, Objectives progress, custom reports over story data. Reports are configurable. Flow metrics are first-class compared to monday Dev and ClickUp where they are dashboard-widgets. Cross-portfolio analytics at enterprise scale are limited.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Limited natively. Integrations to Productboard, Intercom, Zendesk exist via the integrations marketplace, but Capterra reviewers explicitly flag the gap: 'using productboard for discovery and notion for company-wide documentation — the integrations with shortcut are quite ineffective. We are unable to push a feature from productboard to shortcut as a feature, only as an epic.' Not a Productboard-style native ingestion capability.</p>
+<h3 id="integrations-ecosystem_13">Integrations &amp; Ecosystem</h3>
+<p><strong>Customization</strong></p>
+<p>Moderate. Configurable workflow states per Team, custom fields on stories, custom story types, saved filters, configurable iteration cadences. Less rigid than Linear's opinionated workflow; less wildly flexible than ClickUp/monday. The positioning is deliberate — 'enough to fit your process, not enough to let you build a maintenance nightmare.'</p>
+<h3 id="market-position_13">Market Position</h3>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>vs Jira: no SAFe/PI Planning UX, no Jira Align analog, no enterprise governance/audit depth, dramatically smaller marketplace, no on-prem, smaller analyst footprint. vs Linear: not local-first (no comparable sub-100ms responsiveness across the board), command palette is good but Linear's is faster, no native mobile app at Linear's parity, smaller AI/MCP footprint with less proven enterprise adoption, less opinionated visual polish. Across both: weakest mobile experience in the peer group, limited customer-signal ingestion, smaller community, narrower data-residency story.</p>
+<h3 id="sources_2">Sources</h3>
+<ul>
+<li>https://www.shortcut.com/</li>
+<li>https://www.shortcut.com/pricing</li>
+<li>https://help.shortcut.com/hc/en-us/articles/204909925-Set-up-a-Version-Control-System-Integration</li>
+<li>https://www.shortcut.com/blog/shortcut-vcs-integration</li>
+<li>https://www.shortcut.com/integrations/gitlab</li>
+<li>https://www.shortcut.com/import/jira</li>
+<li>https://www.shortcut.com/blog/shortcut-for-agents</li>
+<li>https://www.shortcut.com/blog/linear-alternative-why-engineering-teams-choose-shortcut</li>
+<li>https://efficient.app/compare/linear-vs-shortcut</li>
+<li>https://www.ideaplan.io/compare/linear-vs-shortcut</li>
+<li>https://www.softwareadvice.com/project-management/clubhouse-profile/reviews/</li>
+<li>https://www.capterra.com/p/160498/Shortcut/reviews/</li>
+<li>https://news.ycombinator.com/item?id=29833002</li>
+<li>https://atono.io/blog/most-popular-jira-alternatives-compared</li>
+<li>https://toolstackpm.com/tools/shortcut/features/mobile-app</li>
+</ul>
+<hr />
+<h2 id="targetprocess-ibmapptio">Targetprocess (IBM/Apptio)</h2>
+<p><strong>Priority:</strong> 🟡 Medium</p>
+<blockquote>
+<p>Highly configurable SAFe-capable alternative; named in 2025 Gartner EAP Market Guide; extreme schema flexibility for non-standard frameworks</p>
+</blockquote>
+<h3 id="team-experience_14">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Targetprocess (now branded IBM Targetprocess after the IBM-Apptio acquisition) is built around an unusually configurable entity model: User Stories, Tasks, Bugs, Features, Epics, Iterations, Releases, Portfolios, Projects, Programs, and any custom entity an admin defines. Boards, lists, and timelines are configurable for each entity type. The execution layer is functionally complete for sprint work — backlog, iteration, task breakdown, acceptance criteria, time tracking — but reviews consistently flag that the daily ergonomics are heavier than Jira or Linear: opening a card opens a dense detail view, the search bar is criticised as 'not user-friendly', and small actions like adjusting task time can require zooming the browser. Power comes at the cost of immediacy.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Rich-text descriptions, attachments, and custom field support per entity. No embedded wiki or page-tree structure. Teams using IBM Targetprocess typically continue to maintain documentation in Confluence, SharePoint, or Box.</p>
+<h3 id="developer-experience_11">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Not pitched as a developer-first tool. No first-party VS Code or JetBrains plugin. CLI is limited to the REST API. A community-built Targetprocess MCP server (aaronsb/apptio-target-process-mcp on GitHub) exists and can be imported as a toolkit into IBM watsonx Orchestrate, giving AI assistants the ability to query and mutate Targetprocess data — but this is a community/IBM-orchestrate path rather than a first-party IDE integration like Linear's or Rally's GA MCP. Developer ergonomics are weaker than Jira+GitHub or Linear+Git.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Modern DevOps integrations for GitHub, GitLab, Azure DevOps (Cloud and Server), and Bitbucket (Cloud and Server). Branches, PRs, and merge requests are auto-linked to Targetprocess entities by ID via webhooks, with follow-up API calls fetching branch/MR details. Bi-directional state transitions are achievable (PR opens -&gt; story to In Review, merge -&gt; Done) but require configuration. Depth is mid-tier — better than ServiceNow EAP, comparable to Rally, behind Jira's GitHub app maturity.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>AI direction is via IBM watsonx Orchestrate rather than a standalone in-product copilot. Watsonx Orchestrate exposes Targetprocess as a domain agent: a community MCP server (imported as a watsonx toolkit) lets AI assistants search, retrieve, create, and update User Stories, Bugs, Tasks, and Features. Watsonx Orchestrate ships agentic-AI capabilities and integrates with 80+ enterprise apps (AWS, Adobe, Oracle, Salesforce, ServiceNow, Workday). In-product generative features (auto-acceptance-criteria, sprint summaries, decomposition) are less prominent than Planview Copilot or Atlassian Rovo. Position: enterprise-agentic-via-watsonx is the story; native in-product AI surface is thinner.</p>
+<h3 id="onboarding-adoption_14">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Onboarding is slower than most modern tools because Targetprocess rewards (and effectively requires) up-front model design — what entity types exist, what custom fields, what views, what process. A team that adopts defaults can start within a day; an enterprise adopting Targetprocess for its configurability typically invests weeks-to-months in schema and view design before scaling. Reviewers explicitly cite a steep learning curve and frustration during the initial period.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low-to-moderate. The product is actively maintained under IBM after the Apptio acquisition and was named in the 2025 Gartner EAP Market Guide (published April 8, 2025). Branding has shifted Apptio Targetprocess -&gt; IBM Targetprocess; IBM is positioning it alongside watsonx Orchestrate, Apptio cost management, and Azure Marketplace availability. No public sunset signals. Buyer risk is mainly strategic ambiguity (will IBM keep Targetprocess differentiated from other IBM portfolio assets?) rather than a concrete deprecation.</p>
+<h3 id="framework-portfolio_14">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Strong and flexible. Configurable for Essential SAFe, Large Solution SAFe, Portfolio SAFe, and Full SAFe. PI Planning view supports distributing backlog items across team iterations within a Program Increment, with capacity vs. demand comparison. Remote PI Planning is a named capability. Portfolio Flow and Measure-and-Grow templates ship as 'Solutions Market' content. Targetprocess's differentiator over Rally is that its model is configurable rather than opinionated — it can mirror SAFe precisely or be reshaped for non-SAFe scaled frameworks (Spotify, LeSS, custom hybrids).</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Configurable Visual Reports plus a query language (Targetprocess DSL) that lets admins build velocity, burndown, CFD, throughput, cycle time, lead time, predictability, and custom flow metrics. Reports are powerful but require investment to build well — the trade-off mirrors the schema flexibility. Out-of-the-box dashboards are present but less polished than Planview AgilePlace's pre-built flow-metric suite.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Not a native capability. Customer signals (NPS, feature requests, support tickets) are typically piped in via custom entity types + API/webhook integrations from Productboard, Zendesk, or similar. The platform's flexibility makes it more amenable to building this than most peers, but it is not a turnkey feature.</p>
+<h3 id="integrations-ecosystem_14">Integrations &amp; Ecosystem</h3>
+<p><strong>Community Vitality</strong></p>
+<p>Smaller than Atlassian or even Rally. The Apptio Community hosts a Targetprocess group; the IBM Community handles broader announcements (e.g. the 2025 Gartner Market Guide recognition). Mindshare data point: Targetprocess project-collaboration mindshare slid from 0.8% to 0.6% YoY as of early 2025 — a concrete signal of declining individual-contributor footprint. Reddit/HN/Stack Overflow presence is limited. Consultant network exists but is concentrated.</p>
+<p><strong>Customization</strong></p>
+<p>This is Targetprocess's signature strength. Entity types, custom fields (including the powerful Targetprocess Entity field that points to other entities), custom views, custom quick filters, custom workflows, automation, and a Detailed Views JSON layout system that lets admins reshape card forms (tabs, sections, fields, buttons) per entity. Where Jira's customisation is broad-but-shallow and Linear's is intentionally narrow, Targetprocess's is broad-and-deep. The cost: admin burden is real, configurations age, and the same flexibility that wins large-enterprise deals frustrates new users on day one.</p>
+<h3 id="market-position_14">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Named in 2025 Gartner Market Guide for EAP (April 2025) and rated in Gartner Strategic Portfolio Management. G2 and TrustRadius reviews are mixed: praised for configurability, SAFe coverage, SSO/Slack/Teams integrations, and scalability; criticised for steep learning curve, complex UI for new users, search ergonomics, and dated detail-view interactions. Cultural reputation: 'the configurable enterprise SAFe alternative' — respected by enterprise architects, less loved by individual contributors. Mindshare trend is mildly downward. The IBM/Apptio rebrand is still settling.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: smaller marketplace, no IDE plugin culture, smaller individual-contributor mindshare, less polished daily ergonomics, no GitHub app at Jira's polish level. Versus Linear: no command palette, no local-first responsiveness, dense card UI, no native real-time presence/co-editing, no first-party in-product MCP at Linear's adoption level, weaker mobile parity. Showstoppers for new teams: steep learning curve, daily UI density, and the perception that 'we need a Targetprocess admin' before adoption. Friction-level for enterprises: dated detail views, weaker keyboard fluency, slower modernisation cadence than Atlassian or Linear. Distinguishing strength: schema flexibility for non-standard frameworks remains genuinely differentiated and is the reason Targetprocess wins deals where Rally and Jira would both lose.</p>
+<hr />
+<h2 id="height">Height</h2>
+<p><strong>Priority:</strong> 🔵 Low</p>
+<h3 id="team-experience_15">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Before shutdown, Height was a credible team-execution tool that combined task tracking and chat in one surface — tasks, subtasks, custom attributes, lists, sprints, dependencies, and sophisticated automation. The unique angle was that chat threads were native to tasks, so daily standups, blocker discussions, and decisions sat inside the work item rather than in a separate Slack channel. The execution layer was praised by product and engineering teams for flexibility, design quality, and feature completeness. As of September 24, 2025 the service is discontinued and all data was deleted, so what remains is the design pattern and lessons, not a usable tool.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>This was Height's signature capability and the reason it is referenced in the brief. Threaded chat lived on every task and inside every list, blurring the line between Slack and the work item. @mentions, presence, live cursors on docs, and inline replies meant that the 'open Slack to ask a quick question about this ticket' switch was largely eliminated. The Copilot Chat feature (launched 2024) added an AI participant in those threads that could summarise, suggest assignees, dedupe tasks, turn chat messages into subtasks, and auto-generate async standups. This is the model the brief flags as relevant to EAP's missing real-time collaboration story.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Tasks supported rich descriptions and attachments, and Pages/specs lived alongside tasks. The 'auto-updating specifications' Copilot feature kept doc-style specs synchronised with task progress — an early version of the docs-as-planning idea Notion now sells. This closed-loop pattern is part of why the brief calls Height a relevant reference for context-switching reduction.</p>
+<h3 id="onboarding-adoption_15">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Height was a fast-onboarding tool — sign up, import or create lists, start chatting. Lower configuration burden than Jira; less template scaffolding than Notion or ClickUp. Closer to Linear's 'open it and use it' ergonomics.</p>
+<p><strong>Migration Story</strong></p>
+<p>Critical point for the brief: Height shut down September 24, 2025 and deleted all customer data after the shutdown. Users had to export to JSON or CSV before that date. ClickUp's import tool can process Height exports, and Shortcut published a Height migration guide. Linear is the closest spiritual successor by feel; Asana, Jira, and Notion are also documented receivers. The migration story is now retrospective only.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Maximum — the product is discontinued. Service ended September 24, 2025 (announced March 22, 2025 by CEO Michaël Villar). Founders did not publicly disclose reasons; Height was not acquired. Total funding was $18.3M raised across 3.5 years of public availability. For the purposes of this research it is a teardown reference, not a competitive option.</p>
+<h3 id="framework-portfolio_15">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>None of substance. Height was a flat team-and-product tool. No PI Planning, no ART, no Capability/Feature SAFe taxonomy, no cross-ART dependency mapping, no WSJF. It was never positioned at this layer.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Native chat threads on tasks plus Slack/email-to-task automations meant customer-facing teams could route signal into work items. Not a Productboard-class capability (no NPS, no native feature voting), but better than most peers because of the chat-native surface.</p>
+<h3 id="integrations-ecosystem_15">Integrations &amp; Ecosystem</h3>
+<p><strong>Community Vitality</strong></p>
+<p>Mid-tier in life. Reasonable Twitter/X presence, design-conscious user base. Smaller than Linear's community, larger than niche tools. Now zero — the company and product are offline. Some user-generated 'lessons from Height' retrospectives circulating in 2025-2026.</p>
+<p><strong>Customization</strong></p>
+<p>Custom attributes, custom task types, custom views, automation rules, sophisticated 'adaptive workflow' engine that surfaced relevant fields based on task type. Lighter-touch than Jira's schema-everything model; more flexible than Linear's opinionated rigidity. Praised for hitting a middle ground.</p>
+<h3 id="commercial_9">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Per-seat SaaS. List rate was around $6.99/user/month at the time of shutdown — directly competitive with ClickUp ($7) and below Linear ($8-14). Free tier existed. No published per-portfolio or consumption tier.</p>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>Was low — pure SaaS, low admin overhead, no implementation consultancy ecosystem. The TCO point that matters now is the exit cost: every Height customer paid a forced migration cost in 2025, which is a cautionary tale for any single-vendor lock-in in this category.</p>
+<h3 id="market-position_15">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>While operating: 'cult favourite of product teams', often paired with Linear in 'modern alternatives to Jira' lists, design-press darling, regular Product Hunt visibility. Post-shutdown: a case study in the AI project management category — frequently cited as 'the pioneer that couldn't sustain the burn rate even after pivoting to autonomous AI'. Symbolic of the consolidation pressure on category 3 (chat-native PM) startups in the post-ZIRP era.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: no SAFe, no portfolio, marketplace orders of magnitude smaller, no enterprise admin/governance depth. Versus Linear: less polished P50 perceived latency, smaller community, weaker brand. Versus its own future: business viability — the defining gap. The lesson for EAP is not Height's competitive gaps but its design choices: chat-native task threads, AI-on-tasks, async standup auto-generation, dedup, and the 'one surface for execution and conversation' model.</p>
+<p><strong>What Eap Must Build</strong></p>
+<p>Not applicable (eap-only field).</p>
+<hr />
+<h2 id="notion-notion-projects">Notion / Notion Projects</h2>
+<p><strong>Priority:</strong> 🔵 Low</p>
+<h3 id="team-experience_16">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Notion Projects is a database-native take on team execution rather than a purpose-built agile tool. Projects, Tasks, and Sprints are first-class linked databases with templated views; Tasks ship with three preset types (task, bug, feature request). Sprint boards, backlogs, Kanban, timeline, and table views are all available and visually polished. Story-point estimation is manual; there are no native WIP limits, no opinionated definition-of-done enforcement, and no acceptance-criteria fields by convention — teams build that themselves. The strength is flexibility and beautiful docs-on-tasks; the weakness is that an engineering team that wants strict scrum scaffolding has to construct it. Reviewers in 2025-2026 consistently note Notion 'excels at knowledge management and documentation but struggles with true project execution at scale'.</p>
+<p><strong>Keyboard Command Ux</strong></p>
+<p>Notion has Cmd+K quick find/jump, a slash-command authoring surface, and a growing set of keyboard shortcuts for navigation, block manipulation, and view switching. Status changes via keyboard exist but are noticeably slower than Linear's command-bar pattern; the database query/filter UX is mouse-first. Power users can move fast inside a page; cross-database keyboard fluency is weaker. Not a command-bar-first tool the way Linear or Height were.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Strong on the doc-collab axis: real-time co-editing, comments, @mentions, inline discussion threads on pages and database rows, and shared cursors. The weakness is the absence of a chat-native experience on tasks (the Height pattern) — most teams still open Slack for quick coordination, and Notion's notification quality is widely criticised as noisy and easy to miss. Activity feeds exist but are less immediate than Linear's or Jira's. Real-time collab is the docs strength bleeding into projects rather than a project-tuned collaboration model.</p>
+<p><strong>Mobile Experience</strong></p>
+<p>iOS and Android apps are functional but 'doesn't feel native'. Sprint board parity with desktop is partial: editing limited to pre-opened pages when offline; can't create new databases offline; media sync is online-only; small-screen database editing is unintuitive. A developer can update a single task status from their phone; doing a real backlog grooming session on mobile is impractical. Offline mode is severely limited.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>This is Notion's defining strength and the reason it threatens EAP's single-source-of-truth pitch in non-SAFe orgs. Acceptance criteria, decision logs, PRDs, meeting notes, and runbooks all live as rich pages directly inside or alongside work items. Templated docs (PRD, RFC, retro, postmortem) are abundant. The 'docs-as-planning' pattern lets a lightweight team run product + engineering + ops on Notion alone, eliminating the Confluence+Jira split. For non-regulated, non-SAFe organisations under ~200 people this is genuinely sufficient.</p>
+<h3 id="developer-experience_12">Developer Experience</h3>
+<p><strong>Developer Experience</strong></p>
+<p>Limited as a developer's daily tool. No VS Code or JetBrains plugin from Notion itself. A GitHub property type can link tasks to PRs and trigger automated updates. Developers typically experience Notion as 'where the spec lives' rather than 'where I work' — they tab into it for context, then tab back to the IDE and Linear/Jira. The new Notion MCP server (open-source, <code>makenotion/notion-mcp-server</code>) lets agents (Claude, Cursor, etc.) read/write Notion databases, which makes it consumable from the IDE via MCP without a dedicated plugin. Still developer-adjacent rather than developer-native.</p>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>A native Notion property type allows tasks to be linked to GitHub pull requests with automated status updates on PR changes. Community projects like GitNotion sync GitHub issues, PRs, and commits into structured Notion databases and use Gemini to generate weekly summaries. The depth is shallower than Jira's GitHub app: branch-naming enforcement, automatic state transitions on merge, and deployment status on cards are not native; they require Zapier-class glue or custom automation. Adequate for lightweight teams; insufficient for a regulated engineering org that needs auditable commit-to-story traceability.</p>
+<p><strong>Ai Agentic Maturity</strong></p>
+<p>Materially upgraded in 2025-2026 and the highest-velocity AI strategy of the three items in this batch. Notion 3.3 (February 2026) shipped Custom Agents — configurable AI teammates given access to Notion, Slack, Mail, Calendar, and MCP-connected tools (Linear, Figma, HubSpot, Stripe, GitHub, Intercom, Amplitude, Attio, Sentry). The official Notion MCP server exposes read/write Notion databases to any MCP client, so external agents can update task status, pull blockers, and write standup summaries back to a page. Notion AI is bundled in Business at $20/user/month (the prior $10 add-on was killed May 2025). The AI lives where the docs live, which is a real advantage over PM tools that try to bolt AI onto a sprint board. Agentic depth is competitive with Linear's and Atlassian's, with Notion's edge being the unified doc+task corpus the agent reasons over.</p>
+<h3 id="onboarding-adoption_16">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Very fast for an individual or small team — sign up, open a template, run a sprint within an hour. The template library is enormous (community + official). The catch: 'fast to start, slow to scale'. Larger teams hit governance, permissioning, and reporting walls; admin work to structure cross-team databases and prevent sprawl becomes a real burden. Initial TTV is faster than EAP; sustained TTV at scale flips.</p>
+<p><strong>Migration Story</strong></p>
+<p>A native Jira connector pulls Jira data into Notion AI's context for cross-platform alignment. Importers exist for Asana, Trello, ClickUp, Evernote, and CSV. Direct Jira→Notion migration of issues with full hierarchy and history is partial; teams typically run parallel rather than cut over. The Notion direction of travel is 'connect Jira and live in Notion for docs', not 'replace Jira'. For the brief's threat-modelling: non-SAFe teams quietly let Jira atrophy while doing real work in Notion is the realistic pattern.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low. Notion is profitable, well-funded, expanding aggressively (Notion Mail, Calendar, AI, MCP, Custom Agents in successive 2025-2026 releases). Pricing tier reshuffling in May 2025 was a friction point ($10 AI add-on collapsed into Business at $20) but not a deprecation. Risk profile is pricing creep, not product abandonment.</p>
+<h3 id="framework-portfolio_16">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>None. Notion 'is best suited for a single team — multi-team program increments (SAFe-style) require significant custom configuration'. No PI Planning UX, no ART, no Capability/Feature/Story SAFe taxonomy, no cross-ART dependency mapping, no WSJF. The threat to EAP is not in SAFe shops; it is in the long tail of non-SAFe product orgs that EAP also tries to address.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Sprint velocity charts update only after the sprint closes — no live burndown mid-sprint without a custom dashboard. Notion charts are 'fine for simple use cases' but struggle with cross-database reporting. No native CFD, no out-of-the-box lead-time/cycle-time/throughput flow metrics, no sprint predictability index, no PI health. OKR linkage can be modelled but is not first-class. Reporting is the weakest dimension relative to Jira, Linear, and ServiceNow EAP.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Forms can capture feedback into databases; Intercom, Zendesk, and Slack signal can be MCP-ingested via Custom Agents. NPS, structured feature voting, and dedicated customer-signal pipelines are not native. Less than Productboard; more than a vanilla PM tool because of the doc-corpus the AI can search.</p>
+<h3 id="integrations-ecosystem_16">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>Broad and growing fast. Native: Slack, GitHub, Figma, Jira, Google Drive, Linear, HubSpot, Salesforce, Asana, Trello, Gmail, Intercom, Zoom, GitLab. MCP integrations (September 2025): Lovable, Perplexity, Mistral, Linear, Figma, HubSpot, Ramp, Wiz, Stripe, GitHub, Intercom, Amplitude, Attio, Sentry. Notion Mail and Notion Calendar are own-stack additions. Marketplace size and connector quality are competitive with the top tier.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Massive. Notion has the largest end-user/template-creator community in this category by a wide margin. Template marketplaces, YouTube creators, course economies, and r/Notion (~700K members) drive grassroots adoption. The risk for IT/RTE buyers is that the community is largely individuals and small teams, not enterprise admin practitioners; community guidance for scaling Notion to 5,000+-person engineering orgs is comparatively thin.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>SaaS-only, no self-hosting. Notion offers EU data residency for Enterprise plans (added 2024) and US-based regional hosting; SOC 2 Type 2, ISO 27001, GDPR compliance. No on-premises or airgapped option. For regulated EU government buyers this is a structural gap relative to Plane — but acceptable for most commercial enterprises.</p>
+<p><strong>Customization</strong></p>
+<p>Database-driven customisation is extremely deep — properties, formulas, relations, rollups, synced blocks, custom views per database. Workflow automation is lighter than Jira's rules engine; Notion Automations cover the basics (status changes trigger property updates, notifications, email). No-code extensibility is best-in-class for document and database shape; weaker than Jira for workflow gates and approval chains. The trade-off is that flexibility becomes maintenance burden — large workspaces frequently become 'database spaghetti'.</p>
+<h3 id="commercial_10">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Free (personal, limited), Plus $10/user/month, Business $20/user/month annual ($24 monthly) — includes Notion AI, was previously a $10 add-on collapsed into Business in May 2025. Enterprise custom, typically $25-30/user/month list, negotiable to $20-25 at 200+ seats with 2-3 year commits, into high-teens at 500+. Per-seat only, no per-portfolio model. Materially cheaper than ServiceNow EAP for small/mid teams; comparable to Jira Premium ($16.50) at the Business tier.</p>
+<p><strong>Total Cost Of Ownership</strong></p>
+<p>Low initial cost, low admin overhead at small scale, no required implementation consulting. TCO inflects upward as the workspace grows: workspace-architect FTE costs, template-maintenance burden, and 'database sprawl' clean-up consume meaningful time at 500+-seat deployments. Still substantially lower 3-year TCO than ServiceNow EAP for non-SAFe orgs.</p>
+<h3 id="market-position_16">Market Position</h3>
+<p><strong>Market Perception</strong></p>
+<p>Capterra and G2 scores high (Capterra ~4.7-4.8). Reviewer sentiment 2025-2026: 'excellent for docs and small-team execution; not enterprise-grade PM at scale'. Notion is the consensus 'single source of truth' for startups and small-mid product teams. Gartner does not position Notion in the Enterprise Agile Planning Tools MQ — they sit in different categories (collaborative work management, knowledge management). The brief's framing — 'growing threat to EAP's single-source-of-truth pitch in non-SAFe orgs' — is well-supported.</p>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: no SAFe, no portfolio layer, no live burndown, weak cross-DB reporting, weak workflow gates, weak audit/compliance for regulated dev. Versus Linear: not local-first, slower, weaker keyboard fluency, no opinionated cycles model, weaker dependency management. Severity: showstopper for SAFe-mandated enterprises and regulated finance/health/government; friction (but acceptable) for product-led non-SAFe orgs under 500 engineers — exactly the segment EAP also wants. The strategic threat to EAP is not 'Notion replaces EAP one-for-one'; it is 'teams quietly stop opening EAP because the doc+task+AI loop in Notion is good enough'.</p>
+<p><strong>What Eap Must Build</strong></p>
+<p>Not applicable (eap-only field).</p>
+<hr />
+<h2 id="plane-open-source">Plane (open-source)</h2>
+<p><strong>Priority:</strong> 🔵 Low</p>
+<h3 id="team-experience_17">Team Experience</h3>
+<p><strong>Team Execution Depth</strong></p>
+<p>Plane offers a credible team-execution layer modelled directly on Linear, with rich work items (rich text, attachments, comments, sub-issues, custom states), Cycles (sprints with burndown), Modules (thematic groupings), Epics, and Pages. The 2025 product reorganised Cycles, Modules, Epics, and Pages as horizontal tabs inside each project, putting the daily execution surface front-and-centre rather than burying it in a sidebar. Boards support Kanban/List/Calendar with grouping and sorting by label/state, and a Power K 2.0 command palette landed October 2025. The system feels purpose-built for an engineering squad of 5-30 people; story points, estimates, sub-issues, labels, and custom states are all first-class. Where it lags Linear is in opinionated workflow defaults — Plane gives flexibility but does less of the 'right thing' automatically — and dedicated scrum master views (capacity planning, ceremony templates) are thinner than Jira's.</p>
+<p><strong>Real Time Collaboration</strong></p>
+<p>Threaded replies on work-item comments shipped December 2025, alongside Intake forms and revised workspace navigation. @mentions, activity logs, and notifications exist; Pages support real-time co-editing. Live presence indicators on boards and cards are present but less prominent than Linear's. Slack integration lets conversations be promoted to Plane work items. The collaboration layer is competent but not the headline experience — Plane still expects teams to use Slack/Teams for real-time chat rather than positioning itself as a chat-replacement like Height did.</p>
+<p><strong>In Tool Documentation</strong></p>
+<p>Pages are first-class — nested pages, doc imports, embeds, and inline references mean acceptance criteria, decision logs, and meeting notes can live next to the work items. The September 2025 release added doc imports and nested pages explicitly to make Plane a 'projects and docs in one workspace' tool, directly attacking the Jira-plus-Confluence and Notion-plus-Jira combos.</p>
+<h3 id="developer-experience_13">Developer Experience</h3>
+<p><strong>Vcs Integration Depth</strong></p>
+<p>Two-way GitHub sync: issues created in GitHub flow into Plane and back, with comments and updates synced; Plane work items can be linked to PRs and commits for traceability. GitHub Enterprise integration shipped October 2025. GitLab integration syncs issues, merge requests, and commits. Sentry integration syncs issues. Auto-state transitions on PR open/merge are achievable but require workflow configuration; branch-naming-convention enforcement is not a documented out-of-the-box feature. The depth is closer to Linear's GitHub integration than to Jira's mature 10-year-old app, but it is materially deeper than ServiceNow EAP's.</p>
+<h3 id="onboarding-adoption_17">Onboarding &amp; Adoption</h3>
+<p><strong>Time To Value</strong></p>
+<p>Cloud free tier is genuinely free-forever for up to 12 users with core Cycles/Modules/Pages; sign-up to first sprint board is minutes, not days. Self-hosted deployment via Docker Compose or Helm with sub-2GB images is among the lightest in the category. The product is intentionally less configuration-heavy than Jira — projects, cycles, and modules are the primary scaffold, and templates exist for common team shapes. Steeper than Linear (which is more opinionated) but materially faster to first value than Jira or ServiceNow EAP.</p>
+<p><strong>Deprecation Transition Risk</strong></p>
+<p>Low. Plane is an actively developed OSS project (~31K GitHub stars, 100+ contributors, 500K+ Docker pulls), aggressive 2025 release cadence (monthly changelogs), and a stated open-core sustainability model. AGPL v3.0 license on the Community Edition. Risks: company-funded OSS vendor change (license shift) is a theoretical concern as with any open-core company; self-hosted Free is capped at 12 users which can force a Pro upgrade as teams grow.</p>
+<h3 id="framework-portfolio_17">Framework &amp; Portfolio</h3>
+<p><strong>Safe Framework Alignment</strong></p>
+<p>Weak. Plane is a team-level tool by design — Cycles, Modules, Epics, and Initiatives provide a small portfolio hierarchy, but PI Planning UX, ART boards, Program Increment burndown, Capability/Feature/Story SAFe taxonomy, cross-ART dependency mapping, WSJF prioritisation, and inspect-and-adapt rituals are not first-class. It can be bent into a flat 'project = ART' shape but the ceremonial scaffolding that SAFe customers expect (and that ServiceNow EAP provides) is absent.</p>
+<p><strong>Reporting Metrics</strong></p>
+<p>Cycles produce burndown charts. Analytics surface velocity and basic flow metrics. Custom dashboards in Business and above. Reports are functional rather than category-leading — there is no equivalent to Planview's flow-metrics-first treatment, and CFD/throughput/lead-time as configurable first-class charts are weaker than dedicated flow tools. Acceptable for a team layer, undersized for portfolio reporting.</p>
+<p><strong>Customer Signal Ingestion</strong></p>
+<p>Intake (renamed to custom Intake forms in December 2025) accepts external requests into a triage queue; Slack-to-work-item supports inbound signal capture. There is no native NPS, feature-vote, or support-ticket ingestion comparable to Productboard.</p>
+<h3 id="integrations-ecosystem_17">Integrations &amp; Ecosystem</h3>
+<p><strong>Integration Ecosystem</strong></p>
+<p>GitHub, GitHub Enterprise, GitLab, Slack, Sentry, VS Code MCP, Jira/Asana/ClickUp/CSV importers, and an open Marketplace launched 2025 for community integrations and agents. Figma is not listed as a native integration as of the latest changelogs. The marketplace is young (months old, not years) and small relative to Jira's 5,000+-app ecosystem.</p>
+<p><strong>Community Vitality</strong></p>
+<p>Healthy for its age. ~31K GitHub stars (#1 in the open-source PM category by stars), 100+ contributors, 500K+ Docker pulls. Active GitHub Discussions, monthly changelog cadence, Launch Week Fall 2025. Discord and Reddit presence exists but is modest compared to Linear/Notion. Marketplace and third-party content libraries are nascent.</p>
+<p><strong>Self Hosting Data Residency</strong></p>
+<p>This is Plane's flagship differentiator. Three self-hosted editions: open-source Community (AGPL v3.0), Commercial, and Airgapped. Docker, Docker Compose, Helm, six documented deployment methods, sub-2GB image. Explicitly markets GDPR, HIPAA, SOC 2 compliance posture via customer control of data. The Airgapped Edition with signed offline bundles and zero external calls is targeted at defence, government, and regulated finance — directly the EU/government niche the brief calls out.</p>
+<p><strong>Customization</strong></p>
+<p>Custom work-item types, custom fields, custom states, custom views, project templates (Business+), workflow rules and approvals (Business+). Workflow builder is competent but less deep than Jira's, and admins cannot reshape screens to the same degree. Reasonable middle ground between Linear's opinionated rigidity and Jira's configuration sprawl.</p>
+<h3 id="commercial_11">Commercial</h3>
+<p><strong>Pricing Commercial Model</strong></p>
+<p>Free Community (self-hosted, AGPL, no user cap on self-host) and Free Cloud (up to 12 users). Pro $6/seat/month (Wiki, time tracking, custom work-item types, Epics, Initiatives, SAML SSO). Business $13/seat/month annual (workflows, approvals, intake, RBAC, nested pages, project templates, advanced dashboards, 2x AI credits). Enterprise Grid for multi-workspace, LDAP, SCIM, airgapped, audit logs. 5 free Guest slots per paid seat. Same price for cloud or self-hosted. Materially cheaper than Jira Premium ($16.50) and Notion Business ($20-24), well below ServiceNow EAP's per-portfolio commercial model.</p>
+<h3 id="market-position_17">Market Position</h3>
+<p><strong>Gaps Vs Market Leader</strong></p>
+<p>Versus Jira: no SAFe PI Planning, no ART-level taxonomy, marketplace 5000x smaller, no formal Gartner positioning, weaker enterprise admin governance, no native time-tracking ecosystem of third-party apps. Versus Linear: not local-first, not as polished or as fast in P50 perceived latency, fewer opinionated defaults, weaker mobile parity for power workflows, smaller user community. Versus ServiceNow EAP: no portfolio/strategy layer, no native ITSM/ITIL linkage, no Now Platform data-model integration. Severities: SAFe absence and portfolio layer are showstoppers for SAFe-mandated enterprises; the rest are frictions.</p>
+<p><strong>What Eap Must Build</strong></p>
+<p>Not applicable (eap-only field).</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "id": "targetprocess-apptio",
+  "name": "Targetprocess (IBM/Apptio)",
+  "description": "Highly configurable SAFe-capable alternative; named in 2025 Gartner EAP Market Guide; extreme schema flexibility for non-standard frameworks",
+
+  "team_execution_depth": "Targetprocess (now branded IBM Targetprocess after the IBM-Apptio acquisition) is built around an unusually configurable entity model: User Stories, Tasks, Bugs, Features, Epics, Iterations, Releases, Portfolios, Projects, Programs, and any custom entity an admin defines. Boards, lists, and timelines are configurable for each entity type. The execution layer is functionally complete for sprint work — backlog, iteration, task breakdown, acceptance criteria, time tracking — but reviews consistently flag that the daily ergonomics are heavier than Jira or Linear: opening a card opens a dense detail view, the search bar is criticised as 'not user-friendly', and small actions like adjusting task time can require zooming the browser. Power comes at the cost of immediacy.",
+
+  "keyboard_command_ux": "Limited keyboard-first UX. No Cmd+K-style universal command palette. Some shortcuts exist for card navigation and form fields but they are not the primary interaction model. Power users typically rely on saved Views, quick filters, and the rich filter language (Targetprocess DSL) rather than keyboard chords. [uncertain]",
+
+  "ui_responsiveness": "Web SaaS architecture. Reviewers in 2025 describe the UI as functional but heavier than modern competitors, with detailed-view rendering and large-board filtering as common slow points. No published P50/P95 numbers. Sentiment: slower than Jira Cloud, materially slower than Linear, broadly comparable to Rally. [uncertain]",
+
+  "real_time_collaboration": "Card-level comments with @mentions, activity history, watchers, and notifications. Slack and Microsoft Teams integrations push updates and allow some inline interaction. No live multi-cursor co-editing. Live board presence indicators are limited. [uncertain]",
+
+  "mobile_experience": "Native iOS and Android apps are listed in app stores. Functional parity is partial — primarily card viewing, status updates, and comments. Reviews rarely call out mobile as a strength; the platform is desktop-first. Offline support is not a documented feature. [uncertain]",
+
+  "in_tool_documentation": "Rich-text descriptions, attachments, and custom field support per entity. No embedded wiki or page-tree structure. Teams using IBM Targetprocess typically continue to maintain documentation in Confluence, SharePoint, or Box.",
+
+  "developer_experience": "Not pitched as a developer-first tool. No first-party VS Code or JetBrains plugin. CLI is limited to the REST API. A community-built Targetprocess MCP server (aaronsb/apptio-target-process-mcp on GitHub) exists and can be imported as a toolkit into IBM watsonx Orchestrate, giving AI assistants the ability to query and mutate Targetprocess data — but this is a community/IBM-orchestrate path rather than a first-party IDE integration like Linear's or Rally's GA MCP. Developer ergonomics are weaker than Jira+GitHub or Linear+Git.",
+
+  "vcs_integration_depth": "Modern DevOps integrations for GitHub, GitLab, Azure DevOps (Cloud and Server), and Bitbucket (Cloud and Server). Branches, PRs, and merge requests are auto-linked to Targetprocess entities by ID via webhooks, with follow-up API calls fetching branch/MR details. Bi-directional state transitions are achievable (PR opens -> story to In Review, merge -> Done) but require configuration. Depth is mid-tier — better than ServiceNow EAP, comparable to Rally, behind Jira's GitHub app maturity.",
+
+  "ai_agentic_maturity": "AI direction is via IBM watsonx Orchestrate rather than a standalone in-product copilot. Watsonx Orchestrate exposes Targetprocess as a domain agent: a community MCP server (imported as a watsonx toolkit) lets AI assistants search, retrieve, create, and update User Stories, Bugs, Tasks, and Features. Watsonx Orchestrate ships agentic-AI capabilities and integrates with 80+ enterprise apps (AWS, Adobe, Oracle, Salesforce, ServiceNow, Workday). In-product generative features (auto-acceptance-criteria, sprint summaries, decomposition) are less prominent than Planview Copilot or Atlassian Rovo. Position: enterprise-agentic-via-watsonx is the story; native in-product AI surface is thinner.",
+
+  "time_to_value": "Onboarding is slower than most modern tools because Targetprocess rewards (and effectively requires) up-front model design — what entity types exist, what custom fields, what views, what process. A team that adopts defaults can start within a day; an enterprise adopting Targetprocess for its configurability typically invests weeks-to-months in schema and view design before scaling. Reviewers explicitly cite a steep learning curve and frustration during the initial period.",
+
+  "migration_story": "Native Jira integration is available on request and is set up by IBM/Apptio's implementation team — bidirectional sync between Targetprocess entities and Jira issues. Jira Server -> Cloud migrations are supported by the Targetprocess team running migration scripts and switching profiles; if Jira keys are preserved (XML backup path) sync restores within ~1 hour. Field mapping is rich thanks to schema flexibility but consequently requires careful design — there is no one-click importer. Customer success stories report 'couple of months' to fully integrate. [uncertain]",
+
+  "deprecation_transition_risk": "Low-to-moderate. The product is actively maintained under IBM after the Apptio acquisition and was named in the 2025 Gartner EAP Market Guide (published April 8, 2025). Branding has shifted Apptio Targetprocess -> IBM Targetprocess; IBM is positioning it alongside watsonx Orchestrate, Apptio cost management, and Azure Marketplace availability. No public sunset signals. Buyer risk is mainly strategic ambiguity (will IBM keep Targetprocess differentiated from other IBM portfolio assets?) rather than a concrete deprecation.",
+
+  "safe_framework_alignment": "Strong and flexible. Configurable for Essential SAFe, Large Solution SAFe, Portfolio SAFe, and Full SAFe. PI Planning view supports distributing backlog items across team iterations within a Program Increment, with capacity vs. demand comparison. Remote PI Planning is a named capability. Portfolio Flow and Measure-and-Grow templates ship as 'Solutions Market' content. Targetprocess's differentiator over Rally is that its model is configurable rather than opinionated — it can mirror SAFe precisely or be reshaped for non-SAFe scaled frameworks (Spotify, LeSS, custom hybrids).",
+
+  "reporting_metrics": "Configurable Visual Reports plus a query language (Targetprocess DSL) that lets admins build velocity, burndown, CFD, throughput, cycle time, lead time, predictability, and custom flow metrics. Reports are powerful but require investment to build well — the trade-off mirrors the schema flexibility. Out-of-the-box dashboards are present but less polished than Planview AgilePlace's pre-built flow-metric suite.",
+
+  "customer_signal_ingestion": "Not a native capability. Customer signals (NPS, feature requests, support tickets) are typically piped in via custom entity types + API/webhook integrations from Productboard, Zendesk, or similar. The platform's flexibility makes it more amenable to building this than most peers, but it is not a turnkey feature.",
+
+  "integration_ecosystem": "Native DevOps integrations for GitHub, GitLab, Azure DevOps, Bitbucket. Native Jira integration. Slack and Teams. SSO via the usual enterprise IdPs. AWS Marketplace and Azure Marketplace listings — Azure listing emphasises Azure DevOps interoperability and IBM Apptio cost-management adjacency. Watsonx Orchestrate as the agentic hub. Marketplace breadth is significantly smaller than Atlassian's. [uncertain]",
+
+  "community_vitality": "Smaller than Atlassian or even Rally. The Apptio Community hosts a Targetprocess group; the IBM Community handles broader announcements (e.g. the 2025 Gartner Market Guide recognition). Mindshare data point: Targetprocess project-collaboration mindshare slid from 0.8% to 0.6% YoY as of early 2025 — a concrete signal of declining individual-contributor footprint. Reddit/HN/Stack Overflow presence is limited. Consultant network exists but is concentrated.",
+
+  "self_hosting_data_residency": "SaaS is the primary offering, with multi-region options (US, EU, others) for data residency. On-premises deployment was historically available and may persist for some enterprise customers; the IBM-era direction emphasises SaaS. AWS Marketplace and Azure Marketplace deployment is supported, which helps with cloud-procurement and regional data residency for regulated buyers. [uncertain]",
+
+  "customization": "This is Targetprocess's signature strength. Entity types, custom fields (including the powerful Targetprocess Entity field that points to other entities), custom views, custom quick filters, custom workflows, automation, and a Detailed Views JSON layout system that lets admins reshape card forms (tabs, sections, fields, buttons) per entity. Where Jira's customisation is broad-but-shallow and Linear's is intentionally narrow, Targetprocess's is broad-and-deep. The cost: admin burden is real, configurations age, and the same flexibility that wins large-enterprise deals frustrates new users on day one.",
+
+  "pricing_commercial_model": "Per-user-per-month with tier escalation. Public proxy data: ~$20 PUPM for under 25 users, ~$30 PUPM for Enterprise (25+), and ~$50 PUPM for the Global tier with advanced features. Average annual contract ~$49k, max cited ~$75k. Implementation fees from $1k (small) to $10k-$50k (large). Cost is meaningfully higher than Jira ($7.50 PUPM list) but lower than Rally enterprise quotes. [uncertain]",
+
+  "total_cost_of_ownership": "Moderate-to-high. Per-seat is mid-market but the real TCO driver is configuration and admin overhead — schema design, view maintenance, and DSL/report authoring typically require dedicated admin capacity (0.5-1+ FTE for large tenants). Implementation engagements with IBM/partners are common. Training overhead is non-trivial because of the steep learning curve. Compensating factor: schema flexibility reduces 'replace the tool' projects later. [uncertain]",
+
+  "market_perception": "Named in 2025 Gartner Market Guide for EAP (April 2025) and rated in Gartner Strategic Portfolio Management. G2 and TrustRadius reviews are mixed: praised for configurability, SAFe coverage, SSO/Slack/Teams integrations, and scalability; criticised for steep learning curve, complex UI for new users, search ergonomics, and dated detail-view interactions. Cultural reputation: 'the configurable enterprise SAFe alternative' — respected by enterprise architects, less loved by individual contributors. Mindshare trend is mildly downward. The IBM/Apptio rebrand is still settling.",
+
+  "gaps_vs_market_leader": "Versus Jira: smaller marketplace, no IDE plugin culture, smaller individual-contributor mindshare, less polished daily ergonomics, no GitHub app at Jira's polish level. Versus Linear: no command palette, no local-first responsiveness, dense card UI, no native real-time presence/co-editing, no first-party in-product MCP at Linear's adoption level, weaker mobile parity. Showstoppers for new teams: steep learning curve, daily UI density, and the perception that 'we need a Targetprocess admin' before adoption. Friction-level for enterprises: dated detail views, weaker keyboard fluency, slower modernisation cadence than Atlassian or Linear. Distinguishing strength: schema flexibility for non-standard frameworks remains genuinely differentiated and is the reason Targetprocess wins deals where Rally and Jira would both lose.",
+
+  "uncertain": [
+    "keyboard_command_ux",
+    "ui_responsiveness",
+    "real_time_collaboration",
+    "mobile_experience",
+    "migration_story",
+    "integration_ecosystem",
+    "self_hosting_data_residency",
+    "pricing_commercial_model",
+    "total_cost_of_ownership"
+  ]
+}

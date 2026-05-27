@@ -219,7 +219,7 @@ EAP.renderTrack = function() {
   var toggleHtml =
     '<div class="track-view-toggle">' +
       '<button class="track-view-btn' + (trackView === 'board' ? ' active' : '') + '" data-track-view="board">Board</button>' +
-      '<button class="track-view-btn' + (trackView === 'team' ? ' active' : '') + '" data-track-view="team">Team</button>' +
+      '<button class="track-view-btn' + (trackView === 'team' ? ' active' : '') + '" data-track-view="team">Workload</button>' +
     '</div>';
 
   // ── Context header — micro-dashboard ──
@@ -330,3 +330,4 @@ EAP.renderTrack = function() {
   h += '</div></div></div>';
   return h;
 };
+

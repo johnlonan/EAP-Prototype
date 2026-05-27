@@ -292,6 +292,7 @@ EAP.renderContent = function() {
     setTimeout(function() {
       EAP.initWorkloadSparklines();
       if (EAP.initSprintComparisonChart) EAP.initSprintComparisonChart();
+      if (EAP.initCFDChart) EAP.initCFDChart();
     }, 50);
   }
   // Trace ring popover — idempotent, works via event delegation on any tab
@@ -547,6 +548,14 @@ EAP.renderContent = function() {
       tlHidePop(0);
       if (id && EAP.openDetail) EAP.openDetail(id);
     });
+
+    // Staggered reveal of bar progress fills — demo eye-catcher on load
+    setTimeout(function() {
+      document.querySelectorAll('.tl-bar-fill').forEach(function(el, i) {
+        el.style.animationDelay = (i * 30) + 'ms';
+        el.classList.add('tl-fill-in');
+      });
+    }, 900);
 
     // Auto-scroll to today on render (no animation — instant position)
     tlScrollToToday(false);

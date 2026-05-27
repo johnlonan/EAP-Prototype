@@ -1,0 +1,60 @@
+{
+  "id": "rally-broadcom",
+  "name": "Rally (Broadcom)",
+  "description": "Original enterprise agile planning leader for 6 consecutive Gartner cycles through 2022; deep SAFe alignment but aging UX and losing mindshare",
+
+  "team_execution_depth": "Mature SAFe-first execution layer: Iteration Status, Iteration Tracking, Team Boards, backlog grooming, task-level breakdown, defects, test cases, and acceptance criteria are all first-class objects. Story cards expose tasks, owners, estimates, blocked flags, and discussion threads. WIP and capacity are explicit at team and PI level. The data model is comprehensive and reflects 15+ years of enterprise SAFe practice. However, contemporary reviews repeatedly describe the day-to-day execution UX as feeling dated: dense forms, modal-heavy interactions, and a card editor that feels like a 2014 enterprise web app rather than a tool built for developers and scrum masters in 2026.",
+
+  "keyboard_command_ux": "Rally exposes a documented keyboard shortcut sheet via Shift+/ covering page navigation, work-item creation, and grid actions. There is no Cmd+K-style universal command palette in the Linear sense — no fuzzy global object jump, no inline status/assignee mutation via keypress, no AI-augmented action bar. Shortcuts are page-scoped rather than system-wide, and the fluency reward is modest compared to Linear or Height. [uncertain]",
+
+  "ui_responsiveness": "Server-round-trip SaaS architecture, not local-first. Common interactions (open card, change status, filter board) feel comparable to mid-2010s Jira Server rather than Linear's sub-100ms target. Users on PeerSpot and SoftwareReviews specifically call out slow and unreliable search, sluggish grid loads on large portfolios, and lag when navigating between PI/team views. No published P50/P95 latency numbers; subjective sentiment is consistently 'functional but slow'. [uncertain]",
+
+  "real_time_collaboration": "Discussion threads, @mentions, watchers, and activity feeds exist on every work item. Email and in-app notifications are configurable. There is no live multi-cursor co-editing of a story card, no real-time presence indicators on a board, and no embedded chat. Most teams still bridge to Slack or Teams via Rally's notification connectors rather than collaborating inside Rally.",
+
+  "mobile_experience": "Broadcom does not ship a flagship first-party Rally mobile app for daily execution. A third-party iOS/Android client called 'AsA For Rally' (v2.5) offers burndowns, sprint visualisations, and image capture into work items but is community-maintained, not enterprise-grade. Mobile users most commonly fall back to the responsive web UI, which is acknowledged as workable but not parity-level with desktop. Offline support is absent. [uncertain]",
+
+  "in_tool_documentation": "Rich-text description fields and attachments on every artifact, but no embedded wiki, no Confluence-style page hierarchy, and no inline doc surface. Teams still leave Rally for Confluence, SharePoint, or Notion to write decision logs, runbooks, or detailed acceptance criteria.",
+
+  "developer_experience": "Historically weak on IDE-native workflows. No first-party VS Code or JetBrains plugin equivalent to Jira's. CLI is limited to the public REST API. The signature 2025 improvement is the Rally MCP Server (GA Feb 25, 2025; OAuth added May 18, 2025) which lets Claude Code, Cursor, and other agents read and mutate Rally artifacts from the IDE. This is a meaningful catch-up move but the editor-side ergonomics still trail Jira's GitHub app and Linear's Git workflow.",
+
+  "vcs_integration_depth": "Two named integration paths: (1) the legacy Rally VCS Connector for GitHub / GitHub Enterprise posts commits and links them to changesets and artifacts, and (2) the Rally Bot GitHub App connects user stories and defects to pull requests. GitLab has no native connector — users route through the generic Git VCS connector. Bidirectional state machines (PR opened -> Code Review column, merge -> auto-close) are configurable but not turnkey, and branch-naming enforcement requires custom rules. Depth is mid-tier: more than ServiceNow EAP, less than Jira+GitHub or Linear+GitHub.",
+
+  "ai_agentic_maturity": "Generative AI features run on Google Gemini and include 'Advanced Add New with AI Assistant' (story generation and decomposition) and 'Chart Interpreter' (chart-to-insight summarisation). Subscription-admin controlled. The Rally MCP Server (GA Feb 25, 2025) is the most significant agentic move — it exposes Rally artifacts to external agents (Claude, Cursor) for read/create/update via a standard MCP endpoint. No no-code agent builder analogous to Rovo Studio; no autonomous in-product triage agent yet. Position: meaningful 2025 catch-up, still behind Linear's enterprise agent adoption and Atlassian Rovo.",
+
+  "time_to_value": "Onboarding is slow by 2026 standards. Rally is an enterprise SaaS that assumes a SAFe configuration phase: workspaces, projects, releases, iterations, and team mappings before a sprint can run. Template library exists but is admin-oriented. Self-serve team onboarding without an internal Rally admin is uncommon. Time to first productive sprint is typically days-to-weeks rather than minutes-to-hours.",
+
+  "migration_story": "Jira <-> Rally is supported via the Rally-Jira Work Item Connector (WIC) with bi-directional sync of stories, defects, and tasks. Broadcom publishes a Jira-to-Rally migration playbook and partner consultancies (SPK, Ignite, ICON Agility) offer paid migration services. Field mapping is non-trivial because Jira's flat issue model does not align cleanly with Rally's SAFe hierarchy (Capability/Feature/Story). Customers leaving Rally for Jira report material data-shape friction. For ServiceNow EAP specifically, Rally->EAP would currently require custom ETL.",
+
+  "deprecation_transition_risk": "Multiple active deprecations create real buyer-facing risk: (1) Rally Software On Premise is End-of-Life — customers must move to Commercial SaaS or FedRAMP SaaS, with Broadcom funding one year of data migration; (2) the Rally App SDK and Custom Pages are deprecated, unsupported after Oct 31, 2026 — every customer with custom UI extensions must rebuild on Custom Views and Custom HTML widgets; (3) Rally Idea Manager will receive no further enhancements and support ends Mar 31, 2026. Broader post-Broadcom-acquisition trajectory has prompted ongoing customer concern about long-term roadmap investment.",
+
+  "safe_framework_alignment": "Best-in-class. Rally was built around SAFe and remains one of the most opinionated SAFe implementations on the market: Portfolio Kanban, Capability/Feature/Story hierarchy, PI Planning boards with team breakouts, capacity planning at team and PI level, ROAM risk boards, Plan Progression for in-flight PI changes, WSJF prioritisation, dependency mapping, and Inspect & Adapt support. Federal SAFe and FedRAMP deployments are a stated focus. This remains Rally's strongest differentiator versus Jira and most modern entrants.",
+
+  "reporting_metrics": "Wide built-in catalog: velocity, burndown, burnup, CFD, throughput, cycle time, lead time, sprint predictability, PI predictability, flow distribution, and program/team dashboards. Reports are configurable via Custom Views; advanced analytics typically extend through Broadcom Clarity or ValueOps Insights. Reports are functional but the visual presentation feels dated relative to modern dashboards. Flow metrics are first-class, though Planview AgilePlace is generally considered the stronger pure flow-metrics tool.",
+
+  "customer_signal_ingestion": "Limited. Rally Idea Manager existed but is being sunset (support ends Mar 31, 2026). Customer-feedback-to-roadmap pipelines (NPS, support ticket linkage, feature votes) typically require external tools (Productboard, Pendo) and a Broadcom Clarity bridge.",
+
+  "integration_ecosystem": "Native Jira WIC, GitHub VCS Connector + Rally Bot, generic Git connector (covers GitLab indirectly), Microsoft Azure DevOps via partner connectors, ServiceNow ITSM bridges, Slack and Teams notifications, and Broadcom Clarity PPM tight coupling. The Rally MCP Server (2025) broadens the agent ecosystem materially. Marketplace breadth is far below Atlassian's 5,000+ apps; integrations are mostly first-party or partner-built rather than community.",
+
+  "community_vitality": "Long-established but slowing. Broadcom Community hosts an active Rally forum with named product managers responding to threads. Stack Overflow tag volume is low. Reddit and Hacker News presence is minimal. Consultant/partner network remains healthy (ICON Agility, Rego, SPK, Ignite) but is concentrated among legacy enterprise SAFe shops rather than greenfield teams. Mindshare has clearly drifted to Atlassian and Linear among individual contributors.",
+
+  "self_hosting_data_residency": "On-Premise is officially End-of-Life — Broadcom is migrating all customers to Commercial SaaS or FedRAMP SaaS. FedRAMP-authorised tenancy is the principal data-residency / sovereignty story; EU data residency is available through SaaS region selection. [uncertain]",
+
+  "customization": "Deep schema customisation: custom fields on every entity, custom states, custom workflows, page layouts, and (historically) the App SDK for custom apps and pages. The App SDK deprecation forces a migration to Custom Views + Custom HTML widgets, which are less powerful — a real regression for customers who built bespoke pages. Admin burden is significant; large Rally tenants often dedicate one or more FTEs to configuration upkeep.",
+
+  "pricing_commercial_model": "Per-user-per-month subscription with multiple tiers. Public proxy data: from ~$29 PUPM at the low end to roughly $200-$300 per user per year for enterprise tiers depending on feature bundle. Enterprise quotes are negotiated. Volume discounts available above 100 seats. Rally is consistently described as one of the more expensive seats in the EAP market and the total tool spend often becomes the largest single agile-tooling line item. [uncertain]",
+
+  "total_cost_of_ownership": "High 3-year TCO. Beyond seats: implementation consulting from Broadcom or partners is typical for SAFe rollouts; ongoing admin overhead commonly requires 0.5-2 FTE for large tenants; training programs through Broadcom Software Academy add cost; the App SDK -> Custom Views migration creates a forced 2025-2026 rebuild project; and the On-Premise -> SaaS migration adds another transition cost stream. Cited as high-TCO in PeerSpot and TrustRadius reviews relative to Atlassian. [uncertain]",
+
+  "market_perception": "Six-time Gartner MQ Leader for EAP through 2022, but the cultural narrative has shifted decisively. Reviews consistently flag outdated UI, slow search, and waning developer enthusiasm. Gartner Peer Insights and SoftwareReviews mixed: strong on SAFe depth and enterprise governance, weak on UX, support responsiveness, and modern developer experience. Broadcom acquisition (post-CA) has prompted ongoing customer questions about investment pace and roadmap clarity. Reputation among individual contributors is weak; reputation among enterprise SAFe program offices remains stronger.",
+
+  "gaps_vs_market_leader": "Versus Jira: no marketplace at meaningful scale (5,000+ apps vs Rally's small partner set); weaker GitHub/GitLab depth; no IDE-native plugin culture; dated UI; smaller community footprint. Versus Linear: no command palette; no local-first responsiveness; no native real-time presence/collaboration; mobile experience essentially absent at first-party level; AI feature surface still early. Showstoppers for greenfield teams: dated execution UX, mobile gap, and the looming App SDK deprecation forcing customers to choose between rebuilding or migrating. Friction-level for enterprise SAFe shops: per-seat cost, admin overhead, and slow modernisation.",
+
+  "uncertain": [
+    "keyboard_command_ux",
+    "ui_responsiveness",
+    "mobile_experience",
+    "self_hosting_data_residency",
+    "pricing_commercial_model",
+    "total_cost_of_ownership"
+  ]
+}

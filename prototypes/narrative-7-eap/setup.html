@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ART Setup — Enterprise Agile Planning</title>
+  <title>Team Setup — Agile Planning</title>
   <link rel="stylesheet" href="../shared/shell.css">
   <link rel="stylesheet" href="../../assets/css/tokens.css">
   <link rel="stylesheet" href="../../assets/css/base.css">
@@ -150,24 +150,36 @@ body {
 }
 .stepper-line.done { background: var(--ai-accent); }
 
+/* ── Scrum fast-path: collapse steps 2 and 4 into the flow ── */
+/* Step order in .setup-stepper: item(1) line item(2) line item(3) line item(4) line item(5)
+   = nth-child:       1       2    3    4    5    6    7    8    9
+   Scrum skips 2 and 4 — hide those nodes + the lines that connect TO them */
+.scrum-flow > :nth-child(2),
+.scrum-flow > :nth-child(3),
+.scrum-flow > :nth-child(6),
+.scrum-flow > :nth-child(7) {
+  display: none;
+}
+
 /* Panes */
 .setup-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .setup-pane {
-  display: none; flex-direction: column; gap: 22px;
-  padding: 30px 26px 24px; flex: 1; /* layout: more top breathing; layout rhythm */
+  display: none; flex-direction: column; gap: 24px;
+  padding: 28px 28px 24px; flex: 1;
 }
 /* overdrive: cinematic pane entry — scale+translate+fade for a physical feel */
 .setup-pane.is-active { display: flex; animation: pane-in 300ms cubic-bezier(0.22,1,0.36,1) both; }
 @keyframes pane-in { from { opacity:0; transform:translateY(14px) scale(0.988); } to { opacity:1; transform:none; } }
 
-.pane-heading { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; } /* layout */
+.pane-heading { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
 /* bolder + typeset: 38→44px, 600→700, tighter tracking — commands the step entry */
-.pane-title { font-size: 44px; font-weight: 700; color: var(--ink); letter-spacing:-0.034em; line-height:1.04; margin:0; }
+.pane-title { font-size: 36px; font-weight: 700; color: var(--ink); letter-spacing:-0.028em; line-height:1.08; margin:0; }
 /* typeset: lift sub from muted to sub for legibility; slightly looser leading */
 .pane-sub   { font-size: 13px; color: var(--sub); line-height:1.65; margin:0; max-width:54ch; }
 
 /* Framework grid */
 .fw-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.fw-grid .fw-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .fw-card {
   background: var(--surface); border: 1.5px solid transparent;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
@@ -312,8 +324,8 @@ body {
 .gen-key { color: var(--ink); font-weight: 600; }
 
 /* Done screen */
-.done-wrap { display: flex; flex-direction: column; align-items: center; padding: 24px 0 20px; text-align: center; flex: 1; }
-.done-ring { width: 80px; height: 80px; border-radius: 50%; background: rgba(22,163,74,0.10); border: 2px solid rgba(22,163,74,0.28); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--ai-accent); animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both; }
+.done-wrap { display: flex; flex-direction: column; align-items: center; padding: 32px 24px 28px; text-align: center; flex: 1; }
+.done-ring { width: 80px; height: 80px; border-radius: 50%; background: rgba(22,163,74,0.10); border: 2px solid rgba(22,163,74,0.28); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; color: var(--ai-accent); animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both; }
 /* overdrive: overshoot spring on the success ring */
 @keyframes done-pop {
   0%   { opacity:0; transform:scale(0.5); }
@@ -343,7 +355,7 @@ body {
   display: flex; align-items: center; gap: 10px;
   margin: 0 0 0 0;
 }
-.btn-back { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background 140ms, color 140ms; visibility: hidden; }
+.btn-back { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: background 140ms, color 140ms; visibility: hidden; }
 .btn-back:hover { background: var(--raised); color: var(--ink); }
 .btn-back:active { transform: translateY(1px); box-shadow: none; transition: transform 70ms ease; }
 .btn-back:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 2px; }
@@ -401,7 +413,7 @@ body {
 
 .prev-scroll {
   flex: 1; overflow-y: auto; overflow-x: hidden;
-  padding: 18px 20px;
+  padding: 20px;
 }
 .prev-scroll::-webkit-scrollbar { width: 4px; }
 .prev-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 4px; }
@@ -596,10 +608,10 @@ body {
 .readiness-title { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 2px; }
 .readiness-sub { font-size: 13px; color: var(--sub); line-height: 1.5; }
 
-.readiness-checklist { display: flex; flex-direction: column; gap: 6px; }
+.readiness-checklist { display: flex; flex-direction: column; gap: 8px; }
 .checklist-item {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 8px 10px; border-radius: 9px;
+  padding: 9px 12px; border-radius: 10px;
   animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
 }
 .checklist-item.done  { background: rgba(22,163,74,0.08); }
@@ -641,7 +653,7 @@ body {
 }
 .auto-config-row {
   display: flex; align-items: baseline; gap: 12px;
-  padding: 9px 14px;
+  padding: 10px 14px;
   border-bottom: 1px solid rgba(0,0,0,0.07);
   animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
 }
@@ -655,16 +667,15 @@ body {
 }
 
 /* ── OTTO QA FORM ─────────────────────────────────── */
-.otto-qa-form { display: flex; flex-direction: column; gap: 10px; }
+.otto-qa-form { display: flex; flex-direction: column; gap: 16px; }
 .otto-q-card {
   background: var(--surface); border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 13px; padding: 15px 17px;
+  border-radius: 12px; padding: 16px;
   display: flex; flex-direction: column; gap: 10px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   animation: pane-in 280ms cubic-bezier(0.22,1,0.36,1) both;
 }
-.otto-q-hd { display: flex; align-items: center; gap: 8px; }
-.otto-q-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--ai-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ai-accent); }
+.otto-q-hd { display: flex; align-items: center; }
 .otto-q-label { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.3; }
 .otto-q-note { font-size: 11px; color: var(--muted); font-weight: 400; }
 .otto-sub-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px; }
@@ -898,12 +909,20 @@ body {
         <section class="setup-pane is-active" id="pane-1">
           <div class="pane-heading">
             <h1 class="pane-title">Pick your framework</h1>
-            <p class="pane-sub">EAP sets up the hierarchy, PI cadence, and terminology automatically.</p>
+            <p class="pane-sub">Your hierarchy, cadence, and terminology are configured automatically based on your choice.</p>
           </div>
           <div class="fw-grid" role="radiogroup" aria-label="Framework selection">
-            <div class="fw-card is-selected" data-fw="essential" tabindex="0" role="radio" aria-checked="true">
+            <div class="fw-card is-selected" data-fw="scrum" tabindex="0" role="radio" aria-checked="true">
               <div class="fw-hd">
-                <div class="fw-hd-left"><div class="fw-eyebrow" style="color:var(--ai-accent)">Recommended</div><div class="fw-name">Essential SAFe</div></div>
+                <div class="fw-hd-left"><div class="fw-eyebrow" style="color:var(--ai-accent)">Recommended</div><div class="fw-name">Scrum</div></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Iterative delivery with time-boxed sprints, a prioritised backlog, and daily standups. The most widely adopted agile framework.</div>
+              <div class="fw-meta"><strong>1–4 week sprints</strong> · Backlog · Velocity tracking</div>
+            </div>
+            <div class="fw-card" data-fw="essential" tabindex="0" role="radio" aria-checked="false">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Multi-team · SAFe</div><div class="fw-name">Essential SAFe</div></div>
                 <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               </div>
               <div class="fw-desc">One ART, 50–125 people. Single program, single PI cadence.</div>
@@ -925,20 +944,12 @@ body {
               <div class="fw-desc">Continuous flow, no fixed sprints. For ops, support, or mixed teams.</div>
               <div class="fw-meta"><strong>No sprint cadence</strong> · Pull-based · WIP limits</div>
             </div>
-            <div class="fw-card" data-fw="scrum" tabindex="0" role="radio" aria-checked="false">
-              <div class="fw-hd">
-                <div class="fw-hd-left"><div class="fw-eyebrow">Sprint-based</div><div class="fw-name">Scrum</div></div>
-                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              </div>
-              <div class="fw-desc">Iterative delivery with time-boxed sprints, a prioritised backlog, and daily standups. The most widely adopted agile framework.</div>
-              <div class="fw-meta"><strong>1–4 week sprints</strong> · Backlog · Velocity tracking</div>
-            </div>
             <div class="fw-card" data-fw="blank" tabindex="0" role="radio" aria-checked="false">
               <div class="fw-hd">
                 <div class="fw-hd-left"><div class="fw-eyebrow">Custom</div><div class="fw-name">Blank</div></div>
                 <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               </div>
-              <div class="fw-desc">EAP makes no assumptions. Define hierarchy and terminology from scratch.</div>
+              <div class="fw-desc">Start with a blank workspace. Define your own hierarchy and terminology from scratch.</div>
               <div class="fw-meta" style="color:var(--muted)">Full flexibility</div>
             </div>
           </div>
@@ -972,7 +983,7 @@ body {
               <div class="method-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
               <div class="method-info">
                 <div class="method-name">Import from Jira or Rally</div>
-                <div class="method-desc">Connect your project and EAP maps epics, stories, and sprints to the SAFe hierarchy. Review the mapping before anything is imported.</div>
+                <div class="method-desc">Connect your project and we map your epics, stories, and sprints to the hierarchy. Review the mapping before anything is imported.</div>
               </div>
               <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
@@ -1010,7 +1021,7 @@ body {
                   <span class="scrum-meta-chip primary">Story</span>
                   <span class="scrum-meta-chip">Epic</span>
                   <span class="scrum-meta-chip">Task</span>
-                  <span class="scrum-meta-chip">Bug</span>
+                  <span class="scrum-meta-chip">Defect</span>
                 </div>
               </div>
               <div class="scrum-meta-card">
@@ -1077,7 +1088,7 @@ body {
             <p class="done-sub" id="done-sub">Your first PI is scheduled. Open the board and start planning.</p>
             <div class="done-actions">
               <a href="home.html?p=ananya" class="btn-ghost">Back to home</a>
-              <a href="index.html?p=ananya&visit=new" class="btn-open">Open EAP workspace</a>
+              <a href="index.html?p=ananya&visit=new" class="btn-open">Open workspace</a>
             </div>
           </div>
         </section>
@@ -1103,6 +1114,12 @@ body {
         <div class="prev-pane is-active" id="prev-p1">
           <div class="hier-diagram" id="hier-diagram"><!-- populated by JS --></div>
           <div class="auto-config-section" id="auto-config-section"><!-- populated by JS --></div>
+          <div id="hier-legend" style="margin-top:16px;display:none;">
+            <div style="display:flex;align-items:center;gap:7px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.06);">
+              <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--charcoal);flex-shrink:0;"></span>
+              <span style="font-size:11px;color:var(--muted);line-height:1.45;">The highlighted chip marks each level's primary focus</span>
+            </div>
+          </div>
         </div>
 
         <!-- Step 2: Method detail -->
@@ -1114,7 +1131,7 @@ body {
         <div class="prev-pane" id="prev-p3">
           <!-- Scrum board preview — shown when Scrum selected -->
           <div id="scrum-board-container" style="display:none;margin-bottom:16px;">
-            <div class="scrum-board-label">Board preview</div>
+            <div class="scrum-board-label">Sprint board</div>
             <div class="scrum-board" id="scrum-board-cols">
               <!-- populated by renderScrumBoardPreview() -->
             </div>
@@ -1223,7 +1240,7 @@ body {
   renderNav('setup', {
     avatar: '../../assets/images/SN Avatar-4.png',
     name: 'Ananya Krishnan',
-    links: { 0: 'home.html?p=ananya', 2: 'setup.html', 3: 'index.html?p=ananya&tab=backlog', 4: 'index.html?p=ananya&tab=board' },
+    links: { 0: 'home.html?p=ananya', 2: 'setup.html', 3: 'index.html?p=ananya&tab=board' },
     theme: 'sand'
   });
 
@@ -1231,7 +1248,7 @@ body {
   var step       = 1;
   var totalSteps = 5;
   var aiDone     = false;
-  var selectedFw = 'essential';
+  var selectedFw = 'scrum';
   var selectedMethod = 'ai';
   var genTimers  = [];
   var generatedTeams = []; // populated at generation time from parsed input + selected framework
@@ -1261,9 +1278,8 @@ body {
     ],
     scrum: [
       { key: 'Sprint',        val: '2-week sprints (configurable)' },
-      { key: 'Work items',    val: 'Epic · Story · Task · Bug' },
+      { key: 'Work items',    val: 'Epic · Story · Task · Defect' },
       { key: 'Board columns', val: 'To Do · In Progress · In Review · Done' },
-      { key: 'Views',         val: 'Board · Backlog · Timeline · Reports' },
       { key: 'Metrics',       val: 'Velocity · Burndown · Sprint report' }
     ],
     blank: [
@@ -1305,7 +1321,7 @@ body {
     scrum: {
       label: 'Scrum framework',
       tiers: [
-        { label: 'Backlog', dot: '#383733', note: 'Prioritised work', entities: [{ name: 'Epic', primary: false }, { name: 'Story', primary: true }, { name: 'Task', primary: false }, { name: 'Bug', primary: false }] },
+        { label: 'Backlog', dot: '#383733', note: 'Prioritised work', entities: [{ name: 'Epic', primary: false }, { name: 'Story', primary: true }, { name: 'Task', primary: false }, { name: 'Defect', primary: false }] },
         { label: 'Sprint', dot: '#585753', note: '1–4 week iteration', entities: [{ name: 'Sprint Goal', primary: true }, { name: 'Commitment', primary: false }], connector: { before: 'Pulls from' } },
         { label: 'Board', dot: '#999995', note: 'In-flight work', entities: [{ name: 'To Do', primary: false }, { name: 'In Progress', primary: true }, { name: 'Done', primary: false }], connector: { before: 'Tracks' } }
       ]
@@ -1361,12 +1377,12 @@ body {
 
   // ── Scrum state ──────────────────────────────────────────────────
   var scrumState = {
-    teamName: 'Digital Banking Team',
+    teamName: '',
     sprintWeeks: 2,
-    workTypes: ['Epic', 'Story', 'Task', 'Bug'],
+    workTypes: ['Epic', 'Story', 'Task', 'Defect'],
     statuses: ['To Do', 'In Progress', 'In Review', 'Done'],
     views: ['board', 'backlog', 'timeline'],
-    tools: ['jira']
+    tools: []
   };
 
   var SCRUM_VIEW_OPTIONS = [
@@ -1381,7 +1397,7 @@ body {
   var PLUS_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>';
 
   // These are Scrum defaults — applied silently. Users don't choose them; Scrum already did.
-  var SCRUM_DEFAULT_WORK_TYPES = ['Story', 'Task', 'Bug'];
+  var SCRUM_DEFAULT_WORK_TYPES = ['Story', 'Task', 'Defect'];
   var SCRUM_DEFAULT_STATUSES   = ['To Do', 'In Progress', 'Done'];
   // Extended options if the team wants more columns (shown as optional extras in step 2)
   var SCRUM_EXTRA_STATUSES     = ['In Review', 'Blocked'];
@@ -1435,7 +1451,7 @@ body {
         }).join('') +
         '</div>';
     }
-    colListHtml += '<div class="otto-pill-help">Drag to reorder. Columns appear left to right on your board. Rename any column to match your team's language — "Building" works just as well as "In Progress".</div>';
+    colListHtml += '<div class="otto-pill-help">Drag to reorder. Columns appear left to right on your board. Rename any column to match your team’s language — “Building” works just as well as “In Progress”.</div>';
 
     html += ottoQCard('What are your board columns?', colListHtml);
 
@@ -1593,15 +1609,8 @@ body {
     var form = document.getElementById('otto-qa-form');
     if (!form) return;
 
-    var t = document.getElementById('pane3-title'); if (t) t.textContent = 'Configure your Scrum board';
-    var s = document.getElementById('pane3-sub');   if (s) s.textContent = 'Set up your team name, sprint length, work items, and statuses. You can change any of these later.';
-
-    var pl = ['plabel-teams','plabel-pi','plabel-conn'];
-    ['Team', 'Sprint', 'Tools'].forEach(function(lbl, i) {
-      var el = document.getElementById(pl[i]); if (el) el.textContent = lbl;
-    });
-
-    var html = '';
+    var t = document.getElementById('pane3-title'); if (t) t.textContent = 'Set up your board';
+    var s = document.getElementById('pane3-sub');   if (s) s.textContent = 'Confirm your team name and sprint length. Board columns and work items are set to Scrum defaults — change them in Settings any time.';
 
     // Hide SAFe panels — they don't apply to Scrum
     var ottoCfg = document.getElementById('otto-config-card');
@@ -1609,40 +1618,80 @@ body {
     var artPh = document.getElementById('art-placeholder');
     if (artPh) artPh.style.display = 'none';
 
-    // Step-2 confirmation: show what was chosen for this team
-    var colSummary = scrumState.statuses.join(' → ');
+    var html = '';
+
+    // Q1: Team name
+    html += ottoQCard('Team name',
+      '<input class="scrum-name-input" id="scrum-team-name" type="text" value="' + (scrumState.teamName || '').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
+
+    // Q2: Sprint length — pills for common lengths + free input for any value
+    html += ottoQCard('Sprint length',
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+      [1,2,3,4].map(function(w) {
+        var sel = scrumState.sprintWeeks === w;
+        return '<button class="otto-pill' + (sel ? ' osel' : '') + '" onclick="setScrumSprint(' + w + ',\'help-scrum-sprint\')" type="button">' + w + '-week</button>';
+      }).join('') +
+      '<div style="display:flex;align-items:center;gap:6px;margin-left:4px;">' +
+      '<input id="scrum-sprint-custom" type="number" min="1" max="12" placeholder="other" ' +
+      'style="width:64px;border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-family:inherit;font-size:12px;color:var(--ink);background:var(--surface);outline:none;text-align:center;" ' +
+      'oninput="if(this.value){setScrumSprint(parseInt(this.value)||1,\'help-scrum-sprint\')}">' +
+      '<span style="font-size:12px;color:var(--muted);">weeks</span></div>' +
+      '</div>' +
+      '<div class="otto-pill-help" id="help-scrum-sprint" style="margin-top:6px;">' + (OTTO_SPRINT_HELP[scrumState.sprintWeeks] || '') + '</div>');
+
+    // Silent defaults — board columns and work items only (views are always available, not "configured")
+    // Optional: invite teammates — name search, chip-based selection
+    var suggestedPeople = ['Priya Nair', 'Marcus Cole', 'James Liu', 'Riya Shah'];
+    html += '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+      '<span style="font-size:12px;font-weight:600;color:var(--ink);">Invite teammates</span>' +
+      '<span style="font-size:11px;color:var(--muted);">Optional</span>' +
+      '</div>' +
+      '<input id="scrum-invite-search" type="text" placeholder="Enter names, separated by commas" autocomplete="off" ' +
+      'style="width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);outline:none;" ' +
+      'onfocus="this.style.borderColor=\'rgba(56,55,51,0.32)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+      '<div>' +
+      '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:7px;">Suggested</div>' +
+      '<div id="scrum-invite-chips" style="display:flex;flex-wrap:wrap;gap:6px;">' +
+      suggestedPeople.map(function(name) {
+        return '<button type="button" class="invite-chip" data-name="' + name + '" ' +
+          'onclick="toggleInviteChip(this)" ' +
+          'style="font-family:inherit;font-size:12px;font-weight:500;color:var(--sub);background:var(--raised);border:1.5px solid var(--border);border-radius:999px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 140ms ease;">' +
+          '<span class="chip-check" style="display:none;width:14px;height:14px;background:var(--ai-accent);border-radius:50%;align-items:center;justify-content:center;flex-shrink:0;"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+          name + '</button>';
+      }).join('') +
+      '</div></div></div>';
+
+    // Defaults — sits below invite so it reads as secondary/supplementary info
+    var colSummary  = scrumState.statuses.join(' → ');
     var itemSummary = scrumState.workTypes.join(' · ');
-    html += '<div style="background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.18);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;">' +
-      '<div style="display:flex;align-items:center;gap:8px;">' +
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ai-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-      '<span style="font-size:13px;font-weight:600;color:var(--ink);">' + (scrumState.teamName || 'Scrum Team') + '</span>' +
-      '<span style="font-size:11px;color:var(--muted);">' + (scrumState.teamSize || '6') + ' people</span></div>' +
-      '<div style="font-size:11.5px;color:var(--sub);">Board: ' + colSummary + '</div>' +
-      '<div style="font-size:11.5px;color:var(--sub);">Tracking: ' + itemSummary + '</div>' +
-      '</div>';
-
-    // Sprint length — THE key Scrum decision. Determines every ceremony date.
-    // 4-week is excluded: it's a recognised anti-pattern (planning overhead outweighs benefit).
-    html += ottoQCard('How long are your sprints?',
-      ottoPillRow([1,2,3], scrumState.sprintWeeks, 'setScrumSprint', '-week', 'help-scrum-sprint') +
-      '<div class="otto-pill-help" id="help-scrum-sprint">' + (OTTO_SPRINT_HELP[scrumState.sprintWeeks] || '') + '</div>');
-
-    // Sprint start date — determines the sprint calendar going forward
-    html += ottoQCard('When does Sprint 1 start?',
-      '<input class="otto-date-input" id="scrum-start-date" type="text" placeholder="e.g. Jun 2, 2025" value="' + (scrumState.startDate || '') + '">' +
-      '<div class="otto-pill-help" style="margin-top:6px;">This sets your sprint boundaries. Your first Sprint Planning meeting should happen on this day.</div>');
-
-    // Tools — practical question: what's already in use?
-    html += ottoQCard('Which tools does your team use?',
-      '<div class="otto-tools">' +
-      OTTO_TOOL_LIST.map(function(t) {
-        var active = scrumState.tools.indexOf(t.key) >= 0;
-        var check = active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
-        return '<button class="otto-tool' + (active ? ' osel' : '') + '" onclick="toggleScrumTool(\'' + t.key + '\')" type="button">' + check + t.label + '</button>';
-      }).join('') + '</div>');
+    html += '<div style="background:rgba(56,55,51,0.04);border:1px solid rgba(56,55,51,0.09);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
+      '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Defaults — change in Settings any time</div>' +
+      '<div style="display:flex;flex-direction:column;gap:5px;">' +
+      '<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:11px;font-weight:500;color:var(--sub);min-width:80px;">Board</span><span style="font-size:12px;color:var(--ink);">' + colSummary + '</span></div>' +
+      '<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:11px;font-weight:500;color:var(--sub);min-width:80px;">Work items</span><span style="font-size:12px;color:var(--ink);">' + itemSummary + '</span></div>' +
+      '</div></div>';
 
     form.innerHTML = html;
-    wireScrumInputs();
+
+    // Wire team name input
+    var nameEl = document.getElementById('scrum-team-name');
+    if (nameEl) nameEl.addEventListener('input', function() {
+      scrumState.teamName = nameEl.value;
+      updateScrumPreview();
+    });
+
+    // Chip toggle handler
+    window.toggleInviteChip = function(btn) {
+      var active = btn.dataset.active === '1';
+      btn.dataset.active = active ? '0' : '1';
+      var tick = btn.querySelector('.chip-check');
+      if (tick) tick.style.display = active ? 'none' : 'inline-flex';
+      btn.style.background     = active ? 'var(--raised)' : 'rgba(22,163,74,0.08)';
+      btn.style.borderColor    = active ? 'var(--border)'  : 'rgba(22,163,74,0.30)';
+      btn.style.color          = active ? 'var(--sub)'     : 'var(--ai-accent-deep)';
+    };
+
     renderScrumBoardPreview();
   }
 
@@ -1798,7 +1847,7 @@ body {
   function ottoQCard(label, content, noteText) {
     var note = noteText ? ' <span class="otto-q-note">— ' + noteText + '</span>' : '';
     return '<div class="otto-q-card">' +
-      '<div class="otto-q-hd"><div class="otto-q-icon">' + OTTO_Q_SVG + '</div>' +
+      '<div class="otto-q-hd">' +
       '<span class="otto-q-label">' + label + note + '</span></div>' +
       content + '</div>';
   }
@@ -1856,8 +1905,15 @@ body {
 
     var html = '';
 
-    // Q1: Count
-    html += ottoQCard(countLabel, ottoPillRow(countOptions, ottoState.teamCount, 'setOttoCount'));
+    // Q1: Count — pills for common values + free-text for any number
+    html += ottoQCard(countLabel,
+      ottoPillRow(countOptions, ottoState.teamCount, 'setOttoCount') +
+      '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;">' +
+      '<span style="font-size:11px;color:var(--muted);">Other:</span>' +
+      '<input id="otto-count-custom" type="number" min="1" max="99" placeholder="e.g. 11" ' +
+      'style="width:72px;border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-family:inherit;font-size:12px;color:var(--ink);background:var(--surface);outline:none;" ' +
+      'oninput="if(this.value){setOttoCount(parseInt(this.value)||1)}">' +
+      '</div>');
 
     // Q2: Names (with note that member invites happen in step 4)
     html += ottoQCard(nameLabel,
@@ -1921,17 +1977,7 @@ body {
         '</div>');
     }
 
-    // Q4: Tools (with ServiceNow first since this is a ServiceNow product)
-    html += ottoQCard('Which tools does your team use?',
-      '<div class="otto-tools">' +
-      OTTO_TOOL_LIST.map(function(t) {
-        var active = ottoState.tools.indexOf(t.key) >= 0;
-        var check = active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
-        return '<button class="otto-tool' + (active ? ' osel' : '') + '" onclick="toggleOttoTool(\'' + t.key + '\')" type="button">' + check + t.label + '</button>';
-      }).join('') +
-      '</div>');
-
-    // Q5: PI start (optional, not kanban)
+    // PI start (optional, not kanban)
     if (fw !== 'kanban') {
       html += ottoQCard('When does your next PI kick off?',
         '<input class="otto-date-input" id="otto-pi-start" type="text" placeholder="e.g. Jun 2, 2025" value="' + ottoState.piStart + '">',
@@ -1998,7 +2044,6 @@ body {
       rowData.push(['PI', ottoState.piWeeks + '-week · ' + (Math.floor(ottoState.piWeeks / ottoState.sprintWeeks) - 1) + ' sprints + IP']);
       rowData.push(['Sprint', ottoState.sprintWeeks + '-week']);
     }
-    rowData.push(['Tools', toolsStr]);
     if (ottoState.piStart) rowData.push(['Starts', ottoState.piStart]);
 
     rows.innerHTML = rowData.map(function(r) {
@@ -2222,11 +2267,11 @@ body {
     import: {
       icon: icon(IC.download, 28),
       title: 'Jira import mapping',
-      sub: 'EAP reads your Jira project and maps the existing hierarchy to SAFe. Review before importing.',
+      sub: 'We read your Jira project and map the existing hierarchy to your structure. Review before importing.',
       items: [
-        { icon: icon(IC.arrowR), name: 'Jira Epic → EAP Feature', note: 'Preserves titles, descriptions, and assignments' },
-        { icon: icon(IC.arrowR), name: 'Jira Story → EAP Story', note: 'Story points, status, and sprint history carried over' },
-        { icon: icon(IC.arrowR), name: 'Jira Sprint → EAP Sprint', note: 'Sprint dates and team assignment mapped automatically' },
+        { icon: icon(IC.arrowR), name: 'Jira Epic → Feature', note: 'Preserves titles, descriptions, and assignments' },
+        { icon: icon(IC.arrowR), name: 'Jira Story → Story', note: 'Story points, status, and sprint history carried over' },
+        { icon: icon(IC.arrowR), name: 'Jira Sprint → Sprint', note: 'Sprint dates and team assignment mapped automatically' },
         { icon: icon(IC.warn),   name: 'Custom fields reviewed', note: 'You confirm how custom fields map before importing' },
         { icon: icon(IC.undo),   name: 'Bulk undo available', note: 'One click removes the entire import if something looks wrong' }
       ]
@@ -2283,6 +2328,8 @@ body {
               '</div>';
           }).join('') +
           '</div>';
+        var legend = document.getElementById('hier-legend');
+        if (legend) legend.style.display = '';
       }
     }, 160);
   }
@@ -2310,6 +2357,130 @@ body {
   }
 
   // ── Render invite preview ────────────────────────────────────────
+  // ── Readiness panel — Step 5, framework-aware ───────────────────
+  function renderReadinessPreview(fw) {
+    var panel = document.getElementById('prev-p5');
+    if (!panel) return;
+
+    // Update the preview header label
+    var hd = document.getElementById('prev-hd-sub-panel');
+    var hdLabels = {
+      essential: 'ART Readiness',
+      portfolio: 'Portfolio Readiness',
+      scrum:     'Sprint Readiness',
+      kanban:    'Board Readiness',
+      blank:     'Workspace Readiness'
+    };
+    if (hd) hd.textContent = hdLabels[fw] || hdLabels.essential;
+
+    // Framework-specific readiness data
+    var configs = {
+      essential: {
+        pct: 86,
+        title: 'ART Readiness',
+        sub: '86% ready for PI Planning. 2 items to complete first.',
+        items: [
+          { done: true,  name: (generatedTeams.length || 4) + ' teams configured',    note: generatedTeams.length ? generatedTeams.map(function(t){return t.name.replace(/ Team$/i,'');}).join(' · ') : 'Auth · Payments · Mobile · Data & Analytics' },
+          { done: true,  name: 'PI 26 scheduled',                                      note: 'Jun 2 – Aug 10 · Sprint 2 active' },
+          { done: true,  name: '47 features from Jira',                                note: 'DBKG project connected · features mapped' },
+          { done: false, name: 'PI Planning session not scheduled',                    note: 'Add PI Planning to the team calendar before Sprint 4' },
+          { done: false, name: 'Team capacity not set for Sprint 1',                   note: 'Needed for accurate velocity forecasting' }
+        ]
+      },
+      portfolio: {
+        pct: 80,
+        title: 'Portfolio Readiness',
+        sub: '80% ready. 2 items to complete before PI Planning.',
+        items: [
+          { done: true,  name: '2 ARTs configured',           note: 'Digital Banking · Lending & Mortgages' },
+          { done: true,  name: 'PI cadence set',              note: '10-week PIs · LPM sync every 2 PIs' },
+          { done: true,  name: 'Epics imported',              note: '12 Epics from Jira mapped to value streams' },
+          { done: false, name: 'Lean Budget guardrails not set',  note: 'Required for portfolio-level investment allocation' },
+          { done: false, name: 'Portfolio Kanban not configured', note: 'Add workflow states to track Epic flow' }
+        ]
+      },
+      scrum: (function() {
+        var tn   = scrumState.teamName || 'Your team';
+        var sw   = scrumState.sprintWeeks || 2;
+        var cols = scrumState.statuses.join(' → ');
+        var wt   = scrumState.workTypes.join(' · ');
+        return {
+          pct: 100,
+          title: tn + ' is ready',
+          sub: sw + '-week sprints · ' + scrumState.statuses.length + ' board columns · ready to start Sprint 1.',
+          items: [
+            { done: true, name: tn,                        note: sw + '-week sprints · board configured' },
+            { done: true, name: 'Board columns',           note: cols },
+            { done: true, name: 'Work item types',         note: wt },
+            { done: true, name: 'Ready to add backlog',    note: 'Open the board, add stories, and kick off Sprint 1' }
+          ]
+        };
+      })(),
+      kanban: {
+        pct: 90,
+        title: 'Board Readiness',
+        sub: '90% ready. 1 item to complete before going live.',
+        items: [
+          { done: true,  name: (generatedTeams.length || 4) + ' teams configured',    note: generatedTeams.length ? generatedTeams.map(function(t){return t.name.replace(/ Team$/i,'');}).join(' · ') : 'Teams ready' },
+          { done: true,  name: 'Board columns configured',    note: 'Backlog · In Progress · In Review · Done' },
+          { done: true,  name: 'WIP limits active',           note: 'In Progress: 6 · In Review: 4' },
+          { done: true,  name: '47 work items imported',      note: 'DBKG project connected · backlog mapped' },
+          { done: false, name: 'Throughput baseline not set', note: 'Run 2–3 weeks before cycle time data is reliable' }
+        ]
+      },
+      blank: {
+        pct: 100,
+        title: 'Workspace Ready',
+        sub: 'Nothing is locked in. Configure as you go.',
+        items: [
+          { done: true, name: 'Workspace created',     note: 'Hierarchy and terminology defined' },
+          { done: true, name: 'Roles assigned',        note: 'Admin access granted' },
+          { done: true, name: 'Ready to add work',     note: 'Start by adding teams and creating your first items' }
+        ]
+      }
+    };
+
+    var cfg = configs[fw] || configs.essential;
+    var CIRCUMFERENCE = 164;
+    var offset = Math.round(CIRCUMFERENCE * (1 - cfg.pct / 100));
+
+    var checkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    var warnIcon  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+    var itemsHtml = cfg.items.map(function(item) {
+      return '<div class="checklist-item ' + (item.done ? 'done' : 'warn') + '">' +
+        '<span class="ci-icon">' + (item.done ? checkIcon : warnIcon) + '</span>' +
+        '<div class="ci-body"><div class="ci-name">' + item.name + '</div><div class="ci-note">' + item.note + '</div></div>' +
+      '</div>';
+    }).join('');
+
+    panel.innerHTML =
+      '<div class="readiness-score">' +
+        '<div class="readiness-header">' +
+          '<div class="readiness-ring-wrap">' +
+            '<svg viewBox="0 0 64 64">' +
+              '<circle class="readiness-ring-bg" cx="32" cy="32" r="26"/>' +
+              '<circle class="readiness-ring-fill" id="readiness-arc" cx="32" cy="32" r="26" style="stroke-dashoffset:' + CIRCUMFERENCE + '"/>' +
+            '</svg>' +
+            '<div class="readiness-ring-center">' + (cfg.pct >= 100
+              ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+              : '<span class="readiness-pct">' + cfg.pct + '%</span>') + '</div>' +
+          '</div>' +
+          '<div class="readiness-text">' +
+            '<div class="readiness-title">' + cfg.title + '</div>' +
+            '<div class="readiness-sub">' + cfg.sub + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="readiness-checklist">' + itemsHtml + '</div>' +
+      '</div>';
+
+    // Animate the ring fill in
+    setTimeout(function() {
+      var arc = document.getElementById('readiness-arc');
+      if (arc) arc.style.strokeDashoffset = offset;
+    }, 80);
+  }
+
   function renderInvitePreview() {
     var prev = document.getElementById('invite-preview');
     if (!generatedTeams.length) {
@@ -2574,6 +2745,13 @@ body {
       });
       generatedTeams = [];
 
+    } else if (fw === 'scrum') {
+      // Scrum: single team card — just the team name and sprint cadence
+      var scrumName = scrumState.teamName || 'Your team';
+      var scrumSw   = scrumState.sprintWeeks || 2;
+      units.push({ name: scrumName, sub: scrumSw + '-week sprints', sprId: null });
+      generatedTeams = [{ name: scrumName, count: 0 }];
+
     } else { // essential (default)
       var avg = Math.round((parsed.peopleCount || 80) / Math.max(1, parsed.teamCount));
       var tms = parsed.teams.length >= 2
@@ -2665,7 +2843,7 @@ body {
     var prof = fwProfiles[fw] || fwProfiles.essential;
 
     var parsed = selectedFw === 'scrum'
-      ? { teams: [scrumState.teamName], teamCount: 1, piWeeks: scrumState.sprintWeeks, sprintWeeks: scrumState.sprintWeeks, piLabel: 'Sprint 1', piStart: null, jiraKey: scrumState.tools.indexOf('jira') >= 0 ? 'PROJ' : null, hasJira: scrumState.tools.indexOf('jira') >= 0, hasSlack: scrumState.tools.indexOf('slack') >= 0, peopleCount: 8 }
+      ? { teams: [scrumState.teamName || 'Scrum Team'], teamCount: 1, piWeeks: scrumState.sprintWeeks, sprintWeeks: scrumState.sprintWeeks, piLabel: 'Sprint 1', piStart: null, jiraKey: null, hasJira: false, hasSlack: false, peopleCount: 8 }
       : buildParsedFromOtto();
 
     if (selectedFw === 'scrum') {
@@ -2710,7 +2888,7 @@ body {
       items = [
         [500,  teamCountStr,               teamNamesStr || 'From your description'],
         [950,  'Framework',                fwLabel + ' — ' + parsed.piWeeks + '-week PI, ' + parsed.sprintWeeks + '-week sprints'],
-        [1400, parsed.jiraKey ? 'Jira · ' + parsed.jiraKey : 'Integrations', parsed.jiraKey ? 'Features mapped to EAP hierarchy' : 'No integration detected'],
+        [1400, parsed.jiraKey ? 'Jira · ' + parsed.jiraKey : 'Integrations', parsed.jiraKey ? 'Features mapped to backlog' : 'No integration detected'],
         [1850, parsed.piLabel,             parsed.piStart ? 'Starts ' + parsed.piStart : 'Cadence auto-computed'],
         [2300, 'Sprint calendars',         parsed.teamCount + ' teams × ' + Math.max(2, Math.floor(parsed.piWeeks/parsed.sprintWeeks)-1) + ' sprints + IP sprint']
       ];
@@ -2736,20 +2914,15 @@ body {
       // Scrum gen-items reflect what was configured in the wizard
       var sprintHelp = OTTO_SPRINT_HELP[scrumState.sprintWeeks] || (scrumState.sprintWeeks + '-week sprints');
       items = [
-        [500,  scrumState.teamName || 'Scrum Team',
-               (scrumState.teamSize || '6') + ' people'],
-        [950,  scrumState.sprintWeeks + '-week sprints',
-               sprintHelp],
-        [1400, 'Board',
+        [500,  scrumState.teamName || 'Your team',
+               scrumState.sprintWeeks + '-week sprints'],
+        [950,  'Board columns',
                scrumState.statuses.join(' → ')],
-        [1850, 'Work items',
+        [1400, 'Work items',
                scrumState.workTypes.join(' · ')],
-        [2300, 'Ceremonies',
+        [1850, 'Ceremonies',
                'Sprint Planning · Daily Standup · Sprint Review · Retrospective']
       ];
-      if (scrumState.tools.indexOf('jira') >= 0) {
-        items.push([2750, 'Jira', (parsed.jiraKey ? parsed.jiraKey + ' project' : 'connected') + ' — backlog ready to import']);
-      }
     } else {
       items = [
         [500,  'Blank workspace',   'No assumptions — full control'],
@@ -2787,10 +2960,18 @@ body {
     document.querySelectorAll('.setup-pane').forEach(function(p, i) {
       p.classList.toggle('is-active', i + 1 === step);
     });
-    // Preview panes
+    // Preview panes — toggle is-active by index
     document.querySelectorAll('.prev-pane').forEach(function(p, i) {
       p.classList.toggle('is-active', i + 1 === step);
     });
+    // Explicit inline guard: step-1 hierarchy must never bleed through to other steps.
+    // Inline style overrides any class state, making this definitive regardless of
+    // how is-active was toggled across skipped steps in the Scrum fast-path.
+    var pp1 = document.getElementById('prev-p1');
+    if (pp1) pp1.style.display = (step === 1) ? '' : 'none';
+    // Collapse stepper for Scrum fast-path (shows 3 nodes instead of 5)
+    var stepTabs = document.getElementById('step-tabs');
+    if (stepTabs) stepTabs.classList.toggle('scrum-flow', selectedFw === 'scrum');
     // Stepper nodes
     document.querySelectorAll('.stepper-item').forEach(function(b) {
       var s = parseInt(b.dataset.step);
@@ -2813,21 +2994,40 @@ body {
       var doneTitle = document.getElementById('done-title');
       var doneSub   = document.getElementById('done-sub');
       if (doneTitle && doneSub) {
+        var scrumTeam = scrumState.teamName || 'Your team';
+        var scrumSw   = scrumState.sprintWeeks || 2;
         var fwTitles = {
           essential: generatedTeams.length ? generatedTeams[0].name.replace(/ Team$/i,'') + ' ART is live' : 'Your ART is live',
           portfolio: 'Portfolio is configured',
+          scrum:     scrumTeam + ' is ready',
           kanban:    'Kanban board is live',
           blank:     'Workspace is ready'
         };
         var fwSubs = {
           essential: 'Your first PI is scheduled and teams are configured. Open the board and start planning.',
           portfolio: 'ARTs and Solution Train are configured. Open the portfolio view to begin.',
+          scrum:     scrumSw + '-week sprints. Board columns and work items are set. Open the board and add your first stories.',
           kanban:    'Value streams and WIP limits are active. Open the board and pull in work.',
           blank:     'Your blank workspace is ready. Add teams, define hierarchy, and configure as you go.'
         };
         doneTitle.textContent = fwTitles[selectedFw] || fwTitles.essential;
         doneSub.textContent   = fwSubs[selectedFw]   || fwSubs.essential;
       }
+      // Update CTA label — framework-aware, never "EAP workspace" (we're already in EAP)
+      var btnOpen = document.querySelector('.done-actions .btn-open');
+      if (btnOpen) {
+        var ctaLabels = {
+          essential: 'Open Board',
+          portfolio: 'Open Portfolio',
+          scrum:     'Go to Backlog',
+          kanban:    'Open Board',
+          blank:     'Open Workspace'
+        };
+        btnOpen.textContent = ctaLabels[selectedFw] || 'Open Board';
+        if (selectedFw === 'scrum') btnOpen.href = 'index.html?p=ananya&tab=backlog';
+      }
+      // Render framework-appropriate readiness panel
+      renderReadinessPreview(selectedFw);
       setTimeout(function() {
         var ring = document.getElementById('done-ring');
         if (ring) ring.classList.add('glowed');
@@ -2857,36 +3057,44 @@ body {
   }
 
   // ── Navigation ───────────────────────────────────────────────────
+  // Scrum fast-path skips steps 2 and 4: 1 → 3 → 5
   window.nextStep = function() {
     if (step === 3 && !aiDone) { runGeneration(); return; }
+    if (step === 3 && aiDone && selectedFw === 'scrum') { step = 5; updateUI(); return; }
+    if (step === 1 && selectedFw === 'scrum') { step = 3; updateUI(); return; }
     if (step < totalSteps) { step++; updateUI(); }
   };
 
+  function resetStep3() {
+    genTimers.forEach(clearTimeout); genTimers = [];
+    aiDone = false;
+    document.getElementById('gen-card').classList.remove('is-visible');
+    document.getElementById('otto-qa-form').style.display = '';
+    var cfgCard = document.getElementById('otto-config-card');
+    if (cfgCard) cfgCard.style.display = '';
+    if (selectedFw === 'scrum') {
+      var sb = document.getElementById('scrum-board-container');
+      if (sb) sb.style.display = '';
+      renderScrumBoardPreview();
+    }
+    document.getElementById('gen-items').innerHTML = '';
+    document.getElementById('gen-spinner').className = 'gen-spinner';
+    document.getElementById('art-placeholder').style.display = 'flex';
+    document.getElementById('art-build').style.display = 'none';
+    document.getElementById('art-teams-grid').innerHTML = '';
+    document.getElementById('art-pi-rows').innerHTML = '';
+    document.getElementById('art-conn-rows').innerHTML = '';
+    document.getElementById('art-pi-section').style.display = 'none';
+    document.getElementById('art-conn-section').style.display = 'none';
+    document.getElementById('edit-hint').classList.remove('visible');
+  }
+
   window.prevStep = function() {
     if (step > 1) {
-      if (step === 3) {
-        genTimers.forEach(clearTimeout); genTimers = [];
-        aiDone = false;
-        document.getElementById('gen-card').classList.remove('is-visible');
-        document.getElementById('otto-qa-form').style.display = '';
-        var cfgCard = document.getElementById('otto-config-card');
-        if (cfgCard) cfgCard.style.display = '';
-        if (selectedFw === 'scrum') {
-          var sb = document.getElementById('scrum-board-container');
-          if (sb) sb.style.display = '';
-          renderScrumBoardPreview();
-        }
-        document.getElementById('gen-items').innerHTML = '';
-        document.getElementById('gen-spinner').className = 'gen-spinner';
-        // Reset ART preview
-        document.getElementById('art-placeholder').style.display = 'flex';
-        document.getElementById('art-build').style.display = 'none';
-        document.getElementById('art-teams-grid').innerHTML = '';
-        document.getElementById('art-pi-rows').innerHTML = '';
-        document.getElementById('art-conn-rows').innerHTML = '';
-        document.getElementById('art-pi-section').style.display = 'none';
-        document.getElementById('art-conn-section').style.display = 'none';
-        document.getElementById('edit-hint').classList.remove('visible');
+      if (step === 3) resetStep3();
+      if (selectedFw === 'scrum') {
+        if (step === 3) { step = 1; updateUI(); return; }
+        if (step === 5) { step = 3; updateUI(); return; }
       }
       step--;
       updateUI();
@@ -2894,6 +3102,8 @@ body {
   };
 
   window.goStep = function(n) {
+    // Scrum skips steps 2 and 4 — clicking them does nothing
+    if (selectedFw === 'scrum' && (n === 2 || n === 4)) return;
     if (n <= step) { step = n; updateUI(); }
   };
 
@@ -2907,7 +3117,7 @@ body {
       c.classList.add('is-selected');
       c.setAttribute('aria-checked', 'true');
       selectedFw = c.dataset.fw;
-      if (step === 1) renderHierarchy(selectedFw);
+      if (step === 1) updateUI(); // full sync: hierarchy + stepper scrum-flow + pane visibility
     });
     c.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.click(); } });
   });
@@ -2937,7 +3147,7 @@ body {
   });
 
   // ── Boot ─────────────────────────────────────────────────────────
-  renderHierarchy('essential');
+  renderHierarchy('scrum');
   updateUI();
 
 })();

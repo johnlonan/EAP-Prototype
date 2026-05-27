@@ -331,8 +331,9 @@ EAP.renderContent = function() {
     if (s.tab === 'docs')  h = EAP.renderSpaceDocs  ? EAP.renderSpaceDocs()  : '';
     el.innerHTML = h;
     el.classList.remove('tab-enter'); void el.offsetWidth; el.classList.add('tab-enter');
-    // Wire doc list clicks after render
-    if (s.tab === 'docs' && EAP.wireSpaceDocClicks) EAP.wireSpaceDocClicks();
+    // Wire interactive elements post-render
+    if (s.tab === 'docs'  && EAP.wireSpaceDocClicks)   EAP.wireSpaceDocClicks();
+    if (s.tab === 'list'  && EAP.wireSpaceListFilters) EAP.wireSpaceListFilters();
     return;
   }
 

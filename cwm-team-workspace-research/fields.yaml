@@ -1,0 +1,99 @@
+fields:
+  information_architecture:
+    - name: primary_ia_primitive
+      description: "Atomic unit the workspace is built around — Doc, Board, Task, Object, Channel"
+      detail_level: detailed
+    - name: hierarchy_model
+      description: "How spaces/teams/projects/docs nest; depth of nesting"
+      detail_level: detailed
+    - name: space_to_team_relationship
+      description: "1:1, 1:many, many:1, or matrix — how spaces relate to teams"
+      detail_level: detailed
+    - name: density_spectrum
+      description: "Flat (Linear: 3 levels) vs deep (ClickUp: 5 levels)"
+      detail_level: moderate
+
+  content_and_features:
+    - name: content_types_supported
+      description: "Docs, boards, lists, kanban, tables/databases, whiteboards, chat"
+      detail_level: detailed
+    - name: per_space_feature_toggles
+      description: "Does each Space configure its own enabled modules (like ClickUp ClickApps)?"
+      detail_level: moderate
+    - name: embedded_vs_linked_content
+      description: "Are docs embedded inside boards (Linear, Plane) or linked across products (Jira↔Confluence)?"
+      detail_level: detailed
+    - name: template_library
+      description: "Space-level blueprints vs page/board templates only"
+      detail_level: brief
+
+  agile_integration:
+    - name: agile_coexistence_model
+      description: "How sprints/backlogs live alongside ad-hoc work; sync patterns"
+      detail_level: detailed
+    - name: cross_space_discoverability
+      description: "Can work in one Space appear in another — linked items, mirrored cards, shared lists?"
+      detail_level: moderate
+    - name: insight_rollup_behaviour
+      description: "Does Space roll into Team summary → ART/Portfolio? How hierarchy roll-ups work."
+      detail_level: detailed
+
+  navigation_and_ux:
+    - name: navigation_model
+      description: "How users move between agile-structured work and freeform work"
+      detail_level: detailed
+    - name: default_view_on_entry
+      description: "What does user land on when opening a Space — home, last visited, board, doc, my-work?"
+      detail_level: moderate
+    - name: activity_notifications_model
+      description: "Per-Space inbox, global inbox, or channel-style?"
+      detail_level: brief
+    - name: search_scope_defaults
+      description: "Space-local first, then workspace-wide? Or always global?"
+      detail_level: brief
+
+  onboarding_and_setup:
+    - name: onboarding_mode
+      description: "Wizard / conversational AI / pick-a-template / blank-and-learn"
+      detail_level: detailed
+    - name: space_ownership_model
+      description: "Admin-provisioned, self-serve by anyone, or team-bounded?"
+      detail_level: moderate
+    - name: empty_state_first_run
+      description: "Does empty Space ship with seed content, checklist, or blank canvas?"
+      detail_level: moderate
+    - name: ai_setup_bootstrap
+      description: "Does AI seed the Space — suggest templates, generate structure, draft docs from brief?"
+      detail_level: moderate
+
+  permissions_and_governance:
+    - name: permission_model
+      description: "Space-level only, or page/board/field-level inheritance?"
+      detail_level: moderate
+    - name: guest_cross_team_access
+      description: "Can outside collaborators be invited into a Space without seeing the broader team?"
+      detail_level: moderate
+    - name: content_object_portability
+      description: "Can a doc/board/list move between Spaces without breaking links?"
+      detail_level: brief
+    - name: archival_lifecycle
+      description: "How a finished Space is wound down — archived, soft-deleted, frozen as read-only?"
+      detail_level: brief
+
+  ai_features:
+    - name: ai_scope_boundary
+      description: "Does AI see only this Space, the Team, or the whole workspace?"
+      detail_level: moderate
+    - name: ai_features_2024_2025
+      description: "Any AI assistance for organizing or generating content within a Space"
+      detail_level: detailed
+
+  eap_applicability:
+    - name: eap_pattern_relevance
+      description: "What patterns map to team member experience inside ServiceNow EAP"
+      detail_level: detailed
+    - name: connected_external_work
+      description: "Does Space surface work from other systems inline — incidents, PRs, change requests?"
+      detail_level: moderate
+
+uncertain: []

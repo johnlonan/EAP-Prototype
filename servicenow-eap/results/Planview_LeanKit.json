@@ -1,0 +1,66 @@
+{
+  "id": "planview-leankit",
+  "name": "Planview / LeanKit",
+  "description": "Portfolio + flow metrics depth; enterprise budgeting and capacity planning; first-class CFD, throughput, cycle time for Lean/Kanban management",
+
+  "team_execution_depth": "Strong Kanban-first execution layer. Cards, lanes, swim lanes, WIP limits, card hierarchies, board templates, and customisable card fields are the core unit of daily work. Lane and card types are highly configurable per team — IT Ops, SAFe, software dev, and strategy teams can each shape the board to their flow without separate tools. The product was originally LeanKit (Kanban-native) and that lineage shows: it feels built for visual flow management more than for sprint-board scrum execution. Scrum-specific affordances (sprint capacity, story points as a first-class column, time-tracking) are recurring improvement requests in 2025 reviews.",
+
+  "keyboard_command_ux": "Standard keyboard shortcuts for card navigation, search, and basic actions exist, but there is no Linear-style universal command palette and no AI-powered action bar. Power-user fluency depends mostly on the visual board and right-click context menus rather than a keyboard-first model. [uncertain]",
+
+  "ui_responsiveness": "Web SaaS architecture with no local-first claim. Board interactions feel responsive on typical team-sized boards; large enterprise boards with thousands of cards are reported to slow noticeably during filter and drag operations. No published P50/P95 metrics; user sentiment is 'snappier than Rally, slower than Linear'. [uncertain]",
+
+  "real_time_collaboration": "Live board updates as teammates move cards, in-card comments with @mentions, activity history per card, and email/in-app notifications. Microsoft Teams and Slack channel integrations push card updates into chat and allow some inline actions. No multi-cursor co-editing of card descriptions. Presence indicators on boards are limited. [uncertain]",
+
+  "mobile_experience": "Native iOS and iPad apps and Android support are advertised, focused on board viewing and basic card actions (move, comment, status). Mobile experience is generally regarded as serviceable for status updates and standups but not full-parity with desktop. Offline capability is not a documented strength. [uncertain]",
+
+  "in_tool_documentation": "Card descriptions support rich text and attachments. There is no embedded wiki or page hierarchy comparable to Confluence/Notion. Teams typically pair AgilePlace with a documentation tool. Documentation in-tool is a brief, not a depth, feature.",
+
+  "developer_experience": "AgilePlace is not pitched as a developer tool; it is a Lean/Kanban flow tool used by mixed teams (engineering, ops, PMO, strategy). No first-party VS Code or JetBrains plugin. CLI is limited to public APIs. Developer status visibility is achieved through Planview Hub (formerly Tasktop) which syncs cards bidirectionally with Jira, Azure DevOps, Rally, GitHub, and others — meaning developers often stay in their existing tool while AgilePlace becomes the program/portfolio aggregator. [uncertain]",
+
+  "vcs_integration_depth": "Direct GitHub/GitLab/Bitbucket two-way sync is not a documented native feature in the way Jira's GitHub app is. The intended pattern is Planview Hub (Tasktop-powered) which bridges AgilePlace cards to Jira/Azure DevOps/Rally/GitHub Issues. PR-to-card auto-state-change works only as well as the bridge is configured. This is one of AgilePlace's weaker areas for ServiceNow EAP to learn from rather than emulate. [uncertain]",
+
+  "ai_agentic_maturity": "Planview Copilot is the AI surface — a generative AI assistant available across Strategic Portfolio Management, EAP, VSM, AdaptiveWork, AgilePlace, Portfolios, and Viz. Built on AWS Bedrock. Capabilities: conversational queries over portfolio/agile data, project summarisation, onboarding acceleration, and (as of 2024-2025 expansion) real-time workflow inefficiency identification. Vendor reports human-evaluation accuracy lifted from ~50% to >95% and average latency from 60+s down to ~20s between generations. No public MCP server endpoint comparable to Rally's or Linear's; no advertised no-code agent builder. Position: strong portfolio/strategy AI, weaker on agentic in-IDE workflows for individual developers. [uncertain]",
+
+  "time_to_value": "AgilePlace is faster to stand up than Rally or Targetprocess thanks to its Kanban-first model and board template library (Portfolio, Program, Risks, Teams, Value, Objectives boards). A small team can have a usable board within an afternoon. Enterprise rollouts with Planview Hub bridges and SAFe portfolio configuration add weeks. Reviewers note the initial mental-model shift can be steep if teams come from scrum-first tools.",
+
+  "migration_story": "Migration is typically achieved via Planview Hub (Tasktop) connectors rather than a one-shot importer — Jira, Azure DevOps, Rally, and ServiceNow can sync continuously, which doubles as a soft-migration path. Direct CSV import for cards is supported. There is no published Rally->AgilePlace turnkey importer. Customers leaving AgilePlace typically use Hub in reverse. [uncertain]",
+
+  "deprecation_transition_risk": "Low. AgilePlace is an active product receiving incremental flow-metric and AI investment. No public sunset, no major architecture migration in flight. The LeanKit -> AgilePlace rebrand is complete and stable. Planview-wide consolidation around the Copilot AI surface is an evolution rather than a deprecation event.",
+
+  "safe_framework_alignment": "Solid Portfolio-SAFe alignment. Templates for Objectives, Portfolio, Program, Risks, Teams, and Value boards. Velocity and story-point tracking across PI, team, and ART. WSJF prioritisation, epic-to-feature flow, and capacity planning at release-train level. PI Planning supported through dedicated board configurations. AgilePlace is generally regarded as stronger at the Portfolio/Program layer than at the team-sprint layer; teams running pure team-level scrum often pair it with Jira via Hub.",
+
+  "reporting_metrics": "AgilePlace's anchor strength. First-class CFD, cycle time, throughput, lead time, WIP, flow efficiency, and process control charts — pre-built, configurable, with adjustable start/end lane selection so cycle-time clocks reflect each team's actual definition of 'in progress' and 'done'. Predictability and risk reports feed off the same metric layer. Flow metrics here are deeper and more native than Jira (which needs eazyBI/third-party), Rally (which has them but less elegantly), and ServiceNow EAP. This is the single capability area where AgilePlace clearly leads the EAP field.",
+
+  "customer_signal_ingestion": "Not a core capability. Cards can be created from external systems via Hub or API, but Productboard-style customer feedback ingestion, NPS, or feature voting is not native. Most customers integrate Productboard, Aha!, or a CRM externally and let signals land in AgilePlace cards through Hub.",
+
+  "integration_ecosystem": "Planview Hub (the Tasktop acquisition) is the integration backbone and remains best-in-class for enterprise tool-chain synchronisation — Jira, Azure DevOps, Rally, ServiceNow, GitHub Issues, GitLab, Digital.ai Agility, and others sync bidirectionally with field-level mapping. Native Slack and Microsoft Teams (with MS Teams board embedding). Salesforce, Jenkins, Zapier, and the rest of Planview's product family (Portfolios, AdaptiveWork, ProjectPlace, Viz) integrate first-class. Marketplace is smaller than Atlassian's but the Hub connector library is structurally differentiated.",
+
+  "community_vitality": "Mid-tier. Planview Customer Success Center and Planview Community provide active forums and KB. Reddit/HN presence is low — AgilePlace is enterprise-bought, not developer-discovered. Partner network (consulting and Hub configuration specialists) is healthy. Stack Overflow tag volume is minimal. [uncertain]",
+
+  "self_hosting_data_residency": "SaaS-first. Multi-region SaaS deployment options for data residency. On-premises is not a current standard offering for AgilePlace. [uncertain]",
+
+  "customization": "Card field customisation, lane structure, swim lanes, board templates, card types, and visual styling are all configurable without code. Workflow rules and automations exist but are simpler than Jira automation. Admin burden is moderate — easier than Rally or Targetprocess, harder than Linear or Trello. The platform optimises for board flexibility rather than schema extensibility.",
+
+  "pricing_commercial_model": "Per-user-per-month subscription. Public ranges cited: roughly $19-$29 PUPM across published tiers; enterprise pricing is quote-based. Three plan tiers historically. SaaS-only. Volume discounts apply at enterprise scale. Considered moderately priced for the EAP segment — cheaper than Rally and Targetprocess at list, often comparable after enterprise negotiation. [uncertain]",
+
+  "total_cost_of_ownership": "Moderate. Implementation is lighter than Rally; ongoing admin is typically 0.25-1 FTE per large tenant. The biggest TCO additions are Planview Hub connector licensing (when used to bridge to Jira/ADO/Rally) and Copilot AI subscriptions. Training overhead is lower thanks to the intuitive board UX. Reviews repeatedly call out 'good value for money' as a recurring positive theme. [uncertain]",
+
+  "market_perception": "Reputation: serious enterprise tool with strong flow metrics, Portfolio-SAFe credibility, and a respected integration backbone (Hub). G2 rates Planview overall at 4.1/5 across 1,140+ reviews; PeerSpot scores AgilePlace ~9.0/10. Recognised in Gartner EAP Market Guide and SPM Magic Quadrant. Weaknesses cited in 2025 reviews: scrum/sprint features lag the kanban side, native time-tracking is missing, Jira and Enterprise One integration polish needs work, analytics 'might not be as deep as some competitors' for data-heavy orgs, and the home/landing UX needs modernisation. Cultural reputation is 'mature, capable, slightly dated' — closer to enterprise-buyer-loved than developer-loved.",
+
+  "gaps_vs_market_leader": "Versus Jira: smaller marketplace, weaker direct GitHub/GitLab/Bitbucket integration (Hub-mediated rather than native), no IDE plugin, smaller developer-individual mindshare. Versus Linear: no command palette, no local-first responsiveness, weaker keyboard fluency, no real-time co-editing of card descriptions, no native MCP endpoint, weaker mobile parity. Friction-level gaps: scrum/sprint depth lags kanban; no native time tracking; admin features for board management need 'beefing up' (per reviewers); landing/home UX feels older than the boards it contains. The board-and-metric layer itself is competitive — the gaps cluster around team-execution scrum ergonomics and modern developer-IDE surface.",
+
+  "uncertain": [
+    "keyboard_command_ux",
+    "ui_responsiveness",
+    "real_time_collaboration",
+    "mobile_experience",
+    "developer_experience",
+    "vcs_integration_depth",
+    "ai_agentic_maturity",
+    "migration_story",
+    "community_vitality",
+    "self_hosting_data_residency",
+    "pricing_commercial_model",
+    "total_cost_of_ownership"
+  ]
+}

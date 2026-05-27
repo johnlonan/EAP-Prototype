@@ -358,7 +358,7 @@ EAP.workItems = {
     ]
   },
   sprints: [
-    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:64, totalPts:46, donePts:8, goal:'Deliver PIN fallback handler and biometric onboarding scaffold',
+    {id:'sp2', name:'Sprint 2', dates:EAP._sprintDisplay[1].dates, active:true, capPct:64, totalPts:56, donePts:8, goal:'Deliver PIN fallback handler and biometric onboarding scaffold',
       items: [
         {id:'ls6',  num:'STRY61094201', name:'Handle fallback to PIN on failed biometric scan',     type:'Story',     state:'In Progress', pct:50, pts:3, owner:'James',  team:'Auth Team',     parent:'Fingerprint Login Redesign', goal:'g1'},
         {id:'ls7',  num:'STRY61094202', name:'Build payment confirmation screen layout',            type:'Story',     state:'In Progress', pct:40, pts:5, owner:'Vikram', team:'Payments Team', parent:'Payment Confirmation Flow', goal:'g1'},

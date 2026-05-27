@@ -1,0 +1,250 @@
+# Field definitions for ServiceNow EAP competitive research
+# detail_level hierarchy: brief → moderate → detailed
+# Fields marked with note: "eap-only" apply exclusively to the ServiceNow EAP/CWM items
+
+fields:
+
+  # ── TEAM EXECUTION ────────────────────────────────────────────────────────────
+
+  - name: team_execution_depth
+    description: >
+      Quality of the daily sprint execution layer for individual contributors.
+      Sprint boards, backlog grooming, task-level granularity, story card UX,
+      WIP limits, acceptance criteria, definition of done, time tracking.
+      Does this feel like a tool built FOR developers and scrum masters?
+    detail_level: detailed
+    category: team_experience
+
+  - name: keyboard_command_ux
+    description: >
+      Keyboard-first and command-bar UX for power users. Presence of a
+      command palette (Cmd+K style), keyboard shortcuts for status changes,
+      assignment, and navigation. Linear's sub-100ms command bar is the 2026
+      benchmark. Does the tool reward fluency?
+    detail_level: detailed
+    category: team_experience
+
+  - name: ui_responsiveness
+    description: >
+      Perceived and measured UI interaction latency. Local-first architecture
+      vs. server-round-trip architecture. P50/P95 response times for common
+      actions (opening a card, changing status, filtering a board). Linear's
+      sub-100ms target is the bar that reframes all comparisons.
+    detail_level: moderate
+    category: team_experience
+
+  - name: real_time_collaboration
+    description: >
+      Live presence indicators, simultaneous editing, threaded card comments,
+      @mentions, activity feeds, and notification quality. Does the tool reduce
+      the need to switch to Slack for quick coordination?
+    detail_level: moderate
+    category: team_experience
+
+  - name: mobile_experience
+    description: >
+      Quality of the mobile experience for team members in daily execution:
+      sprint board parity, story status updates, daily standup support,
+      notifications. Native app vs. responsive web. Offline capability.
+      A developer should be able to update a sprint from their phone with
+      meaningful feature parity to desktop.
+    detail_level: moderate
+    category: team_experience
+
+  - name: in_tool_documentation
+    description: >
+      Does the tool reduce context-switching to Confluence/Notion for writing
+      acceptance criteria, meeting notes, decision logs, or knowledge base
+      articles? Inline docs, wiki pages, or embedded markdown on work items.
+      Tools that close this loop (ClickUp, Height, Notion) are eroding the
+      "open Jira + open Confluence" pattern.
+    detail_level: brief
+    category: team_experience
+
+  # ── DEVELOPER EXPERIENCE ──────────────────────────────────────────────────────
+
+  - name: developer_experience
+    description: >
+      Holistic developer-specific UX: IDE plugins (VS Code, JetBrains),
+      CLI for issue management, branch/PR/commit presence on story cards,
+      deployment status visibility, code-review stage on board columns.
+      Does a developer interact with this tool inside their editor, or must
+      they tab-switch constantly?
+    detail_level: detailed
+    category: developer_experience
+
+  - name: vcs_integration_depth
+    description: >
+      Depth of two-way sync between version control and work items.
+      PR opens → story moves to Code Review. Merge → story auto-closes.
+      Branch naming convention enforcement. Deployment status visible on cards.
+      Commit messages referencing story IDs. Jira's GitHub app has had this for
+      a decade; this field isolates it because it is the #1 developer-retention
+      differentiator and ServiceNow EAP's most cited gap.
+    detail_level: detailed
+    category: developer_experience
+
+  - name: ai_agentic_maturity
+    description: >
+      AI depth at the team execution layer. Generative: AI-written acceptance
+      criteria, story decomposition, sprint summaries. Agentic: AI that creates,
+      triages, or updates work items autonomously. MCP server: does the tool
+      expose an MCP endpoint so external agents (Claude, Cursor, etc.) can push
+      items natively? No-code agent builder (Rovo Studio analog)?
+      Linear (mcp.linear.app, 75% enterprise workspaces with agents) and
+      Atlassian (Rovo Studio + Teamwork Graph MCP) are the 2026 benchmarks.
+    detail_level: detailed
+    category: developer_experience
+
+  # ── ONBOARDING & ADOPTION ─────────────────────────────────────────────────────
+
+  - name: time_to_value
+    description: >
+      Time from account creation to first productive sprint, in hours or days.
+      Template library quality, guided setup, self-serve team onboarding,
+      and the absence of mandatory admin configuration. EAP's steep learning
+      curve and planning calendar complexity are documented adoption barriers.
+    detail_level: moderate
+    category: adoption
+
+  - name: migration_story
+    description: >
+      Quality of the Jira→tool (or Rally→tool) migration path: assets,
+      automated importers, field-mapping coverage, data continuity guarantees,
+      rollback safety. For ServiceNow EAP specifically: the Agile 2.0→CWM
+      migration story and whether stories/features/epics survive intact.
+    detail_level: detailed
+    category: adoption
+    note: "especially relevant for servicenow-eap and servicenow-cwm items"
+
+  - name: deprecation_transition_risk
+    description: >
+      Is the tool mid-migration or sunsetting a layer? ServiceNow is deprecating
+      Agile Development 2.0 (May 2026) and migrating teams to CWM — a real
+      buyer-facing risk. Note equivalent risks for other tools (Rally migration
+      uncertainty post-Broadcom, Azure DevOps feature slowdown, etc.).
+    detail_level: moderate
+    category: adoption
+    note: "eap-only for deep detail; note briefly for others"
+
+  # ── FRAMEWORK & PORTFOLIO ─────────────────────────────────────────────────────
+
+  - name: safe_framework_alignment
+    description: >
+      Depth of SAFe support: PI Planning UX, ART visibility, Program Increment
+      burndown, Capability/Feature/Story hierarchy, cross-ART dependency mapping,
+      inspect & adapt support, WSJF prioritization. Does it handle overlapping
+      sprints and heterogeneous team cadences within a single ART?
+    detail_level: detailed
+    category: framework
+
+  - name: reporting_metrics
+    description: >
+      Built-in analytics for team and program health: velocity, burndown,
+      CFD (cumulative flow), flow metrics (lead time, cycle time, throughput),
+      sprint predictability, OKR linkage, PI health dashboards. Are reports
+      configurable or fixed? Are flow metrics first-class (Planview) or
+      bolt-on (Jira requires third-party)?
+    detail_level: moderate
+    category: framework
+
+  - name: customer_signal_ingestion
+    description: >
+      Does the tool ingest customer feedback, support tickets, NPS, or feature
+      votes to inform prioritization? Productboard's core strength; a capability
+      entirely absent from EAP and most agile planning tools. Relevant as product
+      orgs increasingly want a unified signal → roadmap pipeline.
+    detail_level: brief
+    category: framework
+
+  # ── INTEGRATIONS & ECOSYSTEM ──────────────────────────────────────────────────
+
+  - name: integration_ecosystem
+    description: >
+      Breadth of native integrations: Slack, Teams, GitHub, GitLab, Bitbucket,
+      Figma, Confluence, Notion, Salesforce. Plugin marketplace size and
+      community-built connector quality. EAP's Jira↔EAP integration was
+      reportedly still tentatively targeted Dec 2025.
+    detail_level: moderate
+    category: ecosystem
+
+  - name: community_vitality
+    description: >
+      Ecosystem health as a proxy for long-term viability: plugin marketplace
+      size, Stack Overflow tag volume, Reddit/Discord community activity,
+      third-party template libraries, consultant/partner network. Jira's
+      marketplace (5,000+ apps) creates a structural moat.
+    detail_level: brief
+    category: ecosystem
+
+  - name: self_hosting_data_residency
+    description: >
+      Availability of on-premises or private-cloud deployment. GDPR/data
+      sovereignty options. Relevant for regulated EU, government, and financial
+      services buyers — Plane's key differentiator. Note if SaaS-only or if
+      data-residency controls are available.
+    detail_level: brief
+    category: ecosystem
+
+  - name: customization
+    description: >
+      Workflow builder depth, custom field support, no-code extensibility,
+      custom work item types, screen layouts. How much can an admin configure
+      without a developer? How much configuration becomes a maintenance burden?
+    detail_level: moderate
+    category: ecosystem
+
+  # ── COMMERCIAL ────────────────────────────────────────────────────────────────
+
+  - name: pricing_commercial_model
+    description: >
+      Published per-seat pricing, tier structure, and bundling model.
+      Is it per-user, per-project, consumption-based, or enterprise-bundle?
+      Does the pricing model restrict adoption below a certain team size?
+      ServiceNow EAP's per-user + per-portfolio model is cited as a
+      commercial barrier vs. flat-rate tools.
+    detail_level: moderate
+    category: commercial
+
+  - name: total_cost_of_ownership
+    description: >
+      3-year TCO beyond per-seat: implementation consulting cost, ongoing
+      admin overhead (FTE estimate), training requirements, integration
+      maintenance, and upgrade costs. ServiceNow is consistently cited as
+      high-TCO relative to Atlassian or Linear.
+    detail_level: moderate
+    category: commercial
+
+  # ── MARKET POSITION ───────────────────────────────────────────────────────────
+
+  - name: market_perception
+    description: >
+      Gartner/Forrester analyst positioning (2025–2026), G2 and Gartner Peer
+      Insights aggregate scores with review count (sample-size matters:
+      Atlassian 2,708 vs ServiceNow 81), PeerSpot/TrustRadius sentiment themes,
+      Reddit/HN developer sentiment. What is the cultural reputation with
+      developers vs. enterprise buyers?
+    detail_level: moderate
+    category: market
+
+  - name: gaps_vs_market_leader
+    description: >
+      Specific, concrete capability gaps compared to Jira (market share leader)
+      and Linear (team-experience leader). Name the missing feature, note the
+      severity (showstopper vs. friction), and cite evidence (community complaint,
+      review, competitor feature page). This field is the core research deliverable.
+    detail_level: detailed
+    category: market
+
+  - name: what_eap_must_build
+    description: >
+      Prioritised list of capabilities ServiceNow EAP must ship to close the
+      gap and become a full team-to-portfolio solution. Ordered by impact vs.
+      effort framing where possible. Sourced from competitor strengths,
+      documented EAP gaps, and user sentiment. Applies to servicenow-eap and
+      servicenow-cwm items only.
+    detail_level: detailed
+    category: market
+    note: "eap-only"
+
+uncertain: []

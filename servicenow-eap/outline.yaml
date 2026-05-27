@@ -1,0 +1,112 @@
+topic: "ServiceNow EAP — Why It's Not a Market Leader and What It Needs to Become a Full Solution"
+description: >
+  Competitive analysis of ServiceNow Enterprise Agile Planning (EAP) against leading tools,
+  with focus on team-member daily experience and execution gaps. Includes the new CWM layer
+  and 2026 agentic AI competitors. Research date: 2026-05-20.
+
+items:
+  # --- Critical: ServiceNow's own stack ---
+  - id: servicenow-eap
+    name: "ServiceNow EAP"
+    description: "SAFe-aligned enterprise agile planning on the Now Platform — the primary subject"
+    priority: critical
+
+  - id: servicenow-cwm
+    name: "ServiceNow CWM (Collaborative Work Management)"
+    description: "ServiceNow's new team-execution layer replacing Agile Development 2.0 (deprecated May 2026); must be evaluated as EAP's execution partner, not in isolation"
+    priority: critical
+
+  # --- High: Primary benchmarks ---
+  - id: jira-jira-align
+    name: "Jira + Jira Align"
+    description: "Atlassian's dominant team-to-portfolio stack; 2,708 Gartner reviews; Rovo AI + Teamwork Graph (150B connections) shipped Team '26 May 2026"
+    priority: high
+
+  - id: linear
+    name: "Linear"
+    description: "Developer-loved, sub-100ms local-first UI, MCP-native agents at mcp.linear.app; 75% enterprise workspaces have agents; CEO declared issue tracking dead March 2026"
+    priority: high
+
+  - id: azure-devops
+    name: "Azure DevOps"
+    description: "Microsoft's integrated boards + pipelines + repos at $6/user/mo; strong with .NET and regulated enterprise shops"
+    priority: high
+
+  - id: gitlab
+    name: "GitLab"
+    description: "DevOps-native planning with built-in CI/CD; Duo Workflow GA; AI Impact Analytics in Value Stream Dashboard; code-to-issue traceability without integration glue"
+    priority: high
+
+  # --- Medium: Enterprise agile incumbents and challengers ---
+  - id: rally-broadcom
+    name: "Rally (Broadcom)"
+    description: "Original enterprise agile planning leader for 6 consecutive Gartner cycles through 2022; deep SAFe alignment but aging UX and losing mindshare"
+    priority: medium
+
+  - id: planview-leankit
+    name: "Planview / LeanKit"
+    description: "Portfolio + flow metrics depth; enterprise budgeting and capacity planning; first-class CFD, throughput, cycle time for Lean/Kanban management"
+    priority: medium
+
+  - id: targetprocess-apptio
+    name: "Targetprocess (IBM/Apptio)"
+    description: "Highly configurable SAFe-capable alternative; named in 2025 Gartner EAP Market Guide; extreme schema flexibility for non-standard frameworks"
+    priority: medium
+
+  - id: monday-dev
+    name: "Monday Dev"
+    description: "Cross-functional Work OS; AI-analyzed velocity and risk; strong visual UX for non-technical stakeholders; growing enterprise presence"
+    priority: medium
+
+  - id: clickup
+    name: "ClickUp"
+    description: "All-in-one challenger (docs, tasks, chat, whiteboards, agents); Super Agent AI; 800k+ teams; relentless feature velocity; low per-user cost"
+    priority: medium
+
+  - id: shortcut
+    name: "Shortcut (formerly Clubhouse)"
+    description: "Developer-flow focused; tight GitHub/GitLab/Bitbucket integration; built by ex-Linear engineers; Linear alternative for agile engineering teams"
+    priority: medium
+
+  - id: asana
+    name: "Asana / Asana Intelligence"
+    description: "100k+ paying customers; AI-generated project plans and status updates; OKR linkage; cross-functional enterprise presence often overlooked in agile comparisons"
+    priority: medium
+
+  - id: productboard
+    name: "Productboard"
+    description: "Customer-feedback-driven prioritization; AI clusters and prioritizes signals into roadmap items — a capability EAP entirely lacks"
+    priority: medium
+
+  - id: aha
+    name: "Aha!"
+    description: "Premier roadmap-to-OKR tool at $59/user/mo; direct competitor for EAP's strategic-alignment and portfolio narrative"
+    priority: medium
+
+  # --- Low: Niche or emerging signals ---
+  - id: plane
+    name: "Plane (open-source)"
+    description: "Self-hostable Linear clone with cycles, modules, projects; relevant for regulated EU/government buyers — a niche ServiceNow could uniquely address"
+    priority: low
+
+  - id: height
+    name: "Height"
+    description: "Combines task tracking + threaded chat in one surface; relevant model for EAP's missing real-time collaboration and context-switching reduction"
+    priority: low
+
+  - id: notion-projects
+    name: "Notion / Notion Projects"
+    description: "Docs-as-planning trend; lightweight team execution + documentation; growing threat to EAP's single-source-of-truth pitch in non-SAFe orgs"
+    priority: low
+
+execution:
+  batch_size: 6
+  items_per_agent: 3
+  output_dir: ./servicenow-eap/results
+  research_depth: detailed
+  time_range: "last 18 months (since November 2024)"
+  research_focus: >
+    Team-member daily experience and execution gaps — what individual contributors
+    (developers, PMs, scrum masters) actually experience. Portfolio-layer strengths
+    are secondary. Prioritise: board UX, keyboard/speed, AI agents, VCS linking,
+    mobile, collaboration, onboarding friction, and migration story.

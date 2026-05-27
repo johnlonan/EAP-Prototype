@@ -1,0 +1,71 @@
+topic: "Team workspace experiences in CWM tools — unifying agile + ad-hoc work inside a team space"
+date: 2026-05-27
+
+items:
+  # Original items
+  - id: notion_teamspaces
+    name: "Notion Teamspaces"
+    category: doc-first
+  - id: linear
+    name: "Linear"
+    category: agile-first
+  - id: clickup_spaces
+    name: "ClickUp Spaces"
+    category: cwm-full
+  - id: monday
+    name: "Monday.com"
+    category: cwm-full
+  - id: jira_confluence
+    name: "Confluence + Jira (Atlassian)"
+    category: split-tool
+  - id: basecamp
+    name: "Basecamp"
+    category: opinionated-all-in-one
+  - id: trello
+    name: "Trello"
+    category: board-first
+  - id: asana
+    name: "Asana"
+    category: task-first
+  - id: height
+    name: "Height"
+    category: ai-native
+  - id: coda
+    name: "Coda"
+    category: doc-first
+  - id: github_projects
+    name: "GitHub Projects"
+    category: eng-team
+
+  # Supplementary items from web research
+  - id: plane
+    name: "Plane.so"
+    category: ai-native
+    note: "Closest direct analog — Teamspaces primitive, projects+docs+work+AI chat"
+  - id: atlassian_spaces
+    name: "Atlassian Jira Spaces (renamed from Projects, Dec 2025)"
+    category: split-tool
+    note: "Direct industry precedent for 'Spaces' terminology; controversial reception"
+  - id: confluence_whiteboards
+    name: "Confluence Whiteboards"
+    category: visual-planning
+  - id: microsoft_loop
+    name: "Microsoft Loop"
+    category: portable-components
+  - id: slack_canvas_lists
+    name: "Slack Canvas + Lists"
+    category: chat-first
+  - id: wrike_spaces
+    name: "Wrike Spaces"
+    category: cwm-full
+  - id: productboard_teamspaces
+    name: "Productboard Teamspaces"
+    category: product-mgmt
+  - id: miro_mural
+    name: "Miro / Mural"
+    category: visual-planning
+
+execution:
+  batch_size: 4
+  items_per_agent: 3
+  output_dir: ./results

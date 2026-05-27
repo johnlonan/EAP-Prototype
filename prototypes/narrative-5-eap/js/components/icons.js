@@ -59,6 +59,7 @@ EAP._icons = {
   'thumbs-down':  '<path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>',
   'diamond':      '<polygon points="12 2 22 12 12 22 2 12"/>',
   'check':        '<polyline points="20 6 9 17 4 12"/>',
+  'ban':          '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>',
   'size':         '<polygon points="12 2 22 12 12 22 2 12"/>'
 };
 

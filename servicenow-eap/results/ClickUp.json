@@ -1,0 +1,82 @@
+{
+  "id": "clickup",
+  "name": "ClickUp",
+  "description": "All-in-one challenger (docs, tasks, chat, whiteboards, agents); Super Agent AI; 800k+ teams; relentless feature velocity; low per-user cost",
+  "priority": "medium",
+
+  "team_execution_depth": "ClickUp's sprint execution depth is broad but lacks developer focus. Sprint Lists, Sprint Points, Sprint Folders, and a recurring Sprint automation create the scrum primitives; story cards carry status, assignees, priority, sprint points, dependencies, custom fields, subtasks, checklists, time estimates and time tracking. Backlog grooming is supported but the underlying List view feels spreadsheet-first; sprint Board view is workable but not the native paradigm. G2/Capterra reviewers from technical teams explicitly note ClickUp 'was not built for software development — everything is based on lists.' Acceptance criteria typically lives in a description sub-doc or custom field rather than a first-class developer field; definition of done is conventionally a checklist. WIP limits exist per Status column on Board view. The depth is real but the experience is generalist, not developer-native.",
+
+  "keyboard_command_ux": "Command Center (Cmd+K) is present and well-publicised — global search, navigate to spaces/lists/tasks, open settings, run quick actions. Hotkeys cover task creation, comment, assignee, due-date, priority and status changes. The shortcut surface is wider than monday but the command bar's response time and the consistency of keyboard-only flow are not at Linear's sub-100ms bar. Power users can move quickly; the reward for fluency is lower than in Linear or Shortcut. [uncertain]",
+
+  "ui_responsiveness": "Server-round-trip architecture. Performance is the single most-cited complaint across G2, Trustpilot, Capterra and Reddit in 2025–2026: 'sluggish at times,' 'desktop app sometimes feels heavy,' slow loading impacting navigation. Heavy spaces with many custom fields and automations degrade noticeably. ClickUp 3.0 (2024) was a major rewrite aimed at speed; reviewers acknowledge improvement but the perception of bloat persists. No public P50/P95 figures. Mobile↔desktop sync delays are also a recurring complaint. [uncertain]",
+
+  "real_time_collaboration": "Strong. Real-time multi-user editing on Docs, live cursors, @mentions, threaded comments on tasks, assigned comments (convert any comment into an actionable item), ClickUp Chat now lives inside the workspace alongside tasks and docs, and the Inbox unifies notifications. The bet here is explicit: replace Slack-for-coordination by keeping conversation next to the work. For pure dev teams the Slack pattern still dominates, but ClickUp Chat closes the loop more than monday Dev or Jira do natively.",
+
+  "mobile_experience": "Native iOS and Android apps. Reviewers consistently rate mobile as adequate for triage, status updates, and quick edits — not for planning, configuration, or reporting. The desktop app remains the primary surface. Synchronisation between desktop and mobile is cited as unreliable in 2025 reviews. Push notifications, offline view of recent items, and basic creation work; complex workflows are noticeably slower or unavailable on mobile.",
+
+  "in_tool_documentation": "Strongest in class for this field. ClickUp Docs is a near-Notion-grade document surface with nested pages, /-menu blocks, embeds, live collaboration, and the ability to convert text into a task inline. Docs can be attached to tasks or stand alone in a hierarchy. This is one of the genuine reasons teams choose ClickUp over Jira+Confluence — it collapses two tools into one workspace.",
+
+  "developer_experience": "Mid to low. Strengths: GitHub, GitLab and Bitbucket integrations with two-way sync; PRs, branches and commits appear on tasks; ClickUp task IDs in commit messages auto-link; Sprint Points and Velocity reports exist. Weaknesses: no significant IDE plugin in the VS Code/JetBrains tier (community plugins exist but are not first-party); no first-class developer CLI (a third-party 'clickup-cli' exists but is community-maintained); deployment status is integration-dependent; code-review stage is configured rather than native. The G2 'not built for developers' theme is recurring — engineering teams adopting ClickUp usually do so because the broader org is already on it. [uncertain]",
+
+  "vcs_integration_depth": "Mid. GitHub: mature — automatically picks up activity, task-ID anywhere in PR title/description/branch/commit links it, ClickUp posts a comment in the PR with the task link, GitHub Automations let merge state drive status changes. GitLab: a redesigned integration shipped in July 2025 with automatic/manual linking of commits, branches, merge requests and issues, plus the ability to update task status from GitLab commit messages bi-directionally. Bitbucket: supported but lighter. Branch-naming enforcement is convention-based not enforced. Auto-close-on-merge works via automations. Depth is roughly comparable to Jira's GitHub integration but with less mature deployment status reporting. [uncertain]",
+
+  "ai_agentic_maturity": "This is ClickUp's loudest 2025–2026 bet. ClickUp Brain provides generative AI across tasks, docs, and chat (summaries, acceptance-criteria generation, sprint summaries, daily standup digests, AI fields). The bigger story is ClickUp AI Agents and Super Agents (ClickUp 4.x): Super Agents can manage development cycles end-to-end — generate feature branches, track PR statuses, run test summaries, file bugs with stack traces, update docs and release notes, notify the right teams. ClickUp publishes a Certified Agent benchmark (96/100 self-reported) and an agent builder for no-code agents. MCP-style external agent connectivity is being marketed; the public depth versus Linear's mcp.linear.app or Atlassian Rovo Studio is still less proven outside ClickUp-published benchmarks. The vision is broad, the production reality is mixed-quality. [uncertain]",
+
+  "time_to_value": "Fast templates, slow mastery. Self-serve onboarding is genuinely easy — a team can be on a Sprint List inside a day. But ClickUp's 'all-in-one' positioning means the surface area is enormous; reviewers consistently flag a steep learning curve and feeling overwhelmed by the number of features and setup choices. Reaching a tuned, well-governed configuration typically takes weeks for a single space and months at org scale.",
+
+  "migration_story": "From Jira: official new Importer supports Jira Cloud and on-prem (Server/Data Center) with mapping of statuses, custom fields, and users. 50GB upload limit — beyond that, ClickUp Professional Services. Plus a Jira Sync integration for run-in-parallel migrations. From Asana, Monday, Trello, Wrike, Basecamp: native importers. Quality of the Jira import is reasonable for standard fields; complex custom workflows and screen schemes generally do not survive intact, which is the same constraint every Jira-importer hits. Rollback is not formally guaranteed; recommendation is to keep Jira in read-only for the cut-over window. [uncertain]",
+
+  "deprecation_transition_risk": "ClickUp 3.0 was deprecated 27 March 2026 in favour of ClickUp 4.x; the transition was managed and the URL/data continuity preserved, but the major-version cadence does represent a small ongoing migration risk. No platform-level deprecation. The pace of feature shipping itself is a documented risk — features ship faster than they harden, and reviewers note half-finished feature edges. [uncertain]",
+
+  "safe_framework_alignment": "Shallow. ClickUp supports the team-level scrum primitives (Sprints, Points, Velocity, Burndown, CFD as dashboard widgets) and offers Portfolios for cross-list roll-up. SAFe-specific constructs — PI Planning UX, ART boards, Capability/Feature/Story canonical hierarchy, WSJF prioritisation, cross-ART dependency mapping, Inspect & Adapt — are not native and are typically modelled with Spaces/Folders/Lists and custom fields. Multiple analyst comparisons explicitly recommend Targetprocess or Jira Align for scaled SAFe and treat ClickUp as suitable for small-to-mid agile teams.",
+
+  "reporting_metrics": "Built-in Agile Dashboards: Burnup, Burndown, Cumulative Flow, Velocity, Lead Time, Cycle Time. Sprint Point system is configurable. Custom dashboards can be assembled with no-code widgets. Reports are configurable rather than fixed — strong flexibility, but flow metrics are dashboard-widgets rather than canonical first-class objects the way they are in Jira's flow analytics or Planview. Cross-portfolio analytics at enterprise scale typically need supplementary tooling.",
+
+  "customer_signal_ingestion": "Limited natively. ClickUp Forms can capture feedback, and integrations to Intercom, Zendesk and similar exist, but there is no Productboard-style native ingestion of NPS, feature votes, or unified customer signal informing prioritisation. Workaround patterns rely on Forms + custom fields + automations.",
+
+  "integration_ecosystem": "Broad: 1,000+ native integrations including Slack, Teams, GitHub, GitLab, Bitbucket, Figma, Salesforce, Hubspot, Google Workspace, Outlook, Zoom, Zapier, Make, plus a public API and webhooks. Marketplace size is smaller than Atlassian's but the integration coverage of common SaaS tools is competitive. Reviewers flag the Google Calendar/Drive integrations specifically as unreliable with frequent disconnections.",
+
+  "community_vitality": "Large and active for a non-Atlassian tool. 800k+ customer teams (ClickUp's published figure), an active subreddit, an official Community, a template library with thousands of community-shared templates, and a growing partner/consultant network. Stack Overflow tag volume is modest — ClickUp's community skews PM/ops rather than engineering. [uncertain]",
+
+  "self_hosting_data_residency": "SaaS-only. Regional data residency offered for Enterprise (US, EU) — no on-prem or private-cloud deployment. Not suitable for buyers with strict air-gap requirements.",
+
+  "customization": "Very high. Custom Task Types, custom statuses, custom fields, automation builder, conditional logic, custom views (List, Board, Calendar, Gantt, Timeline, Workload, Activity, Map, Mind Map), and a no-code workflow surface. This is the product's structural advantage. The recurring criticism is that the depth becomes a maintenance burden — configuration sprawl, inconsistent statuses across Spaces, and brittle automations are repeatedly cited.",
+
+  "pricing_commercial_model": "Per-seat tiered, aggressively priced versus enterprise comparables. Free Forever (limited storage and features); Unlimited ~$7/seat/mo (annual); Business ~$12/seat/mo; Business Plus ~$19/seat/mo; Enterprise quoted. ClickUp Brain and AI Agents are typically priced as add-ons (~$7/seat/mo on top of the base plan). The headline number is lower than Jira, monday Dev and ServiceNow EAP; the all-in cost with Brain and AI usage closes much of that gap. [uncertain]",
+
+  "total_cost_of_ownership": "Low to mid. Per-seat cost is the lowest in this peer group; implementation cost is generally low; admin overhead grows quickly with adoption because the customisation surface is enormous and ungoverned configuration becomes brittle. Training cost is moderate (steep learning curve is universally cited). AI add-ons can materially affect TCO at scale. [uncertain]",
+
+  "market_perception": "G2 5,000+ reviews and consistently high CSAT (4.7/5 range) — a structural advantage versus ServiceNow's small review base. Gartner Magic Quadrant for Collaborative Work Management lists ClickUp as a Visionary/Challenger. Developer sentiment on Hacker News and Reddit is more critical: 'feature bloat,' 'not built for developers,' 'slow.' Business-side sentiment is much stronger than engineering sentiment.",
+
+  "gaps_vs_market_leader": "vs Jira: shallower SAFe and enterprise governance, smaller marketplace, weaker audit/compliance posture for the largest enterprises, less mature flow analytics, less developer-native ergonomics. vs Linear: not local-first, no Cmd+K command palette at Linear's response-time bar, no native MCP endpoint of equivalent maturity, slower interaction model, feature bloat that contradicts Linear's restraint. Across both: persistent performance complaints, mobile↔desktop sync issues, half-finished feature edges from a feature-velocity-first culture, no IDE plugin of substance, no first-party CLI.",
+
+  "sources": [
+    "https://clickup.com/general-resources/agent-benchmark-report",
+    "https://clickup.com/blog/hub/ai/agentic-ai/super-agents/",
+    "https://clickup.com/brain/agents",
+    "https://help.clickup.com/hc/en-us/articles/6310954639255-Import-from-Jira",
+    "https://help.clickup.com/hc/en-us/articles/12224657564695-Import-from-Jira-legacy",
+    "https://help.clickup.com/hc/en-us/articles/6305771568791-GitHub-integration",
+    "https://help.clickup.com/hc/en-us/articles/6305774858263-GitLab-integration",
+    "https://help.clickup.com/hc/en-us/articles/6309030550167-Use-keyboard-shortcuts",
+    "https://www.g2.com/products/clickup/reviews?qs=pros-and-cons",
+    "https://www.capterra.com/p/158833/ClickUp/reviews/",
+    "https://clickup.com/teams/agile",
+    "https://clickup.com/blog/agile-metrics/",
+    "https://www.capterra.com/compare/19319-158833/JIRA-vs-ClickUp",
+    "https://www.zenhub.com/blog-posts/9-best-clickup-alternatives-for-engineering-teams-in-2025"
+  ],
+
+  "uncertain": [
+    "keyboard_command_ux",
+    "ui_responsiveness",
+    "developer_experience",
+    "vcs_integration_depth",
+    "ai_agentic_maturity",
+    "migration_story",
+    "deprecation_transition_risk",
+    "community_vitality",
+    "pricing_commercial_model",
+    "total_cost_of_ownership"
+  ]
+}

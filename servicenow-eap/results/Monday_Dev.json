@@ -1,0 +1,81 @@
+{
+  "id": "monday-dev",
+  "name": "Monday Dev",
+  "description": "Cross-functional Work OS; AI-analyzed velocity and risk; strong visual UX for non-technical stakeholders; growing enterprise presence",
+  "priority": "medium",
+
+  "team_execution_depth": "Monday Dev is built on top of the broader monday.com Work OS, which means its sprint/Kanban board UX is structurally a configured set of board items rather than a purpose-built developer ticket. Sprint groups represent active sprints with sprint name, timeline, goals, and a Working/Active status indicator; backlog grooming is done by dragging items between sprint groups. Story cards carry status, owner, sprint, story points, priority, type, and linked PRs, but acceptance criteria and definition-of-done live as long-text or checklist columns rather than first-class developer fields. WIP limits, swimlanes, and burndown exist but must be configured by an admin per board. Reviewers consistently note that bringing the full lifecycle into one visual workspace is the strength; the trade-off is that nothing feels developer-native compared to Jira or Linear — the board behaves like a flexible spreadsheet, not a developer issue tracker. [uncertain]",
+
+  "keyboard_command_ux": "Monday Dev exposes a basic search/quick-find but does not offer a Linear-style sub-100ms global command palette. Keyboard shortcuts cover navigation between boards, opening items, and quick column edits, but power-user fluency (status change, assignment, label, sprint move from the keyboard alone) is limited compared with Linear or Shortcut. No published mapping of a Cmd+K command bar with action-level coverage. The interaction model is mouse-and-drag first; this is consistent with monday's broader Work OS positioning where non-technical stakeholders are first-class users. [uncertain]",
+
+  "ui_responsiveness": "Server-round-trip architecture (not local-first). Perceived performance is good on small to medium boards but degrades on heavy boards. Community Forum threads and 2025 Capterra/G2 reviews flag slow page loads and rendering issues at scale — specifically cited for boards with thousands of items and 60–70 columns. No public P50/P95 latency targets. Reviewers consistently rate it slower than Linear and faster than Jira, but not local-first responsive. [uncertain]",
+
+  "real_time_collaboration": "Strong, native-feeling collaboration layer: live presence on items, @mentions, threaded item updates, activity log per item, real-time board updates, and an embedded Workdocs surface. Notifications can be tuned per board or per item. Reviewers frequently call out collaboration with non-engineering stakeholders (product, design, marketing) as a primary reason to choose Monday Dev over Jira. Slack/Teams integrations relay updates but the in-tool conversation often replaces the need to switch.",
+
+  "mobile_experience": "Native iOS and Android apps with offline access, push notifications, camera capture, voice notes, and gesture-based status changes. Mobile board parity is high — sprint board, item updates, comments, and notifications all work — though heavy customization (custom views, complex automations, dashboards) is best done on desktop. Reviewers generally rate mobile as one of the stronger experiences in the category, ahead of Jira mobile and well ahead of Shortcut (which has no native mobile app).",
+
+  "in_tool_documentation": "Monday Workdocs is built into the platform — collaborative docs that can be embedded on boards or linked to items, with live multi-user editing, /-menu blocks, and embeds. This meaningfully reduces the Jira+Confluence pattern for teams that adopt it, though Workdocs is shallower than Notion/Confluence for long-form knowledge architecture (no robust nested page hierarchy or wiki-grade permissions).",
+
+  "developer_experience": "Mid-tier. Strengths: GitHub items appear inline, PR status surfaces on cards, automations cover branch-name → status transitions, and the dev-flow templates ship with realistic columns (To-Do, In Progress, In Review, Done). Weaknesses: no IDE plugin of consequence (no VS Code/JetBrains panel comparable to Jira's or Linear's), no first-class CLI for issue manipulation, deployment status is integration-dependent rather than native, and code review state is not a first-class lifecycle stage. Engineers using Monday Dev as their primary tool typically do so because product/PM/design are already on monday.com — not because it is the most developer-native tool. [uncertain]",
+
+  "vcs_integration_depth": "GitHub integration is the most mature — two-way: branches, PRs, and commit messages link back to monday items, PR status drives item status, and 2025 updates added expanded GitHub Actions support. GitLab integration is described as 'nearly equivalent' for the common workflows (PRs, branches, status sync). Bitbucket is supported but lighter. The depth is closer to Jira's GitHub app than to Linear's tight native integration — useful in practice but reliant on configured automations. Branch-naming convention enforcement and auto-close-on-merge work, though setup is required. Deployment status visibility is integration-dependent. [uncertain]",
+
+  "ai_agentic_maturity": "Monday AI sits across the product, not just Dev. For team execution it generates ticket summaries, draft acceptance criteria, sprint retrospective insights (AI Sprint Summary highlighting velocity, unplanned work, and recommendations), and triage suggestions. Risk prediction at the sprint level is marketed. Agentic capabilities are growing — monday positions AI agents as able to complete tasks end-to-end inside workflows — but the public 2025–2026 narrative is closer to assistive AI than to a Linear-grade MCP endpoint or Atlassian Rovo Studio analog. No public MCP server for external agents (Claude/Cursor) was identifiable in the research window. [uncertain]",
+
+  "time_to_value": "Fast for the Work OS layer — a team can stand up a sprint board from the Dev template in under an hour. Time to a tuned production setup is longer: G2 and Capterra reviewers consistently call out a learning curve around automations, custom columns, and dashboards. The visual nature of the product is a real onboarding asset for cross-functional stakeholders; engineering-only teams often find it slower to reach 'right' than Linear or Shortcut because there are more ways to configure the same outcome.",
+
+  "migration_story": "From Jira: monday offers a Jira integration positioned as a migration bridge — Epic/story sync, sprint data sync, run-in-parallel mode. There is no single-shot Jira XML importer with full fidelity comparable to Linear's; teams typically run a phased transition with the integration active. From Rally/Azure DevOps: weaker, integration- or CSV-based. Field mapping coverage for custom fields is generally hand-mapped. No published rollback guarantee. [uncertain]",
+
+  "deprecation_transition_risk": "Low. Monday.com is a profitable public company (NASDAQ: MNDY), Dev is an actively invested product line, and no deprecation announcements affect the dev workflow. Price increases at the Work OS layer in 2024–2025 have produced churn complaints but not platform risk.",
+
+  "safe_framework_alignment": "Shallow. Monday Dev supports the team-level scrum/kanban primitives well, and the broader monday.com portfolio view can roll up multiple boards into a portfolio dashboard with health snapshots. However, SAFe-specific constructs — PI Planning UX, ART visibility, cross-ART dependency mapping, Capability/Feature/Story hierarchy, WSJF, Inspect & Adapt — are not native. Teams running SAFe on monday.com typically build the hierarchy with sub-items and linked boards, which is workable for a single ART but does not scale to a 50-team portfolio in the way Jira Align or Targetprocess does. [uncertain]",
+
+  "reporting_metrics": "Built-in: velocity, sprint burndown, AI Sprint Summary, and customisable dashboards over board data. CFD and lead/cycle time are achievable via dashboard widgets but are not as canonical as in Jira or Linear. Reports are configurable rather than fixed — strong flexibility, but flow metrics are not first-class the way they are in Planview or LinearB.",
+
+  "customer_signal_ingestion": "Limited natively. Integrations to Intercom, Zendesk, Hubspot, Salesforce, and a growing set of feedback tools can pipe signal into a board, but there is no Productboard-style native ingestion of customer feedback, NPS, or feature votes informing prioritisation. Teams build it via automations; it is not a first-class capability.",
+
+  "integration_ecosystem": "Broad. Slack, Teams, GitHub, GitLab, Bitbucket, Figma, Salesforce, Hubspot, Google Workspace, Outlook, Zoom, Zapier, Make, plus a marketplace of community apps. Strong on business-side integrations relative to Linear; weaker than Atlassian Marketplace at sheer count and at deep DevOps/observability tooling.",
+
+  "community_vitality": "Healthy mid-tier. Active monday Community Forum, growing marketplace, partner/consultant network targeted at business buyers. Smaller developer-community footprint than Jira, Linear, or GitHub — Stack Overflow tag volume and developer-forum presence is modest. [uncertain]",
+
+  "self_hosting_data_residency": "SaaS-only. Regional data residency is offered for Enterprise customers (EU and selected regions) but no on-prem option. Not suitable for buyers with strict private-cloud or air-gap requirements.",
+
+  "customization": "Very high at the Work OS layer — custom columns, item types, views, automations, dashboards, and a no-code workflow builder. This is the product's structural advantage and structural weakness: configuration depth is a maintenance burden, and reviewers regularly cite the time required to keep automations and boards clean as the platform scales.",
+
+  "pricing_commercial_model": "Per-seat tiered: Basic ~$9/seat/mo, Standard ~$12, Pro ~$20, Enterprise quoted at roughly $18–$28/seat/mo based on volume and add-ons. Per-seat pricing is positioned as competitive with Jira at small scale and higher than ClickUp; reviewers note the tiers add up quickly because key features (dashboards beyond a small number, time tracking, advanced automations) are tier-gated. Minimum 3-seat purchase. [uncertain]",
+
+  "total_cost_of_ownership": "Mid. Per-seat cost is moderate; implementation cost is generally lower than ServiceNow or Jira Align (no SI lift required for most deployments); ongoing admin overhead is real because the board/automation surface area grows as the team grows. Training cost is low for end-users, moderate for the platform admin who curates templates and automations. [uncertain]",
+
+  "market_perception": "Strong G2 and Capterra ratings (Monday Dev specifically has high CSAT, monday.com overall has 10,000+ G2 reviews). Gartner positioned monday.com as a Leader in Magic Quadrant for Collaborative Work Management. Developer sentiment on Reddit and Hacker News is mixed — appreciated for cross-functional collaboration, criticised by engineering-purist teams for not feeling like a developer tool. The enterprise narrative is improving year-over-year. [uncertain]",
+
+  "gaps_vs_market_leader": "vs Jira: shallower SAFe/portfolio depth, smaller marketplace, weaker enterprise governance and audit, no first-class workflow schemes or screen schemes. vs Linear: not local-first, no Cmd+K command palette of comparable depth, no native MCP endpoint, slower on heavy boards, less developer-native. Across both: no IDE plugin of substance, no first-class CLI, weaker code-review-as-board-column abstraction, and no native customer-signal ingestion.",
+
+  "sources": [
+    "https://www.g2.com/products/monday-dev/reviews",
+    "https://monday.com/w/dev",
+    "https://support.monday.com/hc/en-us/articles/360010646539-Sprint-management-with-monday-dev",
+    "https://support.monday.com/hc/en-us/articles/4549340160658-Sprint-retrospectives-with-monday-dev",
+    "https://support.monday.com/hc/en-us/articles/24047211522194-AI-Feature-Catalog",
+    "https://till-freitag.com/en/blog/monday-integrations-devops-en",
+    "https://community.monday.com/t/mondays-slow-page-load-and-similar-rendering-issues/59649",
+    "https://www.capterra.com/p/10008569/monday-dev/pricing/",
+    "https://monday.com/pricing",
+    "https://work-management.org/software-development/monday-dev-review/",
+    "https://thedigitalprojectmanager.com/tools/monday-dev-review/"
+  ],
+
+  "uncertain": [
+    "team_execution_depth",
+    "keyboard_command_ux",
+    "ui_responsiveness",
+    "developer_experience",
+    "vcs_integration_depth",
+    "ai_agentic_maturity",
+    "migration_story",
+    "safe_framework_alignment",
+    "community_vitality",
+    "pricing_commercial_model",
+    "total_cost_of_ownership",
+    "market_perception"
+  ]
+}

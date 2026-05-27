@@ -1,0 +1,97 @@
+fields:
+  # --- Identity ---
+  - name: tool_name
+    description: Full product name and vendor
+    type: string
+
+  - name: target_user
+    description: Who primarily does setup — admin/IT team, team lead, or individual contributor? Is it self-service?
+    type: string
+
+  - name: setup_time_estimate
+    description: Realistic time from sign-up/install to a team being productive (first sprint running, board configured). Include source if quoted.
+    type: string
+
+  # --- Setup Flow ---
+  - name: onboarding_wizard
+    description: Does the tool have a guided setup wizard? Describe the steps and any branching logic (e.g. "choose your framework — Scrum/Kanban/SAFe").
+    type: string
+
+  - name: template_library
+    description: Pre-built templates available at setup (sprint board, PI planning, portfolio, etc.). Quality and quantity. Can templates be published/shared across teams?
+    type: string
+
+  - name: ai_assisted_setup
+    description: Any AI features that help with initial configuration — auto-suggest structure, generate workflows, infer settings from connected tools (GitHub, Slack, etc.).
+    type: string
+
+  - name: hierarchy_config
+    description: How is the work hierarchy configured (e.g. Portfolio→Epic→Feature→Story)? Is it fixed, flexible, or schema-free? How long does it take to set up?
+    type: string
+
+  # --- Scaling ---
+  - name: multi_team_setup
+    description: How does the tool handle scaling from 1 team to many (10, 50, 100+ teams)? Is ART/Program-level configuration self-service or admin-required?
+    type: string
+
+  - name: admin_dependency
+    description: What tasks require an admin? What can team leads or members do themselves? Is there a clear self-service vs. admin boundary?
+    type: string
+
+  - name: permissions_model
+    description: How are roles and permissions set up? Is it simple or complex? Does it block team-level adoption while waiting for enterprise config?
+    type: string
+
+  # --- Import / Migration ---
+  - name: import_capabilities
+    description: Can you import from Jira, Rally, CSV, Excel, ADO? Is import self-service or requires professional services? Quality of field mapping.
+    type: string
+
+  - name: migration_story
+    description: Real-world migration experience (from user reviews, case studies, or vendor docs). Does the vendor require a services engagement to migrate?
+    type: string
+
+  # --- Integration Setup ---
+  - name: vcs_integration_setup
+    description: How is GitHub/GitLab/Bitbucket connected? Steps required, permissions needed, time to first linked PR/commit. Self-service?
+    type: string
+
+  - name: slack_notifications_setup
+    description: How Slack/Teams notifications are configured. Steps. Who can configure — admin or any member?
+    type: string
+
+  # --- User Experience Quality ---
+  - name: first_impression_ux
+    description: Qualitative description of the first-run experience — what does the user see on day 1? Empty state design, guidance, sample data.
+    type: string
+
+  - name: time_to_value
+    description: When does the tool start feeling useful? What is the minimum viable setup to get value? Is there a free/trial tier that demonstrates value before commitment?
+    type: string
+
+  # --- User Sentiment ---
+  - name: setup_complaints
+    description: Most common setup/onboarding complaints from G2, Reddit, Gartner reviews, or Trustpilot. Quote specific reviews where possible.
+    type: string
+
+  - name: setup_praise
+    description: Most common setup/onboarding praise from the same sources. What do users say makes it easy?
+    type: string
+
+  # --- Competitive signal ---
+  - name: standout_setup_feature
+    description: One thing this tool does better than anyone else in setup or onboarding. The differentiating moment.
+    type: string
+
+  - name: servicenow_comparison
+    description: Direct comparison to ServiceNow EAP setup where available (user reviews, analyst reports, or migration case studies from ServiceNow to this tool or vice versa).
+    type: string
+
+  # --- Metadata ---
+  - name: sources
+    description: List of sources used (URLs, review sites, docs pages, publication dates)
+    type: array
+
+  - name: uncertain
+    description: List of field names where the value is uncertain or could not be verified
+    type: array

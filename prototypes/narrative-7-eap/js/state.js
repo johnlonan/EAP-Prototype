@@ -85,6 +85,9 @@ EAP.setContext = function(type, name, id) {
     s.spaceData = sp || null;
     s.tab = (sp && sp.defaultTab) ? sp.defaultTab : 'board';
     s.level = null;
+    // Clear space-specific UI state on each space navigation
+    s._openDocId = null;
+    s._spaceListFilter = {};
   } else {
     s.spaceData = null;
     // Auto-set level to default for new context
@@ -126,7 +129,8 @@ EAP.setTab = function(tab) {
   s.pagination = {};
 
   // Kanban tab: apply persona's default kanbanView if no override exists.
-  if (tab === 'board') {
+  // Guard: space context uses its own board renderer — never apply EAP kanban logic.
+  if (tab === 'board' && s.context !== 'space') {
     var p = EAP.personas[s.persona];
     var personaKanbanView = (p && p.defaults && p.defaults.kanbanView) ? p.defaults.kanbanView : 'current-pi';
     if (!s._kanbanViewOverride) s.kanbanView = personaKanbanView;

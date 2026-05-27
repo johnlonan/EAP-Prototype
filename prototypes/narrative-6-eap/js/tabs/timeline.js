@@ -178,14 +178,16 @@ function tlCalBand(range, td) {
 
 function tlPiBand(range, td) {
   var h = '<div class="tl-band tl-band-pi">';
+  var piIdx = 0;
   Object.keys(EAP.piDates).forEach(function(pid) {
     var pi = EAP.piDates[pid]; if (!pi) return;
     var ps = tlP(pi.start), pe = tlP(pi.end);
-    if (pe < range.start || ps > range.end) return;
+    if (pe < range.start || ps > range.end) { piIdx++; return; }
     var left = tlPct(range,td, ps<range.start?range.start:ps);
     var right = tlPct(range,td, pe>range.end?range.end:pe);
-    var cls = 'tl-pi-seg' + (pi.active ? ' current' : '');
+    var cls = 'tl-pi-seg' + (pi.active ? ' current' : '') + ' ' + (piIdx % 2 === 0 ? 'tl-pi-even' : 'tl-pi-odd');
     h += '<span class="'+cls+'" style="left:'+left+'%;width:'+(right-left)+'%;">'+pi.name+(pi.active?' (Current)':'')+'</span>';
+    piIdx++;
   });
   return h + '</div>';
 }
@@ -253,6 +255,19 @@ function tlMs(range, td, level) {
 // ── Grid lines ────────────────────────────────────────
 function tlGrid(range, td, showSp) {
   var h = '';
+  // PI zone background fills — alternating tints connect header bands to body
+  var piIdx = 0;
+  Object.keys(EAP.piDates).forEach(function(pid) {
+    var pi = EAP.piDates[pid]; if (!pi) return;
+    var ps = tlP(pi.start), pe = tlP(pi.end);
+    if (pe < range.start || ps > range.end) { piIdx++; return; }
+    var left = tlPct(range, td, ps < range.start ? range.start : ps);
+    var right = tlPct(range, td, pe > range.end ? range.end : pe);
+    var zoneCls = 'tl-pi-zone' + (pi.active ? ' current' : '') + ' ' + (piIdx % 2 === 0 ? 'tl-pi-z-even' : 'tl-pi-z-odd');
+    h += '<div class="'+zoneCls+'" style="position:absolute;top:0;bottom:0;left:'+left+'%;width:'+(right-left)+'%;pointer-events:none;z-index:0;"></div>';
+    piIdx++;
+  });
+  // PI boundary gridlines
   Object.keys(EAP.piDates).forEach(function(pid) {
     var pi = EAP.piDates[pid]; if (!pi) return;
     var ps = tlP(pi.start);

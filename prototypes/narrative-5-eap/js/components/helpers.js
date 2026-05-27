@@ -501,10 +501,30 @@ EAP.lsCols = function() {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>ART</th><th>% Complete</th><th>Primary Goal</th>',
     r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td>' + EAP.itemNameCell(i) + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td>' + EAP.wsjfCell(i) + '</td><td><span class="tm">' + (i.art || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
   };
-  if (s.level === 'WorkItem') return {
-    h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>% Complete</th><th>Team</th><th>Primary Goal</th>',
-    r: function(i) { return EAP._GT + '<td><span class="record-num">' + (i.num || '') + '</span></td><td>' + EAP.itemNameCell(i) + '</td><td>' + EAP.typeCell(i.type || 'Story') + '</td><td>' + EAP.pill(i.state) + '</td><td><span class="par">' + (i.parent || '—') + '</span></td><td>' + EAP.ownerCell(i.owner) + '</td><td><span class="sz">' + (i.pts || '') + '</span></td><td>' + EAP.pbar(i.pct, i.state) + '</td><td>' + EAP.teamPill(i.team || '') + '</td><td>' + EAP.goalCell(i.goal) + '</td>'; }
-  };
+  if (s.level === 'WorkItem') {
+    return {
+      h: EAP._TH0 + '<th>Number</th><th>Name</th><th>Type</th><th>State</th><th class="td-blocked">Blocked</th><th>Parent</th><th>Assigned to</th><th>Pts</th><th>% Complete</th><th>Team</th><th>Primary Goal</th>',
+      r: function(i) {
+        var isBlocked = i.blocked || i.state === 'Blocked';
+        var banIcon = EAP.icon('ban', 13);
+        var blCell = isBlocked
+          ? '<span class="td-blocked-icon" data-tip="' + (i.blockReason || 'Blocked') + '">' + banIcon + '</span>'
+          : '<span class="td-blocked-icon td-blocked-icon--off">' + banIcon + '</span>';
+        return EAP._GT +
+          '<td><span class="record-num">' + (i.num || '') + '</span></td>' +
+          '<td>' + EAP.itemNameCell(i) + '</td>' +
+          '<td>' + EAP.typeCell(i.type || 'Story') + '</td>' +
+          '<td>' + EAP.pill(i.state) + '</td>' +
+          '<td class="td-blocked">' + blCell + '</td>' +
+          '<td><span class="par">' + (i.parent || '—') + '</span></td>' +
+          '<td>' + EAP.ownerCell(i.owner) + '</td>' +
+          '<td><span class="sz">' + (i.pts || '') + '</span></td>' +
+          '<td>' + EAP.pbar(i.pct, i.state) + '</td>' +
+          '<td>' + EAP.teamPill(i.team || '') + '</td>' +
+          '<td>' + EAP.goalCell(i.goal) + '</td>';
+      }
+    };
+  }
   // Feature
   return {
     h: EAP._TH0 + '<th>Number</th><th>Name</th><th>State</th><th>Parent</th><th>Owner</th>' + EAP._wsjfTh() + '<th>Team</th><th>% Complete</th><th>Primary Goal</th>',

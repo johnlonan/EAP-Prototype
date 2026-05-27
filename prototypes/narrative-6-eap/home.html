@@ -76,11 +76,15 @@ body {
   margin-bottom: 16px;
   background: transparent;
   border-bottom: 1px solid transparent;
-  transition: border-color 220ms ease, background 220ms ease;
+  transition: border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+  will-change: transform;
 }
 .ih-top.is-scrolled {
-  border-bottom-color: #CCCBC8;
-  background: #E1E0DD;
+  border-bottom-color: rgba(0,0,0,0.06);
+  background: rgba(225, 224, 221, 0.55);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 }
 .ih-greet { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ih-greet h1 {
@@ -157,7 +161,7 @@ body {
 /* ── HERO row ── three independent cards (snapshot · detail · brief) ──
    Same chrome as stat cards, same grid rhythm. Each persona's renderer
    outputs three <article class="hero-card"> elements. */
-.ih-top, .ih-hero-row, .ih-stats, .ih-grid { flex-shrink: 0; }
+.ih-top, .ih-hero-row, .ih-stats, .ih-agents, .ih-grid, .ih-intel { flex-shrink: 0; }
 
 .ih-hero-row {
   display: grid;
@@ -332,6 +336,7 @@ body {
 .zone.focus .zone-eyebrow    { color: #b91c1c; }
 .zone.activity .zone-eyebrow { color: var(--ai-accent-deep); }
 .zone.next .zone-eyebrow     { color: var(--color-primary); }
+
 .zone-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 4px 0 0; line-height: 1.3; }
 .zone-sub   { font-size: 11px; font-weight: 400; color: var(--text-tertiary); margin: 2px 0 6px; line-height: 1.45; }
 
@@ -439,6 +444,77 @@ body {
 .btn-bundle.primary:hover { background: var(--ai-accent-deep); color: #fff; }
 .btn-bundle.secondary { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
 .btn-bundle.secondary:hover { background: rgba(0,0,0,0.10); color: var(--text-primary); }
+
+/* ── Decision action buttons within focus rows ── */
+.focus-decision-btns { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+.focus-decision-btn {
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  border: 1px solid #CCCBC8; background: #fff; color: #383733;
+  transition: background 120ms ease, border-color 120ms ease;
+  line-height: 1.4; white-space: nowrap;
+}
+.focus-decision-btn:hover { background: #F1F0ED; border-color: #999995; }
+.focus-decision-btn.is-primary { background: #383733; color: #fff; border-color: #383733; }
+.focus-decision-btn.is-primary:hover { background: #262521; border-color: #262521; }
+.focus-decision-btn.is-ai { background: #16A34A; color: #fff; border-color: #16A34A; }
+.focus-decision-btn.is-ai:hover { background: #15803D; border-color: #15803D; }
+.decision-count {
+  display: inline-flex; align-items: center;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+  background: #383733; color: #fff;
+  padding: 2px 8px; border-radius: 9999px;
+  vertical-align: middle; margin-left: 8px;
+}
+
+/* ── Contextual intelligence strip (below the 3-zone grid) ── */
+.ih-intel {
+  flex-shrink: 0; margin-top: 14px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+}
+.intel-strip { display: grid; gap: 28px; }
+.intel-cols-1 { grid-template-columns: minmax(0, 1fr); }
+.intel-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.intel-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.intel-col-hd {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: #797874; border-bottom: 1px solid rgba(0,0,0,0.07);
+  padding-bottom: 6px; margin-bottom: 10px;
+}
+/* Upstream changes column */
+.intel-chain-list { display: flex; flex-direction: column; gap: 12px; }
+.intel-chain { display: flex; flex-direction: column; gap: 2px; }
+.intel-chain-trigger { font-size: 11.5px; font-weight: 600; color: #383733; line-height: 1.35; padding-bottom: 3px; }
+.intel-chain-impacts {
+  display: flex; flex-direction: column; gap: 0;
+  padding-left: 10px; margin-left: 2px; border-left: 1px solid rgba(0,0,0,0.07);
+}
+.intel-chain-impact { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 0; }
+.intel-chain-text { font-size: 11px; font-weight: 400; color: #585753; line-height: 1.35; min-width: 0; }
+.intel-chain-action {
+  font-family: inherit; font-size: 10.5px; font-weight: 600; color: #383733;
+  background: none; border: none; padding: 0; cursor: pointer; display: block; margin-top: 5px;
+  transition: color 120ms ease;
+  text-decoration: none;
+}
+.intel-chain-action:hover { color: #111111; text-decoration: underline; text-underline-offset: 2px; }
+/* Coordination column */
+.intel-coord-list { display: flex; flex-direction: column; gap: 8px; }
+.intel-coord-dep { display: flex; flex-direction: column; gap: 1px; }
+.intel-coord-dep-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.intel-coord-dep-label { font-size: 11px; font-weight: 600; color: #383733; }
+.intel-coord-dep-note  { font-size: 10px; color: #797874; line-height: 1.3; }
+.intel-coord-sig { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 400; color: #585753; }
+/* Severity dots — no text labels in the strip */
+.intel-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.intel-dot.blocked { background: #DC2626; }
+.intel-dot.risk    { background: #D97706; }
+.intel-dot.warn    { background: #CCCBC8; }
+/* Outcome column */
+.intel-outcomes .outcome-bars { gap: 10px; }
 
 /* ── Activity feed ── */
 .activity-list { display: flex; flex-direction: column; gap: 0; }
@@ -1297,11 +1373,13 @@ body {
   .ih-grid { grid-template-columns: 1fr 1fr; }
   .zone.next { grid-column: span 2; min-height: auto; }
   .ih-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .intel-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 800px) {
   .ih-grid { grid-template-columns: 1fr; }
   .zone.next { grid-column: span 1; }
   .ih-stats { grid-template-columns: 1fr; }
+  .intel-strip { grid-template-columns: 1fr !important; }
   .hero-ananya, .hero-james, .hero-dev, .hero-priya, .hero-kenji, .hero-marcus_cdo, .hero-riya { grid-template-columns: 1fr; }
   .hero-brief { grid-column: span 1 !important; }
   .content-viewport { margin: 0 0 0 64px; }
@@ -1350,6 +1428,184 @@ body {
   border-color: rgba(22, 163, 74, 0.45);
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.10);
 }
+
+/* ── AI Agents strip ──────────────────────────────────────────── */
+@property --agent-tint {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #F8F7F4;
+}
+
+@keyframes agent-breathe {
+  0%, 100% { --agent-tint: #F8F7F4; }
+  50%       { --agent-tint: #ECF5EE; }
+}
+
+@keyframes card-slide-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes vt-status-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.90); }
+}
+@keyframes vt-status-in {
+  from { opacity: 0; transform: scale(0.90); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes icon-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(22,163,74,0.16), 0 0 0 5px rgba(22,163,74,0.06); }
+  50%       { box-shadow: 0 0 0 3px rgba(22,163,74,0.26), 0 0 0 7px rgba(22,163,74,0.08); }
+}
+@keyframes status-dot-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+::view-transition-old(status-pi-planner),
+::view-transition-old(status-wsjf),
+::view-transition-old(status-dep-triage),
+::view-transition-old(status-story-decomp) {
+  animation: 140ms ease-in both vt-status-out;
+}
+::view-transition-new(status-pi-planner),
+::view-transition-new(status-wsjf),
+::view-transition-new(status-dep-triage),
+::view-transition-new(status-story-decomp) {
+  animation: 200ms cubic-bezier(0.22, 1, 0.36, 1) both vt-status-in;
+}
+
+.ih-agents {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 18px 20px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  margin-bottom: 14px;
+}
+.agents-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.agents-hd-left { display: flex; align-items: center; gap: 8px; }
+.agents-eyebrow {
+  font-size: 10px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-tertiary);
+}
+.agents-count {
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 999px;
+  background: rgba(22,163,74,0.10); color: #15803D;
+}
+.agents-link {
+  font-family: inherit; font-size: 11px; font-weight: 500;
+  color: var(--text-tertiary); background: none; border: none;
+  padding: 0; cursor: pointer; transition: color 120ms;
+}
+.agents-link:hover { color: var(--text-primary); }
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.agent-card {
+  background: var(--agent-tint);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex; flex-direction: column;
+  position: relative;
+  animation: card-slide-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: border-color 220ms ease, box-shadow 160ms ease;
+}
+.agents-grid .agent-card:nth-child(1) { animation-delay: 0ms; }
+.agents-grid .agent-card:nth-child(2) { animation-delay: 70ms; }
+.agents-grid .agent-card:nth-child(3) { animation-delay: 140ms; }
+.agents-grid .agent-card:nth-child(4) { animation-delay: 210ms; }
+.agent-card:hover { border-color: rgba(0,0,0,0.10); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.agent-card.is-running {
+  animation: agent-breathe 2.8s ease-in-out infinite;
+  border-color: rgba(22,163,74,0.25);
+}
+.agent-card.is-running .agent-icon {
+  animation: icon-pulse 1.8s ease-in-out infinite;
+}
+.agent-card.is-completed {
+  --agent-tint: #F4FAF5;
+  border-color: rgba(22,163,74,0.18);
+}
+.agent-card-hd { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.agent-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: #343331; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.agent-icon svg { width: 14px; height: 14px; display: block; }
+.agent-name-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.agent-name { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.agent-desc { font-size: 11px; color: var(--text-tertiary); line-height: 1.45; }
+.agent-progress {
+  height: 2px; background: rgba(0,0,0,0.06); border-radius: 1px;
+  overflow: hidden; margin: 0 0 4px;
+  opacity: 0; transition: opacity 220ms ease;
+}
+.agent-progress.visible { opacity: 1; }
+.agent-progress-fill {
+  height: 100%; background: var(--ai-accent); border-radius: 1px;
+  width: 0%; transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.agent-step {
+  font-size: 10.5px; color: var(--ai-accent-deep); line-height: 1.4;
+  height: 14px; margin-bottom: 6px;
+  overflow: hidden;
+}
+.agent-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: auto; padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+.agent-meta-left { display: flex; flex-direction: column; gap: 2px; }
+.agent-last-run { font-size: 10px; color: var(--text-tertiary); font-weight: 400; font-variant-numeric: tabular-nums; }
+.agent-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  white-space: nowrap; align-self: flex-start;
+}
+.agent-status.ready     { background: rgba(52,51,49,0.07); color: #999995; font-weight: 500; }
+.agent-status.running   { background: rgba(22,163,74,0.12); color: #15803D; }
+.agent-status.completed { background: rgba(22,163,74,0.10); color: #16A34A; }
+.agent-status.review    { background: rgba(217,119,6,0.10); color: #D97706; }
+.agent-status.running::before {
+  content: '';
+  width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; flex-shrink: 0;
+  animation: status-dot-blink 1.6s ease-in-out infinite;
+}
+.agent-run-btn {
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  padding: 5px 13px; border-radius: 999px; cursor: pointer;
+  border: 1px solid #CCCBC8; background: #fff; color: #343331;
+  transition: background 120ms ease, border-color 120ms ease, color 180ms ease;
+  white-space: nowrap; flex-shrink: 0;
+}
+.agent-run-btn:hover:not(:disabled) { background: #F1F0ED; border-color: #999995; }
+.agent-run-btn:disabled { cursor: default; }
+.agent-run-btn.is-running {
+  background: rgba(22,163,74,0.08); color: #15803D;
+  border-color: rgba(22,163,74,0.30); opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-card,
+  .agent-card.is-running,
+  .agent-card.is-running .agent-icon { animation: none; }
+  .agent-status.running::before { animation: none; }
+  .agent-progress-fill { transition: width 200ms linear; }
+}
 </style>
 </head>
 <body>
@@ -1385,12 +1641,18 @@ body {
     <!-- STAT row -->
     <div class="ih-stats" id="stats"></div>
 
+    <!-- AI Agents strip -->
+    <div class="ih-agents" id="agents" style="display:none"></div>
+
     <!-- 3-zone grid -->
     <div class="ih-grid">
-      <article class="zone focus" id="focus"></article>
+      <article class="zone focus"    id="focus"></article>
       <article class="zone activity" id="activity"></article>
-      <article class="zone next" id="next"></article>
+      <article class="zone next"     id="next"></article>
     </div>
+
+    <!-- Intelligence strip — flat band below the grid, no card chrome -->
+    <div class="ih-intel" id="intel"></div>
 
   </main>
 </div>
@@ -1399,8 +1661,9 @@ body {
 <script src="../shared/nav.js"></script>
 <script src="js/data.js?v=8"></script>
 <script src="js/state.js?v=5"></script>
-<script src="js/data-personas.js?v=4"></script>
+<script src="js/data-personas.js?v=10"></script>
 <script src="js/components/persona-switcher.js?v=2"></script>
+<script src="js/components/command-palette.js?v=4"></script>
 
 <script>
 (function() {
@@ -2289,23 +2552,226 @@ body {
   }
 
   // ════════════════════════════════════════════════════════
+  // AI AGENTS STRIP
+  // ════════════════════════════════════════════════════════
+  function renderAgents() {
+    var el = document.getElementById('agents');
+    if (!el) return;
+    if (['ananya', 'riya'].indexOf(personaKey) < 0) { el.style.display = 'none'; return; }
+    el.style.display = '';
+
+    var ICONS = {
+      plan:  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>',
+      rank:  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="14" y2="12"/><line x1="2" y1="8" x2="10" y2="8"/><line x1="2" y1="4" x2="7" y2="4"/><polyline points="12 5 14 3 12 1"/><line x1="14" y1="3" x2="14" y2="10"/></svg>',
+      deps:  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="3" cy="8" r="2"/><circle cx="13" cy="3" r="2"/><circle cx="13" cy="13" r="2"/><line x1="5" y1="7.5" x2="11" y2="4"/><line x1="5" y1="8.5" x2="11" y2="12"/></svg>',
+      split: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="4" rx="1.5"/><rect x="2" y="7" width="5.5" height="3" rx="1"/><rect x="8.5" y="7" width="5.5" height="3" rx="1"/><line x1="5" y1="13" x2="11" y2="13"/><line x1="8" y1="10" x2="8" y2="13"/></svg>'
+    };
+
+    var AGENTS_DATA = [
+      {
+        id: 'pi-planner', name: 'PI Planner', icon: 'plan',
+        iconBg: 'rgba(99,102,241,0.10)', iconBorder: 'rgba(99,102,241,0.18)', iconColor: '#6366F1',
+        desc: 'Allocates capacity across ARTs for upcoming PI',
+        lastRun: 'Yesterday, 4:32 PM', status: 'ready',
+        steps: ['Loading ART capacity…', 'Analysing PI objectives…', 'Balancing allocations…', 'PI plan ready for review'],
+        toast: '✦ PI plan updated — capacity balanced across 3 ARTs'
+      },
+      {
+        id: 'wsjf', name: 'WSJF Recompute', icon: 'rank',
+        iconBg: 'rgba(234,88,12,0.09)', iconBorder: 'rgba(234,88,12,0.16)', iconColor: '#EA580C',
+        desc: 'Scores and re-ranks backlog by weighted value',
+        lastRun: '2 days ago', status: 'ready',
+        steps: ['Fetching backlog…', 'Applying WSJF model…', 'Scoring 34 features…', '34 items rescored'],
+        toast: '✦ WSJF scores updated for 34 backlog items'
+      },
+      {
+        id: 'dep-triage', name: 'Dependency Triage', icon: 'deps',
+        iconBg: 'rgba(2,132,199,0.09)', iconBorder: 'rgba(2,132,199,0.16)', iconColor: '#0284C7',
+        desc: 'Identifies cross-team blockers and sequencing risks',
+        lastRun: '3 hours ago', status: 'completed',
+        steps: ['Scanning dependencies…', 'Mapping blockers…', 'Prioritising risks…', '6 blockers flagged'],
+        toast: '✦ Dependency triage complete — 6 blockers flagged'
+      },
+      {
+        id: 'story-decomp', name: 'Story Decomposer', icon: 'split',
+        iconBg: 'rgba(5,150,105,0.09)', iconBorder: 'rgba(5,150,105,0.16)', iconColor: '#059669',
+        desc: 'Breaks features into right-sized stories with ACs',
+        lastRun: '4 days ago', status: 'ready',
+        steps: ['Reading feature scope…', 'Applying story patterns…', 'Generating acceptance criteria…', '12 stories created'],
+        toast: '✦ 12 stories created and added to backlog'
+      }
+    ];
+
+    var STATUS_LABEL = { ready: 'Ready', running: 'Running', completed: 'Completed', review: 'Needs review' };
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function withTransition(fn) {
+      if (!reduced && document.startViewTransition) {
+        document.startViewTransition(fn);
+      } else {
+        fn();
+      }
+    }
+
+    function slideStep(stepEl, text) {
+      if (reduced || !stepEl.textContent) {
+        stepEl.textContent = text;
+        return;
+      }
+      stepEl.animate(
+        [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(-5px)' }],
+        { duration: 130, easing: 'ease-in', fill: 'forwards' }
+      ).finished.then(function() {
+        stepEl.textContent = text;
+        stepEl.animate(
+          [{ opacity: 0, transform: 'translateY(7px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 180, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+        );
+      });
+    }
+
+    function cardHtml(a) {
+      var isCompleted = a.status === 'completed';
+      var lastRunHtml = isCompleted
+        ? '<span class="agent-last-run">✦ ' + a.lastRun + '</span>'
+        : '<span class="agent-last-run">Last run: ' + a.lastRun + '</span>';
+      var btnLabel = isCompleted ? 'Re-run' : 'Run';
+      return '<div class="agent-card' + (isCompleted ? ' is-completed' : '') + '" id="agent-' + a.id + '">' +
+        '<div class="agent-card-hd">' +
+          '<div class="agent-icon" style="background:' + a.iconBg + ';border:1px solid ' + a.iconBorder + ';color:' + a.iconColor + '">' + ICONS[a.icon] + '</div>' +
+          '<div class="agent-name-block">' +
+            '<div class="agent-name">' + a.name + '</div>' +
+            '<div class="agent-desc">' + a.desc + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="agent-progress" id="agent-progress-' + a.id + '"><div class="agent-progress-fill" id="agent-fill-' + a.id + '"></div></div>' +
+        '<div class="agent-step" id="agent-step-' + a.id + '"></div>' +
+        '<div class="agent-foot">' +
+          '<div class="agent-meta-left">' +
+            '<span class="agent-status ' + a.status + '" id="agent-status-' + a.id + '" style="view-transition-name:status-' + a.id + '">' + STATUS_LABEL[a.status] + '</span>' +
+            lastRunHtml +
+          '</div>' +
+          '<button class="agent-run-btn" id="agent-btn-' + a.id + '">' + btnLabel + '</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    el.innerHTML =
+      '<div class="agents-hd">' +
+        '<div class="agents-hd-left">' +
+          '<span class="agents-eyebrow">AI Agents</span>' +
+          '<span class="agents-count">4 agents</span>' +
+        '</div>' +
+        '<button class="agents-link">Manage agents</button>' +
+      '</div>' +
+      '<div class="agents-grid">' +
+        AGENTS_DATA.map(cardHtml).join('') +
+      '</div>';
+
+    function runAgent(a) {
+      var card     = document.getElementById('agent-' + a.id);
+      var btn      = document.getElementById('agent-btn-' + a.id);
+      var statusEl = document.getElementById('agent-status-' + a.id);
+      var progressEl = document.getElementById('agent-progress-' + a.id);
+      var fillEl   = document.getElementById('agent-fill-' + a.id);
+      var stepEl   = document.getElementById('agent-step-' + a.id);
+      if (!card || !btn || btn.disabled) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Running…';
+      btn.classList.add('is-running');
+      progressEl.classList.add('visible');
+
+      withTransition(function() {
+        card.classList.remove('is-completed');
+        card.classList.add('is-running');
+        statusEl.className = 'agent-status running';
+        statusEl.textContent = 'Running';
+      });
+
+      var current = 0;
+      var pcts = [18, 50, 78, 100];
+
+      function advance() {
+        if (current >= a.steps.length - 1) {
+          fillEl.style.width = '100%';
+          slideStep(stepEl, '✦ ' + a.steps[a.steps.length - 1]);
+          setTimeout(function() {
+            withTransition(function() {
+              card.classList.remove('is-running');
+              card.classList.add('is-completed');
+              statusEl.className = 'agent-status completed';
+              statusEl.textContent = 'Completed';
+              btn.disabled = false;
+              btn.textContent = 'Re-run';
+              btn.classList.remove('is-running');
+              var lastEl = card.querySelector('.agent-last-run');
+              if (lastEl) lastEl.textContent = '✦ Just now';
+            });
+            setTimeout(function() {
+              progressEl.classList.remove('visible');
+              setTimeout(function() { stepEl.textContent = ''; fillEl.style.width = '0%'; }, 220);
+            }, 700);
+            if (EAP.toast) EAP.toast({ message: a.toast, duration: 5000 });
+          }, 500);
+          return;
+        }
+        slideStep(stepEl, a.steps[current]);
+        fillEl.style.width = pcts[current] + '%';
+        current++;
+        setTimeout(advance, 900);
+      }
+
+      setTimeout(advance, 150);
+    }
+
+    AGENTS_DATA.forEach(function(a) {
+      var btn = document.getElementById('agent-btn-' + a.id);
+      if (btn) btn.addEventListener('click', function() { runAgent(a); });
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
   // FOCUS — ranked decisions with source icons
   // ════════════════════════════════════════════════════════
   function renderFocus() {
     var card = document.getElementById('focus');
     if (!hc) return;
 
-    var items = hc.focus.items.map(function(it) {
-      var srcIcon = SRC_ICONS[it.source] || SRC_ICONS.product;
-      var srcClass = 'src-' + (it.source || 'product');
+    var focusDecisions = (EAP.focusDecisions || {})[personaKey] || {};
+    var decisionCount  = Object.keys(focusDecisions).length;
+
+    var items = hc.focus.items.map(function(it, idx) {
+      var srcIcon   = SRC_ICONS[it.source] || SRC_ICONS.product;
+      var srcClass  = 'src-' + (it.source || 'product');
       var bundleAttr = (it.source === 'ai-bundle') ? ' data-is-bundle="1"' : '';
-      var bundleCls = (it.source === 'ai-bundle') ? ' bundle-row' : '';
-      var ottoAttr  = it.otto      ? ' data-otto="'      + it.otto.replace(/"/g, '&quot;')      + '"' : '';
-      var hlAttr    = it.highlight ? ' data-highlight="' + it.highlight + '"' : '';
+      var bundleCls  = (it.source === 'ai-bundle') ? ' bundle-row' : '';
+      var ottoAttr   = it.otto      ? ' data-otto="'      + it.otto.replace(/"/g, '&quot;')      + '"' : '';
+      var hlAttr     = it.highlight ? ' data-highlight="' + it.highlight + '"' : '';
+
+      var decisions = focusDecisions[idx] || [];
+      var decisionsHtml = '';
+      if (decisions.length) {
+        decisionsHtml = '<div class="focus-decision-btns">' +
+          decisions.map(function(d) {
+            var cls = 'focus-decision-btn';
+            if (d.ai)          cls += ' is-ai';
+            else if (d.primary) cls += ' is-primary';
+            var btnOtto = (d.ai && it.otto) ? ' data-btn-otto="' + it.otto.replace(/"/g, '&quot;') + '"' : '';
+            return '<button class="' + cls + '" type="button" data-btn-tab="' + (it.tab || '') + '"' + btnOtto + '>' + d.label + '</button>';
+          }).join('') +
+        '</div>';
+      }
+
       return '<div class="focus-row' + bundleCls + '" data-tab="' + (it.tab || '') + '"' + bundleAttr + ottoAttr + hlAttr + '>' +
         '<span class="src-icon ' + srcClass + '">' + srcIcon + '</span>' +
         '<span class="severity-dot ' + it.severity + '"></span>' +
-        '<div class="focus-text"><div class="focus-title">' + it.title + '</div><div class="focus-desc">' + it.desc + '</div></div>' +
+        '<div class="focus-text">' +
+          '<div class="focus-title">' + it.title + '</div>' +
+          '<div class="focus-desc">' + it.desc + '</div>' +
+          decisionsHtml +
+        '</div>' +
         '<div class="focus-stat">' + renderStat(it.stat) + '</div>' +
       '</div>';
     }).join('');
@@ -2338,15 +2804,17 @@ body {
       '</div>';
     }
 
+    var countBadge = decisionCount ? '<span class="decision-count">' + decisionCount + ' pending</span>' : '';
+
     card.innerHTML =
-      '<div class="zone-eyebrow">FOCUS · 1</div>' +
-      '<h2 class="zone-title">' + hc.focus.title + '</h2>' +
+      '<div class="zone-eyebrow">DECISIONS · 1</div>' +
+      '<h2 class="zone-title">' + hc.focus.title + ' ' + countBadge + '</h2>' +
       '<div class="zone-sub">' + hc.focus.subtitle + '</div>' +
       '<div class="focus-list">' + items + bundleDetailHtml + '</div>';
 
     drawAllMiniRings(card);
 
-    // Wire up clicks
+    // Row clicks — navigate to tab (unchanged behaviour)
     card.querySelectorAll('.focus-row').forEach(function(el) {
       el.addEventListener('click', function() {
         if (el.getAttribute('data-is-bundle')) {
@@ -2361,6 +2829,20 @@ body {
           var url = tabUrl(t);
           if (hl) url += '&highlight=' + encodeURIComponent(hl);
           if (ot) url += '&otto='      + encodeURIComponent(ot);
+          window.location.href = url;
+        }
+      });
+    });
+
+    // Decision button clicks — navigate to tab; ai buttons include otto context; stop propagation
+    card.querySelectorAll('.focus-decision-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var t  = btn.getAttribute('data-btn-tab');
+        var ot = btn.getAttribute('data-btn-otto');
+        if (t) {
+          var url = tabUrl(t);
+          if (ot) url += '&otto=' + encodeURIComponent(ot);
           window.location.href = url;
         }
       });
@@ -3376,6 +3858,121 @@ body {
   }
 
   // ════════════════════════════════════════════════════════
+  // INTELLIGENCE STRIP — flat band below the 3-zone grid.
+  // No card chrome. Structure from typography + columns.
+  // Dots replace text status badges. Text links replace buttons.
+  // ════════════════════════════════════════════════════════
+  function renderIntel() {
+    var el = document.getElementById('intel');
+    if (!el) return;
+
+    var chainData   = (EAP.cascadeChains || {})[personaKey];
+    var coordData   = (EAP.coordHealth   || {})[personaKey];
+    var outcomeData = (EAP.outcomePanel  || {})[personaKey];
+    var hasChains   = chainData   && chainData.chains && chainData.chains.length;
+    var hasCoord    = coordData   && coordData.length;
+    var hasOutcome  = outcomeData && outcomeData.goals && outcomeData.goals.length;
+
+    // Intel strip hidden pending redesign — flip each to true to restore
+    var SHOW_UPSTREAM = false;
+    var SHOW_COORD    = false;
+    var SHOW_OUTCOME  = false;
+    if (!SHOW_UPSTREAM) hasChains  = false;
+    if (!SHOW_COORD)    hasCoord   = false;
+    if (!SHOW_OUTCOME)  hasOutcome = false;
+
+    if (!hasChains && !hasCoord && !hasOutcome) { el.style.display = 'none'; return; }
+
+    var dot = function(kind) { return '<span class="intel-dot ' + kind + '"></span>'; };
+    var numCols = (hasChains ? 1 : 0) + (hasCoord ? 1 : 0) + (hasOutcome ? 1 : 0);
+    var cols = '';
+
+    // ── Upstream changes column ───────────────────────────
+    if (hasChains) {
+      var chainsHtml = chainData.chains.map(function(chain) {
+        var impactsHtml = chain.nodes.map(function(node) {
+          return '<div class="intel-chain-impact">' +
+            '<span class="intel-chain-text">' + node.text + '</span>' +
+            dot(node.kind) +
+          '</div>';
+        }).join('');
+        var actionHtml = chain.action
+          ? '<button class="intel-chain-action" type="button" data-tab="' + chain.action.tab + '">' + chain.action.label + '</button>'
+          : '';
+        return '<div class="intel-chain">' +
+          '<div class="intel-chain-trigger">' + chain.trigger + '</div>' +
+          '<div class="intel-chain-impacts">' + impactsHtml + '</div>' +
+          actionHtml +
+        '</div>';
+      }).join('');
+
+      cols += '<div class="intel-col">' +
+        '<div class="intel-col-hd">Upstream changes</div>' +
+        '<div class="intel-chain-list">' + chainsHtml + '</div>' +
+      '</div>';
+    }
+
+    // ── Coordination column ───────────────────────────────
+    if (hasCoord) {
+      var coordHtml = coordData.map(function(item) {
+        if (item.kind === 'dep') {
+          return '<div class="intel-coord-dep">' +
+            '<div class="intel-coord-dep-row">' +
+              '<span class="intel-coord-dep-label">' + item.from + ' → ' + item.to + '</span>' +
+              dot(item.status) +
+            '</div>' +
+            '<div class="intel-coord-dep-note">' + item.note + '</div>' +
+          '</div>';
+        }
+        return '<div class="intel-coord-sig">' +
+          '<span>' + item.text + '</span>' +
+          dot(item.status) +
+        '</div>';
+      }).join('');
+
+      cols += '<div class="intel-col">' +
+        '<div class="intel-col-hd">Coordination</div>' +
+        '<div class="intel-coord-list">' + coordHtml + '</div>' +
+      '</div>';
+    }
+
+    // ── Outcome progress column ───────────────────────────
+    if (hasOutcome) {
+      var goalsHtml = outcomeData.goals.map(function(g) {
+        return '<div class="outcome-bar">' +
+          '<div class="outcome-bar-hd">' +
+            '<span class="outcome-bar-name">' + g.name + '</span>' +
+            '<span class="outcome-bar-val">' + g.pct + '%</span>' +
+          '</div>' +
+          '<div class="outcome-bar-track">' +
+            '<div class="outcome-bar-fill" style="width:' + Math.min(g.pct,100) + '%;background:' + g.fill + '"></div>' +
+            '<div class="outcome-bar-target" style="left:' + Math.min(g.target,100) + '%"></div>' +
+          '</div>' +
+          '<div class="outcome-bar-insight">' + g.insight + '</div>' +
+        '</div>';
+      }).join('');
+
+      var noteHtml = outcomeData.note
+        ? '<div style="font-size:10px;color:#797874;margin-top:8px;line-height:1.4">' + outcomeData.note + '</div>'
+        : '';
+
+      cols += '<div class="intel-col">' +
+        '<div class="intel-col-hd">Outcome progress</div>' +
+        '<div class="intel-outcomes"><div class="outcome-bars" style="gap:10px">' + goalsHtml + '</div>' + noteHtml + '</div>' +
+      '</div>';
+    }
+
+    el.innerHTML = '<div class="intel-strip intel-cols-' + numCols + '">' + cols + '</div>';
+
+    el.querySelectorAll('.intel-chain-action[data-tab]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var t = btn.getAttribute('data-tab');
+        if (t) window.location.href = tabUrl(t);
+      });
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
   // BOOT
   // ════════════════════════════════════════════════════════
   renderStandupBrief();
@@ -3401,9 +3998,11 @@ body {
     });
   })();
 
+  renderAgents();
   renderFocus();
   renderActivity();
   renderNext();
+  renderIntel();
 
 })();
 </script>

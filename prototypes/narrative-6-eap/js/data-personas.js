@@ -246,7 +246,8 @@ EAP.homeContent = {
     omniPlaceholders: [
       'Ask: \'Show PI 27 backlog readiness\'',
       'Ask: \'Which features are below 30%?\'',
-      'Ask: \'Summarise sprint review demo line-up\''
+      'Ask: \'Summarise sprint review demo line-up\'',
+      '⌘K — ask Otto, navigate, filter'
     ],
     promptPills: [
       { icon: 'check',     label: 'Demo line-up' },
@@ -295,12 +296,12 @@ EAP.homeContent = {
       title: 'Getting ready for PI 27 Planning',
       anchor: 'PI 27 Planning',
       daysUntil: 35,
-      readiness: { ready: 8, total: 25, label: 'Backlog readiness' },
+      readiness: { ready: 13, total: 25, label: 'Backlog readiness' },
       timeline: [
-        { date:'May 7',  label:'Demo line-up confirmed',   state:'pending' },
-        { date:'May 14', label:'Backlog ranking lock',     state:'pending' },
-        { date:'May 21', label:'Capacity confirmed',       state:'upcoming' },
-        { date:'Jun 3',  label:'PI 27 Planning · Day 1',   state:'upcoming' }
+        { date:'+7 days',  label:'Demo line-up confirmed',   state:'pending' },
+        { date:'+14 days', label:'Backlog ranking lock',     state:'pending' },
+        { date:'+21 days', label:'Capacity confirmed',       state:'upcoming' },
+        { date:'+35 days', label:'PI 27 Planning · Day 1',   state:'upcoming' }
       ],
       tab: 'backlog'
     }
@@ -313,7 +314,8 @@ EAP.homeContent = {
     omniPlaceholders: [
       'Ask: \'What\'s on me today?\'',
       'Ask: \'Show my review queue\'',
-      'Ask: \'Where am I blocking the team?\''
+      'Ask: \'Where am I blocking the team?\'',
+      '⌘K — ask Otto, navigate, filter'
     ],
     promptPills: [
       { icon: 'check',     label: "Catch me up" },
@@ -365,7 +367,8 @@ EAP.homeContent = {
     omniPlaceholders: [
       'Ask: \'Show PI 27 capacity confirmations\'',
       'Ask: \'Summarise dependency map\'',
-      'Ask: \'Which teams are flagged?\''
+      'Ask: \'Which teams are flagged?\'',
+      '⌘K — ask Otto, navigate, filter'
     ],
     promptPills: [
       { icon: 'check',     label: 'Capacity confirmations' },
@@ -424,7 +427,8 @@ EAP.homeContent = {
     omniPlaceholders: [
       'Ask: \'Where\'s the team blocked?\'',
       'Ask: \'What might slip Sprint 2?\'',
-      'Ask: \'Sprint 3 refinement state\''
+      'Ask: \'Sprint 3 refinement state\'',
+      '⌘K — ask Otto, navigate, filter'
     ],
     promptPills: [
       { icon: 'check',     label: "What might slip" },
@@ -482,7 +486,8 @@ EAP.homeContent = {
     omniPlaceholders: [
       'Ask: \'Show stalled epics\'',
       'Ask: \'OKR coverage gaps\'',
-      'Ask: \'Q3 commitment burn\''
+      'Ask: \'Q3 commitment burn\'',
+      '⌘K — ask Otto, navigate, filter'
     ],
     promptPills: [
       { icon: 'check',     label: 'Stalled epics' },
@@ -537,7 +542,8 @@ EAP.homeContent = {
     omniPlaceholders: [
       'Ask: \'Show outcome health\'',
       'Ask: \'Compile board summary\'',
-      'Ask: \'Escalations needing me\''
+      'Ask: \'Escalations needing me\'',
+      '⌘K — ask Otto, navigate, filter'
     ],
     promptPills: [
       { icon: 'check',     label: 'Compile board report' },
@@ -598,7 +604,8 @@ EAP.homeContent = {
     omniPlaceholders: [
       'Ask: \'Show ART utilisation outlook\'',
       'Ask: \'Funding queue summary\'',
-      'Ask: \'Q3 burn vs forecast\''
+      'Ask: \'Q3 burn vs forecast\'',
+      '⌘K — ask Otto, navigate, filter'
     ],
     promptPills: [
       { icon: 'check',     label: 'Submit Finance input' },
@@ -807,5 +814,310 @@ EAP.eventAttendees = {
   'Board report · circulate':      ['Marcus_CDO','Priya','Kenji'],
   'Capacity envelope due':         ['Kenji','Riya'],
   'CapEx/OpEx classification':     ['Kenji']
+};
+
+// ═══════════════════════════════════════════════════════
+// FOCUS DECISIONS — action buttons per focus item
+// Keys are the 0-based index of hc.focus.items[] for each persona.
+// primary: charcoal button  ·  ai: green button  ·  neither: ghost outline
+// Button click navigates to the item's tab; ai button also opens otto panel.
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// CASCADE CHAINS — change propagation data per persona
+// Each chain: trigger (source event) → nodes (downstream impacts)
+// node.kind: 'blocked' (red) | 'risk' (amber) | 'warn' (grey)
+// node.tab: navigates to that tab view on click
+// All triggers and nodes reference real items from data.js.
+// ═══════════════════════════════════════════════════════
+EAP.cascadeChains = {
+  ananya: {
+    chains: [
+      {
+        trigger: 'Auth API contract unsigned · Day 2',
+        nodes: [
+          { text: 'Payment Confirmation · Blocked · 20%', kind:'blocked', tab:'planning' },
+          { text: '2 Sprint 2 stories waiting',           kind:'blocked', tab:'board'    },
+          { text: 'Cross-Border Payment · PI 27 at risk', kind:'risk',    tab:'timeline' }
+        ],
+        action: { label:'Escalate to Auth', tab:'planning' }
+      },
+      {
+        trigger: 'Onboarding Team at 60% of target velocity',
+        nodes: [
+          { text: 'Onboarding Flow · 0% · PI 26',  kind:'risk', tab:'board' },
+          { text: 'Sprint 2 demo line-up affected', kind:'warn', tab:'board' }
+        ],
+        action: { label:'View impacted features', tab:'board' }
+      }
+    ]
+  },
+  james: {
+    chains: [
+      {
+        trigger: 'Auth Session Expiry not pushed to review',
+        nodes: [
+          { text: 'Payments team blocked · 2 days', kind:'blocked', tab:'taskboard' },
+          { text: 'Auth API integration waiting',   kind:'blocked', tab:'taskboard' },
+          { text: 'Payment Confirmation at 20%',    kind:'risk',    tab:'taskboard' }
+        ],
+        action: { label:'Start review now', tab:'taskboard' }
+      },
+      {
+        trigger: 'Biometric Onboarding added mid-cycle · Day 5',
+        nodes: [
+          { text: '5 pts added · burn pace affected', kind:'warn', tab:'taskboard' },
+          { text: '3 items below close pace',         kind:'warn', tab:'taskboard' }
+        ],
+        action: { label:'View sprint', tab:'taskboard' }
+      }
+    ]
+  },
+  riya: {
+    chains: [
+      {
+        trigger: 'Auth API contract unsigned · Day 2',
+        nodes: [
+          { text: 'Payments team blocked · 2 stories', kind:'blocked', tab:'planning' },
+          { text: 'Payment Confirmation · 20%',         kind:'blocked', tab:'planning' },
+          { text: 'Cross-Border Payment · PI 27 risk',  kind:'risk',    tab:'timeline' }
+        ],
+        action: { label:'Open dependency map', tab:'timeline' }
+      },
+      {
+        trigger: 'Onboarding Team at 60% of target velocity',
+        nodes: [
+          { text: 'Onboarding Flow · 0% · PI 26 scope', kind:'risk', tab:'planning' },
+          { text: 'PI confidence 74% · trending down',  kind:'warn', tab:'planning' }
+        ],
+        action: { label:'Investigate team', tab:'planning' }
+      },
+      {
+        trigger: '4 cross-ART dependencies unresolved · PI 27',
+        nodes: [
+          { text: 'PI 27 capacity uncommitted', kind:'risk', tab:'timeline' },
+          { text: 'Planning window · 14 days',  kind:'warn', tab:'timeline' }
+        ],
+        action: { label:'View PI 27 deps', tab:'timeline' }
+      }
+    ]
+  },
+  dev: {
+    chains: [
+      {
+        trigger: 'Auth token defect · ownerless 4 days',
+        nodes: [
+          { text: 'Auth integration blocked',    kind:'blocked', tab:'taskboard' },
+          { text: 'Payment screen waiting',      kind:'blocked', tab:'taskboard' },
+          { text: 'Payment Confirmation at 20%', kind:'risk',    tab:'taskboard' }
+        ],
+        action: { label:'Escalate to Auth', tab:'taskboard' }
+      },
+      {
+        trigger: '3 stories below burn pace',
+        nodes: [
+          { text: 'Sprint 2 forecast · 64%',           kind:'warn', tab:'taskboard' },
+          { text: 'System demo line-up at risk · Fri',  kind:'warn', tab:'taskboard' }
+        ],
+        action: { label:'View sprint', tab:'taskboard' }
+      }
+    ]
+  },
+  priya: {
+    chains: [
+      {
+        trigger: 'Mobile Banking Platform at risk · 42% complete',
+        nodes: [
+          { text: 'Goal 1 pace · 42% vs 50% target', kind:'risk', tab:'hierarchy' },
+          { text: 'Board narrative weakening',        kind:'warn', tab:'hierarchy' }
+        ],
+        action: { label:'View outcome health', tab:'hierarchy' }
+      },
+      {
+        trigger: 'Open Banking stalled · 4 weeks in Analysis',
+        nodes: [
+          { text: 'PSD3 Compliance delayed',    kind:'risk',    tab:'timeline' },
+          { text: 'Regulatory deadline at risk', kind:'blocked', tab:'timeline' }
+        ],
+        action: { label:'View PSD3 timeline', tab:'timeline' }
+      },
+      {
+        trigger: 'Portfolio WIP exceeded · 5 in flight, limit 4',
+        nodes: [
+          { text: 'Funding decisions blocked · 3 epics', kind:'warn', tab:'backlog' },
+          { text: 'PI 27 scope decisions deferred',      kind:'risk', tab:'backlog' }
+        ],
+        action: { label:'View funding queue', tab:'backlog' }
+      }
+    ]
+  },
+  marcus_cdo: {
+    chains: [
+      {
+        trigger: 'Goal 2 cost reduction · 12% vs 35% target',
+        nodes: [
+          { text: 'Cost pace · 22 pts behind plan',   kind:'blocked', tab:'hierarchy' },
+          { text: 'Board report · 7 days · red flag', kind:'risk',    tab:'hierarchy' }
+        ],
+        action: { label:'See action plan', tab:'hierarchy' }
+      },
+      {
+        trigger: 'Mobile Banking + Open Banking both blocked',
+        nodes: [
+          { text: 'Goal 1 pace · 42% · slowing', kind:'risk', tab:'hierarchy' },
+          { text: 'Investor narrative at risk',   kind:'warn', tab:'hierarchy' }
+        ],
+        action: { label:'Review blockers', tab:'hierarchy' }
+      },
+      {
+        trigger: 'Digital Banking ART at 118% capacity for PI 27',
+        nodes: [
+          { text: 'Commitment exceeds capacity',       kind:'blocked', tab:'planning' },
+          { text: 'PI 27 outcomes delivery uncertain', kind:'risk',    tab:'planning' }
+        ],
+        action: { label:'View capacity', tab:'planning' }
+      }
+    ]
+  },
+  kenji: {
+    chains: [
+      {
+        trigger: 'Digital Banking ART at 118% capacity · PI 27',
+        nodes: [
+          { text: 'PI 27 scope over-committed',         kind:'blocked', tab:'planning' },
+          { text: 'Re-balance needed · lock in 7 days', kind:'risk',    tab:'planning' }
+        ],
+        action: { label:'Rebalance capacity', tab:'planning' }
+      },
+      {
+        trigger: 'Finance input overdue · PI 27 locks in 7 days',
+        nodes: [
+          { text: 'PI 27 capacity ceiling unset',    kind:'blocked', tab:'planning' },
+          { text: 'Teams planning without a ceiling', kind:'warn',   tab:'planning' }
+        ],
+        action: { label:'Submit input', tab:'planning' }
+      },
+      {
+        trigger: '4 CapEx items unclassified · 10-day deadline',
+        nodes: [
+          { text: 'Quarter close at risk', kind:'risk', tab:'backlog' },
+          { text: 'CFO audit concern',     kind:'warn', tab:'backlog' }
+        ],
+        action: { label:'Classify items', tab:'backlog' }
+      }
+    ]
+  }
+};
+
+EAP.focusDecisions = {
+  ananya: {
+    0: [ { label:'Confirm line-up',      primary:true }, { label:'De-scope f3' } ],
+    2: [ { label:'Send AI draft',        ai:true      }, { label:'Reply manually' } ],
+    3: [ { label:'Escalate to Auth',     primary:true }, { label:'De-scope from PI 26' } ]
+  },
+  james: {
+    0: [ { label:'Reply with ETA',       primary:true }, { label:'Escalate' } ],
+    1: [ { label:'Start review',         primary:true } ],
+    3: [ { label:'Review AI stories',    ai:true } ]
+  },
+  riya: {
+    0: [ { label:'Open dependency map',  primary:true }, { label:'Request ART sync' } ],
+    1: [ { label:'Send AI chasers',      ai:true      }, { label:'Extend deadline' } ],
+    2: [ { label:'Investigate team',     primary:true }, { label:'Adjust PI 26 scope' } ],
+    3: [ { label:'Review AI brief',      ai:true      }, { label:'Send manually' } ]
+  },
+  dev: {
+    0: [ { label:'Escalate to Auth',     primary:true }, { label:'Assign to self' } ],
+    1: [ { label:'Send AI response',     ai:true      }, { label:'Reply manually' } ],
+    2: [ { label:'View at-risk items',   primary:true }, { label:'Negotiate scope' } ],
+    3: [ { label:'Review AI agenda',     ai:true } ]
+  },
+  priya: {
+    0: [ { label:'Open approval queue',  primary:true }, { label:'Schedule review' } ],
+    1: [ { label:'Send AI response',     ai:true      }, { label:'Schedule call' } ],
+    2: [ { label:'View epics in flight', primary:true }, { label:'Pause one epic' } ],
+    3: [ { label:'Review AI map',        ai:true      }, { label:'Map manually' } ]
+  },
+  marcus_cdo: {
+    0: [ { label:'Review 5 sections',   ai:true      }, { label:'Circulate draft' } ],
+    1: [ { label:'See action plan',     primary:true }, { label:'Trigger review' } ],
+    2: [ { label:'Send AI response',    ai:true      }, { label:'Schedule call' } ],
+    3: [ { label:'Review blockers',     primary:true } ]
+  },
+  kenji: {
+    0: [ { label:'Submit input',        primary:true }, { label:'Request extension' } ],
+    1: [ { label:'Review memo',         ai:true      }, { label:'Send to CFO' } ],
+    2: [ { label:'Rebalance capacity',  primary:true }, { label:'Flag to Riya' } ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// COORDINATION HEALTH — how teams are working together right now
+// Different from cascade chains (which are causal/temporal).
+// This shows structural relationship state between teams.
+// kind: 'dep' (team-to-team dependency) | 'sig' (comms/ceremony signal)
+// status: 'blocked' | 'risk' | 'warn'
+// Only rendered for personas who operate across teams: riya, ananya, dev
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// OUTCOME PANEL — output vs outcome framing for the intel panel
+// Shows goal progress with target markers and contribution context.
+// Reuses existing .outcome-bar-* CSS — no new bar styles needed.
+// Rendered for portfolio/exec personas: ananya, priya, marcus_cdo, kenji
+// ═══════════════════════════════════════════════════════
+EAP.outcomePanel = {
+  ananya: {
+    goals: [
+      { name:'Top digital bank',   pct:42, target:50, fill:'#16A34A', insight:'4 features in PI 26 · est. +8pts this PI' },
+      { name:'Reduce costs 18%',   pct:12, target:35, fill:'#DC2626', insight:'1 active feature · 23pts gap to target' }
+    ]
+  },
+  james: {
+    goals: [
+      { name:'Top digital bank',   pct:42, target:50, fill:'#16A34A', insight:'Your sprint auth work contributes to 3 PI 26 features' },
+      { name:'Reduce costs 18%',   pct:12, target:35, fill:'#DC2626', insight:'No Sprint 2 auth work maps here yet' }
+    ],
+    note: 'Resolving the auth blocker unblocks the other 2 contributions'
+  },
+  priya: {
+    goals: [
+      { name:'Top digital bank',   pct:42, target:50, fill:'#16A34A', insight:'Mobile Banking contributing · 2 epics pace at risk' },
+      { name:'Reduce costs 18%',   pct:12, target:35, fill:'#DC2626', insight:'Self-Service, Mortgages mapped · pace critical' }
+    ],
+    note: 'OKR coverage: 3 of 5 epics mapped · 2 unmapped'
+  },
+  marcus_cdo: {
+    goals: [
+      { name:'Top digital bank',   pct:42, target:50, fill:'#16A34A', insight:'Composite pace on track · Mobile Banking risk' },
+      { name:'Reduce costs 18%',   pct:12, target:35, fill:'#DC2626', insight:'22pts behind plan · board report in 7 days' }
+    ],
+    note: 'Investment decision on Goal 2 overdue · 6 days open'
+  },
+  kenji: {
+    goals: [
+      { name:'Top digital bank',   pct:42, target:50, fill:'#16A34A', insight:'90% of Digital Banking budget committed here' },
+      { name:'Reduce costs 18%',   pct:12, target:35, fill:'#DC2626', insight:'Cost reduction pace not in spend profile' }
+    ],
+    note: '82% budget committed · 18% not mapped to outcomes'
+  }
+};
+
+EAP.coordHealth = {
+  riya: [
+    { kind:'dep', from:'Auth',       to:'Payments',  status:'blocked', note:'Session expiry unresolved · Day 2' },
+    { kind:'dep', from:'Onboarding', to:'ART scope', status:'risk',    note:'Running at 60% · PI 26 delivery at risk' },
+    { kind:'sig', text:'Capacity poll · 4 of 6 teams not responded',      status:'risk' },
+    { kind:'sig', text:'SoS brief ready · 2 risks flagged · pending send',  status:'warn' },
+    { kind:'sig', text:'4 I&A actions open · 2 near escalation window',     status:'warn' }
+  ],
+  ananya: [
+    { kind:'dep', from:'Auth',       to:'Payments', status:'blocked', note:'API contract delay · 3 stories waiting' },
+    { kind:'dep', from:'Onboarding', to:'PI 26',    status:'risk',   note:'Running at 60% · Onboarding Flow at 0%' },
+    { kind:'sig', text:'Sprint 2 demo line-up unconfirmed · Day 7 of 10', status:'risk' }
+  ],
+  dev: [
+    { kind:'dep', from:'Auth', to:'Payments', status:'blocked', note:'Session expiry blocking your sprint · Day 2' },
+    { kind:'sig', text:'PI 27 capacity input overdue · Riya waiting 3 days', status:'risk' },
+    { kind:'sig', text:'Retro agenda not circulated · themes unaligned',    status:'warn' }
+  ]
 };
 

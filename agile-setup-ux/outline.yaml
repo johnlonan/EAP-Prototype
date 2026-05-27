@@ -1,0 +1,108 @@
+topic: "Agile Planning Tools — Setup UX and Onboarding: How Competitors Make Configuration Easy and Scalable"
+description: >
+  Focused competitive research on how leading Agile planning tools handle initial setup,
+  workspace configuration, team onboarding, and scaling — with specific attention to
+  reducing human dependency. ServiceNow EAP's setup is considered tedious and difficult
+  to scale. This research surfaces what competitors do better: guided setup wizards,
+  AI-assisted configuration, templates, import flows, and automation of repetitive setup tasks.
+  Research date: 2026-05-25.
+
+items:
+  # --- The benchmark: what ServiceNow EAP currently does ---
+  - id: servicenow-eap-setup
+    name: "ServiceNow EAP Setup"
+    description: "Current setup experience for EAP: ART configuration, team onboarding, PI cadence setup, hierarchy configuration (Portfolio→Epic→Capability→Feature→Story), admin dependency, time required, and known friction points. The baseline to beat."
+    priority: critical
+
+  # --- Primary competitors: team-scale, developer-loved ---
+  - id: linear-setup
+    name: "Linear Setup"
+    description: "Linear's workspace setup flow: team creation, cycle configuration, workflow states, integrations (GitHub/Slack), invite flow, and any AI-assisted configuration. Known for sub-100ms UI and developer-first onboarding."
+    priority: high
+
+  - id: jira-setup
+    name: "Jira + Jira Align Setup"
+    description: "Jira's project setup wizard, board configuration, Jira Align connection to teams, Program Increment setup. How do they handle the complexity gap between Jira team boards and Jira Align enterprise planning layers?"
+    priority: high
+
+  - id: azure-devops-setup
+    name: "Azure DevOps Setup"
+    description: "Azure DevOps organization setup, project creation, process templates (Agile/Scrum/CMMI), team configuration, area/iteration paths. Import from other tools. Admin overhead vs. self-service."
+    priority: high
+
+  - id: monday-dev-setup
+    name: "Monday Dev Setup"
+    description: "Monday.com workspace setup for dev teams: templates, sprint board creation, team onboarding flow, AI setup assistant (if any), time-to-first-board. Considered user-friendly — what makes it so?"
+    priority: high
+
+  # --- SAFe-aligned enterprise tools ---
+  - id: rally-setup
+    name: "Rally (Broadcom) Setup"
+    description: "Rally's workspace configuration for SAFe: Agile Release Train setup, Program Increment cadence, subscription/workspace/project hierarchy configuration. Known for complexity — what is the actual setup friction?"
+    priority: high
+
+  - id: targetprocess-setup
+    name: "Targetprocess (IBM/Apptio) Setup"
+    description: "Targetprocess's configuration model: extreme schema flexibility but at what setup cost? Process templates, custom entity types, SAFe plugin activation. Admin-driven vs. self-service."
+    priority: medium
+
+  - id: planview-setup
+    name: "Planview / LeanKit Setup"
+    description: "Planview Enterprise One and LeanKit onboarding: portfolio setup, board templates, capacity planning configuration, team structure import. Enterprise procurement and IT-driven setup patterns."
+    priority: medium
+
+  # --- Modern challengers: low-friction setup ---
+  - id: clickup-setup
+    name: "ClickUp Setup"
+    description: "ClickUp's onboarding wizard: Workspace→Space→Folder→List hierarchy, AI setup assistant (ClickUp Brain), template library, sprint setup. Time-to-first-useful-board. Import from Jira/Asana/Trello."
+    priority: medium
+
+  - id: shortcut-setup
+    name: "Shortcut Setup"
+    description: "Shortcut's team setup: workflow states, epics/stories structure, GitHub/GitLab integration wizard. Onboarding time. What makes it feel lightweight vs. enterprise tools?"
+    priority: medium
+
+  - id: asana-setup
+    name: "Asana Setup"
+    description: "Asana's project setup wizard, team configuration, goals/OKR linking setup, AI onboarding assistant, template gallery. Cross-functional team onboarding vs. dev-specific tools."
+    priority: medium
+
+  # --- AI-native / next-gen setup patterns ---
+  - id: notion-setup
+    name: "Notion Projects Setup"
+    description: "Notion's setup model: docs-first, no predefined hierarchy — team creates structure. AI fills gaps (Notion AI project setup). Template gallery. Is the lack of structure a feature or a bug for planning?"
+    priority: medium
+
+  - id: height-setup
+    name: "Height Setup"
+    description: "Height's combined task+chat setup model. How does embedding communication into setup reduce the 'human handoff' problem? Team onboarding friction."
+    priority: low
+
+  - id: plane-setup
+    name: "Plane (open-source) Setup"
+    description: "Plane's self-hosted and cloud setup: workspace, projects, cycles, modules. How does an open-source challenger handle setup complexity vs. enterprise tools?"
+    priority: low
+
+  # --- Cross-cutting: AI-assisted setup patterns ---
+  - id: ai-setup-patterns
+    name: "AI-Assisted Setup Patterns (Cross-tool)"
+    description: "Emerging pattern: tools using AI to generate initial configurations, suggest team structures, auto-import from Git/Slack/email, or learn from usage to reduce manual setup. Survey of AI-driven onboarding across the market: ClickUp Brain, Linear Triage, Jira's Rovo, Monday AI, Notion AI, GitHub Projects AI suggestions."
+    priority: high
+
+  - id: import-migration-patterns
+    name: "Import and Migration UX (Cross-tool)"
+    description: "How tools handle the 'we're moving from Jira/Rally/spreadsheets' scenario: CSV import, native Jira importers, API migration, mapping wizards. Which tools make migration self-service vs. requiring a services engagement?"
+    priority: high
+
+execution:
+  batch_size: 6
+  items_per_agent: 2
+  output_dir: ./agile-setup-ux/results
+  research_depth: detailed
+  time_range: "last 18 months (since November 2024)"
+  research_focus: >
+    Setup and onboarding UX — specifically: time-to-first-useful-board, admin dependency,
+    self-service vs. IT-driven configuration, templates and wizards, AI-assisted setup,
+    scaling from 1 team to 50 teams, and real user pain points (G2, Reddit, Gartner reviews).
+    The goal is to identify patterns that make setup easy, human-independent, and scalable —
+    and surface them for potential adoption in ServiceNow EAP prototyping.

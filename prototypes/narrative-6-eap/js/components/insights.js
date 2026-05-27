@@ -404,6 +404,72 @@ EAP.renderInsights = function() {
   h += '</div>';
   el.innerHTML = h;
 
+  // ── Hero metric: count-up number + bar + label reveal ──────────────
+  if (d.predict || d.gauge) {
+    var _ht = d.predict ? d.predict.value : (d.gauge ? d.gauge.value : 0);
+    var _numEl  = el.querySelector('.ins-hero-v-num');
+    var _fillEl = el.querySelector('.ins-hero-verdict .ins-pbar-fill');
+    var _labEls = el.querySelectorAll('.ins-pbar-rr-lo, .ins-pbar-rr-hi');
+
+    // Count-up: update the raw text node that precedes the % span
+    if (_numEl && _ht > 0) {
+      var _tn = null;
+      for (var _ci = 0; _ci < _numEl.childNodes.length; _ci++) {
+        if (_numEl.childNodes[_ci].nodeType === 3) { _tn = _numEl.childNodes[_ci]; break; }
+      }
+      if (_tn) {
+        _tn.nodeValue = '0';
+        var _t0 = null;
+        function _tick(ts) {
+          if (_t0 === null) _t0 = ts;
+          var p = Math.min((ts - _t0) / 900, 1);
+          _tn.nodeValue = String(Math.round((1 - Math.pow(1 - p, 5)) * _ht));
+          if (p < 1) requestAnimationFrame(_tick);
+        }
+        requestAnimationFrame(_tick);
+      }
+    }
+
+    // Bar grows 100ms after number starts, labels fade in once bar completes
+    if (_fillEl) setTimeout(function() { _fillEl.classList.add('ins-bar-in'); }, 100);
+    if (_labEls.length) {
+      setTimeout(function() {
+        _labEls.forEach(function(l) { l.classList.add('ins-label-visible'); });
+      }, 800);
+    }
+  }
+
+  // ── Signal cards: staggered slide-up (all personas) ────────────────
+  el.querySelectorAll('.ins-sig, .ins-ok-strip').forEach(function(sig, i) {
+    sig.style.animationDelay = (i * 55) + 'ms';
+    sig.classList.add('ins-anim-in');
+  });
+
+  // ── Monte Carlo date rows: staggered slide-up (Planning tab) ───────
+  el.querySelectorAll('.ins-mc-row').forEach(function(row, i) {
+    row.style.animationDelay = (i * 65) + 'ms';
+    row.classList.add('ins-anim-in');
+  });
+
+  // ── Feature progress: ghost first, then actual fill (ART Feature) ──
+  el.querySelectorAll('.ins-feat-row').forEach(function(row, i) {
+    var base = i * 75;
+    var ghost = row.querySelector('.ins-feat-ghost');
+    var fill  = row.querySelector('.ins-feat-fill');
+    if (ghost) { ghost.style.animationDelay = base + 'ms'; ghost.classList.add('ins-anim-in'); }
+    if (fill)  { fill.style.animationDelay  = (base + 150) + 'ms'; fill.classList.add('ins-anim-in'); }
+  });
+
+  // ── Sprint metric bars: staggered reveal (Task Board WorkItem) ─────
+  el.querySelectorAll('.ins-metric-fill').forEach(function(fill, i) {
+    fill.style.animationDelay = (i * 90) + 'ms';
+    fill.classList.add('ins-anim-in');
+  });
+
+  // ── Member workload bar (Task Board team member view) ──────────────
+  var _pfill = el.querySelector('.ins-member-pfill');
+  if (_pfill) _pfill.classList.add('ins-anim-in');
+
   // Wire expand toggles for progressive disclosure
   el.querySelectorAll('.ins-sig-expand-toggle').forEach(function(btn) {
     btn.addEventListener('click', function(e) {

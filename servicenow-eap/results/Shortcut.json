@@ -1,0 +1,85 @@
+{
+  "id": "shortcut",
+  "name": "Shortcut (formerly Clubhouse)",
+  "description": "Developer-flow focused; tight GitHub/GitLab/Bitbucket integration; built by ex-Linear engineers; Linear alternative for agile engineering teams",
+  "priority": "medium",
+
+  "team_execution_depth": "Shortcut is purpose-built for software teams and the daily execution layer reflects that. Story cards are first-class developer objects with workflow state, owner, requester, type (feature/bug/chore), estimate, epic, iteration, labels, branch/PR/commit links, blockers, relationships, and tasks (subtasks with own owners and completion). Iterations are time-boxed sprint primitives (with start/end and capacity), Epics group cross-iteration work, Objectives roll Epics into outcomes. Backlog grooming is well-supported via the Stories view with multi-select, bulk edit, and saved filters. Definition-of-done is conventionally a tasks checklist on the story; acceptance criteria lives in the description (markdown) or a dedicated section. WIP limits per workflow state are configurable. Reviewers consistently call this 'the simplest developer-first tracker after Linear.'",
+
+  "keyboard_command_ux": "Shortcut ships a global command bar and an extensive keyboard shortcut surface — open story, change status, change owner, change estimate, add label, copy git-branch name, archive — all keyboard-accessible. The interaction model is explicitly keyboard-friendly and the comparison pages and reviews position it as 'Linear's speed and simplicity with full customization.' That said, direct comparisons (Efficient App, Shortcut's own engineering-team blog post, Hacker News) consistently conclude Linear wins on raw keyboard-driven speed by a small but noticeable margin — Linear's command bar is the benchmark; Shortcut is in the same conversation but a step below. [uncertain]",
+
+  "ui_responsiveness": "Fast, but not local-first. Server-round-trip architecture (no public local-first sync layer comparable to Linear's). Perceived performance is consistently described as significantly faster than Jira, on par with or slightly slower than Linear. Reviewers explicitly contrast it with Jira: 'Jira was incredibly slow and a bit clunky, while Shortcut surpasses performance expectations and just works.' No public P50/P95 figures. [uncertain]",
+
+  "real_time_collaboration": "Good for an engineering-focused tool. Story comments with @mentions and threading, activity feed per story, presence indicators on the story view, and notifications via the in-app inbox plus Slack/email. The collaboration surface is intentionally narrower than monday/ClickUp (no in-app chat product, lighter doc surface) — the bet is that engineering teams already coordinate in Slack and just need the tracker to feed it well.",
+
+  "mobile_experience": "Weakest area. As of late 2025/early 2026 Shortcut does not ship a fully native cross-platform app in the way Jira, monday or ClickUp do — the mobile experience is largely a responsive web surface with home-screen widgets (iOS 14+/Android) for task counts/recent activity. Reviewers describe it as adequate for status updates and @mention responses, significantly degraded for task creation, configuration, or board management. Offline capability is limited. For developer teams that do not need mobile parity this is acceptable; for execs/PMs who triage from phones it is a clear gap. [uncertain]",
+
+  "in_tool_documentation": "Limited. Shortcut Docs and Notes exist but are shallow versus Notion/ClickUp/Confluence — sufficient for spec snippets, release notes, retro notes; not a knowledge base architecture with nested hierarchy and wiki-grade permissions. The product position is to integrate with Notion/Confluence rather than replace them. Markdown on story descriptions is solid.",
+
+  "developer_experience": "High — this is Shortcut's defining strength. Branch naming convention ('/sc<id>/') is baked in; commit messages with formatted directives (e.g. 'fixes [sc123]') auto-link and move stories across workflow states; PR draft vs open vs merged drives story status; a Git Helper generates branch names from any story. Slack integration relays story events into channels. There is a public API and CLI-style tooling, and recent positioning explicitly markets connections to Cursor and Claude Code so coding agents can sync work to GitHub. No deep IDE panel of Jira-app caliber, but the friction surface inside a developer's day is genuinely low. Multiple Capterra reviewers cite ramp-up speed and 'works the way developers think' as primary buying reasons.",
+
+  "vcs_integration_depth": "Best-in-peer-group for non-Linear tools. Native first-party integrations with GitHub, GitLab and Bitbucket (all three with similar feature parity): branches, commits and PRs link to stories, branch-name conventions auto-link, PR open moves stories to In Review, PR merge to Done (configurable per workflow), draft/WIP PRs are correctly ignored until promoted. The integrations are described in Shortcut docs as the canonical way to drive workflow — a 2026 differentiator vs ClickUp's still-maturing GitLab integration and monday's heavier-configuration model. Deployment status reporting is integration-dependent rather than first-class.",
+
+  "ai_agentic_maturity": "Growing meaningfully in 2025–2026. Shortcut markets 'Shortcut for Agents' — AI agents treated as first-class team members (assigned Stories, tagged in comments, tracked in workflows, visible in updates). The product position explicitly supports connecting to Cursor and Claude Code so coding agents can pick up work, code it, and push back to GitHub with story sync. Generative features include scope assistance, PR drafting, and progress tracking from inside Shortcut. Public MCP endpoint depth and adoption versus Linear's mcp.linear.app (cited as ~75% enterprise workspace adoption) is less proven. The vision aligns with the 2026 benchmark; the production maturity is mid-tier. [uncertain]",
+
+  "time_to_value": "Fast. Reviewers repeatedly highlight first-day productivity — minimal mandatory setup, sensible defaults, opinionated structure (Iterations + Epics + Stories) that avoids the configuration sprawl of Jira/monday/ClickUp. Free tier up to 10 users lowers buying friction. The opinionated-but-customisable balance is the central reason engineering teams pick it.",
+
+  "migration_story": "Official 'Switch from Jira' importer for Jira Cloud; CSV importer specifically called out for Jira Server. The importer brings projects, issues, statuses and users; complex custom fields and workflows need mapping. A Shortcut↔Jira sync integration supports run-in-parallel transitions for larger migrations. Fidelity for standard scrum work (Epics → Epics, Stories → Stories, Sprints → Iterations) is reasonable; SAFe-style hierarchies and bespoke screens generally do not survive intact. Field mapping coverage is shallower than the Linear or ClickUp importers. [uncertain]",
+
+  "deprecation_transition_risk": "Low at the product layer — Shortcut has been a continuously developed product since the Clubhouse rebrand (2021). Commercially Shortcut is a smaller private company than the others in this peer group, which is a structural buyer-perception risk for risk-averse enterprises, but no deprecation/sunsetting events affect the workflow. [uncertain]",
+
+  "safe_framework_alignment": "Shallow by design. Shortcut supports Epics → Iterations → Stories and Objectives → Epics for outcomes-based roll-up, which covers team-level scrum and lightweight program management. SAFe-specific constructs — PI Planning UX, ART boards, Capability/Feature/Story canonical hierarchy, WSJF, cross-ART dependency mapping, Inspect & Adapt — are not native. For a single engineering org running disciplined scrum this is sufficient; for an enterprise running 50-team SAFe it is not the right tool. Shortcut's positioning explicitly targets the gap between Linear's opinionated simplicity and Jira's configurability — not Jira Align territory.",
+
+  "reporting_metrics": "Built-in: velocity per iteration, burndown, cycle time, lead time, throughput, Objectives progress, custom reports over story data. Reports are configurable. Flow metrics are first-class compared to monday Dev and ClickUp where they are dashboard-widgets. Cross-portfolio analytics at enterprise scale are limited.",
+
+  "customer_signal_ingestion": "Limited natively. Integrations to Productboard, Intercom, Zendesk exist via the integrations marketplace, but Capterra reviewers explicitly flag the gap: 'using productboard for discovery and notion for company-wide documentation — the integrations with shortcut are quite ineffective. We are unable to push a feature from productboard to shortcut as a feature, only as an epic.' Not a Productboard-style native ingestion capability.",
+
+  "integration_ecosystem": "Mid. Native: GitHub, GitLab, Bitbucket, Slack, Microsoft Teams, Figma, Sentry, PagerDuty, Linear (import), Jira (sync), Notion, Loom, Zapier. Public REST API and webhooks. Cursor/Claude Code integrations are recent and pitched at AI-agent workflows. Marketplace is much smaller than Atlassian's; coverage of common SaaS tools is competitive for an engineering audience but thinner for product/marketing/customer-success tooling. [uncertain]",
+
+  "community_vitality": "Mid-small. Active but modest community footprint — Capterra/G2 reviews number in the hundreds rather than thousands (versus Jira/ClickUp/monday with thousands each), Stack Overflow tag volume is small, and the developer-community presence is smaller than Linear's. The smaller community is a real adoption risk-signal for enterprise procurement. [uncertain]",
+
+  "self_hosting_data_residency": "SaaS-only. No on-prem option. Data residency options are limited (US primarily); EU residency is offered for Enterprise customers per recent positioning but is narrower than Atlassian or ServiceNow's options. Not suitable for buyers with strict private-cloud or government data-sovereignty requirements. [uncertain]",
+
+  "customization": "Moderate. Configurable workflow states per Team, custom fields on stories, custom story types, saved filters, configurable iteration cadences. Less rigid than Linear's opinionated workflow; less wildly flexible than ClickUp/monday. The positioning is deliberate — 'enough to fit your process, not enough to let you build a maintenance nightmare.'",
+
+  "pricing_commercial_model": "Per-seat tiered with a meaningful free tier. Free up to 10 users; paid plans Team/Business/Enterprise. Pricing positioned as below Jira and meaningfully below monday Dev — Capterra and Vendr comparisons describe it as 'below-average pricing.' Specific 2026 tier dollars vary; Team commonly cited around $8/seat/mo, Business around $12/seat/mo, Enterprise quoted. SSO and audit features are tier-gated. [uncertain]",
+
+  "total_cost_of_ownership": "Low. Per-seat cost is competitive, implementation cost is near-zero (most teams self-onboard in days), admin overhead is low because the customisation surface is intentionally bounded, training cost is low for engineers. The main TCO risk is migration cost from Jira/Rally if existing field/workflow complexity is high. [uncertain]",
+
+  "market_perception": "Strong with engineering teams, niche overall. G2 and Capterra ratings are high (4.6–4.8/5 range) but on a much smaller review base than Jira/monday/ClickUp — a known credibility constraint for enterprise procurement. Hacker News and developer-Reddit sentiment is consistently positive: 'simple, fast, just works,' 'first-day productive.' No Magic Quadrant Leader position; analyst coverage is thinner than for monday or ClickUp. The Clubhouse rebrand history is occasionally cited as a concern. [uncertain]",
+
+  "gaps_vs_market_leader": "vs Jira: no SAFe/PI Planning UX, no Jira Align analog, no enterprise governance/audit depth, dramatically smaller marketplace, no on-prem, smaller analyst footprint. vs Linear: not local-first (no comparable sub-100ms responsiveness across the board), command palette is good but Linear's is faster, no native mobile app at Linear's parity, smaller AI/MCP footprint with less proven enterprise adoption, less opinionated visual polish. Across both: weakest mobile experience in the peer group, limited customer-signal ingestion, smaller community, narrower data-residency story.",
+
+  "sources": [
+    "https://www.shortcut.com/",
+    "https://www.shortcut.com/pricing",
+    "https://help.shortcut.com/hc/en-us/articles/204909925-Set-up-a-Version-Control-System-Integration",
+    "https://www.shortcut.com/blog/shortcut-vcs-integration",
+    "https://www.shortcut.com/integrations/gitlab",
+    "https://www.shortcut.com/import/jira",
+    "https://www.shortcut.com/blog/shortcut-for-agents",
+    "https://www.shortcut.com/blog/linear-alternative-why-engineering-teams-choose-shortcut",
+    "https://efficient.app/compare/linear-vs-shortcut",
+    "https://www.ideaplan.io/compare/linear-vs-shortcut",
+    "https://www.softwareadvice.com/project-management/clubhouse-profile/reviews/",
+    "https://www.capterra.com/p/160498/Shortcut/reviews/",
+    "https://news.ycombinator.com/item?id=29833002",
+    "https://atono.io/blog/most-popular-jira-alternatives-compared",
+    "https://toolstackpm.com/tools/shortcut/features/mobile-app"
+  ],
+
+  "uncertain": [
+    "keyboard_command_ux",
+    "ui_responsiveness",
+    "mobile_experience",
+    "ai_agentic_maturity",
+    "migration_story",
+    "deprecation_transition_risk",
+    "integration_ecosystem",
+    "community_vitality",
+    "self_hosting_data_residency",
+    "pricing_commercial_model",
+    "total_cost_of_ownership",
+    "market_perception"
+  ]
+}
