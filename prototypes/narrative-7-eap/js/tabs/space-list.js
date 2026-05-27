@@ -114,8 +114,8 @@ EAP.renderSpaceList = function() {
         globalRank +
       '</td>' +
 
-      // Description — wraps naturally within auto column width
-      '<td style="color:var(--text-primary);font-weight:400;white-space:normal;line-height:1.4;">' +
+      // Description — truncates like all other .dtbl tds (white-space:nowrap from CSS)
+      '<td style="color:var(--text-primary);font-weight:400;" title="' + row.bug.replace(/"/g, '&quot;') + '">' +
         row.bug +
       '</td>' +
 
