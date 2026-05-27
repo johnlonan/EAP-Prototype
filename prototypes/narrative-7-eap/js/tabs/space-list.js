@@ -87,13 +87,13 @@ EAP.renderSpaceList = function() {
     '<table class="dtbl">' +
     '<thead><tr>' +
       EAP._TH0 +  // grip col header (24px, empty)
-      '<th style="width:56px;">Rank</th>' +
-      '<th style="min-width:320px;">Bug</th>' +
-      '<th style="width:90px;">Severity</th>' +
-      '<th style="width:130px;">Component</th>' +
-      '<th style="width:100px;">Owner</th>' +
-      '<th style="width:110px;">Status</th>' +
-      '<th style="width:76px;">Logged</th>' +
+      '<th style="width:52px;">Rank</th>' +
+      '<th>Description</th>' +
+      '<th style="width:100px;">Severity</th>' +
+      '<th style="width:158px;">Component</th>' +
+      '<th style="width:128px;">Owner</th>' +
+      '<th style="width:118px;">Status</th>' +
+      '<th style="width:80px;">Logged</th>' +
     '</tr></thead>' +
     '<tbody>';
 
@@ -110,12 +110,12 @@ EAP.renderSpaceList = function() {
       EAP._GT +
 
       // Rank number
-      '<td style="font-size:12px;font-variant-numeric:tabular-nums;color:#9CA3AF;font-weight:500;width:56px;">' +
+      '<td style="font-size:12px;font-variant-numeric:tabular-nums;color:#9CA3AF;font-weight:500;width:52px;">' +
         globalRank +
       '</td>' +
 
-      // Bug title — primary text
-      '<td style="color:var(--text-primary);font-weight:400;white-space:normal;line-height:1.4;max-width:420px;">' +
+      // Description — wraps naturally within auto column width
+      '<td style="color:var(--text-primary);font-weight:400;white-space:normal;line-height:1.4;">' +
         row.bug +
       '</td>' +
 
