@@ -95,6 +95,10 @@ EAP.setContext = function(type, name, id) {
     s.spaceData = null;
     // Auto-set level to default for new context
     s.level = EAP.defaultLevel[type];
+    // If coming from a space, the tab may be a space-only value ('docs', 'list').
+    // Reset to 'backlog' so renderContent always has a valid handler.
+    var nonSpaceTabs = { backlog: 1, planning: 1, timeline: 1, board: 1, analytics: 1, hierarchy: 1 };
+    if (!nonSpaceTabs[s.tab]) s.tab = 'backlog';
   }
 
   // Reset transient UI state
