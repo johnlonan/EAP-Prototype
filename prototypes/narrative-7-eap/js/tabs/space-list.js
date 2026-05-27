@@ -84,15 +84,15 @@ EAP.renderSpaceList = function() {
 
     // Scrollable table body — same .gpanel-scroll as Backlog
     '<div class="gpanel-scroll">' +
-    '<table class="dtbl" style="table-layout:fixed;width:auto;">' +
+    '<table class="dtbl">' +
     '<thead><tr>' +
-      EAP._TH0 +  // grip col (24px)
-      '<th style="width:50px;">Rank</th>' +
-      '<th style="width:280px;">Description</th>' +
-      '<th style="width:110px;">Severity</th>' +
-      '<th style="width:170px;">Component</th>' +
-      '<th style="width:140px;">Owner</th>' +
-      '<th style="width:120px;">Status</th>' +
+      EAP._TH0 +
+      '<th style="width:52px;">Rank</th>' +
+      '<th>Description</th>' +
+      '<th style="width:96px;">Severity</th>' +
+      '<th style="width:130px;">Component</th>' +
+      '<th style="width:110px;">Owner</th>' +
+      '<th style="width:110px;">Status</th>' +
       '<th style="width:80px;">Logged</th>' +
     '</tr></thead>' +
     '<tbody>';
