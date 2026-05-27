@@ -86,8 +86,11 @@ EAP.setContext = function(type, name, id) {
     s.tab = (sp && sp.defaultTab) ? sp.defaultTab : 'board';
     s.level = null;
     // Clear space-specific UI state on each space navigation
-    s._openDocId = null;
+    // Pre-select first doc so the detail panel is never empty
+    s._openDocId = (sp && sp.docs && sp.docs.length) ? sp.docs[0].id : null;
     s._spaceListFilter = {};
+    s._spaceListPage = 1;
+    s._spaceListOrder = null;
   } else {
     s.spaceData = null;
     // Auto-set level to default for new context

@@ -89,9 +89,9 @@ EAP.renderSpaceBoard = function() {
       var avColor  = person ? person.color : '#6B7280';
       var firstName = person ? person.name.split(' ')[0] : card.author;
 
-      // Use .bcard class — gets hover shadow, border-radius etc from app.css
+      // bcard-compact adds padding-bottom:12px — base .bcard has padding-bottom:0
       html +=
-        '<div class="bcard">' +
+        '<div class="bcard bcard-compact">' +
         '<p class="bcard-title" style="font-size:12px;font-weight:400;line-height:1.5;margin-bottom:8px;">' +
           card.text +
         '</p>' +

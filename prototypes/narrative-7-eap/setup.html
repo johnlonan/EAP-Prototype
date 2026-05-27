@@ -2285,53 +2285,55 @@ body {
     if (panelSub) panelSub.textContent = data.label;
     updateStepperLabels(fw);
     var diag = document.getElementById('hier-diagram');
-    diag.style.opacity = '0';
-    diag.style.transition = 'opacity 180ms ease';
-    setTimeout(function() {
-      var html = '';
-      data.tiers.forEach(function(tier, i) {
-        if (i > 0 && tier.connector) {
-          html += '<div class="hier-connector"><div class="hier-conn-line"></div>' +
-            '<div class="hier-conn-label">' + tier.connector.before + '</div>' +
-            '<div class="hier-conn-line-b"></div></div>';
-        }
-        var opacity = tier.custom ? 'opacity:0.45;' : '';
-        html += '<div class="hier-tier" style="' + opacity + 'animation-delay:' + (i * 80) + 'ms">' +
-          '<div class="hier-tier-hd">' +
-          '<div class="hier-tier-dot" style="background:' + tier.dot + '"></div>' +
-          '<span class="hier-tier-label" style="color:' + tier.dot + '">' + tier.label + '</span>' +
-          '<span class="hier-tier-note">' + tier.note + '</span>' +
-          '</div>' +
-          '<div class="hier-entities">' +
-          tier.entities.map(function(e) {
-            return '<span class="hier-entity' + (e.primary ? ' primary' : '') + '">' + e.name + '</span>';
-          }).join('') +
-          '</div></div>';
-      });
-      diag.innerHTML = html;
-      diag.style.opacity = '1';
+    if (!diag) return;
 
-      // Populate auto-configured section below the hierarchy
-      var acData = autoConfigData[fw] || autoConfigData.essential;
-      var acEl = document.getElementById('auto-config-section');
-      if (acEl) {
-        acEl.innerHTML =
-          '<div class="auto-config-hd">' +
-            '<span class="auto-config-label">Auto-configured</span>' +
-            '<span class="auto-config-ai-tag">AI</span>' +
-          '</div>' +
-          '<div class="auto-config-rows">' +
-          acData.map(function(row, i) {
-            return '<div class="auto-config-row" style="animation-delay:' + (360 + i * 55) + 'ms">' +
-              '<span class="acr-key">' + row.key + '</span>' +
-              '<span class="acr-val">' + row.val + '</span>' +
-              '</div>';
-          }).join('') +
-          '</div>';
-        var legend = document.getElementById('hier-legend');
-        if (legend) legend.style.display = '';
+    // Render synchronously — no opacity fade, no setTimeout.
+    // Async opacity transitions caused blank preview when switching frameworks
+    // because the restore never fired if updateUI re-ran within the delay window.
+    var html = '';
+    data.tiers.forEach(function(tier, i) {
+      if (i > 0 && tier.connector) {
+        html += '<div class="hier-connector"><div class="hier-conn-line"></div>' +
+          '<div class="hier-conn-label">' + tier.connector.before + '</div>' +
+          '<div class="hier-conn-line-b"></div></div>';
       }
-    }, 160);
+      var opacity = tier.custom ? 'opacity:0.45;' : '';
+      html += '<div class="hier-tier" style="' + opacity + 'animation-delay:' + (i * 80) + 'ms">' +
+        '<div class="hier-tier-hd">' +
+        '<div class="hier-tier-dot" style="background:' + tier.dot + '"></div>' +
+        '<span class="hier-tier-label" style="color:' + tier.dot + '">' + tier.label + '</span>' +
+        '<span class="hier-tier-note">' + tier.note + '</span>' +
+        '</div>' +
+        '<div class="hier-entities">' +
+        tier.entities.map(function(e) {
+          return '<span class="hier-entity' + (e.primary ? ' primary' : '') + '">' + e.name + '</span>';
+        }).join('') +
+        '</div></div>';
+    });
+    diag.innerHTML = html;
+    diag.style.opacity = '1';
+    diag.style.transition = '';
+
+    // Auto-configured section
+    var acData = autoConfigData[fw] || autoConfigData.essential;
+    var acEl = document.getElementById('auto-config-section');
+    if (acEl) {
+      acEl.innerHTML =
+        '<div class="auto-config-hd">' +
+          '<span class="auto-config-label">Auto-configured</span>' +
+          '<span class="auto-config-ai-tag">AI</span>' +
+        '</div>' +
+        '<div class="auto-config-rows">' +
+        acData.map(function(row, i) {
+          return '<div class="auto-config-row" style="animation-delay:' + (360 + i * 55) + 'ms">' +
+            '<span class="acr-key">' + row.key + '</span>' +
+            '<span class="acr-val">' + row.val + '</span>' +
+            '</div>';
+        }).join('') +
+        '</div>';
+      var legend = document.getElementById('hier-legend');
+      if (legend) legend.style.display = '';
+    }
   }
 
   // ── Render method preview ────────────────────────────────────────

@@ -1362,15 +1362,28 @@ EAP.spaces = {
     tabs: ['list'],
     defaultTab: 'list',
     list: {
-      columns: ['Bug', 'Severity', 'Component', 'Owner', 'Status', 'Logged'],
+      columns: ['#', 'Bug', 'Severity', 'Component', 'Owner', 'Status', 'Logged'],
       rows: [
-        { id: 'b1', bug: 'MFA bypass possible with expired TOTP within 30s grace window', severity: 'Critical', component: 'MFA',          owner: 'Kiran',  status: 'Done',        logged: 'Apr 22' },
-        { id: 'b2', bug: 'PKCE code_verifier mismatch in Safari private mode',             severity: 'High',     component: 'OAuth',        owner: 'James',  status: 'In Review',   logged: 'May 9'  },
-        { id: 'b3', bug: 'Token refresh fails on slow network (>3s timeout)',              severity: 'High',     component: 'Auth Service',  owner: 'Kiran',  status: 'In Progress', logged: 'May 14' },
-        { id: 'b4', bug: 'Rate limiting not enforced on refresh token endpoint',           severity: 'High',     component: 'Auth Service',  owner: 'James',  status: 'Done',        logged: 'Apr 30' },
-        { id: 'b5', bug: 'SSO redirect loses query params on iOS 18.4',                    severity: 'Medium',   component: 'SSO',           owner: 'Sana',   status: 'Open',        logged: 'May 19' },
-        { id: 'b6', bug: 'Biometric fallback loop on Samsung Galaxy S24',                  severity: 'Medium',   component: 'Mobile Auth',   owner: 'Sana',   status: 'Open',        logged: 'May 20' },
-        { id: 'b7', bug: 'Session timeout warning not shown on mobile web',                severity: 'Low',      component: 'Session Mgmt',  owner: 'Kiran',  status: 'Open',        logged: 'May 22' }
+        { id: 'b1',  bug: 'OAuth scope downgrade not enforced after token reuse',                       severity: 'Critical', component: 'OAuth',        owner: 'James',  status: 'In Progress', logged: 'May 25' },
+        { id: 'b2',  bug: 'MFA bypass possible with expired TOTP within 30s grace window',              severity: 'Critical', component: 'MFA',          owner: 'Kiran',  status: 'Done',        logged: 'Apr 22' },
+        { id: 'b3',  bug: 'Logout does not invalidate refresh token on server side',                    severity: 'High',     component: 'Auth Service',  owner: 'Kiran',  status: 'Open',        logged: 'Apr 28' },
+        { id: 'b4',  bug: 'Biometric data not cleared on device wipe (MDM)',                            severity: 'High',     component: 'Mobile Auth',   owner: 'Sana',   status: 'Open',        logged: 'May 26' },
+        { id: 'b5',  bug: 'JWT audience claim missing from service-to-service tokens',                  severity: 'High',     component: 'Auth Service',  owner: 'James',  status: 'In Progress', logged: 'May 22' },
+        { id: 'b6',  bug: 'Password reset email link expires after 5 min instead of 60',               severity: 'High',     component: 'Auth Service',  owner: 'Kiran',  status: 'Open',        logged: 'May 24' },
+        { id: 'b7',  bug: 'PKCE code_verifier mismatch in Safari private mode',                         severity: 'High',     component: 'OAuth',        owner: 'James',  status: 'In Review',   logged: 'May 9'  },
+        { id: 'b8',  bug: 'Token refresh fails on slow network (>3s timeout)',                          severity: 'High',     component: 'Auth Service',  owner: 'Kiran',  status: 'In Progress', logged: 'May 14' },
+        { id: 'b9',  bug: 'Rate limiting not enforced on refresh token endpoint',                       severity: 'High',     component: 'Auth Service',  owner: 'James',  status: 'Done',        logged: 'Apr 30' },
+        { id: 'b10', bug: 'OAuth token introspection endpoint returns 500 for expired tokens',          severity: 'High',     component: 'OAuth',        owner: 'James',  status: 'Open',        logged: 'May 23' },
+        { id: 'b11', bug: 'TOTP QR code breaks for accounts with special characters in email address',  severity: 'Medium',   component: 'MFA',          owner: 'Sana',   status: 'In Review',   logged: 'May 15' },
+        { id: 'b12', bug: 'SSO redirect loses query params on iOS 18.4',                               severity: 'Medium',   component: 'SSO',           owner: 'Sana',   status: 'Open',        logged: 'May 19' },
+        { id: 'b13', bug: 'Biometric fallback loop on Samsung Galaxy S24',                              severity: 'Medium',   component: 'Mobile Auth',   owner: 'Sana',   status: 'Open',        logged: 'May 20' },
+        { id: 'b14', bug: 'Remember device feature resets on app update',                               severity: 'Medium',   component: 'Session Mgmt',  owner: 'Kiran',  status: 'In Progress', logged: 'May 21' },
+        { id: 'b15', bug: 'Auth logs missing correlation ID for federated login events',                severity: 'Medium',   component: 'SSO',           owner: 'James',  status: 'Open',        logged: 'May 16' },
+        { id: 'b16', bug: 'Auth audit trail missing IP address for mobile logins',                      severity: 'Medium',   component: 'Auth Service',  owner: 'Kiran',  status: 'Open',        logged: 'May 17' },
+        { id: 'b17', bug: 'Stale session check fails under 200ms latency conditions',                   severity: 'Medium',   component: 'Session Mgmt',  owner: 'James',  status: 'Open',        logged: 'May 13' },
+        { id: 'b18', bug: 'Session timeout warning not shown on mobile web',                            severity: 'Low',      component: 'Session Mgmt',  owner: 'Kiran',  status: 'Open',        logged: 'May 22' },
+        { id: 'b19', bug: 'Concurrent login detection sends duplicate push notifications',              severity: 'Low',      component: 'Auth Service',  owner: 'Sana',   status: 'Open',        logged: 'May 18' },
+        { id: 'b20', bug: 'Login page flashes briefly on successful biometric auth (iOS)',              severity: 'Low',      component: 'Mobile Auth',   owner: 'Sana',   status: 'Open',        logged: 'May 20' }
       ]
     }
   },
