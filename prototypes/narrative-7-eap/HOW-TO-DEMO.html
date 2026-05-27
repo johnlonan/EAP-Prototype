@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>N7 EAP — Demo Guide</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #111;
+    background: #E1E0DD;
+    padding: 32px 16px 64px;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 36px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+  }
+  .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .header p  { font-size: 13px; color: #585753; }
+  .entry-links { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .entry-link {
+    display: inline-block;
+    background: #383733;
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .entry-link:hover { background: #262521; }
+  .entry-link.secondary {
+    background: transparent;
+    color: #383733;
+    border: 1px solid #CCCBC8;
+  }
+  .entry-link.secondary:hover { background: #F1F0ED; }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #797874;
+    margin-bottom: 16px;
+  }
+
+  /* ── Two-col grid ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* ── Persona table ── */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #797874;
+    text-align: left;
+    padding: 0 12px 8px 0;
+    border-bottom: 1px solid #E1E0DD;
+  }
+  td {
+    padding: 10px 12px 10px 0;
+    border-bottom: 1px solid #F1F0ED;
+    vertical-align: top;
+    font-size: 13px;
+    color: #383733;
+  }
+  tr:last-child td { border-bottom: none; }
+  .role-cell { color: #585753; font-size: 12px; }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background: rgba(56,55,51,.08);
+    color: #383733;
+    border: 1px solid rgba(56,55,51,.15);
+    white-space: nowrap;
+  }
+  .badge.green {
+    background: rgba(22,163,74,.08);
+    color: #15803D;
+    border-color: rgba(22,163,74,.2);
+  }
+  .badge.amber {
+    background: rgba(217,119,6,.08);
+    color: #B45309;
+    border-color: rgba(217,119,6,.2);
+  }
+  .badge.blue {
+    background: rgba(37,99,235,.08);
+    color: #1D4ED8;
+    border-color: rgba(37,99,235,.2);
+  }
+
+  /* ── Tabs display ── */
+  .tabs-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tab-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: #F1F0ED;
+    color: #585753;
+    border: 1px solid #E1E0DD;
+  }
+  .tab-pill.key { background: #383733; color: #fff; border-color: #383733; }
+
+  /* ── Steps ── */
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .step { display: flex; gap: 14px; align-items: flex-start; }
+  .step-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    background: #383733;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .step-body h3 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .step-body p  { font-size: 13px; color: #585753; }
+  .step-body .tip {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #15803D;
+    background: rgba(22,163,74,.08);
+    border: 1px solid rgba(22,163,74,.2);
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+
+  /* ── Feature list ── */
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .feature-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+  .feature-list li::before {
+    content: '✦';
+    color: #16A34A;
+    font-size: 10px;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .feature-list li strong { color: #111; }
+  .feature-list li span  { color: #585753; }
+
+  /* ── Callout ── */
+  .callout {
+    background: #F8F7F4;
+    border: 1px solid #E1E0DD;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #585753;
+    margin-top: 16px;
+  }
+  .callout strong { color: #383733; }
+
+  /* ── Scope band ── */
+  .scope-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .scope-arrow { color: #CCCBC8; font-size: 12px; }
+  .scope-item {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: #F1F0ED;
+    color: #383733;
+  }
+  .scope-entity { font-size: 11px; color: #797874; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <h1>Narrative 7 — EAP Setup UX</h1>
+    <p>Demo guide for the product team · Sand theme · Setup UX + full EAP workspace</p>
+    <div class="entry-links">
+      <a href="home.html" class="entry-link">Start here → Home</a>
+      <a href="setup.html" class="entry-link secondary">Setup wizard</a>
+      <a href="index.html" class="entry-link secondary">EAP workspace</a>
+    </div>
+  </div>
+
+
+  <!-- ── Personas ── -->
+  <div class="card">
+    <div class="card-title">Personas — switch via the avatar in the top-right corner</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Lands on</th>
+          <th>Best for showing</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ananya</strong> <span class="badge green">Default</span></td>
+          <td class="role-cell">ART Product Manager</td>
+          <td>Backlog (Feature level)</td>
+          <td>ART planning, WSJF, PI view</td>
+        </tr>
+        <tr>
+          <td><strong>Riya</strong></td>
+          <td class="role-cell">Release Train Engineer</td>
+          <td>Planning (split view)</td>
+          <td>PI Planning, cross-team dependencies</td>
+        </tr>
+        <tr>
+          <td><strong>Dev</strong></td>
+          <td class="role-cell">Scrum Master · Payments Team</td>
+          <td>Kanban (sprint board)</td>
+          <td>Team execution, sprint board, Spaces</td>
+        </tr>
+        <tr>
+          <td><strong>Priya</strong></td>
+          <td class="role-cell">Portfolio Director</td>
+          <td>Backlog (Epic level)</td>
+          <td>Portfolio governance, OKR linkage</td>
+        </tr>
+        <tr>
+          <td><strong>Marcus</strong></td>
+          <td class="role-cell">Chief Digital Officer</td>
+          <td>Home — executive brief</td>
+          <td>Executive summary, strategic goals</td>
+        </tr>
+        <tr>
+          <td><strong>Kenji</strong></td>
+          <td class="role-cell">Finance &amp; Capacity Lead</td>
+          <td>Analytics</td>
+          <td>Budget, capacity, financial view</td>
+        </tr>
+        <tr>
+          <td><strong>James</strong></td>
+          <td class="role-cell">Developer · Auth Team</td>
+          <td>Kanban (my work)</td>
+          <td>Developer / team-member daily experience</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Tip:</strong> switching persona resets filters and tab defaults — each one is a self-contained story. Start with Ananya for the PM view, then switch to Dev or James to show the team-level experience.
+    </div>
+  </div>
+
+
+  <!-- ── Two-col: Tabs + Scope ── -->
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title">EAP Workspace tabs</div>
+      <div class="tabs-row">
+        <span class="tab-pill key">Backlog</span>
+        <span class="tab-pill key">Planning</span>
+        <span class="tab-pill key">Timeline</span>
+        <span class="tab-pill">Kanban</span>
+        <span class="tab-pill">Hierarchy</span>
+        <span class="tab-pill">Analytics</span>
+      </div>
+      <p style="font-size:12px;color:#797874;margin-top:4px;">Bolded tabs have the most demo depth. Kanban switches between <em>Current PI</em> and <em>Sprint</em> views via the dropdown.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Scope levels (top-left dropdown)</div>
+      <div class="scope-row">
+        <span class="scope-item">Portfolio</span>
+        <span class="scope-arrow">›</span>
+        <span class="scope-item">Solution Train</span>
+        <span class="scope-arrow">›</span>
+        <span class="scope-item">ART</span>
+        <span class="scope-arrow">›</span>
+        <span class="scope-item">Team</span>
+      </div>
+      <div class="scope-entity">Epics → Capabilities → Features → Stories / Work Items</div>
+      <div class="callout" style="margin-top:10px;">Change the scope to show how the same tabs adapt — the Backlog at Portfolio shows Epics, at Team it shows Stories.</div>
+    </div>
+
+  </div>
+
+
+  <!-- ── Setup wizard ── -->
+  <div class="card">
+    <div class="card-title">Setup wizard — the headline feature of N7</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Pick your framework</h3>
+          <p>Scrum, Essential SAFe, Portfolio SAFe, Kanban, or Custom. The right-hand preview updates instantly — showing the hierarchy, terminology, and cadence for that framework.</p>
+          <span class="tip">✦ Scrum is fully built out. Other frameworks show a "coming soon" preview state — set the expectation before clicking them.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>How to set up your ART</h3>
+          <p>Two paths: <strong>AI (Otto)</strong> — paste a plain-language description of your teams and Otto generates the full config. Or <strong>Manual</strong> — build it yourself.</p>
+          <span class="tip">✦ The AI path is the money shot. Type something like: "Digital Banking ART, 6 teams of 8, 10-week PIs, 2-week sprints" and watch it generate.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Otto Q&amp;A / Configure</h3>
+          <p>Otto asks follow-up questions. The live config card on the right updates as you answer — showing ART name, cadence, team count. Nothing is saved yet.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Invite team</h3>
+          <p>Add team members by name or email. Member count in the preview panel updates live.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Done → Open workspace</h3>
+          <p>Lands on the EAP workspace as Ananya with a <em>new workspace</em> banner experience.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── Spaces ── -->
+  <div class="card">
+    <div class="card-title">Spaces — team-level execution layer</div>
+    <p style="font-size:13px;color:#585753;margin-bottom:16px;">Spaces are team workspaces that live inside EAP. Access them from the left nav or by switching to Dev / James persona. Each Space has up to three tabs:</p>
+    <div class="tabs-row" style="margin-bottom:12px;">
+      <span class="tab-pill key">Board</span>
+      <span class="tab-pill key">List</span>
+      <span class="tab-pill key">Docs</span>
+    </div>
+    <ul class="feature-list">
+      <li>
+        <strong>Retrospective space</strong>
+        <span>— Auth Team retro with Board and Docs views. Shows how a team runs structured ceremonies inside the platform.</span>
+      </li>
+      <li>
+        <strong>Bug Register space</strong>
+        <span>— A List-view space for tracking bugs. Columns, filters, status pills. Good for showing non-sprint use cases.</span>
+      </li>
+      <li>
+        <strong>Docs tab</strong>
+        <span>— Collaborative document editor inside a Space. Shows the "reduce context switching to Confluence" story.</span>
+      </li>
+    </ul>
+  </div>
+
+
+  <!-- ── Key moments ── -->
+  <div class="card">
+    <div class="card-title">Moments worth calling out in the demo</div>
+    <ul class="feature-list">
+      <li>
+        <strong>Home page adapts per persona</strong>
+        <span>— each role sees different insight cards, AI signals, and quick actions. Marcus (CDO) gets an executive brief; Dev gets a sprint board summary.</span>
+      </li>
+      <li>
+        <strong>AI signals use ✦ sparkle</strong>
+        <span>— teal in AINPX, green in Sand. AI-inferred items show a confidence score. Rule-based items never do.</span>
+      </li>
+      <li>
+        <strong>Planning tab split view</strong>
+        <span>— click the Split button (columns icon, top right of filter bar) to open the insights panel alongside the backlog.</span>
+      </li>
+      <li>
+        <strong>Filter by owner</strong>
+        <span>— the owner chip in the filter bar narrows to "Mine Only" — each persona's items. Good for showing personalisation.</span>
+      </li>
+      <li>
+        <strong>Hierarchy tab</strong>
+        <span>— shows the full Portfolio → Epic → Capability → Feature → Story tree. Use the Level dropdown to zoom in/out.</span>
+      </li>
+      <li>
+        <strong>Setup wizard right panel</strong>
+        <span>— the live preview is the most designed surface in N7. Make sure it's visible; it's half the story.</span>
+      </li>
+    </ul>
+  </div>
+
+
+  <!-- ── What's not built ── -->
+  <div class="card">
+    <div class="card-title">What's intentionally preview-only / not built out</div>
+    <table>
+      <thead>
+        <tr><th>Surface</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Portfolio SAFe setup path</td>
+          <td><span class="badge amber">Preview only</span></td>
+        </tr>
+        <tr>
+          <td>Kanban setup path</td>
+          <td><span class="badge amber">Preview only</span></td>
+        </tr>
+        <tr>
+          <td>Custom framework setup</td>
+          <td><span class="badge amber">Preview only</span></td>
+        </tr>
+        <tr>
+          <td>Jira / external integrations in setup</td>
+          <td><span class="badge">Not in scope</span></td>
+        </tr>
+        <tr>
+          <td>Analytics tab (Kenji persona)</td>
+          <td><span class="badge blue">Partial</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Recommended demo path:</strong> Home (Ananya) → Setup wizard (Scrum + AI path) → Open workspace → switch to Dev → Kanban sprint board → Space (Bug Register or Retro) → switch to Riya → Planning split view.
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

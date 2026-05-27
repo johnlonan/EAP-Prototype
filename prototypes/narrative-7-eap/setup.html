@@ -1149,7 +1149,7 @@ body {
             </div>
             <div class="art-build-label" id="plabel-pi" style="margin-top:4px">PI Calendar</div>
             <div class="placeholder-row" style="height:56px"></div>
-            <div class="art-build-label" id="plabel-conn" style="margin-top:4px">Integrations</div>
+            <div class="art-build-label" id="plabel-conn" style="margin-top:4px">Configuration</div>
             <div class="placeholder-row" style="height:44px"></div>
             <div class="placeholder-row" style="height:44px"></div>
             <div class="placeholder-label">Describe your team and Otto builds this out</div>
@@ -1169,7 +1169,7 @@ body {
               <div id="art-pi-rows"><!-- PI rows added by JS --></div>
             </div>
             <div class="art-build-section" id="art-conn-section" style="display:none">
-              <div class="art-build-label" id="label-conn">Integrations</div>
+              <div class="art-build-label" id="label-conn">Configuration</div>
               <div class="art-connections" id="art-conn-rows"><!-- connections added by JS --></div>
             </div>
           </div>
@@ -2376,7 +2376,6 @@ body {
         items: [
           { done: true,  name: (generatedTeams.length || 4) + ' teams configured',    note: generatedTeams.length ? generatedTeams.map(function(t){return t.name.replace(/ Team$/i,'');}).join(' · ') : 'Auth · Payments · Mobile · Data & Analytics' },
           { done: true,  name: 'PI 26 scheduled',                                      note: 'Jun 2 – Aug 10 · Sprint 2 active' },
-          { done: true,  name: '47 features from Jira',                                note: 'DBKG project connected · features mapped' },
           { done: false, name: 'PI Planning session not scheduled',                    note: 'Add PI Planning to the team calendar before Sprint 4' },
           { done: false, name: 'Team capacity not set for Sprint 1',                   note: 'Needed for accurate velocity forecasting' }
         ]
@@ -2388,7 +2387,7 @@ body {
         items: [
           { done: true,  name: '2 ARTs configured',           note: 'Digital Banking · Lending & Mortgages' },
           { done: true,  name: 'PI cadence set',              note: '10-week PIs · LPM sync every 2 PIs' },
-          { done: true,  name: 'Epics imported',              note: '12 Epics from Jira mapped to value streams' },
+          { done: true,  name: 'Epics added',                  note: '12 Epics mapped to value streams' },
           { done: false, name: 'Lean Budget guardrails not set',  note: 'Required for portfolio-level investment allocation' },
           { done: false, name: 'Portfolio Kanban not configured', note: 'Add workflow states to track Epic flow' }
         ]
@@ -2803,29 +2802,6 @@ body {
       piRows.appendChild(piRow);
     }, 1850));
 
-    // ── Integrations ──────────────────────────────────────────────
-    if (parsed.hasJira || fw === 'essential' || fw === 'portfolio') {
-      genTimers.push(setTimeout(function() {
-        document.getElementById('art-conn-section').style.display = 'flex';
-        var connRows = document.getElementById('art-conn-rows');
-        var key = parsed.jiraKey || 'PROJ';
-        var jira = document.createElement('div');
-        jira.className = 'art-conn-badge'; jira.style.animationDelay = '0ms';
-        jira.innerHTML = '<div class="conn-icon">J</div><span class="conn-name">Jira · ' + key + '</span><span class="conn-note">' + (fw === 'portfolio' ? 'All ARTs connected' : 'Features mapped') + '</span>';
-        connRows.appendChild(jira);
-      }, 1400));
-    }
-    if (parsed.hasSlack) {
-      genTimers.push(setTimeout(function() {
-        document.getElementById('art-conn-section').style.display = 'flex';
-        var connRows = document.getElementById('art-conn-rows');
-        var slack = document.createElement('div');
-        slack.className = 'art-conn-badge'; slack.style.animationDelay = '0ms';
-        var chan = parsed.jiraKey ? '#' + parsed.jiraKey.toLowerCase() + '-art' : '#art-updates';
-        slack.innerHTML = '<div class="conn-icon" style="font-size:10px">Sl</div><span class="conn-name">Slack · ' + chan + '</span><span class="conn-note">Ready</span>';
-        connRows.appendChild(slack);
-      }, 2750));
-    }
 
     genTimers.push(setTimeout(function() {
       document.getElementById('edit-hint').classList.add('visible');
@@ -2883,11 +2859,9 @@ body {
       items = [
         [500,  teamCountStr,               teamNamesStr || 'From your description'],
         [950,  'Framework',                fwLabel + ' — ' + parsed.piWeeks + '-week PI, ' + parsed.sprintWeeks + '-week sprints'],
-        [1400, parsed.jiraKey ? 'Jira · ' + parsed.jiraKey : 'Integrations', parsed.jiraKey ? 'Features mapped to backlog' : 'No integration detected'],
-        [1850, parsed.piLabel,             parsed.piStart ? 'Starts ' + parsed.piStart : 'Cadence auto-computed'],
-        [2300, 'Sprint calendars',         parsed.teamCount + ' teams × ' + Math.max(2, Math.floor(parsed.piWeeks/parsed.sprintWeeks)-1) + ' sprints + IP sprint']
+        [1400, parsed.piLabel,             parsed.piStart ? 'Starts ' + parsed.piStart : 'Cadence auto-computed'],
+        [1850, 'Sprint calendars',         parsed.teamCount + ' teams × ' + Math.max(2, Math.floor(parsed.piWeeks/parsed.sprintWeeks)-1) + ' sprints + IP sprint']
       ];
-      if (parsed.hasSlack) items.push([2750, 'Slack', (parsed.jiraKey ? '#' + parsed.jiraKey.toLowerCase() + '-art' : '#art-updates') + ' channel linked']);
     } else if (fw === 'portfolio') {
       items = [
         [500,  teamCountStr,               teamNamesStr || 'Across your portfolio'],
@@ -2904,7 +2878,6 @@ body {
         [1850, 'CFD dashboard',            'Cumulative flow, cycle time, throughput ready'],
         [2300, 'Flow board',               'Kanban columns mapped to your value streams']
       ];
-      if (parsed.hasJira) items.push([2750, 'Jira', (parsed.jiraKey || 'PROJ') + ' → Kanban board synced']);
     } else if (fw === 'scrum') {
       // Scrum gen-items reflect what was configured in the wizard
       var sprintHelp = OTTO_SPRINT_HELP[scrumState.sprintWeeks] || (scrumState.sprintWeeks + '-week sprints');
@@ -2922,7 +2895,7 @@ body {
       items = [
         [500,  'Blank workspace',   'No assumptions — full control'],
         [1200, 'Custom hierarchy',  'Define levels, entities, and relationships'],
-        [2200, 'Ready to configure', 'Add teams, cadence, and integrations as needed']
+        [2200, 'Ready to configure', 'Add teams, cadence, and work items as needed']
       ];
     }
 
@@ -3033,7 +3006,8 @@ body {
       else if (step === 3 && aiDone)  cont.textContent = 'Confirm and continue';
       else if (step === 4)            cont.textContent = 'Send invites';
       else                            cont.textContent = 'Continue';
-      cont.disabled = false;
+      // Demo: only Scrum is fully built. Disable Continue at step 1 for all other frameworks.
+      cont.disabled = (step === 1 && selectedFw !== 'scrum');
     }
 
     // Preview-specific renders
@@ -3053,7 +3027,9 @@ body {
 
   // ── Navigation ───────────────────────────────────────────────────
   // Scrum fast-path skips steps 2 and 4: 1 → 3 → 5
+  // Demo: only the Scrum flow is fully built. All other frameworks are blocked at step 1.
   window.nextStep = function() {
+    if (step === 1 && selectedFw !== 'scrum') return;
     if (step === 3 && !aiDone) { runGeneration(); return; }
     if (step === 3 && aiDone && selectedFw === 'scrum') { step = 5; updateUI(); return; }
     if (step === 1 && selectedFw === 'scrum') { step = 3; updateUI(); return; }

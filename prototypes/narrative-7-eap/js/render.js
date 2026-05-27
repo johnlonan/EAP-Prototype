@@ -35,22 +35,21 @@ EAP.renderChrome = function() {
     _sliderFrom = { left: _ar.left - _gr.left, width: _ar.width };
   }
 
-  // Scope selector badge — indigo style for Space, standard grey for all other contexts
+  // Scope selector badge — indigo class for Space, standard Sand style for all other contexts
   var isSpace = s.context === 'space';
-  var badgeStyle = isSpace
-    ? 'background:rgba(99,102,241,0.12);color:#4338CA;border:1px solid rgba(99,102,241,0.22);'
-    : '';
+  var badgeClass = isSpace ? 'art-sel-badge space' : 'art-sel-badge';
+  var badgeStyle = '';
 
   // For space context, show parent team as a breadcrumb prefix
   var scopeLabel = s.contextName;
   if (isSpace && s.spaceData) {
-    scopeLabel = '<span style="color:#9CA3AF;font-weight:400;">' + s.spaceData.teamName + ' &rsaquo;</span> ' + s.contextName;
+    scopeLabel = '<span style="color:#343331;font-weight:400;">' + s.spaceData.teamName + ' &rsaquo;</span> ' + s.contextName;
   }
 
   el.innerHTML =
     '<div class="chrome-dd-wrap"><span class="chrome-dd-label">Scope</span>' +
       '<div class="art-sel" id="ctx-sel-btn">' +
-        '<span class="art-sel-badge" style="' + badgeStyle + '">' + tl[s.context] + '</span>' +
+        '<span class="' + badgeClass + '">' + tl[s.context] + '</span>' +
         '<span class="art-sel-name">' + scopeLabel + '</span>' +
         '<span class="chev"></span>' +
       '</div></div>' +

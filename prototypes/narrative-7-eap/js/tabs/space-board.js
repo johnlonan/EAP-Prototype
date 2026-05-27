@@ -25,10 +25,10 @@ EAP.renderSpaceBoard = function() {
       'box-shadow:0 8px 12px rgba(56,56,56,0.10);';
   }
 
-  // Column body style — identical to EAP._colBodyStyle
-  var CB = 'background:#F8F9FA;border:1px solid #E3E2DF;border-top:none;' +
+  // Column body style — Sand neutral background, soft shadow
+  var CB = 'background:#F8F7F4;border:1px solid #E3E2DF;border-top:none;' +
     'border-radius:0 0 12px 12px;padding:8px;min-height:100px;flex:1;' +
-    'box-shadow:0 4px 6px -1px rgba(0,0,0,0.10),0 2px 4px -1px rgba(0,0,0,0.06);' +
+    'box-shadow:0 2px 6px rgba(0,0,0,0.05);' +
     'overflow-y:auto;';
 
   var html =
@@ -104,7 +104,7 @@ EAP.renderSpaceBoard = function() {
           '">' + initials + '</span>' +
           '<span style="font-size:11px;color:#797874;">' + firstName + '</span>' +
           // Source note for action board cards (sp3)
-          (card.source ? '<span style="font-size:10px;color:#BBBBB7;margin-left:auto;font-style:italic;">' + card.source + '</span>' : '') +
+          (card.source ? '<span style="font-size:10px;color:#CCCBC8;margin-left:auto;">' + card.source + '</span>' : '') +
         '</div>' +
         '</div>';
     });

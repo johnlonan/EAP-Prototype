@@ -1409,58 +1409,172 @@ EAP.spaces = {
     docs: [
       {
         id: 'd1',
+        type: 'meeting',
         title: 'Stakeholder Sync — Biometric Auth Launch Criteria',
         date: 'May 22, 2026',
         author: 'Kiran',
         attendees: ['Kiran', 'Sana', 'James'],
         external: 'Lisa Chen (CISO)',
-        summary: 'Reviewed launch criteria for biometric auth upgrade. Security sign-off for PI 27 is conditional on liveness detection and fallback hardening being complete. Lisa confirmed no blockers on policy side if scope ships as defined.',
-        decisions: [
-          'Liveness detection must pass security review before PI 27 code freeze',
-          'Fallback hardening (PIN + password) ships with biometric — not as a follow-on',
-          'Lisa Chen to receive pre-launch brief 5 days before release'
+        sections: [
+          { type: 'callout', variant: 'info', title: 'Meeting Summary',
+            text: 'Security sign-off for biometric auth in PI 27 is conditional on two requirements. Liveness detection must clear the security review before code freeze. Fallback hardening (PIN + password) must ship with biometric — not as a follow-on. Lisa Chen confirmed no policy blockers if scope ships as defined.' },
+          { type: 'h2', text: 'Agenda' },
+          { type: 'ol', items: [
+            'PI 27 biometric auth scope review',
+            'Security sign-off conditions — CISO input',
+            'Fallback hardening dependencies',
+            'Release communication plan',
+            'Open items and next steps'
+          ]},
+          { type: 'h2', text: 'Biometric Auth Scope Review' },
+          { type: 'p', text: 'The team walked through current implementation status for biometric authentication targeting PI 27. iOS Face ID and fingerprint flows are complete and in QA. Android is at 80% — liveness detection integration is the remaining blocker. <strong>Android 11 device compatibility</strong> (approx. 12% of the user base) was flagged as a risk by Sana, pending confirmation from the liveness detection vendor.' },
+          { type: 'ul', items: [
+            'iOS biometric flow — complete, in QA',
+            'Android biometric flow — 80% complete',
+            'Liveness detection — pending security integration',
+            'Fallback (PIN + password) — complete, pending hardening review'
+          ]},
+          { type: 'h2', text: 'Security Sign-Off Conditions' },
+          { type: 'p', text: 'Lisa Chen (CISO) confirmed that policy sign-off is unconditional provided both requirements are met before PI 27 code freeze. The EU Digital Identity framework compliance review is a separate workstream and does not block this launch. No new regulatory concerns raised since the previous review.' },
+          { type: 'callout', variant: 'warning', title: 'Risk',
+            text: 'If liveness detection fails the security review, the biometric launch scope must be descoped from PI 27. Fallback hardening can still ship independently on its current schedule.' },
+          { type: 'h2', text: 'Fallback Hardening Dependencies' },
+          { type: 'p', text: 'Fallback hardening (PIN reset + password recovery flows) is functionally complete. One outstanding item: security team review of edge cases in the PIN reset flow where a network timeout occurs mid-transaction. Sana to schedule this review before May 28.' },
+          { type: 'h2', text: 'Release Communication Plan' },
+          { type: 'p', text: 'Agreed format: written summary plus a live walkthrough for Lisa Chen, delivered 5 business days before the release date. Engineering sign-off from James is required before the brief is sent. Kiran owns end-to-end coordination.' },
+          { type: 'h2', text: 'Action Items' },
+          { type: 'actions', items: [
+            { text: 'Submit liveness detection for formal security review', owner: 'James', due: 'Jun 2', status: 'open' },
+            { text: 'Confirm Android 11 compatibility with liveness detection vendor', owner: 'Sana', due: 'May 28', status: 'in-progress' },
+            { text: 'Schedule fallback PIN reset edge-case review with security team', owner: 'Sana', due: 'May 28', status: 'open' },
+            { text: 'Prepare biometric pre-launch brief for Lisa Chen (CISO)', owner: 'Kiran', due: '5 days pre-release', status: 'open' },
+            { text: 'Engineering sign-off on pre-launch brief content', owner: 'James', due: 'TBD', status: 'open' }
+          ]},
+          { type: 'divider' },
+          { type: 'p', text: '<strong>Next meeting:</strong> Jun 5 · Biometric auth launch readiness review · Auth Team' }
         ]
       },
       {
         id: 'd2',
+        type: 'architecture',
         title: 'Architecture Review — SSO Session Handling',
         date: 'May 20, 2026',
         author: 'James',
         attendees: ['Kiran', 'Sana', 'James'],
         external: null,
-        summary: 'Evaluated options for session store backing SSO across mobile and web. Redis-backed session store chosen over in-memory for scalability and multi-node support. Infra Team capacity for Redis provisioning to be confirmed.',
-        decisions: [
-          'Redis-backed session store adopted as the architecture decision',
-          'James to review Redis capacity requirements with Infra Team',
-          'Session TTL set to 24h with sliding expiry — matches current web session behaviour'
+        sections: [
+          { type: 'callout', variant: 'success', title: 'Architecture Decision',
+            text: 'Redis-backed session store adopted for SSO across mobile and web. In-memory store rejected on multi-node scalability grounds. Session TTL: <strong>24 hours with sliding expiry</strong> — matching existing web session behaviour.' },
+          { type: 'h2', text: 'Context' },
+          { type: 'p', text: 'The current SSO implementation uses an in-memory session store that cannot support multi-node deployment. With auth service horizontal scaling planned for PI 27 to support biometric auth load, a distributed session store is required before launch.' },
+          { type: 'h2', text: 'Options Evaluated' },
+          { type: 'comparison', rows: [
+            { option: 'Redis Cluster (managed)', pros: 'Multi-node, proven at scale, sub-ms reads, TTL built-in', cons: 'Infra dependency, capacity provisioning required', verdict: 'chosen' },
+            { option: 'In-memory store', pros: 'No infra overhead, already in use', cons: 'Cannot support multi-node; session loss on pod restart', verdict: 'rejected' },
+            { option: 'Database-backed sessions', pros: 'Fully durable, queryable session history', cons: 'Too slow (~20ms per lookup); over-engineered for this use case', verdict: 'rejected' }
+          ]},
+          { type: 'h2', text: 'Architecture Decision' },
+          { type: 'p', text: 'Redis Cluster (managed, 3-node) to be provisioned by Infra Team in PI 27 Sprint 1. Auth service to adopt session middleware wrapping the Redis client. Token refresh updates TTL in-place — no re-authentication required within the sliding window.' },
+          { type: 'ul', items: [
+            'Session TTL: 24 hours, sliding expiry on activity',
+            'Invalidation: explicit logout only — no passive expiry during active sessions',
+            'Mobile: same TTL, device-bound refresh token handles background refresh',
+            'Fallback: graceful session-not-found → re-auth prompt (no silent failure)',
+            'Monitoring: session count, hit rate, and memory tracked in Datadog'
+          ]},
+          { type: 'h2', text: 'Action Items' },
+          { type: 'actions', items: [
+            { text: 'Review Redis capacity requirements with Infra Team', owner: 'James', due: 'May 23', status: 'done' },
+            { text: 'Write ADR for Redis session store adoption', owner: 'James', due: 'May 24', status: 'done' },
+            { text: 'Update auth service architecture diagram', owner: 'Sana', due: 'May 27', status: 'in-progress' },
+            { text: 'Confirm Redis provisioning timeline with Infra Team', owner: 'Kiran', due: 'May 26', status: 'done' }
+          ]}
         ]
       },
       {
         id: 'd3',
+        type: 'planning',
         title: 'Sprint 2 Planning',
         date: 'May 14, 2026',
         author: 'Sana',
         attendees: ['Kiran', 'Sana', 'James'],
         external: null,
-        summary: 'Sprint goal: ship OAuth 2.0 PKCE flow for web and complete biometric fallback hardening. Capacity: 36 points across 3 engineers. Committed: 34 points. Two stories moved from Sprint 1 carry-over.',
-        decisions: [
-          'Sprint goal: OAuth PKCE web + biometric fallback — committed at 34 pts',
-          'Carry-over stories (token refresh edge cases) absorbed into Sprint 2 scope',
-          'Sana to update sprint commitment doc after scope reduction agreed with SM'
+        sections: [
+          { type: 'callout', variant: 'info', title: 'Sprint Goal',
+            text: 'Ship OAuth 2.0 PKCE flow for web and complete biometric fallback hardening. Committed: <strong>34 points</strong> across 3 engineers. Total capacity: 36 pts · Buffer: 2 pts.' },
+          { type: 'h2', text: 'Capacity' },
+          { type: 'stats', items: [
+            { label: 'Total Capacity', value: '36 pts' },
+            { label: 'Committed', value: '34 pts' },
+            { label: 'Buffer', value: '2 pts' },
+            { label: 'Carry-over', value: '4 pts' }
+          ]},
+          { type: 'h2', text: 'Committed Stories' },
+          { type: 'stories', items: [
+            { id: 'S-112', title: 'OAuth 2.0 PKCE authorisation code flow', pts: 8, owner: 'James', status: 'ready' },
+            { id: 'S-113', title: 'PKCE token exchange endpoint', pts: 5, owner: 'James', status: 'ready' },
+            { id: 'S-117', title: 'OAuth scope validation middleware', pts: 5, owner: 'James', status: 'ready' },
+            { id: 'S-108', title: 'Biometric fallback: PIN reset flow', pts: 5, owner: 'Sana', status: 'ready' },
+            { id: 'S-109', title: 'Biometric fallback: password recovery', pts: 3, owner: 'Sana', status: 'ready' },
+            { id: 'S-115', title: 'Token refresh edge cases', pts: 5, owner: 'Kiran', status: 'carry-over' },
+            { id: 'S-116', title: 'Session invalidation on logout', pts: 3, owner: 'Kiran', status: 'carry-over' }
+          ]},
+          { type: 'h2', text: 'Scope Decisions' },
+          { type: 'p', text: 'Two stories deferred to Sprint 3: <strong>S-110</strong> (MFA device registration UI, 5 pts) and <strong>S-111</strong> (audit log improvements, 3 pts). Both depend on SSO session architecture work not yet stable at planning time. Decision confirmed with SM.' },
+          { type: 'h2', text: 'Risks' },
+          { type: 'ul', items: [
+            '<strong>OAuth PKCE (S-112)</strong> — vendor OAuth library update required; James to validate before sprint start',
+            '<strong>Carry-over (S-115/116)</strong> — root cause was blocked on SSO session decision, now unblocked by architecture review',
+            '<strong>Capacity</strong> — Kiran at 60% first 3 days due to cross-team architecture work'
+          ]},
+          { type: 'h2', text: 'Action Items' },
+          { type: 'actions', items: [
+            { text: 'Update sprint commitment doc after scope reduction', owner: 'Sana', due: 'May 15', status: 'done' },
+            { text: 'Validate OAuth PKCE library update before sprint start', owner: 'James', due: 'May 15', status: 'done' },
+            { text: 'Confirm S-110/111 deferral with SM and PM', owner: 'Kiran', due: 'May 15', status: 'done' }
+          ]}
         ]
       },
       {
         id: 'd4',
+        type: 'retro',
         title: 'Team Retro — Sprint 1',
         date: 'May 7, 2026',
         author: 'Sana',
         attendees: ['Kiran', 'Sana', 'James'],
         external: null,
-        summary: 'Sprint 1 retrospective. Strong delivery on auth service refactor. Key theme: documentation lagging behind implementation caused 3-day blocker for Mobile Exp Team.',
-        decisions: [
-          'API docs must be updated within the same sprint as implementation — not follow-on',
-          'Retrospective format changed to async pre-fill before the session',
-          'Standup moved from 10:00 to 09:30 to resolve calendar overlap with Payments Team'
+        sections: [
+          { type: 'retro', columns: [
+            { label: 'What went well', variant: 'success', items: [
+              'Auth service refactor shipped 3 days ahead of estimate',
+              'Strong cross-pairing between Kiran and James on token architecture',
+              'Sprint 1 velocity (28 pts) exceeded the baseline estimate of 24',
+              'Zero critical bugs in QA — test coverage investment paid off'
+            ]},
+            { label: 'To improve', variant: 'warning', items: [
+              'API docs lagged implementation — caused 3-day blocker for Mobile Exp Team',
+              'Standup ran over 15 min on 3 separate days',
+              'Retro format felt rushed — no pre-fill meant low-quality input',
+              'Tech debt items not visible in sprint board'
+            ]},
+            { label: 'Experiments', variant: 'indigo', items: [
+              'Async retro pre-fill template (Sana to create)',
+              'Rotate retro facilitator each sprint',
+              'Add tech debt swim lane to sprint board'
+            ]}
+          ]},
+          { type: 'h2', text: 'Key Theme' },
+          { type: 'p', text: 'Documentation as a team responsibility, not a follow-on task. The 3-day Mobile Exp Team blocker traced directly to auth service API docs being 8 days behind implementation. <strong>New norm: API docs update in the same sprint as implementation — no exceptions.</strong>' },
+          { type: 'callout', variant: 'info', title: 'New Team Norms',
+            text: 'API docs update within the same sprint as implementation. Standup hard-capped at 15 minutes. Retro pre-fill template sent 48 hours before the retro session.' },
+          { type: 'h2', text: 'Action Items' },
+          { type: 'actions', items: [
+            { text: 'Create async retro pre-fill template', owner: 'Sana', due: 'May 8', status: 'done' },
+            { text: 'Move standup to 09:30 (fix calendar overlap with Payments Team)', owner: 'Kiran', due: 'May 8', status: 'done' },
+            { text: 'Share Sprint 1 retro actions with SM', owner: 'Kiran', due: 'May 8', status: 'done' },
+            { text: 'Circulate async retro template to team', owner: 'Sana', due: 'May 8', status: 'done' },
+            { text: 'Add tech debt swim lane to sprint board', owner: 'James', due: 'May 12', status: 'open' }
+          ]}
         ]
       }
     ],
@@ -1502,15 +1616,48 @@ EAP.spaces = {
     docs: [
       {
         id: 'pd1',
+        type: 'runbook',
         title: 'Payment Gateway Failover Runbook',
         date: 'May 15, 2026',
         author: 'Vikram',
         attendees: ['Vikram', 'Mei'],
         external: null,
-        summary: 'Step-by-step failover procedure for payment gateway outages. Covers Stripe primary, Adyen fallback, and manual processing bridge. Last reviewed after May incident.',
-        decisions: [
-          'Adyen fallback promoted to hot standby — no longer requires manual activation',
-          'Runbook review cadence set to monthly — Vikram owns'
+        sections: [
+          { type: 'callout', variant: 'warning', title: 'Last updated after May 2026 incident',
+            text: 'Adyen fallback promoted to hot standby. Runbook reviewed and validated by Vikram and Mei. Next scheduled review: <strong>Jun 15, 2026</strong>.' },
+          { type: 'h2', text: 'Overview' },
+          { type: 'p', text: 'This runbook covers the full failover procedure for payment gateway outages. It applies when the primary Stripe integration becomes unavailable or degrades below the 99.5% SLA threshold. Adyen is the hot standby. Manual processing bridge is the last-resort fallback.' },
+          { type: 'h2', text: 'Failover Decision Tree' },
+          { type: 'ol', items: [
+            '<strong>Detect</strong> — PagerDuty alert fires or error rate exceeds 2% over a 5-min window',
+            '<strong>Confirm</strong> — Check Stripe status page and internal error dashboard',
+            '<strong>Notify</strong> — Page on-call engineer, alert #payments-ops Slack channel',
+            '<strong>Switch</strong> — Execute Adyen failover via the ops console (see Step 3)',
+            '<strong>Monitor</strong> — Verify payment success rate recovers to >99% within 10 min',
+            '<strong>Communicate</strong> — Post incident update to #incidents every 30 min',
+            '<strong>Restore</strong> — Switch back to Stripe once stable for 15+ min, confirm rollback'
+          ]},
+          { type: 'h2', text: 'Step 1 — Confirm Outage' },
+          { type: 'p', text: 'Verify the outage is on Stripe\'s side, not an internal issue. Check <strong>status.stripe.com</strong> and the internal payment error rate dashboard. If error rate is below 2% and Stripe status is green, do not proceed to failover — escalate to Payments Engineering.' },
+          { type: 'h2', text: 'Step 2 — Notify Stakeholders' },
+          { type: 'ul', items: [
+            'Page on-call engineer via PagerDuty escalation policy P2',
+            'Post to <strong>#payments-ops</strong>: "Payment gateway degraded — initiating failover to Adyen"',
+            'Notify Head of Payments (Vikram) if outage >5 min',
+            'Open incident ticket in ServiceNow — tag as P1 if revenue impact confirmed'
+          ]},
+          { type: 'h2', text: 'Step 3 — Execute Adyen Failover' },
+          { type: 'p', text: 'Adyen is configured as a hot standby since the May incident. Failover is automatic via feature flag. Manual override available in the Ops Console under <strong>Payments › Gateway › Failover</strong>.' },
+          { type: 'callout', variant: 'info', title: 'Hot Standby Change (May 2026)',
+            text: 'Adyen no longer requires manual activation. The failover flag triggers automatically when Stripe error rate exceeds 2% for 3 consecutive minutes. Manual override is still available if needed.' },
+          { type: 'h2', text: 'Step 4 — Manual Processing Bridge' },
+          { type: 'p', text: 'Last-resort only. Used if both Stripe and Adyen are unavailable. Queues transactions for manual processing. Capacity: approx. 800 transactions/hr. Customer-facing message: "Payment processing is temporarily delayed. Your order is safe and will be confirmed within 2 hours."' },
+          { type: 'h2', text: 'Post-Incident Actions' },
+          { type: 'actions', items: [
+            { text: 'File post-incident review within 48 hours', owner: 'Vikram', due: 'Within 48h', status: 'open' },
+            { text: 'Update runbook with any procedure changes', owner: 'Vikram', due: 'Within 1 week', status: 'open' },
+            { text: 'Review Adyen hot standby configuration', owner: 'Mei', due: 'Monthly', status: 'done' }
+          ]}
         ]
       }
     ]
