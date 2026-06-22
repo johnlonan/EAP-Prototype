@@ -144,7 +144,7 @@ var injectStyles = function() {
     .snp-ov-body { padding: 0 24px 32px; }
 
     /* AI summary card */
-    .snp-ai-card { border: 1.5px solid #00875a; border-radius: 8px; background: #fff; overflow: hidden; }
+    .snp-ai-card { border: 1px solid #00875a; border-left: 3px solid #00875a; border-radius: 8px; background: #fff; overflow: hidden; }
     .snp-ai-hdr { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
     .snp-ai-hdr-left { display: flex; align-items: center; gap: 8px; }
     .snp-ai-sparkle { font-size: 14px; color: #107869; line-height: 1; }
@@ -459,6 +459,42 @@ var injectStyles = function() {
     }
     .snp-empty-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 4px; }
     .snp-empty-sub { font-size: 13px; color: #6b7280; }
+
+    /* ── Overview layout ───────────────────────────────────────────── */
+    .snp-ov-layout { flex: 1; display: flex; flex-direction: row; overflow: hidden; min-height: 0; }
+    .snp-ov-right-panel {
+      width: 40px; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      align-items: center; padding-top: 10px; gap: 2px;
+      border-left: 1px solid #e0e5e8; background: #fff;
+    }
+
+    /* ── Assessment card ───────────────────────────────────────────── */
+    .snp-score-box {
+      border: 1px solid #d1d5db; border-radius: 6px;
+      padding: 10px 14px; margin: 14px 0 4px;
+      background: #f9fafb;
+    }
+    .snp-score-title { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+    .snp-score-val   { font-size: 14px; color: #374151; line-height: 1.5; }
+
+    .snp-team { margin-top: 16px; }
+    .snp-team-hdr {
+      font-size: 14px; font-weight: 600; color: #374151;
+      text-decoration: underline; margin-bottom: 6px;
+    }
+    .snp-pf-row  { display: flex; align-items: center; gap: 6px; margin: 8px 0 3px; }
+    .snp-pf-pass { font-size: 14px; font-weight: 600; color: #16a34a; }
+    .snp-pf-fail { font-size: 14px; font-weight: 600; color: #dc2626; }
+    .snp-pf-list { list-style: disc; padding-left: 24px; margin: 2px 0 4px; }
+    .snp-pf-list li { font-size: 14px; color: #374151; line-height: 1.6; }
+
+    /* ── Sparkle nav icon ──────────────────────────────────────────── */
+    .snp-nav-sparkle-icon {
+      font-size: 13px; width: 16px; height: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0; line-height: 1;
+    }
   `;
   document.head.appendChild(el);
 };
@@ -499,14 +535,15 @@ var STATE_CFG = {
 
 // valid Seismic icon names (from component-map.md)
 var NAV_ITEMS = [
-  { id: 'overview',             label: 'Overview',             icon: 'home-outline'              },
-  { id: 'playbook',             label: 'Playbook',             icon: 'arrow-clockwise-outline'   },
-  { id: 'details',              label: 'Details',              icon: 'list-outline'               },
-  { id: 'financials',           label: 'Financials',           icon: 'chart-bar-vertical-outline' },
-  { id: 'resource-assignments', label: 'Resource assignments', icon: 'user-outline'               },
-  { id: 'demand-tasks',         label: 'Demand tasks',         icon: 'circle-check-outline'       },
-  { id: 'docs',                 label: 'Docs',                 icon: 'document-outline'           },
-  { id: 'similar-demands',      label: 'Similar Demands',      icon: 'magnifying-glass-outline'   },
+  { id: 'overview',             label: 'Overview',             icon: 'table-outline'              },
+  { id: 'playbook',             label: 'Playbook',             icon: 'arrow-clockwise-outline'    },
+  { id: 'details',              label: 'Details',              icon: 'list-outline'                },
+  { id: 'financials',           label: 'Financials',           icon: 'chart-bar-vertical-outline'  },
+  { id: 'resource-assignments', label: 'Resource assignments', icon: 'user-group-outline'          },
+  { id: 'demand-tasks',         label: 'Demand tasks',         icon: 'circle-check-outline'        },
+  { id: 'docs',                 label: 'Docs',                 icon: 'document-outline'            },
+  { id: 'smart-assessments',    label: 'Smart assessments',    icon: '__sparkle__'                 },
+  { id: 'similar-demands',      label: 'Similar Demands',      icon: 'magnifying-glass-outline'    },
 ];
 
 var RESOURCE_PEOPLE = [
@@ -689,65 +726,168 @@ function DemandsListPage(props) {
 // ─── Overview Tab ──────────────────────────────────────────────────────────────
 function OverviewTab(props) {
   var demand = props.demand;
-  return React.createElement('div', { className: 'snp-ov-scroll' },
-    React.createElement('div', { className: 'snp-ov-title-area' },
-      React.createElement('h1', { className: 'snp-ov-title' }, demand.name)
-    ),
-    React.createElement('div', { className: 'snp-ov-body' },
-      React.createElement('div', { className: 'snp-ai-card' },
-        React.createElement('div', { className: 'snp-ai-hdr' },
-          React.createElement('div', { className: 'snp-ai-hdr-left' },
-            React.createElement('span', { className: 'snp-ai-sparkle' }, '✦'),
-            React.createElement('span', { className: 'snp-ai-lbl' }, 'Summary by Now Assist'),
-            React.createElement('now-icon', { icon: 'circle-info-outline', size: 'sm', style: { color: '#9ca3af' } })
-          ),
-          React.createElement('div', { className: 'snp-ai-hdr-right' },
-            iconBtn('arrow-clockwise-outline', 'Refresh', 'sm'),
-            iconBtn('chevron-up-outline', 'Collapse', 'sm')
-          )
+
+  function aiCardHdr(title) {
+    return React.createElement('div', { className: 'snp-ai-hdr' },
+      React.createElement('div', { className: 'snp-ai-hdr-left' },
+        React.createElement('span', { className: 'snp-ai-sparkle' }, '✶'),
+        React.createElement('span', { className: 'snp-ai-lbl' }, title),
+        React.createElement('now-icon', { icon: 'circle-info-outline', size: 'sm', style: { color: '#9ca3af' } })
+      ),
+      React.createElement('div', { className: 'snp-ai-hdr-right' },
+        iconBtn('arrow-clockwise-outline', 'Refresh', 'sm'),
+        iconBtn('chevron-up-outline', 'Collapse', 'sm')
+      )
+    );
+  }
+
+  function aiCardFtr() {
+    return React.createElement('div', { className: 'snp-ai-ftr' },
+      React.createElement('span', null, 'Check AI-generated summaries for accuracy'),
+      React.createElement('div', { className: 'snp-ai-thumbs' },
+        React.createElement('button', { className: 'snp-thumb' },
+          React.createElement('now-icon', { icon: 'thumbs-up-outline', size: 'sm' })
         ),
-        React.createElement('div', { className: 'snp-ai-body' },
-          React.createElement('p', { className: 'snp-ai-sec-title' }, 'Business requirement'),
-          React.createElement('p', { className: 'snp-ai-sec-text' },
-            'The Automated Data Retention & Deletion System demand aims to implement a compliant, automated solution to enforce data retention schedules and secure deletion of data past its regulatory or operational lifetime across IT systems. Automation will reduce manual errors, ensure audit-readiness, optimize storage costs, and help avoid regulatory fines, supporting the organization\'s data privacy and governance objectives.'
-          ),
-          React.createElement('p', { className: 'snp-ai-sec-title' }, 'Key risks of performing'),
-          React.createElement('ul', { className: 'snp-ai-sec-list' },
-            React.createElement('li', null, 'Accidental data deletion'),
-            React.createElement('li', null, 'Misconfiguration of automation policies')
-          ),
-          React.createElement('p', { className: 'snp-ai-sec-title' }, 'Key risks of not performing'),
-          React.createElement('ul', { className: 'snp-ai-sec-list' },
-            React.createElement('li', null, 'Regulatory fines and compliance violations'),
-            React.createElement('li', null, 'Higher data storage/maintenance costs')
-          ),
-          React.createElement('p', { className: 'snp-ai-sec-title' }, 'Cost'),
-          React.createElement('ul', { className: 'snp-ai-sec-list' },
-            React.createElement('li', null, '$170,000 implementation'),
-            React.createElement('li', null, '$35,000 annual maintenance')
-          ),
-          React.createElement('p', { className: 'snp-ai-sec-title' }, 'Monetary Benefit'),
-          React.createElement('ul', { className: 'snp-ai-sec-list' },
-            React.createElement('li', null, '$280,000 annual savings'),
-            React.createElement('li', null, '$1.4–$12.9 million annual cost avoidance (errors, fines, storage)')
-          ),
-          React.createElement('p', { className: 'snp-ai-sec-title' }, 'ROI'),
-          React.createElement('ul', { className: 'snp-ai-sec-list' },
-            React.createElement('li', null, '65% first year')
-          )
-        ),
-        React.createElement('div', { className: 'snp-ai-ftr' },
-          React.createElement('span', null, 'Check AI-generated summaries for accuracy'),
-          React.createElement('div', { className: 'snp-ai-thumbs' },
-            React.createElement('button', { className: 'snp-thumb' },
-              React.createElement('now-icon', { icon: 'thumbs-up-outline', size: 'sm' })
-            ),
-            React.createElement('button', { className: 'snp-thumb' },
-              React.createElement('now-icon', { icon: 'thumbs-down-outline', size: 'sm' })
-            )
-          )
+        React.createElement('button', { className: 'snp-thumb' },
+          React.createElement('now-icon', { icon: 'thumbs-down-outline', size: 'sm' })
         )
       )
+    );
+  }
+
+  // ── Summary body ───────────────────────────────────────────────────────────
+  var summaryBody = React.createElement('div', { className: 'snp-ai-body' },
+    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Business requirement'),
+    React.createElement('p', { className: 'snp-ai-sec-text' },
+      'The Automated Data Retention & Deletion System demand aims to implement a compliant, automated solution to enforce data retention schedules and secure deletion of data past its regulatory or operational lifetime across IT systems. Automation will reduce manual errors, ensure audit-readiness, optimize storage costs, and help avoid regulatory fines, supporting the organization\'s data privacy and governance objectives.'
+    ),
+    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Key risks of performing'),
+    React.createElement('ul', { className: 'snp-ai-sec-list' },
+      React.createElement('li', null, 'Accidental data deletion'),
+      React.createElement('li', null, 'Misconfiguration of automation policies')
+    ),
+    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Key risks of not performing'),
+    React.createElement('ul', { className: 'snp-ai-sec-list' },
+      React.createElement('li', null, 'Regulatory fines and compliance violations'),
+      React.createElement('li', null, 'Higher data storage/maintenance costs')
+    ),
+    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Cost'),
+    React.createElement('ul', { className: 'snp-ai-sec-list' },
+      React.createElement('li', null, '$170,000 implementation'),
+      React.createElement('li', null, '$35,000 annual maintenance')
+    ),
+    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Monetary Benefit'),
+    React.createElement('ul', { className: 'snp-ai-sec-list' },
+      React.createElement('li', null, '$280,000 annual savings'),
+      React.createElement('li', null, '$1.4–12.9 million annual cost avoidance (errors, fines, storage)')
+    ),
+    React.createElement('p', { className: 'snp-ai-sec-title' }, 'ROI'),
+    React.createElement('ul', { className: 'snp-ai-sec-list' },
+      React.createElement('li', null, '65% first year')
+    )
+  );
+
+  // ── Assessment body ────────────────────────────────────────────────────────
+  var TEAMS = [
+    {
+      name: 'Legal Team Assessment',
+      pass: [
+        'Compliant with major laws and keeps audit logs.',
+        'Clear policies exist but some legal hold procedures need tightening.',
+      ],
+      fail: [
+        'Retention schedules lack clear ownership and accountability, risking outdated or inconsistent enforcement.',
+      ],
+    },
+    {
+      name: 'Database/IT Team Assessment',
+      pass: [
+        'Monitoring dashboards exist but need tuning for alert accuracy.',
+        'Automation targets manual errors and supports multiple data types well.',
+      ],
+      fail: [
+        'Comprehensive data mapping is incomplete—more work needed.',
+        'Backup policies have gaps, risking non-compliance and potential data loss during retention periods.',
+      ],
+    },
+    {
+      name: 'Business Team Assessment',
+      pass: [
+        'Audit support is well designed and documented.',
+        'Reduces storage costs by automatically deleting data past retention, optimizing infrastructure spending.',
+        'Supports audit and reporting requirements with detailed logs and compliance documentation',
+      ],
+      fail: [
+        'Initial investment and ongoing maintenance costs can be high; requires business case justification.',
+        'Change management impact on business processes needs evaluation and staff training for smooth adoption.',
+        'Requires coordination with multiple departments, which may impact timelines due to varying priorities.',
+      ],
+    },
+  ];
+
+  var assessmentChildren = [
+    React.createElement('p', { key: 'intro', className: 'snp-ai-sec-text', style: { marginTop: '4px' } },
+      'This assessment of the demand titled “' + demand.name + '” has been conducted according to the guidelines outlined in the knowledge base (KB) article. The evaluation considers feedback from key stakeholder groups including Legal, Database/IT, and Finance/Business teams.'
+    ),
+    React.createElement('div', { key: 'score', className: 'snp-score-box' },
+      React.createElement('p', { className: 'snp-score-title' }, 'Assessment Score'),
+      React.createElement('p', { className: 'snp-score-val' },
+        'Score: ', React.createElement('strong', null, '7 out of 10'),
+        ' (Good – Mostly compliant with minor gaps or challenges; manageable with mitigation)'
+      )
+    ),
+  ];
+
+  TEAMS.forEach(function(t) {
+    assessmentChildren.push(
+      React.createElement('div', { key: t.name, className: 'snp-team' },
+        React.createElement('p', { className: 'snp-team-hdr' }, t.name),
+        React.createElement('div', { className: 'snp-pf-row' },
+          React.createElement('span', { style: { color: '#16a34a', display: 'inline-flex', alignItems: 'center', flexShrink: 0 } },
+            React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' })
+          ),
+          React.createElement('span', { className: 'snp-pf-pass' }, 'Pass')
+        ),
+        React.createElement('ul', { className: 'snp-pf-list' },
+          t.pass.map(function(p, i) { return React.createElement('li', { key: i }, p); })
+        ),
+        React.createElement('div', { className: 'snp-pf-row' },
+          React.createElement('span', { style: { color: '#dc2626', display: 'inline-flex', alignItems: 'center', flexShrink: 0 } },
+            React.createElement('now-icon', { icon: 'circle-close-fill', size: 'sm' })
+          ),
+          React.createElement('span', { className: 'snp-pf-fail' }, 'Fail')
+        ),
+        React.createElement('ul', { className: 'snp-pf-list' },
+          t.fail.map(function(f, i) { return React.createElement('li', { key: i }, f); })
+        )
+      )
+    );
+  });
+
+  var assessmentBody = React.createElement('div', { className: 'snp-ai-body' }, assessmentChildren);
+
+  return React.createElement('div', { className: 'snp-ov-layout' },
+    React.createElement('div', { className: 'snp-ov-scroll' },
+      React.createElement('div', { className: 'snp-ov-title-area' },
+        React.createElement('h1', { className: 'snp-ov-title' }, demand.name)
+      ),
+      React.createElement('div', { className: 'snp-ov-body' },
+        React.createElement('div', { className: 'snp-ai-card' },
+          aiCardHdr('Summary by Now Assist'),
+          summaryBody,
+          aiCardFtr()
+        ),
+        React.createElement('div', { className: 'snp-ai-card', style: { marginTop: '16px' } },
+          aiCardHdr('Assessment by Now Assist'),
+          assessmentBody,
+          aiCardFtr()
+        )
+      )
+    ),
+    React.createElement('div', { className: 'snp-ov-right-panel' },
+      iconBtn('plus-outline', 'Add', 'sm'),
+      iconBtn('paperclip-outline', 'Attach', 'sm'),
+      iconBtn('clipboard-outline', 'Notes', 'sm')
     )
   );
 }
@@ -1170,7 +1310,9 @@ function DemandDetailPage(props) {
               className: 'snp-nav-item' + (tab === item.id ? ' is-active' : ''),
               onClick: function() { setTab(item.id); },
             },
-              React.createElement('now-icon', { icon: item.icon, size: 'sm' }),
+              item.icon === '__sparkle__'
+                ? React.createElement('span', { className: 'snp-nav-sparkle-icon' }, '✦')
+                : React.createElement('now-icon', { icon: item.icon, size: 'sm' }),
               item.label
             );
           })
@@ -1264,13 +1406,13 @@ injectStyles();
 injectWorkspaceAppShellStyles();
 
 var BASE_MODULES = [
-  { id: 'home',    label: 'Home',    icon: 'home-outline',     group: 'top' },
-  { id: 'inbox',   label: 'Inbox',   icon: 'inbox-outline',    group: 'top' },
-  { id: 'demands', label: 'Demands', icon: 'inbox-fill',       group: 'top' },
-  { id: 'docs',    label: 'Docs',    icon: 'document-outline', group: 'top' },
-  { id: 'users',   label: 'Users',   icon: 'user-outline',     group: 'top' },
-  { id: 'list',    label: 'List',    icon: 'list-fill',        group: 'top' },
-  { id: 'teams',   label: 'Teams',   icon: 'user-outline',     group: 'bottom' },
+  { id: 'home',    label: 'Home',    icon: 'grid-four-outline',  group: 'top' },
+  { id: 'inbox',   label: 'Inbox',   icon: 'lightbulb-outline',  group: 'top' },
+  { id: 'demands', label: 'Demands', icon: 'filter-fill',        group: 'top' },
+  { id: 'docs',    label: 'Docs',    icon: 'clipboard-outline',  group: 'top' },
+  { id: 'users',   label: 'Users',   icon: 'user-group-outline', group: 'top' },
+  { id: 'list',    label: 'List',    icon: 'list-fill',          group: 'top' },
+  { id: 'teams',   label: 'Teams',   icon: 'user-group-outline', group: 'bottom' },
 ];
 
 // ─── App — manages hub ↔ prototype routing ────────────────────────────────────
