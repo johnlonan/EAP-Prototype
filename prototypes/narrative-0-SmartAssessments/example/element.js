@@ -90,48 +90,52 @@ var injectStyles = function() {
 
     /* Sidebar */
     .snp-sidebar {
-      width: 232px; flex-shrink: 0;
-      border-right: 1px solid #e0e5e8;
+      width: 256px; flex-shrink: 0;
+      border-right: 1px solid #d6d3d1;
       display: flex; flex-direction: column;
       background: #fff; overflow-y: auto;
+      position: relative;
     }
-    .snp-sidebar-top {
-      padding: 14px 16px 12px;
-      border-bottom: 1px solid #eaecef;
+    .snp-sidebar-top { padding: 16px 0 4px; }
+    .snp-sidebar-demand-label {
+      font-size: 12px; color: #6b7280; padding-left: 12px; margin-bottom: 3px;
     }
-    .snp-sidebar-top-label {
-      font-size: 10px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.7px; color: #9ca3af; margin-bottom: 5px;
-    }
-    .snp-sidebar-top-title {
-      font-size: 13px; font-weight: 600; color: #111827;
-      line-height: 1.4; margin-bottom: 7px;
-      display: -webkit-box; -webkit-line-clamp: 2;
+    .snp-sidebar-demand-title {
+      font-size: 16px; font-weight: 700; color: #10171a; line-height: 1.3;
+      font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', Lato, sans-serif);
+      padding-left: 12px; margin-bottom: 8px;
+      display: -webkit-box; -webkit-line-clamp: 1;
       -webkit-box-orient: vertical; overflow: hidden;
     }
-    .snp-sidebar-top-meta {
-      font-size: 12px; color: #6b7280;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .snp-sidebar-top-meta-sep { color: #d1d5db; }
-    .snp-sidebar-nav { padding: 4px 0; }
+    .snp-sidebar-meta-row { display: flex; align-items: center; }
+    .snp-sidebar-meta-item { display: flex; align-items: center; gap: 6px; padding: 0 12px; }
+    .snp-sidebar-meta-lbl { font-size: 12px; color: #6b7280; }
+    .snp-sidebar-meta-val { font-size: 12px; color: #10171a; }
+    .snp-sidebar-meta-sep { font-size: 12px; color: #d1d5db; }
+    .snp-sidebar-nav { padding: 12px 0; }
     .snp-nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 18px; font-size: 14px; color: #293e40;
-      cursor: pointer; user-select: none;
-      border-left: 3px solid transparent;
+      display: flex; align-items: stretch;
+      cursor: pointer; user-select: none; min-height: 32px;
     }
-    .snp-nav-item:hover { background: #f0f5f7; }
-    .snp-nav-item.is-active {
-      background: #e5f2f7; border-left-color: #0f7aab;
-      color: #0d3248; font-weight: 500;
+    .snp-nav-item-bar { width: 4px; flex-shrink: 0; background: transparent; }
+    .snp-nav-item.is-active .snp-nav-item-bar { background: #5CAEC4; }
+    .snp-nav-item-content {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; font-size: 16px; color: #10171a;
     }
+    .snp-nav-item.is-active .snp-nav-item-content { background: #eef7fa; padding-left: 4px; }
+    .snp-nav-item:hover:not(.is-active) .snp-nav-item-content { background: #f5f4f2; }
+    .snp-nav-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; flex-shrink: 0; color: #10171a;
+    }
+    .snp-nav-icon svg { display: block; }
     .snp-sidebar-collapse {
+      position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+      width: 20px; height: 20px; background: #f5f5f4;
+      border: 1px solid #9ca3af; border-radius: 4px;
       display: flex; align-items: center; justify-content: center;
-      position: absolute; left: 218px; top: 50%; transform: translateY(-50%);
-      width: 20px; height: 48px; background: #fff;
-      border: 1px solid #e0e5e8; border-left: none;
-      border-radius: 0 4px 4px 0; cursor: pointer; z-index: 10; color: #6b7280;
+      cursor: pointer; z-index: 10;
     }
 
     /* Main content — overview scrolls itself; resource tab manages its own height */
@@ -524,12 +528,12 @@ var DEMANDS = [
 ];
 
 var STATE_CFG = {
-  'Draft':        { color: 'critical', variant: 'secondary' },
+  'Draft':        { color: 'gray',     variant: 'secondary' },
   'Submitted':    { color: 'info',     variant: 'secondary' },
   'Screening':    { color: 'purple',   variant: 'secondary' },
   'Qualified':    { color: 'teal',     variant: 'secondary' },
   'Approved':     { color: 'positive', variant: 'primary'   },
-  'Complete':     { color: 'warning',  variant: 'secondary' },
+  'Complete':     { color: 'gray',     variant: 'secondary' },
   'AI Qualified': { color: 'positive', variant: 'primary'   },
 };
 
@@ -592,7 +596,7 @@ function stateCell(s) {
     value: s,
     highlightedValue: {
       value: s === 'AI Qualified' ? '✦ ' + s : s,
-      color: c.color, variant: c.variant, size: 'md',
+      color: c.color, variant: c.variant, size: 'sm',
       showIcon: s !== 'AI Qualified', iconName: 'circle-fill',
     },
   };
@@ -648,14 +652,9 @@ function DemandsListPage(props) {
   return React.createElement('div', { className: 'snp-list-page' },
 
     React.createElement('div', { className: 'snp-bc' },
-      React.createElement('span', { className: 'snp-to-hub', onClick: onToHub },
-        '‹ Hub'
-      ),
-      React.createElement('span', { className: 'snp-bc-sep', style: { marginRight: '4px' } }, '|'),
       React.createElement('now-icon', { icon: 'home-outline', size: 'sm' }),
       React.createElement('span', { className: 'snp-bc-sep' }, '›'),
-      React.createElement('span', { style: { fontWeight: 500 } }, 'Demands'),
-      React.createElement('span', { className: 'snp-variant-badge' }, 'Option ' + variant)
+      React.createElement('span', { style: { fontWeight: 500 } }, 'Demands')
     ),
 
     React.createElement('div', { className: 'snp-list-hdr' },
@@ -1261,6 +1260,66 @@ function ResourceAssignmentsTab(props) {
   );
 }
 
+// ─── Nav SVGs (exact paths from design) ────────────────────────────────────────
+var _S = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none">';
+var _E = '</svg>';
+var NAV_SVG = {
+  'overview': _S +
+    '<path d="M3.00012 2.50001C3.00012 2.29778 2.87829 2.11547 2.69146 2.03807C2.50462 1.96068 2.28956 2.00346 2.14656 2.14646L1.32135 2.97167C1.12609 3.16694 1.12609 3.48352 1.32135 3.67878C1.50743 3.86486 1.80367 3.87361 2.00012 3.70505V4.50001C2.00012 4.77616 2.22397 5.00001 2.50012 5.00001C2.77626 5.00001 3.00012 4.77616 3.00012 4.50001V2.50001Z" fill="currentColor"/>' +
+    '<path d="M4.50012 3C4.22398 3 4.00012 3.22386 4.00012 3.5C4.00012 3.77614 4.22398 4 4.50012 4H13.5001C13.7763 4 14.0001 3.77614 14.0001 3.5C14.0001 3.22386 13.7763 3 13.5001 3H4.50012Z" fill="currentColor"/>' +
+    '<path d="M4.50012 7C4.22398 7 4.00012 7.22386 4.00012 7.5C4.00012 7.77614 4.22398 8 4.50012 8H13.5001C13.7763 8 14.0001 7.77614 14.0001 7.5C14.0001 7.22386 13.7763 7 13.5001 7H4.50012Z" fill="currentColor"/>' +
+    '<path d="M4.00012 11.5C4.00012 11.2239 4.22398 11 4.50012 11H13.5001C13.7763 11 14.0001 11.2239 14.0001 11.5C14.0001 11.7761 13.7763 12 13.5001 12H4.50012C4.22398 12 4.00012 11.7761 4.00012 11.5Z" fill="currentColor"/>' +
+    '<path d="M1.99252 7.0237C1.98708 7.03693 1.98107 7.05297 1.97466 7.07228C1.88765 7.33436 1.60465 7.47627 1.34258 7.38925C1.0805 7.30223 0.938592 7.01924 1.02561 6.75717C1.0929 6.55452 1.19818 6.34771 1.38665 6.19826C1.58464 6.04124 1.80716 6 2.00013 6C2.54629 6 3.00012 6.46662 3.00012 7.08076C3.00012 7.22674 2.95378 7.35688 2.9166 7.4435C2.87563 7.53892 2.82247 7.63364 2.76796 7.72092C2.70939 7.81472 2.64218 7.91109 2.57234 8.00518C2.81425 8.04019 3.0001 8.24839 3.0001 8.5C3.0001 8.77614 2.77624 9 2.5001 9H1.50011C1.30033 9 1.11971 8.88107 1.04079 8.69753C0.961866 8.51402 0.999754 8.30114 1.13714 8.15612C1.30114 7.98029 1.4601 7.79959 1.61125 7.61257C1.73087 7.46458 1.84155 7.31648 1.91978 7.19122C1.95902 7.12839 1.98399 7.08095 1.99771 7.04899C1.99626 7.03878 1.99452 7.03 1.99252 7.0237Z" fill="currentColor"/>' +
+    '<path d="M1.98672 10C1.57437 10 1.25185 10.2443 1.06118 10.5939C0.928946 10.8363 1.01827 11.14 1.2607 11.2723C1.37459 11.3344 1.502 11.3476 1.61881 11.319C1.59643 11.3765 1.58457 11.4384 1.58476 11.5019C1.58495 11.5641 1.59667 11.6246 1.61846 11.6809C1.50174 11.6524 1.37447 11.6657 1.2607 11.7277C1.01827 11.86 0.928946 12.1637 1.06118 12.4061L1.09705 12.4719C1.27464 12.7974 1.61587 13 1.98672 13C2.54784 13 3.00013 12.5319 3.00013 11.9754C3.00013 11.804 2.95033 11.6394 2.86058 11.4995C2.95382 11.3542 3.00013 11.1856 3.00013 11.0134C3.00013 10.4537 2.54641 10 1.98672 10Z" fill="currentColor"/>' +
+    _E,
+  'playbook': _S +
+    '<path d="M11.8536 1.14645C11.6583 0.951184 11.3417 0.951184 11.1464 1.14645C10.9512 1.34171 10.9512 1.65829 11.1464 1.85355L12.2929 3H9.5C8.11929 3 7 4.11929 7 5.5V7.5C7 7.77614 7.22386 8 7.5 8C7.77614 8 8 7.77614 8 7.5V5.5C8 4.67157 8.67157 4 9.5 4H12.2929L11.1464 5.14645C10.9512 5.34171 10.9512 5.65829 11.1464 5.85355C11.3417 6.04882 11.6583 6.04882 11.8536 5.85355L13.8536 3.85355C14.0488 3.65829 14.0488 3.34171 13.8536 3.14645L11.8536 1.14645Z" fill="currentColor"/>' +
+    '<path d="M11.1464 8.14645C11.3417 7.95118 11.6583 7.95118 11.8536 8.14645L13 9.29289L14.1464 8.14645C14.3417 7.95118 14.6583 7.95118 14.8536 8.14645C15.0488 8.34171 15.0488 8.65829 14.8536 8.85355L13.7071 10L14.8536 11.1464C15.0488 11.3417 15.0488 11.6583 14.8536 11.8536C14.6583 12.0488 14.3417 12.0488 14.1464 11.8536L13 10.7071L11.8536 11.8536C11.6583 12.0488 11.3417 12.0488 11.1464 11.8536C10.9512 11.6583 10.9512 11.3417 11.1464 11.1464L12.2929 10L11.1464 8.85355C10.9512 8.65829 10.9512 8.34171 11.1464 8.14645Z" fill="currentColor"/>' +
+    '<path d="M1.85355 4.14645C1.65829 3.95118 1.34171 3.95118 1.14645 4.14645C0.951184 4.34171 0.951184 4.65829 1.14645 4.85355L2.29289 6L1.14645 7.14645C0.951185 7.34171 0.951185 7.65829 1.14645 7.85355C1.34171 8.04882 1.65829 8.04882 1.85355 7.85355L3 6.70711L4.14645 7.85355C4.34171 8.04882 4.65829 8.04882 4.85355 7.85355C5.04882 7.65829 5.04882 7.34171 4.85355 7.14645L3.70711 6L4.85355 4.85355C5.04882 4.65829 5.04882 4.34171 4.85355 4.14645C4.65829 3.95118 4.34171 3.95118 4.14645 4.14645L3 5.29289L1.85355 4.14645Z" fill="currentColor"/>' +
+    '<path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 10C6.11929 10 5 11.1193 5 12.5C5 13.8807 6.11929 15 7.5 15C8.88071 15 10 13.8807 10 12.5C10 11.1193 8.88071 10 7.5 10ZM6 12.5C6 11.6716 6.67157 11 7.5 11C8.32843 11 9 11.6716 9 12.5C9 13.3284 8.32843 14 7.5 14C6.67157 14 6 13.3284 6 12.5Z" fill="currentColor"/>' +
+    _E,
+  'details': _S +
+    '<path fill-rule="evenodd" clip-rule="evenodd" d="M9.00051 2.49946C9.00055 1.67109 9.67157 1 10.5 1C11.1389 1 11.7534 1.36648 11.9415 2H12.5C13.3284 2 14 2.67157 14 3.5V12.5C14 13.3284 13.3284 14 12.5 14H2.5C1.67157 14 1 13.3284 1 12.5V3.5C1 2.67157 1.67157 2 2.5 2H7.5C7.77614 2 8 2.22386 8 2.5C8 2.77614 7.77614 3 7.5 3H2.5C2.22386 3 2 3.22386 2 3.5V12.5C2 12.7761 2.22386 13 2.5 13H12.5C12.7761 13 13 12.7761 13 12.5V3.5C13 3.22386 12.7761 3 12.5 3H11.9999V9.49995C11.9999 9.57762 11.9819 9.65422 11.9471 9.72368L10.9466 11.7232C10.8619 11.8925 10.6887 11.9995 10.4994 11.9995C10.31 11.9994 10.1369 11.8924 10.0522 11.7231L9.05224 9.72306C9.01752 9.65361 8.99945 9.57703 8.99946 9.49938L9.00051 2.49946ZM10.5 2C10.2239 2 10.0005 2.22336 10.0005 2.49953L9.99948 9.38146L10.4996 10.3818L10.9999 9.38183V2.41457C10.9999 2.19556 10.837 2 10.5 2ZM3 5.5C3 5.22386 3.22386 5 3.5 5H7.5C7.77614 5 8 5.22386 8 5.5C8 5.77614 7.77614 6 7.5 6H3.5C3.22386 6 3 5.77614 3 5.5ZM3 7.5C3 7.22386 3.22386 7 3.5 7H7.5C7.77614 7 8 7.22386 8 7.5C8 7.77614 7.77614 8 7.5 8H3.5C3.22386 8 3 7.77614 3 7.5ZM3 9.5C3 9.22386 3.22386 9 3.5 9H7.5C7.77614 9 8 9.22386 8 9.5C8 9.77614 7.77614 10 7.5 10H3.5C3.22386 10 3 9.77614 3 9.5Z" fill="currentColor"/>' +
+    _E,
+  'financials': _S +
+    '<path d="M1 2H3V1H1V2Z" fill="currentColor"/>' +
+    '<path fill-rule="evenodd" clip-rule="evenodd" d="M10.9659 3.31823C10.8921 3.12912 10.7113 3.0034 10.5083 3.00007C10.3053 2.99674 10.1205 3.11646 10.0405 3.30304L8.45612 7H6.86048L5.97444 4.34189C5.9088 4.14495 5.72829 4.00906 5.52088 4.00043C5.31347 3.99181 5.1223 4.11224 5.04053 4.30304L3.88469 7H1V8H3.45612L2.04053 11.303L2.95967 11.697L4.54408 8H6.13972L7.02576 10.6581C7.0914 10.8551 7.27191 10.9909 7.47932 10.9996C7.68673 11.0082 7.8779 10.8878 7.95967 10.697L9.11551 8H11.7195L12.0343 8.80677L12.9659 8.44323L12.7929 8H15V7H12.4027L10.9659 3.31823ZM11.3292 7L10.4784 4.81984L9.54408 7H11.3292ZM8.02754 8H7.19381L7.55857 9.09427L8.02754 8ZM5.80639 7L5.44163 5.90573L4.97266 7H5.80639Z" fill="currentColor"/>' +
+    '<path d="M7 2H5V1H7V2Z" fill="currentColor"/>' +
+    '<path d="M9 2H11V1H9V2Z" fill="currentColor"/>' +
+    '<path d="M15 2H13V1H15V2Z" fill="currentColor"/>' +
+    '<path d="M1 15H3V14H1V15Z" fill="currentColor"/>' +
+    '<path d="M7 15H5V14H7V15Z" fill="currentColor"/>' +
+    '<path d="M9 15H11V14H9V15Z" fill="currentColor"/>' +
+    '<path d="M15 15H13V14H15V15Z" fill="currentColor"/>' +
+    _E,
+  'resource-assignments': _S +
+    '<path d="M9.32402 7.121C10.0303 6.6792 10.5 5.89446 10.5 5C10.5 3.61929 9.38071 2.5 8 2.5C6.61929 2.5 5.5 3.61929 5.5 5C5.5 5.89446 5.96974 6.6792 6.67598 7.121C5.93378 7.27111 5.34817 7.55904 4.9113 7.97454C4.84146 8.04096 4.77632 8.10979 4.71564 8.18079C4.52671 7.86353 4.25408 7.59731 3.92982 7.39843C4.28257 7.03782 4.5 6.5443 4.5 6C4.5 4.89543 3.60457 4 2.5 4C1.39543 4 0.5 4.89543 0.5 6C0.5 6.5443 0.717432 7.03782 1.07018 7.39843C0.436489 7.78709 0 8.43296 0 9.21429V10C0 10.5523 0.447715 11 1 11H4V11.5C4 12.3284 4.67157 13 5.5 13H10.5C11.3284 13 12 12.3284 12 11.5V11H15C15.5523 11 16 10.5523 16 10V9.21429C16 8.43296 15.5635 7.78708 14.9298 7.39843C15.2826 7.03781 15.5 6.5443 15.5 6C15.5 4.89543 14.6046 4 13.5 4C12.3954 4 11.5 4.89543 11.5 6C11.5 6.5443 11.7174 7.03781 12.0702 7.39843C11.7459 7.5973 11.4733 7.86353 11.2844 8.1808C11.2237 8.1098 11.1585 8.04096 11.0887 7.97454C10.6518 7.55904 10.0662 7.27111 9.32402 7.121ZM8 6.5C7.17157 6.5 6.5 5.82843 6.5 5C6.5 4.17157 7.17157 3.5 8 3.5C8.82843 3.5 9.5 4.17157 9.5 5C9.5 5.82843 8.82843 6.5 8 6.5ZM3.5 6C3.5 6.55228 3.05228 7 2.5 7C1.94772 7 1.5 6.55228 1.5 6C1.5 5.44772 1.94772 5 2.5 5C3.05228 5 3.5 5.44772 3.5 6ZM12 9.21429C12 8.61319 12.5965 8 13.5 8C14.4035 8 15 8.61319 15 9.21429V10H12V9.21429ZM13.5 7C12.9477 7 12.5 6.55228 12.5 6C12.5 5.44772 12.9477 5 13.5 5C14.0523 5 14.5 5.44772 14.5 6C14.5 6.55228 14.0523 7 13.5 7ZM2.5 8C3.40351 8 4 8.61319 4 9.21429V10H1V9.21429C1 8.61319 1.59649 8 2.5 8ZM5 10.3571C5 9.65446 5.18762 9.0918 5.60047 8.69914C6.0176 8.30241 6.74747 8 8 8C9.25253 8 9.9824 8.30241 10.3995 8.69914C10.8124 9.0918 11 9.65446 11 10.3571V11.5C11 11.7761 10.7761 12 10.5 12H5.5C5.22386 12 5 11.7761 5 11.5V10.3571Z" fill="currentColor"/>' +
+    _E,
+  'demand-tasks': _S +
+    '<path d="M4.85355 3.14645C5.04882 3.34171 5.04882 3.65829 4.85355 3.85355L2.85355 5.85355C2.65829 6.04882 2.34171 6.04882 2.14645 5.85355L1.14645 4.85355C0.951184 4.65829 0.951184 4.34171 1.14645 4.14645C1.34171 3.95118 1.65829 3.95118 1.85355 4.14645L2.5 4.79289L4.14645 3.14645C4.34171 2.95118 4.65829 2.95118 4.85355 3.14645Z" fill="currentColor"/>' +
+    '<path d="M5 5.5C5 5.22386 5.22386 5 5.5 5H13.5C13.7761 5 14 5.22386 14 5.5C14 5.77614 13.7761 6 13.5 6H5.5C5.22386 6 5 5.77614 5 5.5Z" fill="currentColor"/>' +
+    '<path d="M4.5 8H13.5C13.7761 8 14 8.22386 14 8.5C14 8.77614 13.7761 9 13.5 9H4.5C4.22386 9 4 8.77614 4 8.5C4 8.22386 4.22386 8 4.5 8Z" fill="currentColor"/>' +
+    '<path d="M4.5 11H13.5C13.7761 11 14 11.2239 14 11.5C14 11.7761 13.7761 12 13.5 12H4.5C4.22386 12 4 11.7761 4 11.5C4 11.2239 4.22386 11 4.5 11Z" fill="currentColor"/>' +
+    '<path d="M3 8.5C3 8.77614 2.77614 9 2.5 9C2.22386 9 2 8.77614 2 8.5C2 8.22386 2.22386 8 2.5 8C2.77614 8 3 8.22386 3 8.5Z" fill="currentColor"/>' +
+    '<path d="M2.5 12C2.77614 12 3 11.7761 3 11.5C3 11.2239 2.77614 11 2.5 11C2.22386 11 2 11.2239 2 11.5C2 11.7761 2.22386 12 2.5 12Z" fill="currentColor"/>' +
+    _E,
+  'docs': _S +
+    '<path d="M5 8.5C5 8.22386 5.22386 8 5.5 8H10.5C10.7761 8 11 8.22386 11 8.5C11 8.77614 10.7761 9 10.5 9H5.5C5.22386 9 5 8.77614 5 8.5Z" fill="currentColor"/>' +
+    '<path d="M5.5 10C5.22386 10 5 10.2239 5 10.5C5 10.7761 5.22386 11 5.5 11H10.5C10.7761 11 11 10.7761 11 10.5C11 10.2239 10.7761 10 10.5 10H5.5Z" fill="currentColor"/>' +
+    '<path d="M3.5 1C2.67157 1 2 1.67157 2 2.5V13.5C2 14.3284 2.67157 15 3.5 15H12.5C13.3284 15 14 14.3284 14 13.5V5.70095C14 5.28767 13.8295 4.89269 13.5287 4.60926L10.1318 1.40832C9.85346 1.14606 9.48549 1 9.10308 1H3.5ZM3 2.5C3 2.22386 3.22386 2 3.5 2H9V4.5C9 5.32843 9.67157 6 10.5 6H13V13.5C13 13.7761 12.7761 14 12.5 14H3.5C3.22386 14 3 13.7761 3 13.5V2.5ZM12.4852 5H10.5C10.2239 5 10 4.77614 10 4.5V2.65817L12.4852 5Z" fill="currentColor"/>' +
+    _E,
+  'smart-assessments': _S +
+    '<path d="M3.08535 3H2.5C2.22386 3 2 3.22386 2 3.5V13.5C2 13.7761 2.22386 14 2.5 14H7.50801C7.69677 14.3531 7.93587 14.6882 8.22153 15H2.5C1.67157 15 1 14.3284 1 13.5V3.5C1 2.67157 1.67157 2 2.5 2H3.08535C3.29127 1.4174 3.84689 1 4.5 1H8.5C9.15311 1 9.70873 1.4174 9.91465 2H10.5C11.3284 2 12 2.67157 12 3.5V6C11.627 6 11.272 6.13864 11 6.38194V3.5C11 3.22386 10.7761 3 10.5 3H9.91465C9.70873 3.5826 9.15311 4 8.5 4H4.5C3.84689 4 3.29127 3.5826 3.08535 3ZM4 2.5C4 2.77614 4.22386 3 4.5 3H8.5C8.77614 3 9 2.77614 9 2.5C9 2.22386 8.77614 2 8.5 2H4.5C4.22386 2 4 2.22386 4 2.5Z" fill="currentColor"/>' +
+    '<path d="M7 10.2058V8.66368L5.62346 10.2796L3.83914 8.63255C3.63623 8.44525 3.3199 8.4579 3.1326 8.66081C2.9453 8.86372 2.95795 9.18005 3.16086 9.36735L5.32753 11.3674C5.42751 11.4596 5.56078 11.5072 5.6966 11.4991C5.83242 11.4909 5.95905 11.4278 6.04729 11.3242L7 10.2058Z" fill="currentColor"/>' +
+    '<path d="M12.4105 7.21453C12.317 7.08013 12.1637 7 12 7C11.8363 7 11.683 7.08013 11.5895 7.21453C11.4955 7.34966 11.1631 7.63354 10.6366 7.77983C10.1336 7.91958 9.47321 7.92668 8.72318 7.55257C8.56818 7.47526 8.38422 7.48367 8.23693 7.5748C8.08964 7.66593 8 7.8268 8 8V12C8 13.6255 9.29756 15.2782 11.8679 15.9822C11.9544 16.0059 12.0456 16.0059 12.1321 15.9822C14.7024 15.2782 16 13.6255 16 12V8C16 7.8268 15.9104 7.66593 15.7631 7.5748C15.6158 7.48367 15.4318 7.47526 15.2768 7.55257C14.5268 7.92668 13.8664 7.91958 13.3634 7.77983C12.8369 7.63354 12.5045 7.34966 12.4105 7.21453ZM9 12V8.72909C9.70742 8.92889 10.3592 8.89476 10.9043 8.74333C11.3395 8.62242 11.7162 8.42352 12 8.20323C12.2838 8.42352 12.6605 8.62242 13.0957 8.74333C13.6408 8.89476 14.2926 8.92889 15 8.72909V12C15 13.0152 14.1876 14.3386 12 14.9803C9.81243 14.3386 9 13.0152 9 12Z" fill="currentColor"/>' +
+    _E,
+  'similar-demands': _S +
+    '<path d="M10.7269 10.0195C11.5219 9.06578 12.0002 7.83875 12.0002 6.5C12.0002 3.46243 9.53781 1 6.50024 1C3.46268 1 1.00024 3.46243 1.00024 6.5C1.00024 7.78743 1.44259 8.97154 2.18358 9.90865C2.22611 9.77925 2.25588 9.64396 2.2714 9.50425L2.30759 9.17856C2.33321 8.94797 2.40899 8.75473 2.51867 8.59886C2.18766 7.97222 2.00024 7.25799 2.00024 6.5C2.00024 4.01472 4.01496 2 6.50024 2C8.98553 2 11.0002 4.01472 11.0002 6.5C11.0002 8.63043 9.51978 10.4151 7.53152 10.8813C7.43756 11.0987 7.28772 11.2619 7.1099 11.3708C7.38703 11.4656 7.59024 11.6452 7.71954 11.8644C8.58034 11.6695 9.36455 11.2728 10.0198 10.7266L14.1467 14.8536C14.342 15.0489 14.6586 15.0489 14.8538 14.8536C15.0491 14.6583 15.0491 14.3417 14.8538 14.1465L10.7269 10.0195Z" fill="currentColor"/>' +
+    '<path d="M6.27752 7.10371C6.12968 7.67968 5.67993 8.12943 5.10396 8.27727L4.5829 8.41102C4.4727 8.43931 4.4727 8.59582 4.5829 8.62411L5.10402 8.75787C5.67995 8.90571 6.12969 9.35542 6.27756 9.93135L6.41127 10.4522C6.43956 10.5624 6.59607 10.5624 6.62436 10.4522L6.75808 9.93135C6.90594 9.35543 7.35568 8.90571 7.93162 8.75787L8.45273 8.62411C8.56293 8.59582 8.56293 8.43931 8.45273 8.41102L7.93167 8.27727C7.35571 8.12943 6.90595 7.67968 6.75811 7.10371L6.62436 6.58265C6.59608 6.47245 6.43956 6.47245 6.41127 6.58265L6.27752 7.10371Z" fill="currentColor"/>' +
+    '<path d="M0.614931 12.265C2.00947 12.1101 3.11034 11.0092 3.26529 9.61468L3.30148 9.28899C3.32783 9.05177 3.67267 9.05177 3.69903 9.28899L3.73522 9.61468C3.89017 11.0092 4.99103 12.1101 6.38557 12.265L6.71126 12.3012C6.94848 12.3276 6.94848 12.6724 6.71126 12.6988L6.38557 12.735C4.99103 12.8899 3.89017 13.9908 3.73522 15.3853L3.69903 15.711C3.67267 15.9482 3.32783 15.9482 3.30148 15.711L3.26529 15.3853C3.11034 13.9908 2.00947 12.8899 0.61493 12.735L0.289241 12.6988C0.0520232 12.6724 0.052024 12.3276 0.289242 12.3012L0.614931 12.265Z" fill="currentColor"/>' +
+    _E,
+};
+
 // ─── Demand Detail Page ────────────────────────────────────────────────────────
 function DemandDetailPage(props) {
   var demand   = props.demand;
@@ -1281,8 +1340,7 @@ function DemandDetailPage(props) {
         'Demands'
       ),
       React.createElement('span', { className: 'snp-bc-sep' }, '>'),
-      React.createElement('span', { style: { color: '#293e40' } }, demand.name),
-      React.createElement('span', { className: 'snp-variant-badge' }, 'Option ' + variant)
+      React.createElement('span', { style: { color: '#293e40' } }, demand.name)
     ),
 
     // Two-column layout
@@ -1291,15 +1349,17 @@ function DemandDetailPage(props) {
       // Left sidebar
       React.createElement('div', { className: 'snp-sidebar' },
         React.createElement('div', { className: 'snp-sidebar-top' },
-          React.createElement('div', { className: 'snp-sidebar-top-label' }, 'Current demand'),
-          React.createElement('div', { className: 'snp-sidebar-top-title' }, demand.name),
-          React.createElement('div', { className: 'snp-sidebar-top-meta' },
-            React.createElement('span', null,
-              'State ', React.createElement('strong', { style: { color: '#111827' } }, demand.state)
+          React.createElement('div', { className: 'snp-sidebar-demand-label' }, 'Current demand'),
+          React.createElement('div', { className: 'snp-sidebar-demand-title' }, demand.name),
+          React.createElement('div', { className: 'snp-sidebar-meta-row' },
+            React.createElement('div', { className: 'snp-sidebar-meta-item' },
+              React.createElement('span', { className: 'snp-sidebar-meta-lbl' }, 'State'),
+              React.createElement('span', { className: 'snp-sidebar-meta-val' }, demand.state)
             ),
-            React.createElement('span', { className: 'snp-sidebar-top-meta-sep' }, '|'),
-            React.createElement('span', null,
-              'Type ', React.createElement('strong', { style: { color: '#111827' } }, 'Project')
+            React.createElement('span', { className: 'snp-sidebar-meta-sep' }, '|'),
+            React.createElement('div', { className: 'snp-sidebar-meta-item' },
+              React.createElement('span', { className: 'snp-sidebar-meta-lbl' }, 'Type'),
+              React.createElement('span', { className: 'snp-sidebar-meta-val' }, 'Project')
             )
           )
         ),
@@ -1310,12 +1370,19 @@ function DemandDetailPage(props) {
               className: 'snp-nav-item' + (tab === item.id ? ' is-active' : ''),
               onClick: function() { setTab(item.id); },
             },
-              item.icon === '__sparkle__'
-                ? React.createElement('span', { className: 'snp-nav-sparkle-icon' }, '✦')
-                : React.createElement('now-icon', { icon: item.icon, size: 'sm' }),
-              item.label
+              React.createElement('div', { className: 'snp-nav-item-bar' }),
+              React.createElement('div', { className: 'snp-nav-item-content' },
+                React.createElement('span', {
+                  className: 'snp-nav-icon',
+                  dangerouslySetInnerHTML: { __html: NAV_SVG[item.id] || '' },
+                }),
+                item.label
+              )
             );
           })
+        ),
+        React.createElement('div', { className: 'snp-sidebar-collapse' },
+          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="11" height="12" viewBox="0 0 11 12" fill="none"><path d="M7.87629 2.17075C8.05813 2.37857 8.03707 2.69445 7.82925 2.8763L4.2593 6.00001L7.82925 9.12372C8.03707 9.30556 8.05813 9.62144 7.87629 9.82926C7.69445 10.0371 7.37857 10.0581 7.17075 9.8763L3.17075 6.3763C3.06224 6.28135 3 6.14419 3 6.00001C3 5.85583 3.06224 5.71866 3.17075 5.62372L7.17075 2.12372C7.37857 1.94188 7.69445 1.96294 7.87629 2.17075Z" fill="#454D5B"/></svg>' } })
         )
       ),
 
