@@ -541,20 +541,19 @@ var injectStyles = function() {
     .snp-sa-title { font-size: 22px; font-weight: 700; color: #10171a; letter-spacing: -0.2px; }
     .snp-sa-subtitle { font-size: 12px; color: #6b7280; }
     .snp-sa-hdr-right { display: flex; align-items: center; gap: 6px; }
-    .snp-sa-filters { display: flex; gap: 8px; padding: 0 24px 10px; flex-shrink: 0; }
-    .snp-sa-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 4px; cursor: pointer;
-      font-size: 13px; color: #374151;
-      border: 1px solid #d1d5db; background: #fff;
-    }
-    .snp-sa-pill-active { background: #111827; color: #fff; border-color: #111827; }
     .snp-sa-body { flex: 1; overflow: auto; border-top: 1px solid #e8ecef; min-height: 0; }
     .snp-sa-footer {
       display: flex; justify-content: space-between; align-items: center;
       padding: 8px 24px; border-top: 1px solid #e8ecef;
       font-size: 13px; color: #4b5563; flex-shrink: 0;
     }
+    .snp-sa-page-btn {
+      width: 28px; height: 28px; border-radius: 4px;
+      border: 1px solid #d1d5db; background: #fff;
+      font-size: 13px; color: #374151; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .snp-sa-page-btn-active { background: #032d42; color: #fff; border-color: #032d42; }
   `;
   document.head.appendChild(el);
 };
@@ -1435,15 +1434,6 @@ function SmartAssessmentsTab() {
       )
     ),
 
-    React.createElement('div', { className: 'snp-sa-filters' },
-      React.createElement('div', { className: 'snp-sa-pill snp-sa-pill-active' },
-        'All ', React.createElement('now-badge', { value: 6 })
-      ),
-      React.createElement('div', { className: 'snp-sa-pill' },
-        'New ', React.createElement('now-badge', { value: 3 })
-      )
-    ),
-
     React.createElement('div', {
       className: 'snp-sa-body',
       ref: function(el) {
@@ -1462,11 +1452,7 @@ function SmartAssessmentsTab() {
 
     React.createElement('div', { className: 'snp-sa-footer' },
       React.createElement('span', null, 'Showing 1–6 of 6'),
-      React.createElement('now-pagination-control', {
-        'current-page': 1,
-        'total-count': 6,
-        'page-size': 15,
-      })
+      React.createElement('button', { className: 'snp-sa-page-btn snp-sa-page-btn-active' }, '1')
     )
   );
 }
