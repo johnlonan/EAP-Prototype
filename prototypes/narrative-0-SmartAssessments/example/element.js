@@ -121,9 +121,9 @@ var injectStyles = function() {
     .snp-nav-item.is-active .snp-nav-item-bar { background: #5CAEC4; }
     .snp-nav-item-content {
       flex: 1; display: flex; align-items: center; gap: 8px;
-      padding: 6px 8px; font-size: 16px; color: #10171a;
+      padding: 6px 8px 6px 20px; font-size: 16px; color: #10171a;
     }
-    .snp-nav-item.is-active .snp-nav-item-content { background: #eef7fa; padding-left: 4px; }
+    .snp-nav-item.is-active .snp-nav-item-content { background: #eef7fa; padding-left: 16px; }
     .snp-nav-item:hover:not(.is-active) .snp-nav-item-content { background: #f5f4f2; }
     .snp-nav-icon {
       display: inline-flex; align-items: center; justify-content: center;
@@ -513,7 +513,7 @@ var injectStyles = function() {
     .snp-score-title { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 4px; }
     .snp-score-val   { font-size: 14px; color: #374151; line-height: 1.5; }
 
-    .snp-team { margin-top: 16px; }
+    .snp-team { margin-top: 16px; padding: 0 12px; }
     .snp-team-hdr {
       font-size: 14px; font-weight: 600; color: #374151;
       text-decoration: underline; margin-bottom: 6px;
