@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+		<title>Demand Management</title>
+		<meta content="width=device-width, initial-scale=1" name="viewport"/>
+	</head>
+	<body>
+		<script type="text/javascript" src="./snComponentLoader.dev.js"></script>
+		<script type="text/javascript">
+			snComponentLoader.load([], {
+				polyfillBaseUrl: 'polyfills/'
+			}).then(function () {
+				if (window.ShadyCSS && window.ShadyCSS.CustomStyleInterface) {
+					var styleElement = document.getElementById('example-css');
+					window.ShadyCSS.CustomStyleInterface.addCustomStyle(styleElement);
+				}
+			});
+		</script>
+		<script type="module">
+			import './main.mjs';
+		</script>
+	</body>
+</html>
