@@ -148,24 +148,55 @@ var injectStyles = function() {
     .snp-ov-body { padding: 0 24px 32px; }
 
     /* AI summary card */
-    .snp-ai-card { border: 1px solid #00875a; border-left: 3px solid #00875a; border-radius: 8px; background: #fff; overflow: hidden; }
-    .snp-ai-hdr { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
-    .snp-ai-hdr-left { display: flex; align-items: center; gap: 8px; }
-    .snp-ai-sparkle { font-size: 14px; color: #107869; line-height: 1; }
-    .snp-ai-lbl { font-size: 14px; font-weight: 600; color: #107869; }
-    .snp-ai-hdr-right { display: flex; align-items: center; gap: 2px; }
-    .snp-ai-body { padding: 4px 20px 20px; border-top: 1px solid #e6f4ef; }
-    .snp-ai-sec-title { font-size: 14px; font-weight: 600; color: #111827; margin: 16px 0 5px; }
-    .snp-ai-sec-text { font-size: 14px; color: #374151; line-height: 1.55; }
-    .snp-ai-sec-list { list-style: disc; padding-left: 20px; font-size: 14px; color: #374151; line-height: 1.65; }
+    .snp-ai-card {
+      background: #fff; border-radius: 2px; overflow: hidden;
+      box-shadow: inset 0 0 0 1px #4ade80;
+    }
+    .snp-ai-inner { display: flex; flex-direction: row; }
+    .snp-ai-bar {
+      width: 4px; flex-shrink: 0; align-self: stretch;
+      background: linear-gradient(180deg, #26BFC8 0%, #00718F 100%);
+      border-radius: 3px 0 0 3px;
+    }
+    .snp-ai-content { flex: 1; display: flex; flex-direction: column; padding: 4px 4px 0; gap: 4px; min-width: 0; }
+    .snp-ai-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px; min-height: 40px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .snp-ai-hdr-left { display: flex; align-items: center; gap: 4px; flex: 1; }
+    .snp-ai-hdr-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .snp-ai-sparkle { display: inline-flex; align-items: center; flex-shrink: 0; }
+    .snp-ai-lbl {
+      font-size: 16px; font-weight: 700; color: #032d42;
+      font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', Lato, sans-serif);
+    }
+    .snp-icon-btn {
+      background: none; border: none; cursor: pointer; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 6px;
+    }
+    .snp-icon-btn:hover { background: rgba(0,0,0,0.06); }
+    .snp-ai-sec { padding: 4px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .snp-ai-sec-title {
+      font-size: 16px; font-weight: 600; color: #10171a;
+      font-family: var(--now-font-family, 'Lato', 'Source Sans Pro', sans-serif);
+    }
+    .snp-ai-sec-text {
+      font-size: 16px; font-weight: 400; color: #18181b; line-height: 1.5;
+      font-family: var(--now-font-family, 'Source Sans Pro', 'Lato', sans-serif);
+    }
     .snp-ai-ftr {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 9px 16px; border-top: 1px solid #e6f4ef;
-      font-size: 12px; color: #6b7280;
+      padding: 48px 8px 16px 16px; font-size: 12px; color: #37444a;
     }
-    .snp-ai-thumbs { display: flex; align-items: center; gap: 8px; }
-    .snp-thumb { background: none; border: none; cursor: pointer; color: #9ca3af; padding: 2px; display: flex; align-items: center; font-family: inherit; }
-    .snp-thumb:hover { color: #374151; }
+    .snp-ai-thumbs { display: flex; align-items: center; }
+    .snp-thumb {
+      background: none; border: none; cursor: pointer; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 6px;
+    }
+    .snp-thumb:hover { background: rgba(0,0,0,0.06); }
 
     /* ── Resource assignments ──────────────────────────────────────── */
     .snp-ra { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
@@ -726,64 +757,78 @@ function DemandsListPage(props) {
 function OverviewTab(props) {
   var demand = props.demand;
 
-  function aiCardHdr(title) {
-    return React.createElement('div', { className: 'snp-ai-hdr' },
-      React.createElement('div', { className: 'snp-ai-hdr-left' },
-        React.createElement('span', { className: 'snp-ai-sparkle' }, '✶'),
-        React.createElement('span', { className: 'snp-ai-lbl' }, title),
-        React.createElement('now-icon', { icon: 'circle-info-outline', size: 'sm', style: { color: '#9ca3af' } })
-      ),
-      React.createElement('div', { className: 'snp-ai-hdr-right' },
-        iconBtn('arrow-clockwise-outline', 'Refresh', 'sm'),
-        iconBtn('chevron-up-outline', 'Collapse', 'sm')
-      )
+  // ── SVG assets from design spec ───────────────────────────────────────────
+  var SVG_SPARKLE = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M11.8642 1.77543C11.6803 2.47109 11.137 3.01439 10.4413 3.19816L9.52015 3.44151C9.28852 3.5027 9.28849 3.83145 9.5201 3.89269L10.4418 4.13638C11.1372 4.32025 11.6803 4.86343 11.8641 5.55889L12.1076 6.48014C12.1688 6.71176 12.4976 6.71176 12.5588 6.48014L12.8023 5.55889C12.9861 4.86343 13.5292 4.32025 14.2247 4.13638L15.1463 3.89269C15.3779 3.83145 15.3779 3.5027 15.1463 3.44151L14.2251 3.19816C13.5294 3.01439 12.9861 2.47109 12.8023 1.77543L12.5588 0.854083C12.4976 0.622451 12.1688 0.622451 12.1076 0.854083L11.8642 1.77543Z" fill="#00718F"/><path d="M6.27752 5.05811C5.90008 6.65427 4.65381 7.90054 3.05765 8.27798L1.6478 8.61136C1.23728 8.70843 1.23716 9.2926 1.64763 9.38985L3.05941 9.7243C4.65463 10.1022 5.90001 11.348 6.27742 12.9433L6.6109 14.353C6.70801 14.7635 7.2921 14.7636 7.38938 14.3532L7.72394 12.9416C8.10183 11.3472 9.34672 10.1023 10.9411 9.7244L12.3527 9.38984C12.7631 9.29256 12.763 8.70847 12.3526 8.61136L10.9429 8.27788C9.34754 7.90047 8.10176 6.65509 7.72384 5.05988L7.38939 3.64809C7.29214 3.23762 6.70797 3.23774 6.61089 3.64826L6.27752 5.05811Z" fill="#00718F"/></svg>';
+  var SVG_INFO = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 3.25C5 3.11193 5.11193 3 5.25 3H5.75C5.88807 3 6 3.11193 6 3.25V3.75C6 3.88807 5.88807 4 5.75 4H5.25C5.11193 4 5 3.88807 5 3.75V3.25Z" fill="#37444A"/><path d="M5 5.25C5 5.11193 5.11193 5 5.25 5H5.75C5.88807 5 6 5.11193 6 5.25V7.75C6 7.88807 5.88807 8 5.75 8H5.25C5.11193 8 5 7.88807 5 7.75V5.25Z" fill="#37444A"/><path d="M11 5.5C11 2.46243 8.53757 0 5.5 0C2.46243 0 0 2.46243 0 5.5C0 8.53757 2.46243 11 5.5 11C8.53757 11 11 8.53757 11 5.5ZM10 5.5C10 7.98528 7.98528 10 5.5 10C3.01472 10 1 7.98528 1 5.5C0.999999 3.01472 3.01472 1 5.5 1C7.98528 1 10 3.01472 10 5.5Z" fill="#37444A"/></svg>';
+  var SVG_SYNC = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.8635 2.45976C7.61156 2.32941 7.34181 2.22403 7.05656 2.14759C4.9227 1.57583 2.72935 2.84216 2.15758 4.97602C2.1047 5.17339 2.06758 5.37096 2.04536 5.56746C2.01434 5.84186 1.76676 6.03915 1.49236 6.00813C1.42396 6.0004 1.36035 5.97921 1.30387 5.9475C1.12178 5.8566 1.00657 5.65916 1.03024 5.44506C1.30665 2.94456 3.42577 1 5.99975 1C6.8392 1 7.63016 1.20688 8.32457 1.57227C8.99259 1.91813 9.56029 2.4044 10 2.98285V2.49993C10 2.22379 10.2239 1.99993 10.5 1.99993C10.7761 1.99993 11 2.22379 11 2.49993V4.49993C11 4.77607 10.7761 4.99993 10.5 4.99993L8.5 4.99993C8.22386 4.99993 8 4.77607 8 4.49993C8 4.22379 8.22386 3.99993 8.5 3.99993L9.46469 3.99993C9.08723 3.34751 8.53113 2.81192 7.8635 2.45976Z" fill="#37444A"/><path d="M9.95404 6.60708C9.96221 6.55342 9.9693 6.4994 9.97531 6.44506C10.0005 6.21746 10.1747 6.04251 10.3899 6.00669C10.4348 5.99918 10.4815 5.99772 10.5289 6.00308C10.8033 6.0341 11.0006 6.28169 10.9696 6.55608C10.9621 6.62269 10.9532 6.68935 10.9429 6.75603C10.8684 7.24652 10.7228 7.7136 10.5168 8.14639C9.84038 9.57395 8.53502 10.5733 7.03763 10.8922C6.50631 11.0053 5.95081 11.0328 5.39065 10.9633C4.75286 10.8858 4.15219 10.6882 3.6119 10.394C3.03965 10.0835 2.54384 9.66891 2.14255 9.18161C2.09368 9.12243 2.04615 9.06211 2 9.00069V9.49993C2 9.77607 1.77614 9.99993 1.5 9.99993C1.22386 9.99993 1 9.77607 1 9.49993V7.49993C1 7.22379 1.22386 6.99993 1.5 6.99993H3.5C3.77614 6.99993 4 7.22379 4 7.49993C4 7.77607 3.77614 7.99993 3.5 7.99993H2.53587C2.6516 8.20041 2.78458 8.39085 2.93341 8.56885C3.25013 8.9465 3.63522 9.26467 4.06956 9.50439C4.34644 9.65659 4.6459 9.77819 4.96472 9.86362C5.15092 9.91351 5.33757 9.94941 5.52355 9.97195C5.67971 9.99047 5.83862 10 5.99975 10C6.28877 10 6.57065 9.96934 6.8423 9.91109C7.40027 9.79045 7.9246 9.55164 8.37986 9.21511C9.08215 8.69599 9.6201 7.94433 9.8637 7.03519C9.90196 6.89243 9.93196 6.74957 9.95404 6.60708Z" fill="#37444A"/></svg>';
+  var SVG_CHEVRON_UP = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.17075 7.87629C2.37857 8.05813 2.69445 8.03707 2.8763 7.82925L6.00001 4.2593L9.12372 7.82925C9.30556 8.03707 9.62144 8.05813 9.82926 7.87629C10.0371 7.69445 10.0581 7.37857 9.8763 7.17075L6.3763 3.17075C6.28135 3.06224 6.14419 3 6.00001 3C5.85583 3 5.71866 3.06224 5.62372 3.17075L2.12372 7.17075C1.94188 7.37857 1.96294 7.69445 2.17075 7.87629Z" fill="#37444A"/></svg>';
+  var SVG_THUMBS_UP = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 7H4.79289L7 4.79289V3.5C7 2.67157 7.67157 2 8.5 2C9.32843 2 10 2.67157 10 3.5V4.92141C10 5.0272 9.98294 5.13231 9.94949 5.23267L9.69371 6H12.1488C12.8264 6 13.4763 6.26919 13.9555 6.74836C14.6398 7.43268 14.8787 8.44491 14.5727 9.36303L13.549 12.4342C13.4754 12.6551 13.3513 12.8558 13.1866 13.0205L12.6464 13.5607C12.3651 13.842 11.9836 14 11.5858 14H6.41421C6.01639 14 5.63486 13.842 5.35355 13.5607L4.93934 13.1464C4.84557 13.0527 4.71839 13 4.58579 13H4V13.5C4 13.7761 3.77614 14 3.5 14H1.5C1.22386 14 1 13.7761 1 13.5V6.5C1 6.22386 1.22386 6 1.5 6H3.5C3.77614 6 4 6.22386 4 6.5V7ZM8 3.5V4.90057C8 5.09684 7.92203 5.28508 7.78324 5.42386L5.35355 7.85355C5.25979 7.94732 5.13261 8 5 8H4V12H4.58579C4.98361 12 5.36514 12.158 5.64645 12.4393L6.06066 12.8536C6.15443 12.9473 6.28161 13 6.41421 13H11.5858C11.7184 13 11.8456 12.9473 11.9393 12.8536L12.4795 12.3134C12.5344 12.2585 12.5758 12.1916 12.6003 12.1179L13.624 9.0468C13.8103 8.48802 13.6648 7.87196 13.2484 7.45546C12.9567 7.16384 12.5612 7 12.1488 7H9C8.83928 7 8.68835 6.92274 8.59438 6.79236C8.5004 6.66197 8.47483 6.49436 8.52566 6.34189L9 4.91886V3.5C9 3.22386 8.77614 3 8.5 3C8.22386 3 8 3.22386 8 3.5ZM3 7H2V13H3V7Z" fill="#37444A"/></svg>';
+  var SVG_THUMBS_DOWN = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 9H4.79289L7 11.2071V12.5C7 13.3284 7.67157 14 8.5 14C9.32843 14 10 13.3284 10 12.5V11.0786C10 10.9728 9.98294 10.8677 9.94949 10.7673L9.69371 10H12.1488C12.8264 10 13.4763 9.73081 13.9555 9.25164C14.6398 8.56732 14.8787 7.55509 14.5727 6.63697L13.549 3.56584C13.4754 3.34492 13.3513 3.14418 13.1866 2.97952L12.6464 2.43934C12.3651 2.15803 11.9836 2 11.5858 2H6.41421C6.01639 2 5.63486 2.15804 5.35355 2.43934L4.93934 2.85355C4.84557 2.94732 4.71839 3 4.58579 3H4V2.5C4 2.22386 3.77614 2 3.5 2H1.5C1.22386 2 1 2.22386 1 2.5V9.5C1 9.77614 1.22386 10 1.5 10H3.5C3.77614 10 4 9.77614 4 9.5V9ZM8 12.5V11.0994C8 10.9032 7.92203 10.7149 7.78324 10.5761L5.35355 8.14645C5.25979 8.05268 5.13261 8 5 8H4V4H4.58579C4.98361 4 5.36514 3.84197 5.64645 3.56066L6.06066 3.14645C6.15443 3.05268 6.28161 3 6.41421 3H11.5858C11.7184 3 11.8456 3.05268 11.9393 3.14645L12.4795 3.68663C12.5344 3.74152 12.5758 3.80843 12.6003 3.88207L13.624 6.9532C13.8103 7.51198 13.6648 8.12804 13.2484 8.54454C12.9567 8.83616 12.5612 9 12.1488 9H9C8.83928 9 8.68835 9.07726 8.59438 9.20764C8.5004 9.33803 8.47483 9.50564 8.52566 9.65811L9 11.0811V12.5C9 12.7761 8.77614 13 8.5 13C8.22386 13 8 12.7761 8 12.5ZM3 9H2V3H3V9Z" fill="#37444A"/></svg>';
+
+  function aiSec(title, lines, key) {
+    var textChildren = Array.isArray(lines)
+      ? lines.reduce(function(acc, line, i) {
+          if (i > 0) acc.push(React.createElement('br', { key: 'b' + i }));
+          acc.push(line);
+          return acc;
+        }, [])
+      : lines;
+    return React.createElement('div', { key: key, className: 'snp-ai-sec' },
+      React.createElement('div', { className: 'snp-ai-sec-title' }, title),
+      React.createElement('div', { className: 'snp-ai-sec-text' }, textChildren)
     );
   }
 
-  function aiCardFtr() {
-    return React.createElement('div', { className: 'snp-ai-ftr' },
-      React.createElement('span', null, 'Check AI-generated summaries for accuracy'),
-      React.createElement('div', { className: 'snp-ai-thumbs' },
-        React.createElement('button', { className: 'snp-thumb' },
-          React.createElement('now-icon', { icon: 'thumbs-up-outline', size: 'sm' })
-        ),
-        React.createElement('button', { className: 'snp-thumb' },
-          React.createElement('now-icon', { icon: 'thumbs-down-outline', size: 'sm' })
+  function aiCard(titleStr, bodyEl) {
+    return React.createElement('div', { className: 'snp-ai-card' },
+      React.createElement('div', { className: 'snp-ai-inner' },
+        React.createElement('div', { className: 'snp-ai-bar' }),
+        React.createElement('div', { className: 'snp-ai-content' },
+          React.createElement('div', { className: 'snp-ai-hdr' },
+            React.createElement('div', { className: 'snp-ai-hdr-left' },
+              React.createElement('span', { className: 'snp-ai-sparkle', dangerouslySetInnerHTML: { __html: SVG_SPARKLE } }),
+              React.createElement('span', { className: 'snp-ai-lbl' }, titleStr),
+              React.createElement('button', { className: 'snp-icon-btn' },
+                React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_INFO } })
+              )
+            ),
+            React.createElement('div', { className: 'snp-ai-hdr-right' },
+              React.createElement('button', { className: 'snp-icon-btn' },
+                React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_SYNC } })
+              ),
+              React.createElement('button', { className: 'snp-icon-btn' },
+                React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_CHEVRON_UP } })
+              )
+            )
+          ),
+          bodyEl,
+          React.createElement('div', { className: 'snp-ai-ftr' },
+            React.createElement('span', null, 'Check AI-generated summaries for accuracy'),
+            React.createElement('div', { className: 'snp-ai-thumbs' },
+              React.createElement('button', { className: 'snp-thumb' },
+                React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_THUMBS_UP } })
+              ),
+              React.createElement('button', { className: 'snp-thumb' },
+                React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_THUMBS_DOWN } })
+              )
+            )
+          )
         )
       )
     );
   }
 
   // ── Summary body ───────────────────────────────────────────────────────────
-  var summaryBody = React.createElement('div', { className: 'snp-ai-body' },
-    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Business requirement'),
-    React.createElement('p', { className: 'snp-ai-sec-text' },
-      'The Automated Data Retention & Deletion System demand aims to implement a compliant, automated solution to enforce data retention schedules and secure deletion of data past its regulatory or operational lifetime across IT systems. Automation will reduce manual errors, ensure audit-readiness, optimize storage costs, and help avoid regulatory fines, supporting the organization\'s data privacy and governance objectives.'
+  var summaryBody = React.createElement('div', null,
+    aiSec('Business requirement',
+      'The Automated Data Retention & Deletion System demand aims to implement a compliant, automated solution to enforce data retention schedules and secure deletion of data past its regulatory or operational lifetime across IT systems. Automation will reduce manual errors, ensure audit-readiness, optimize storage costs, and help avoid regulatory fines, supporting the organization\'s data privacy and governance objectives.',
+      'br'
     ),
-    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Key risks of performing'),
-    React.createElement('ul', { className: 'snp-ai-sec-list' },
-      React.createElement('li', null, 'Accidental data deletion'),
-      React.createElement('li', null, 'Misconfiguration of automation policies')
-    ),
-    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Key risks of not performing'),
-    React.createElement('ul', { className: 'snp-ai-sec-list' },
-      React.createElement('li', null, 'Regulatory fines and compliance violations'),
-      React.createElement('li', null, 'Higher data storage/maintenance costs')
-    ),
-    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Cost'),
-    React.createElement('ul', { className: 'snp-ai-sec-list' },
-      React.createElement('li', null, '$170,000 implementation'),
-      React.createElement('li', null, '$35,000 annual maintenance')
-    ),
-    React.createElement('p', { className: 'snp-ai-sec-title' }, 'Monetary Benefit'),
-    React.createElement('ul', { className: 'snp-ai-sec-list' },
-      React.createElement('li', null, '$280,000 annual savings'),
-      React.createElement('li', null, '$1.4–12.9 million annual cost avoidance (errors, fines, storage)')
-    ),
-    React.createElement('p', { className: 'snp-ai-sec-title' }, 'ROI'),
-    React.createElement('ul', { className: 'snp-ai-sec-list' },
-      React.createElement('li', null, '65% first year')
-    )
+    aiSec('Key risks of performing',  ['Accidental data deletion', 'Misconfiguration of automation policies'], 'kr'),
+    aiSec('Key risks of not performing', ['Regulatory fines and compliance violations', 'Higher data storage/maintenance costs'], 'knr'),
+    aiSec('Cost', ['$170,000 implementation', '$35,000 annual maintenance'], 'cost'),
+    aiSec('Monetary Benefit', ['$280,000 annual savings', '$1.4–$12.9 million annual cost avoidance (errors, fines, storage)'], 'mb'),
+    aiSec('ROI', '65% first year', 'roi')
   );
 
   // ── Assessment body ────────────────────────────────────────────────────────
@@ -825,8 +870,10 @@ function OverviewTab(props) {
   ];
 
   var assessmentChildren = [
-    React.createElement('p', { key: 'intro', className: 'snp-ai-sec-text', style: { marginTop: '4px' } },
-      'This assessment of the demand titled “' + demand.name + '” has been conducted according to the guidelines outlined in the knowledge base (KB) article. The evaluation considers feedback from key stakeholder groups including Legal, Database/IT, and Finance/Business teams.'
+    React.createElement('div', { key: 'intro', className: 'snp-ai-sec' },
+      React.createElement('div', { className: 'snp-ai-sec-text' },
+        'This assessment of the demand titled “' + demand.name + '” has been conducted according to the guidelines outlined in the knowledge base (KB) article. The evaluation considers feedback from key stakeholder groups including Legal, Database/IT, and Finance/Business teams.'
+      )
     ),
     React.createElement('div', { key: 'score', className: 'snp-score-box' },
       React.createElement('p', { className: 'snp-score-title' }, 'Assessment Score'),
@@ -863,24 +910,15 @@ function OverviewTab(props) {
     );
   });
 
-  var assessmentBody = React.createElement('div', { className: 'snp-ai-body' }, assessmentChildren);
-
   return React.createElement('div', { className: 'snp-ov-layout' },
     React.createElement('div', { className: 'snp-ov-scroll' },
       React.createElement('div', { className: 'snp-ov-title-area' },
         React.createElement('h1', { className: 'snp-ov-title' }, demand.name)
       ),
       React.createElement('div', { className: 'snp-ov-body' },
-        React.createElement('div', { className: 'snp-ai-card' },
-          aiCardHdr('Summary by Now Assist'),
-          summaryBody,
-          aiCardFtr()
-        ),
-        React.createElement('div', { className: 'snp-ai-card', style: { marginTop: '16px' } },
-          aiCardHdr('Assessment by Now Assist'),
-          assessmentBody,
-          aiCardFtr()
-        )
+        aiCard('Summary by Now Assist', summaryBody),
+        React.createElement('div', { style: { height: '16px' } }),
+        aiCard('Assessment by Now Assist', React.createElement('div', null, assessmentChildren))
       )
     ),
     React.createElement('div', { className: 'snp-ov-right-panel' },
