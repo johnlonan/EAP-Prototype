@@ -530,6 +530,31 @@ var injectStyles = function() {
       display: inline-flex; align-items: center; justify-content: center;
       flex-shrink: 0; line-height: 1;
     }
+
+    /* ── Smart Assessments tab ─────────────────────────────────────────────── */
+    .snp-sa { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; background: #fff; }
+    .snp-sa-hdr {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 14px 24px 8px; flex-shrink: 0;
+    }
+    .snp-sa-hdr-left { display: flex; flex-direction: column; gap: 3px; }
+    .snp-sa-title { font-size: 22px; font-weight: 700; color: #10171a; letter-spacing: -0.2px; }
+    .snp-sa-subtitle { font-size: 12px; color: #6b7280; }
+    .snp-sa-hdr-right { display: flex; align-items: center; gap: 6px; }
+    .snp-sa-filters { display: flex; gap: 8px; padding: 0 24px 10px; flex-shrink: 0; }
+    .snp-sa-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 4px; cursor: pointer;
+      font-size: 13px; color: #374151;
+      border: 1px solid #d1d5db; background: #fff;
+    }
+    .snp-sa-pill-active { background: #111827; color: #fff; border-color: #111827; }
+    .snp-sa-body { flex: 1; overflow: auto; border-top: 1px solid #e8ecef; min-height: 0; }
+    .snp-sa-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 24px; border-top: 1px solid #e8ecef;
+      font-size: 13px; color: #4b5563; flex-shrink: 0;
+    }
   `;
   document.head.appendChild(el);
 };
@@ -1358,6 +1383,94 @@ var NAV_SVG = {
     _E,
 };
 
+// ─── Smart Assessments Tab ────────────────────────────────────────────────────
+var SMART_ASSESSMENTS = [
+  { key: 'sa1', number: 'ASMT0002460', template: 'Smart Assessment Standard',  state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-15 10:00:00' },
+  { key: 'sa2', number: 'ASMT0002458', template: 'Smart Assessment Standard',  state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-15 09:30:00' },
+  { key: 'sa3', number: 'ASMT0002455', template: 'Demand Feasibility Review',  state: 'Open', user: 'James Wilson',  dueDate: '2026-07-20 14:00:00' },
+  { key: 'sa4', number: 'ASMT0002452', template: 'Risk Impact Assessment',     state: 'Open', user: 'Sarah Chen',    dueDate: '2026-06-30 16:00:00' },
+  { key: 'sa5', number: 'ASMT0002449', template: 'Demand Feasibility Review',  state: 'Open', user: 'James Wilson',  dueDate: '2026-08-01 11:00:00' },
+  { key: 'sa6', number: 'ASMT0002446', template: 'Compliance Readiness Check', state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-25 13:00:00' },
+];
+
+function SmartAssessmentsTab() {
+  var colDefs = JSON.stringify({
+    columns: [
+      { key: 'number',   type: 'link',   label: 'Assessment instance', grow: 2   },
+      { key: 'template', type: 'string', label: 'Assessment template', grow: 2.5 },
+      { key: 'state',    type: 'string', label: 'State',               grow: 1   },
+      { key: 'user',     type: 'string', label: 'Users',               grow: 1.5 },
+      { key: 'dueDate',  type: 'string', label: 'Due date',            grow: 1.5 },
+    ],
+  });
+
+  var rowDefs = JSON.stringify({
+    rows: SMART_ASSESSMENTS.map(function(a) {
+      return {
+        key: a.key,
+        cells: {
+          number:   { value: a.key, label: a.number },
+          template: { value: a.template },
+          state:    { value: a.state },
+          user:     { value: a.user },
+          dueDate:  { value: a.dueDate },
+        },
+      };
+    }),
+  });
+
+  return React.createElement('div', { className: 'snp-sa' },
+
+    React.createElement('div', { className: 'snp-sa-hdr' },
+      React.createElement('div', { className: 'snp-sa-hdr-left' },
+        React.createElement('h2', { className: 'snp-sa-title' }, 'All - Demand assessments'),
+        React.createElement('p', { className: 'snp-sa-subtitle' }, 'Last refreshed 1m ago.')
+      ),
+      React.createElement('div', { className: 'snp-sa-hdr-right' },
+        iconBtn('arrow-clockwise-outline', 'Refresh', 'sm'),
+        iconBtn('gear-outline', 'Settings', 'sm'),
+        iconBtn('filter-outline', 'Filter', 'sm'),
+        React.createElement('now-button', { label: 'Combine (2)', variant: 'primary', size: 'md' }),
+        React.createElement('now-button', { label: 'Export', variant: 'secondary', size: 'md' })
+      )
+    ),
+
+    React.createElement('div', { className: 'snp-sa-filters' },
+      React.createElement('div', { className: 'snp-sa-pill snp-sa-pill-active' },
+        'All ', React.createElement('now-badge', { value: 6 })
+      ),
+      React.createElement('div', { className: 'snp-sa-pill' },
+        'New ', React.createElement('now-badge', { value: 3 })
+      )
+    ),
+
+    React.createElement('div', {
+      className: 'snp-sa-body',
+      ref: function(el) {
+        if (!el || el._bound) return;
+        el._bound = true;
+        el.addEventListener('NOW_LIST#CELL_LINK_CLICKED', function() {});
+      },
+    },
+      React.createElement('now-list', {
+        'column-definitions': colDefs,
+        'row-definitions':    rowDefs,
+        'selection-enabled':  'true',
+        style: { display: 'block' },
+      })
+    ),
+
+    React.createElement('div', { className: 'snp-sa-footer' },
+      React.createElement('span', null, 'Showing 1–6 of 6'),
+      React.createElement('now-pagination-control', {
+        'current-page': 1,
+        'total-count': 6,
+        'page-size': 15,
+      })
+    )
+  );
+}
+
 // ─── Demand Detail Page ────────────────────────────────────────────────────────
 function DemandDetailPage(props) {
   var demand   = props.demand;
@@ -1428,7 +1541,9 @@ function DemandDetailPage(props) {
       React.createElement('div', { className: 'snp-main' },
         tab === 'resource-assignments'
           ? React.createElement(ResourceAssignmentsTab, { demand: demand, variant: variant })
-          : React.createElement(OverviewTab, { demand: demand })
+          : tab === 'smart-assessments'
+            ? React.createElement(SmartAssessmentsTab)
+            : React.createElement(OverviewTab, { demand: demand })
       )
     )
   );
