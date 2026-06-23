@@ -596,6 +596,21 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
       cursor: pointer; white-space: nowrap;
     }
+    .snp-asi-filter-wrap { position: relative; display: inline-flex; }
+    .snp-asi-dropdown {
+      position: absolute; top: calc(100% + 4px); right: 0;
+      background: #fff; border-radius: 6px; z-index: 200; min-width: 210px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.14), 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .snp-asi-dd-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; cursor: pointer;
+      font-size: 16px; color: #151920;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-asi-dd-item:hover { background: #F3F8F9; }
+    .snp-asi-dd-check { width: 16px; font-size: 12px; color: #0080A3; }
     /* Body layout */
     .snp-asi-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
     .snp-asi-left {
@@ -1816,6 +1831,18 @@ function SmartAssessmentInstanceView(props) {
   var subS = React.useState('overview');
   var activeSubId = subS[0]; var setActiveSubId = subS[1];
 
+  var filterOpenS = React.useState(false);
+  var filterOpen = filterOpenS[0]; var setFilterOpen = filterOpenS[1];
+  var filterValS = React.useState('all');
+  var filterVal = filterValS[0]; var setFilterVal = filterValS[1];
+
+  var FILTER_OPTIONS = [
+    { id: 'all',         label: 'All questions' },
+    { id: 'unanswered',  label: 'Unanswered questions' },
+    { id: 'ai-assisted', label: 'AI assisted' },
+  ];
+  var filterLabel = (FILTER_OPTIONS.filter(function(o) { return o.id === filterVal; })[0] || FILTER_OPTIONS[0]).label;
+
   // Flat ordered list for pagination
   var allSubs = [];
   ASSESSMENT_SECTIONS.forEach(function(s) {
@@ -2033,10 +2060,29 @@ function SmartAssessmentInstanceView(props) {
           )
         ),
         React.createElement('div', { className: 'snp-asi-hdr-actions' },
-          React.createElement('button', { className: 'snp-asi-filter-btn' },
-            React.createElement('now-icon', { icon: 'filter-outline', size: 'sm' }),
-            'All Questions',
-            React.createElement('now-icon', { icon: 'chevron-down-outline', size: 'sm' })
+          React.createElement('div', { className: 'snp-asi-filter-wrap' },
+            React.createElement('button', {
+              className: 'snp-asi-filter-btn',
+              onClick: function() { setFilterOpen(function(o) { return !o; }); },
+            },
+              React.createElement('now-icon', { icon: 'filter-outline', size: 'sm' }),
+              filterLabel,
+              React.createElement('now-icon', { icon: 'chevron-down-outline', size: 'sm' })
+            ),
+            filterOpen && React.createElement('div', { className: 'snp-asi-dropdown' },
+              FILTER_OPTIONS.map(function(opt) {
+                return React.createElement('div', {
+                  key: opt.id,
+                  className: 'snp-asi-dd-item',
+                  onClick: function() { setFilterVal(opt.id); setFilterOpen(false); },
+                },
+                  React.createElement('span', { className: 'snp-asi-dd-check' },
+                    filterVal === opt.id ? '✓' : ''
+                  ),
+                  opt.label
+                );
+              })
+            )
           ),
           React.createElement('now-button', { label: 'Submit', variant: 'primary', size: 'md' }),
           React.createElement('button', { className: 'snp-icon-btn' },
@@ -2206,6 +2252,11 @@ var OPTION_CARDS = [
     num: 1,
     title: 'Smart Assessments',
     desc: 'Smart Assessments bring AI-assisted evaluation into the demand management process. Demands are assessed across key dimensions — financial impact, risk, compliance, and resourcing — with guided question sets, AI-suggested responses, and structured sign-off workflows.',
+  },
+  {
+    num: 2,
+    title: 'AI Assisted Smart Assessment',
+    desc: 'Experience AI-accelerated demand evaluation — automated draft responses, intelligent scoring, and guided sign-off to reduce manual effort and surface insights faster across all assessment dimensions.',
   },
 ];
 
