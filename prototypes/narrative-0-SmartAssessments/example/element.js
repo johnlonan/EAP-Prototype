@@ -695,11 +695,15 @@ var injectStyles = function() {
       border: 1px solid #e0e5e8; border-radius: 6px;
       padding: 16px 20px; margin-bottom: 16px;
     }
-    .snp-asi-q-card.first-q { border-left: 3px solid #5CAEC4; }
-    .snp-asi-q-layout { display: flex; gap: 16px; align-items: flex-start; }
+    .snp-asi-q-card.first-q {
+      outline: 2px solid #4F52BD;
+      box-shadow: 0px 2px 4px rgba(56,56,56,0.25);
+    }
+    .snp-asi-q-layout { display: flex; gap: 24px; align-items: flex-start; }
     .snp-asi-q-num {
-      font-size: 14px; font-weight: 600; color: #374151;
-      flex-shrink: 0; min-width: 20px; margin-top: 2px;
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: #F6F6F8; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 600; color: #151920;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-q-body { flex: 1; }
@@ -736,27 +740,34 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
       color: #374151; background: #fff;
     }
-    /* Footer */
-    .snp-asi-footer {
+    /* Pagination (inside content column) */
+    .snp-asi-pagination {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 32px; border-top: 1px solid #e0e5e8; flex-shrink: 0; background: #fff;
+      padding: 8px 0; margin-top: 24px;
+      border-top: 1px solid #E4E6EA;
     }
     .snp-asi-back-btn {
-      padding: 6px 16px; min-height: 32px;
-      border: none; box-shadow: inset 0 0 0 1px #d1d5db; border-radius: 6px;
-      background: #fff; color: #172B31; font-size: 14px;
+      padding: 6px 16px; min-height: 32px; border-radius: 4px;
+      border: none; box-shadow: inset 0 0 0 1px #4F52BD;
+      background: transparent; color: #4F52BD;
+      font-size: 16px; font-weight: 700;
       cursor: pointer; font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-back-btn:disabled { opacity: 0.35; cursor: default; }
-    .snp-asi-page-num {
-      font-size: 14px; color: #172B31;
+    .snp-asi-page-nums { display: flex; align-items: center; }
+    .snp-asi-page-btn {
+      min-width: 32px; min-height: 32px; border-radius: 4px;
+      border: none; background: transparent;
+      font-size: 16px; font-weight: 400; color: #151920;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
+    .snp-asi-page-btn.current { background: #E4E6EA; font-weight: 700; }
     .snp-asi-next-btn {
-      padding: 6px 16px; min-height: 32px;
-      border: none; background: #032D42; color: #fff; border-radius: 6px;
-      font-size: 14px; cursor: pointer;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
+      padding: 6px 16px; min-height: 32px; border-radius: 4px;
+      border: none; background: #4F52BD; color: #fff;
+      font-size: 16px; font-weight: 700;
+      cursor: pointer; font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-next-btn:disabled { opacity: 0.35; cursor: default; }
     /* Right panel */
@@ -2001,24 +2012,31 @@ function SmartAssessmentInstanceView(props) {
         ),
         React.createElement('div', { className: 'snp-asi-section-heading' }, activeSection.label),
         React.createElement('div', { className: 'snp-asi-sub-heading' }, activeSub.label),
-        activeSub.questions.map(function(q, idx) { return renderQ(q, idx + 1); })
+        activeSub.questions.map(function(q, idx) { return renderQ(q, idx + 1); }),
+        // Pagination inside the content column
+        React.createElement('div', { className: 'snp-asi-pagination' },
+          React.createElement('button', {
+            className: 'snp-asi-back-btn',
+            onClick: function() { navigate(currentIdx - 1); },
+            disabled: currentIdx === 0,
+          }, 'Back'),
+          React.createElement('div', { className: 'snp-asi-page-nums' },
+            allSubs.map(function(_, idx) {
+              return React.createElement('button', {
+                key: idx,
+                className: 'snp-asi-page-btn' + (idx === currentIdx ? ' current' : ''),
+                onClick: function() { navigate(idx); },
+              }, idx + 1);
+            })
+          ),
+          React.createElement('button', {
+            className: 'snp-asi-next-btn',
+            onClick: function() { navigate(currentIdx + 1); },
+            disabled: currentIdx === allSubs.length - 1,
+          }, 'Next')
+        )
       ),
       rightPanel
-    ),
-
-    // Footer
-    React.createElement('div', { className: 'snp-asi-footer' },
-      React.createElement('button', {
-        className: 'snp-asi-back-btn',
-        onClick: function() { navigate(currentIdx - 1); },
-        disabled: currentIdx === 0,
-      }, 'back'),
-      React.createElement('span', { className: 'snp-asi-page-num' }, currentIdx + 1),
-      React.createElement('button', {
-        className: 'snp-asi-next-btn',
-        onClick: function() { navigate(currentIdx + 1); },
-        disabled: currentIdx === allSubs.length - 1,
-      }, 'next')
     )
   );
 }
