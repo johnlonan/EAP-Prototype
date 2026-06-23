@@ -740,16 +740,17 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
       color: #374151; background: #fff;
     }
-    /* Pagination (inside content column) */
+    /* Pagination — sticky at bottom of scrollable content column */
     .snp-asi-pagination {
+      position: sticky; bottom: 0;
       display: flex; align-items: center; justify-content: space-between;
       padding: 8px 0; margin-top: 24px;
-      border-top: 1px solid #E4E6EA;
+      border-top: 1px solid #E4E6EA; background: #fff;
     }
     .snp-asi-back-btn {
-      padding: 6px 16px; min-height: 32px; border-radius: 4px;
-      border: none; box-shadow: inset 0 0 0 1px #4F52BD;
-      background: transparent; color: #4F52BD;
+      padding: 6px 16px; min-height: 32px; border-radius: 6px;
+      border: none; box-shadow: inset 0 0 0 1px #B1C3C9;
+      background: transparent; color: #006F8E;
       font-size: 16px; font-weight: 700;
       cursor: pointer; font-family: var(--now-font-family, 'Lato', sans-serif);
     }
@@ -764,8 +765,9 @@ var injectStyles = function() {
     }
     .snp-asi-page-btn.current { background: #E4E6EA; font-weight: 700; }
     .snp-asi-next-btn {
-      padding: 6px 16px; min-height: 32px; border-radius: 4px;
-      border: none; background: #4F52BD; color: #fff;
+      padding: 6px 16px; min-height: 32px; border-radius: 6px;
+      border: none; box-shadow: inset 0 0 0 1px #0080A3;
+      background: #0080A3; color: #fff;
       font-size: 16px; font-weight: 700;
       cursor: pointer; font-family: var(--now-font-family, 'Lato', sans-serif);
     }
