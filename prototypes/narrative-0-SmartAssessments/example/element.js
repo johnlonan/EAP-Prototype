@@ -557,17 +557,17 @@ var injectStyles = function() {
 
     /* ── Smart Assessment Instance View ──────────────────────────────────── */
     .snp-asi-hdr {
-      padding: 16px; border-bottom: 1px solid #e0e5e8;
-      display: flex; flex-direction: column; gap: 6px;
-      flex-shrink: 0;
+      padding: 12px 16px; border-bottom: 1px solid #e0e5e8;
+      display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; background: #fff;
     }
     .snp-asi-hdr-top {
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
     }
     .snp-asi-hdr-title-row { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
     .snp-asi-title {
       font-size: 20px; font-weight: 700; color: #032d42;
       font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .snp-asi-saved {
       display: inline-flex; align-items: flex-end; gap: 6px; flex-shrink: 0;
@@ -587,20 +587,6 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-hdr-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .snp-asi-draft-btn {
-      display: inline-flex; align-items: center; gap: 2px;
-      padding: 6px 16px; min-height: 32px; border: none;
-      border-radius: 6px;
-      background: linear-gradient(135deg, #86F673 5%, #71D5FE 95%);
-      box-shadow: none;
-      color: #004F65;
-      font-size: 16px; font-weight: 700;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
-      cursor: pointer; white-space: nowrap;
-    }
-    .snp-asi-draft-btn:hover {
-      background: linear-gradient(135deg, #79e968 5%, #5ec8f0 95%);
-    }
     .snp-asi-filter-btn {
       display: inline-flex; align-items: center; gap: 4px;
       padding: 6px 16px; min-height: 32px;
@@ -613,103 +599,128 @@ var injectStyles = function() {
     /* Body layout */
     .snp-asi-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
     .snp-asi-left {
-      width: 320px; flex-shrink: 0; border-right: 1px solid #e0e5e8;
-      overflow-y: auto; padding-bottom: 16px;
+      width: 308px; flex-shrink: 0; border-right: 1px solid #e0e5e8;
+      overflow-y: auto; background: #f7f8fa;
     }
-    .snp-asi-main { flex: 1; overflow-y: auto; padding: 20px 24px; }
+    .snp-asi-main { flex: 1; overflow-y: auto; padding: 32px; background: #fff; }
     .snp-asi-right {
       width: 220px; flex-shrink: 0; border-left: 1px solid #e0e5e8;
-      overflow-y: auto; padding: 16px;
+      overflow-y: auto; padding: 16px; background: #fff;
     }
     /* Left panel */
-    .snp-asi-sections-hdr {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 8px 16px 16px; flex-shrink: 0;
+    .snp-asi-progress-block { padding: 24px 20px 12px; }
+    .snp-asi-progress-counts {
+      display: flex; justify-content: space-between; margin-bottom: 8px;
     }
-    .snp-asi-sections-title {
-      flex: 1; min-width: 0; color: #294149;
-      font-size: 20px; font-weight: 700;
-      font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
-      line-height: 1.3;
+    .snp-asi-progress-item { display: flex; align-items: center; gap: 6px; }
+    .snp-asi-progress-lbl {
+      font-size: 12px; color: #4A5E65;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-asi-progress-val {
+      font-size: 12px; font-weight: 600; color: #172B31;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-asi-prog-bar-bg {
+      height: 4px; background: #d1d5db; border-radius: 2px; overflow: hidden;
+    }
+    .snp-asi-prog-bar-fill { height: 100%; background: #00566E; border-radius: 2px; }
+    .snp-asi-nav-list { padding: 0 8px 16px; }
+    .snp-asi-instructions {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; margin-bottom: 4px;
+      font-size: 14px; color: #172B31;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+      cursor: pointer; border-radius: 4px;
+    }
+    .snp-asi-instructions:hover { background: rgba(0,0,0,0.04); }
+    .snp-asi-sec-item { margin-bottom: 2px; }
+    .snp-asi-sec-header {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 12px; cursor: pointer; border-radius: 4px;
+    }
+    .snp-asi-sec-header:hover { background: rgba(0,0,0,0.04); }
+    .snp-asi-sec-num-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1.5px solid #9ca3af;
+      font-size: 11px; color: #374151; flex-shrink: 0; margin-top: 1px;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-asi-sec-num-badge.active { border-color: #00566E; color: #00566E; }
+    .snp-asi-sec-name-block { flex: 1; min-width: 0; }
+    .snp-asi-sec-name {
+      font-size: 14px; color: #172B31; line-height: 1.3;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .snp-asi-sections-actions { display: flex; align-items: flex-start; }
-    .snp-asi-icon-action {
-      background: none; border: none; cursor: pointer; padding: 0;
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 32px; min-height: 32px; border-radius: 6px; flex-shrink: 0;
-    }
-    .snp-asi-icon-action:hover { background: rgba(74,94,101,0.08); }
-    .snp-asi-sec-group { margin: 0 8px 2px; padding: 0; border-radius: 6px; }
-    .snp-asi-sec-group.active { background: rgba(189,222,231,0.22); }
-    .snp-asi-sec-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 8px; min-height: 46px; cursor: pointer;
-      font-size: 16px; font-weight: 600; color: #172B31;
+    .snp-asi-sec-context {
+      font-size: 12px; color: #4A5E65; margin-top: 2px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
-      border-radius: 6px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .snp-asi-sec-row:hover { background: rgba(189,222,231,0.08); border-radius: 6px; }
-    .snp-asi-sec-row.active { background: transparent; }
-    .snp-asi-sec-label { flex: 1; }
-    .snp-asi-sec-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .snp-asi-sec-count {
-      font-size: 12px; color: #4A5E65;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
-    }
-    .snp-asi-subs-container { padding: 0 8px 8px; }
-    .snp-asi-sub-row {
+    .snp-asi-subs { padding: 0 0 4px 30px; }
+    .snp-asi-sub-item {
       display: flex; align-items: center; gap: 8px;
-      padding: 12px 8px; min-height: 32px; cursor: pointer;
-      border-radius: 6px;
-      font-size: 16px; font-weight: 400; color: #172B31;
+      padding: 6px 10px; cursor: pointer; border-radius: 4px;
+      font-size: 13px; color: #4A5E65;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-sub-row:hover:not(.active) { background: rgba(0,0,0,0.03); }
-    .snp-asi-sub-row.active {
-      background: rgba(0,128,163,0.10);
-      color: #00566E; font-weight: 700;
-    }
-    .snp-asi-sub-label { flex: 1; }
+    .snp-asi-sub-item.active { background: rgba(0,86,110,0.08); color: #00566E; font-weight: 500; border-radius: 6px; }
+    .snp-asi-sub-item:hover:not(.active) { background: rgba(0,0,0,0.04); }
     /* Main content */
-    .snp-asi-content-hdr { margin-bottom: 20px; }
-    .snp-asi-section-title {
-      font-size: 24px; font-weight: 600; color: #032d42; margin-bottom: 3px;
+    .snp-asi-assess-label {
+      font-size: 12px; color: #4A5E65; margin-bottom: 4px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-asi-content-title {
+      font-size: 24px; font-weight: 700; color: #032d42; margin-bottom: 6px;
+      font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
+    }
+    .snp-asi-content-context {
+      font-size: 12px; color: #4A5E65; margin-bottom: 24px;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-asi-context-lbl { color: #4A5E65; margin-right: 4px; }
+    .snp-asi-context-val { color: #172B31; }
+    .snp-asi-section-heading {
+      font-size: 20px; font-weight: 700; color: #032d42; margin-bottom: 4px;
+      font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
     }
     .snp-asi-sub-heading {
-      font-size: 12px; color: #4A5E65;
+      font-size: 14px; color: #4A5E65; margin-bottom: 20px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-q-card {
-      box-shadow: inset 0 0 0 1px #d6d3d1;
-      border-radius: 6px; padding: 16px; margin-bottom: 12px; position: relative;
+      border: 1px solid #e0e5e8; border-radius: 6px;
+      padding: 16px 20px; margin-bottom: 16px;
     }
-    .snp-asi-q-row { display: flex; gap: 16px; align-items: flex-start; }
+    .snp-asi-q-card.first-q { border-left: 3px solid #5CAEC4; }
+    .snp-asi-q-layout { display: flex; gap: 16px; align-items: flex-start; }
     .snp-asi-q-num {
-      font-size: 16px; font-weight: 600; color: #374151; flex-shrink: 0; min-width: 20px;
+      font-size: 14px; font-weight: 600; color: #374151;
+      flex-shrink: 0; min-width: 20px; margin-top: 2px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
+    .snp-asi-q-body { flex: 1; }
     .snp-asi-q-text {
-      font-size: 16px; color: #10171a; line-height: 1.5; flex: 1; padding-right: 90px;
+      font-size: 14px; color: #172B31; line-height: 1.5; margin-bottom: 6px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-q-req {
-      position: absolute; top: 12px; right: 14px;
-      font-size: 12px; color: #4A5E65;
+    .snp-asi-q-field-lbl {
+      font-size: 12px; color: #4A5E65; margin-bottom: 6px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-q-body { margin-top: 12px; padding-left: 36px; }
     .snp-asi-radio { display: flex; flex-direction: column; gap: 10px; }
     .snp-asi-radio-opt {
       display: flex; align-items: center; gap: 8px; cursor: pointer;
-      font-size: 16px; color: #374151;
+      font-size: 14px; color: #374151;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-textarea {
-      width: 100%; min-height: 72px; border: none;
+      width: 100%; min-height: 60px; border: none;
       box-shadow: inset 0 0 0 1px #d1d5db; border-radius: 4px;
-      padding: 8px 10px; font-size: 16px;
+      padding: 8px 10px; font-size: 14px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
       resize: vertical; color: #374151; box-sizing: border-box;
     }
@@ -721,55 +732,36 @@ var injectStyles = function() {
     .snp-asi-select {
       width: 100%; border: none;
       box-shadow: inset 0 0 0 1px #d1d5db; border-radius: 4px;
-      padding: 7px 10px; font-size: 16px;
+      padding: 7px 10px; font-size: 14px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
       color: #374151; background: #fff;
     }
-    /* AI suggestion */
-    .snp-asi-ai-sug {
-      margin-top: 12px; margin-left: 36px;
-      box-shadow: inset 0 0 0 1px #e0e5e8; border-radius: 6px;
-      padding: 10px 12px; background: #f9fafb;
+    /* Footer */
+    .snp-asi-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 32px; border-top: 1px solid #e0e5e8; flex-shrink: 0; background: #fff;
     }
-    .snp-asi-ai-sug-lbl {
-      font-size: 12px; color: #00718F; font-weight: 600;
-      display: flex; align-items: center; gap: 4px; margin-bottom: 5px;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
-    }
-    .snp-asi-ai-sug-val {
-      font-size: 16px; color: #374151; margin-bottom: 5px;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
-    }
-    .snp-asi-ai-sug-src {
-      font-size: 12px; color: #006F8E; cursor: pointer; margin-bottom: 8px;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
-    }
-    .snp-asi-ai-sug-actions { display: flex; align-items: center; gap: 8px; }
-    .snp-asi-apply {
+    .snp-asi-back-btn {
       padding: 6px 16px; min-height: 32px;
       border: none; box-shadow: inset 0 0 0 1px #d1d5db; border-radius: 6px;
-      background: #fff; font-size: 16px; font-weight: 700; color: #374151;
+      background: #fff; color: #172B31; font-size: 14px;
       cursor: pointer; font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-discard {
-      background: none; border: none;
-      font-size: 16px; font-weight: 400; color: #4A5E65; cursor: pointer;
+    .snp-asi-back-btn:disabled { opacity: 0.35; cursor: default; }
+    .snp-asi-page-num {
+      font-size: 14px; color: #172B31;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    /* Inline Back/Next navigation (inside scrollable content) */
-    .snp-asi-nav-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 24px 0 8px;
-    }
-    .snp-asi-nav-text {
-      background: none; border: none; cursor: pointer;
-      font-size: 16px; font-weight: 400; color: #006F8E; padding: 0;
+    .snp-asi-next-btn {
+      padding: 6px 16px; min-height: 32px;
+      border: none; background: #032D42; color: #fff; border-radius: 6px;
+      font-size: 14px; cursor: pointer;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-nav-text:disabled { opacity: 0.35; cursor: default; }
+    .snp-asi-next-btn:disabled { opacity: 0.35; cursor: default; }
     /* Right panel */
     .snp-asi-details-hdr {
-      font-size: 16px; font-weight: 700; color: #10171a; margin-bottom: 16px;
+      font-size: 16px; font-weight: 700; color: #172B31; margin-bottom: 16px;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-detail-sec {
@@ -787,11 +779,11 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-detail-val {
-      font-size: 12px; color: #10171a; line-height: 1.4;
+      font-size: 12px; color: #172B31; line-height: 1.4;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-detail-name {
-      font-size: 12px; font-weight: 600; color: #10171a;
+      font-size: 12px; font-weight: 600; color: #172B31;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-detail-sub {
@@ -1711,68 +1703,69 @@ function SmartAssessmentsTab(props) {
 var ASSESSMENT_SECTIONS = [
   { id: 'general', label: 'General Information', subs: [
     { id: 'overview', label: 'Demand Overview', required: 3, questions: [
-      { id: 'gq1', type: 'textarea',  text: 'What business problem does this demand address? Describe the current pain point and its impact on the organisation.', required: true },
-      { id: 'gq2', type: 'dropdown', text: 'Which business unit is the primary owner of this demand?', required: true, options: ['IT', 'Finance', 'HR', 'Operations', 'Legal', 'Marketing', 'Product'] },
-      { id: 'gq3', type: 'radio',    text: 'Has this demand been formally approved at the executive or leadership level?', required: true, aiSuggestion: 'Yes' },
+      { id: 'gq1', type: 'textarea',  fieldLabel: 'Business Problem', text: 'What business problem does this demand address? Describe the current pain point and its impact on the organisation.', required: true },
+      { id: 'gq2', type: 'dropdown', fieldLabel: 'Business Unit',    text: 'Which business unit is the primary owner of this demand?', required: true, options: ['IT', 'Finance', 'HR', 'Operations', 'Legal', 'Marketing', 'Product'] },
+      { id: 'gq3', type: 'radio',    fieldLabel: 'Executive Approval', text: 'Has this demand been formally approved at the executive or leadership level?', required: true, aiSuggestion: 'Yes' },
     ]},
     { id: 'objectives', label: 'Objectives & Scope', required: 2, questions: [
-      { id: 'gq4', type: 'textarea', text: 'What are the primary success criteria and measurable outcomes for this demand?', required: true },
-      { id: 'gq5', type: 'textarea', text: 'What is explicitly out of scope for this demand?', required: true },
+      { id: 'gq4', type: 'textarea', fieldLabel: 'Success Criteria',  text: 'What are the primary success criteria and measurable outcomes for this demand?', required: true },
+      { id: 'gq5', type: 'textarea', fieldLabel: 'Out of Scope',      text: 'What is explicitly out of scope for this demand?', required: true },
     ]},
   ]},
   { id: 'financial', label: 'Financial Assessment', subs: [
     { id: 'cost', label: 'Cost Estimation', required: 4, questions: [
-      { id: 'fq1', type: 'textarea', text: 'What is the estimated total implementation cost, including infrastructure and licensing?', required: true },
-      { id: 'fq2', type: 'textarea', text: 'What is the estimated annual maintenance and operational cost?', required: true },
-      { id: 'fq3', type: 'textarea', text: 'What is the estimated resource cost including FTE and contractor expenses?', required: true },
-      { id: 'fq4', type: 'radio',    text: 'Has a budget been formally allocated and approved for this demand?', required: true, aiSuggestion: 'No' },
+      { id: 'fq1', type: 'textarea', fieldLabel: 'Implementation Cost', text: 'What is the estimated total implementation cost, including infrastructure and licensing?', required: true },
+      { id: 'fq2', type: 'textarea', fieldLabel: 'Maintenance Cost',    text: 'What is the estimated annual maintenance and operational cost?', required: true },
+      { id: 'fq3', type: 'textarea', fieldLabel: 'Resource Cost',       text: 'What is the estimated resource cost including FTE and contractor expenses?', required: true },
+      { id: 'fq4', type: 'radio',    fieldLabel: 'Budget Allocated',    text: 'Has a budget been formally allocated and approved for this demand?', required: true, aiSuggestion: 'No' },
     ]},
     { id: 'roi', label: 'Return on Investment', required: 3, questions: [
-      { id: 'fq5', type: 'textarea', text: 'What annual savings or revenue gains are expected from fulfilling this demand?', required: true },
-      { id: 'fq6', type: 'textarea', text: 'What is the estimated payback period in months?', required: true },
-      { id: 'fq7', type: 'radio',    text: 'Has a formal ROI calculation been completed and documented?', required: true },
+      { id: 'fq5', type: 'textarea', fieldLabel: 'Expected Savings', text: 'What annual savings or revenue gains are expected from fulfilling this demand?', required: true },
+      { id: 'fq6', type: 'textarea', fieldLabel: 'Payback Period',   text: 'What is the estimated payback period in months?', required: true },
+      { id: 'fq7', type: 'radio',    fieldLabel: 'ROI Calculated',   text: 'Has a formal ROI calculation been completed and documented?', required: true },
     ]},
   ]},
   { id: 'risk', label: 'Risk Evaluation', subs: [
     { id: 'tech', label: 'Technical Risks', required: 3, questions: [
-      { id: 'rq1', type: 'dropdown', text: 'What is the overall technical complexity level of this demand?', required: true, options: ['Low', 'Medium', 'High', 'Very High'] },
-      { id: 'rq2', type: 'textarea', text: 'List any critical system integration dependencies required to fulfil this demand.', required: true },
-      { id: 'rq3', type: 'radio',    text: 'Is there a significant risk of delivery failure based on current technical readiness?', required: true },
+      { id: 'rq1', type: 'dropdown', fieldLabel: 'Complexity Level',        text: 'What is the overall technical complexity level of this demand?', required: true, options: ['Low', 'Medium', 'High', 'Very High'] },
+      { id: 'rq2', type: 'textarea', fieldLabel: 'Integration Dependencies', text: 'List any critical system integration dependencies required to fulfil this demand.', required: true },
+      { id: 'rq3', type: 'radio',    fieldLabel: 'Delivery Risk',           text: 'Is there a significant risk of delivery failure based on current technical readiness?', required: true },
     ]},
     { id: 'biz', label: 'Business Risks', required: 2, questions: [
-      { id: 'rq4', type: 'textarea', text: 'What is the potential business impact if this demand is not fulfilled or significantly delayed?', required: true },
-      { id: 'rq5', type: 'radio',    text: 'Does the identified risk level exceed the organisation\'s risk tolerance threshold?', required: true },
+      { id: 'rq4', type: 'textarea', fieldLabel: 'Business Impact',  text: 'What is the potential business impact if this demand is not fulfilled or significantly delayed?', required: true },
+      { id: 'rq5', type: 'radio',    fieldLabel: 'Risk Tolerance',   text: 'Does the identified risk level exceed the organisation\'s risk tolerance threshold?', required: true },
     ]},
   ]},
   { id: 'resources', label: 'Resource Requirements', subs: [
     { id: 'people', label: 'People & Skills', required: 3, questions: [
-      { id: 'req1', type: 'radio',    text: 'Are the skills required to deliver this demand available internally without external hiring?', required: true, aiSuggestion: 'No' },
-      { id: 'req2', type: 'textarea', text: 'What is the estimated FTE count required to deliver this demand?', required: true },
-      { id: 'req3', type: 'radio',    text: 'Is there a dependency on external vendors or contracted resources?', required: true },
+      { id: 'req1', type: 'radio',    fieldLabel: 'Internal Skills',    text: 'Are the skills required to deliver this demand available internally without external hiring?', required: true, aiSuggestion: 'No' },
+      { id: 'req2', type: 'textarea', fieldLabel: 'FTE Estimate',       text: 'What is the estimated FTE count required to deliver this demand?', required: true },
+      { id: 'req3', type: 'radio',    fieldLabel: 'Vendor Dependency',  text: 'Is there a dependency on external vendors or contracted resources?', required: true },
     ]},
     { id: 'timeline', label: 'Timeline', required: 2, questions: [
-      { id: 'req4', type: 'textarea', text: 'What is the estimated delivery date for the initial release or first milestone?', required: true },
-      { id: 'req5', type: 'radio',    text: 'Is the proposed timeline realistic given current team capacity and organisational priorities?', required: true },
+      { id: 'req4', type: 'textarea', fieldLabel: 'Delivery Date',        text: 'What is the estimated delivery date for the initial release or first milestone?', required: true },
+      { id: 'req5', type: 'radio',    fieldLabel: 'Timeline Feasibility', text: 'Is the proposed timeline realistic given current team capacity and organisational priorities?', required: true },
     ]},
   ]},
   { id: 'compliance', label: 'Compliance & Governance', subs: [
     { id: 'regulatory', label: 'Regulatory Alignment', required: 3, questions: [
-      { id: 'cq1', type: 'radio',    text: 'Does this demand involve the processing or storage of personal or sensitive data?', required: true, aiSuggestion: 'Yes' },
-      { id: 'cq2', type: 'textarea', text: 'List any specific regulatory or compliance obligations applicable to this demand.', required: true },
-      { id: 'cq3', type: 'radio',    text: 'Is GDPR, CCPA, or equivalent data protection regulation applicable to this demand?', required: true },
+      { id: 'cq1', type: 'radio',    fieldLabel: 'Personal Data',           text: 'Does this demand involve the processing or storage of personal or sensitive data?', required: true, aiSuggestion: 'Yes' },
+      { id: 'cq2', type: 'textarea', fieldLabel: 'Regulatory Obligations',  text: 'List any specific regulatory or compliance obligations applicable to this demand.', required: true },
+      { id: 'cq3', type: 'radio',    fieldLabel: 'GDPR Applicable',         text: 'Is GDPR, CCPA, or equivalent data protection regulation applicable to this demand?', required: true },
     ]},
     { id: 'policy', label: 'Policy Compliance', required: 2, questions: [
-      { id: 'cq4', type: 'radio', text: 'Is this demand fully aligned with enterprise architecture and technology standards?', required: true },
-      { id: 'cq5', type: 'radio', text: 'Has this demand been reviewed and cleared by the legal and compliance team?', required: true },
+      { id: 'cq4', type: 'radio', fieldLabel: 'Architecture Aligned', text: 'Is this demand fully aligned with enterprise architecture and technology standards?', required: true },
+      { id: 'cq5', type: 'radio', fieldLabel: 'Legal Clearance',      text: 'Has this demand been reviewed and cleared by the legal and compliance team?', required: true },
     ]},
   ]},
   { id: 'approval', label: 'Review & Approval', subs: [
     { id: 'signoff', label: 'Stakeholder Sign-off', required: 2, questions: [
-      { id: 'aq1', type: 'radio', text: 'Has the business sponsor formally confirmed and endorsed this demand?', required: true },
-      { id: 'aq2', type: 'radio', text: 'Has the finance team approved the budget allocation for this demand?', required: true },
+      { id: 'aq1', type: 'radio', fieldLabel: 'Sponsor Confirmation', text: 'Has the business sponsor formally confirmed and endorsed this demand?', required: true },
+      { id: 'aq2', type: 'radio', fieldLabel: 'Finance Approval',     text: 'Has the finance team approved the budget allocation for this demand?', required: true },
     ]},
   ]},
 ];
+
 
 // ─── Smart Assessment Instance View ──────────────────────────────────────────
 function SmartAssessmentInstanceView(props) {
@@ -1785,11 +1778,12 @@ function SmartAssessmentInstanceView(props) {
   var subS = React.useState('overview');
   var activeSubId = subS[0]; var setActiveSubId = subS[1];
 
-  // Flat ordered list of all sub-sections for pagination
+  // Flat ordered list for pagination
   var allSubs = [];
   ASSESSMENT_SECTIONS.forEach(function(s) {
     s.subs.forEach(function(sub) { allSubs.push({ sId: s.id, subId: sub.id }); });
   });
+  var totalQ = allSubs.reduce(function(sum) { return sum; }, 0);
   var currentIdx = 0;
   for (var i = 0; i < allSubs.length; i++) {
     if (allSubs[i].sId === activeSectionId && allSubs[i].subId === activeSubId) { currentIdx = i; break; }
@@ -1809,7 +1803,17 @@ function SmartAssessmentInstanceView(props) {
     if (activeSection.subs[sj].id === activeSubId) { activeSub = activeSection.subs[sj]; break; }
   }
 
-  // ── Question renderer ──────────────────────────────────────────────────────
+  // Total questions across all sections
+  var totalQuestions = 0;
+  ASSESSMENT_SECTIONS.forEach(function(s) { s.subs.forEach(function(sub) { totalQuestions += sub.questions.length; }); });
+
+  // SVGs
+  var SVG_DOC_16 = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 8.5C5 8.22386 5.22386 8 5.5 8H10.5C10.7761 8 11 8.22386 11 8.5C11 8.77614 10.7761 9 10.5 9H5.5C5.22386 9 5 8.77614 5 8.5Z" fill="#172B31"/><path d="M5.5 10C5.22386 10 5 10.2239 5 10.5C5 10.7761 5.22386 11 5.5 11H10.5C10.7761 11 11 10.7761 11 10.5C11 10.2239 10.7761 10 10.5 10H5.5Z" fill="#172B31"/><path d="M3.5 1C2.67157 1 2 1.67157 2 2.5V13.5C2 14.3284 2.67157 15 3.5 15H12.5C13.3284 15 14 14.3284 14 13.5V5.70095C14 5.28767 13.8295 4.89269 13.5287 4.60926L10.1318 1.40832C9.85346 1.14606 9.48549 1 9.10308 1H3.5ZM3 2.5C3 2.22386 3.22386 2 3.5 2H9V4.5C9 5.32843 9.67157 6 10.5 6H13V13.5C13 13.7761 12.7761 14 12.5 14H3.5C3.22386 14 3 13.7761 3 13.5V2.5ZM12.4852 5H10.5C10.2239 5 10 4.77614 10 4.5V2.65817L12.4852 5Z" fill="#172B31"/></svg>';
+  var SVG_CIRCLE_12 = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5.5 11C8.53757 11 11 8.53757 11 5.5C11 2.46243 8.53757 0 5.5 0C2.46243 0 0 2.46243 0 5.5C0 8.53757 2.46243 11 5.5 11ZM0.999999 5.5C0.999999 3.01472 3.01472 1 5.5 1C7.98528 1 10 3.01472 10 5.5C10 7.98528 7.98528 10 5.5 10C3.01472 10 1 7.98528 0.999999 5.5Z" fill="#4A5E65"/></svg>';
+  var SVG_CIRCLE_ACTIVE_12 = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5.5 11C8.53757 11 11 8.53757 11 5.5C11 2.46243 8.53757 0 5.5 0C2.46243 0 0 2.46243 0 5.5C0 8.53757 2.46243 11 5.5 11ZM0.999999 5.5C0.999999 3.01472 3.01472 1 5.5 1C7.98528 1 10 3.01472 10 5.5C10 7.98528 7.98528 10 5.5 10C3.01472 10 1 7.98528 0.999999 5.5Z" fill="#00566E"/></svg>';
+  var SVG_CLOUD_CHECK = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8.85275 5.85435C9.04846 5.65953 9.04917 5.34295 8.85435 5.14725C8.65953 4.95154 8.34295 4.95083 8.14725 5.14565L6.4992 6.78625L5.85195 6.14485C5.6558 5.95047 5.33922 5.95191 5.14485 6.14805C4.95047 6.3442 4.95191 6.66078 5.14805 6.85515L6.14805 7.84612C6.34326 8.03956 6.65799 8.0392 6.85275 7.84532L8.85275 5.85435Z" fill="#151920"/><path d="M8 2C6.97504 2 6.07086 2.51382 5.5299 3.297C5.22534 3.10869 4.86549 3 4.48077 3C3.39412 3 2.5 3.86942 2.5 4.95809C2.5 4.97209 2.50015 4.98606 2.50045 5C1.11974 5 0 6.11929 0 7.5C0 8.88071 1.11929 10 2.5 10C2.53136 10 2.56261 9.99942 2.59374 9.99827C2.60092 9.99857 2.60813 9.99873 2.61539 9.99873H9.30211C9.32952 9.99957 9.35702 9.99999 9.38462 9.99999C10.8217 9.99999 12 8.8508 12 7.41701C12 6.57996 11.5971 5.83892 10.9775 5.36829C10.9924 5.24731 11 5.12425 11 4.99958C11 3.34288 9.65677 2 8 2Z" fill="#151920"/></svg>';
+
+  // ── Question renderer ────────────────────────────────────────────────────────
   function renderQ(q, num) {
     var inputEl;
     if (q.type === 'radio') {
@@ -1823,101 +1827,82 @@ function SmartAssessmentInstanceView(props) {
       );
     } else if (q.type === 'textarea') {
       inputEl = React.createElement('div', null,
-        React.createElement('textarea', { className: 'snp-asi-textarea', rows: 3 }),
+        React.createElement('textarea', { className: 'snp-asi-textarea', rows: 2 }),
         React.createElement('div', { className: 'snp-asi-chars' }, '○ Characters left: 1000')
       );
     } else {
       inputEl = React.createElement('select', { className: 'snp-asi-select' },
         React.createElement('option', { value: '' }, ''),
-        q.options.map(function(o) { return React.createElement('option', { key: o, value: o }, o); })
+        (q.options || []).map(function(o) { return React.createElement('option', { key: o, value: o }, o); })
       );
     }
-
-    var aiBlock = null;
-    if (q.aiSuggestion) {
-      aiBlock = React.createElement('div', { className: 'snp-asi-ai-sug' },
-        React.createElement('div', { className: 'snp-asi-ai-sug-lbl' },
-          React.createElement('span', { style: { marginRight: '3px' } }, '✶'),
-          'AI Suggestions'
-        ),
-        React.createElement('div', { className: 'snp-asi-ai-sug-val' }, q.aiSuggestion),
-        React.createElement('div', { className: 'snp-asi-ai-sug-src' }, 'View sources'),
-        React.createElement('div', { className: 'snp-asi-ai-sug-actions' },
-          React.createElement('button', { className: 'snp-asi-apply' }, 'Apply'),
-          React.createElement('button', { className: 'snp-asi-discard' }, 'Discard')
-        )
-      );
-    }
-
-    return React.createElement('div', { key: q.id, className: 'snp-asi-q-card' + (num === 1 ? ' focused' : '') },
-      q.required && React.createElement('span', { className: 'snp-asi-q-req' }, '✦ Required'),
-      React.createElement('div', { className: 'snp-asi-q-row' },
+    return React.createElement('div', { key: q.id, className: 'snp-asi-q-card' + (num === 1 ? ' first-q' : '') },
+      React.createElement('div', { className: 'snp-asi-q-layout' },
         React.createElement('span', { className: 'snp-asi-q-num' }, num),
-        React.createElement('span', { className: 'snp-asi-q-text' }, q.text)
-      ),
-      React.createElement('div', { className: 'snp-asi-q-body' }, inputEl),
-      aiBlock
+        React.createElement('div', { className: 'snp-asi-q-body' },
+          React.createElement('div', { className: 'snp-asi-q-text' }, q.text),
+          q.fieldLabel && React.createElement('div', { className: 'snp-asi-q-field-lbl' }, q.fieldLabel),
+          inputEl
+        )
+      )
     );
   }
 
-  // ── Left panel ─────────────────────────────────────────────────────────────
+  // ── Left panel ───────────────────────────────────────────────────────────────
   var leftPanel = React.createElement('div', { className: 'snp-asi-left' },
-    React.createElement('div', { className: 'snp-asi-sections-hdr' },
-      React.createElement('div', { className: 'snp-asi-sections-title' }, assessment.template),
-      React.createElement('div', { className: 'snp-asi-sections-actions' },
-        React.createElement('button', { className: 'snp-asi-icon-action' },
-          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.05444 1.27311C2.13978 1.10553 2.31194 1 2.5 1H13.5C13.6881 1 13.8602 1.10553 13.9456 1.27311C14.0309 1.4407 14.015 1.64199 13.9044 1.79409L10 7.16259V13C10 13.1894 9.893 13.3625 9.72361 13.4472L6.72361 14.9472C6.56861 15.0247 6.38455 15.0164 6.23714 14.9253C6.08973 14.8342 6 14.6733 6 14.5V7.16259L2.09563 1.79409C1.98502 1.64199 1.96911 1.4407 2.05444 1.27311ZM3.48189 2L6.90437 6.70591C6.96652 6.79137 7 6.89433 7 7V13.691L9 12.691V7C9 6.89433 9.03348 6.79137 9.09563 6.70591L12.5181 2H3.48189Z" fill="#4A5E65"/></svg>' } })
+    React.createElement('div', { className: 'snp-asi-progress-block' },
+      React.createElement('div', { className: 'snp-asi-progress-counts' },
+        React.createElement('div', { className: 'snp-asi-progress-item' },
+          React.createElement('span', { className: 'snp-asi-progress-lbl' }, 'Complete'),
+          React.createElement('span', { className: 'snp-asi-progress-val' }, '0%')
         ),
-        React.createElement('button', { className: 'snp-asi-icon-action' },
-          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9.5 3.5C9.5 4.32843 8.82843 5 8 5C7.17157 5 6.5 4.32843 6.5 3.5C6.5 2.67157 7.17157 2 8 2C8.82843 2 9.5 2.67157 9.5 3.5Z" fill="#4A5E65"/><path d="M9.5 8C9.5 8.82843 8.82843 9.5 8 9.5C7.17157 9.5 6.5 8.82843 6.5 8C6.5 7.17157 7.17157 6.5 8 6.5C8.82843 6.5 9.5 7.17157 9.5 8Z" fill="#4A5E65"/><path d="M9.5 12.5C9.5 13.3284 8.82843 14 8 14C7.17157 14 6.5 13.3284 6.5 12.5C6.5 11.6716 7.17157 11 8 11C8.82843 11 9.5 11.6716 9.5 12.5Z" fill="#4A5E65"/></svg>' } })
-        ),
-        React.createElement('button', { className: 'snp-asi-icon-action' },
-          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.16214 10.8686C2.3657 11.0552 2.68198 11.0414 2.86858 10.8379L8 5.23995L13.1314 10.8379C13.318 11.0414 13.6343 11.0552 13.8379 10.8686C14.0414 10.682 14.0552 10.3657 13.8686 10.1621L8.36858 4.16214C8.27387 4.05882 8.14016 4 8 4C7.85985 4 7.72613 4.05882 7.63143 4.16214L2.13143 10.1621C1.94483 10.3657 1.95858 10.682 2.16214 10.8686Z" fill="#4A5E65"/></svg>' } })
+        React.createElement('div', { className: 'snp-asi-progress-item' },
+          React.createElement('span', { className: 'snp-asi-progress-lbl' }, 'Questions complete'),
+          React.createElement('span', { className: 'snp-asi-progress-val' }, '0/' + totalQuestions)
         )
+      ),
+      React.createElement('div', { className: 'snp-asi-prog-bar-bg' },
+        React.createElement('div', { className: 'snp-asi-prog-bar-fill', style: { width: '0%' } })
       )
     ),
-    ASSESSMENT_SECTIONS.map(function(s) {
-      var isSec = s.id === activeSectionId;
-      var activeSubIdx = 0;
-      if (isSec) {
-        for (var k = 0; k < s.subs.length; k++) {
-          if (s.subs[k].id === activeSubId) { activeSubIdx = k + 1; break; }
-        }
-      }
-      var SVG_CHEVRON_UP_12 = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.17075 7.87629C2.37857 8.05813 2.69445 8.03707 2.8763 7.82925L6.00001 4.2593L9.12372 7.82925C9.30556 8.03707 9.62144 8.05813 9.82926 7.87629C10.0371 7.69445 10.0581 7.37857 9.8763 7.17075L6.3763 3.17075C6.28135 3.06224 6.14419 3 6.00001 3C5.85583 3 5.71866 3.06224 5.62372 3.17075L2.12372 7.17075C1.94188 7.37857 1.96294 7.69445 2.17075 7.87629Z" fill="#384E55"/></svg>';
-      var SVG_CHEVRON_DOWN_12 = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M9.82925 4.12371C9.62143 3.94187 9.30555 3.96293 9.1237 4.17075L6.00001 7.74069L2.87629 4.17075C2.69445 3.96293 2.37857 3.94187 2.17075 4.12371C1.96293 4.30555 1.94187 4.62143 2.12371 4.82925L5.62371 8.82925C5.71866 8.93776 5.85582 9 6.00001 9C6.14419 9 6.28135 8.93776 6.37629 8.82925L9.87629 4.82925C10.0581 4.62143 10.0371 4.30555 9.82925 4.12371Z" fill="#384E55"/></svg>';
-      var SVG_CIRCLE = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7.5 2C4.46243 2 2 4.46243 2 7.5C2 10.5376 4.46243 13 7.5 13C10.5376 13 13 10.5376 13 7.5C13 4.46243 10.5376 2 7.5 2ZM0 7.5C0 3.35786 3.35786 0 7.5 0C11.6421 0 15 3.35786 15 7.5C15 11.6421 11.6421 15 7.5 15C3.35786 15 0 11.6421 0 7.5Z" fill="#00566E"/></svg>';
-      return React.createElement('div', { key: s.id, className: 'snp-asi-sec-group' + (isSec ? ' active' : '') },
-        React.createElement('div', {
-          className: 'snp-asi-sec-row' + (isSec ? ' active' : ''),
-          onClick: function() { setActiveSectionId(s.id); setActiveSubId(s.subs[0].id); },
-        },
-          React.createElement('span', { className: 'snp-asi-sec-label' }, s.label),
-          React.createElement('div', { className: 'snp-asi-sec-right' },
-            isSec && React.createElement('span', { className: 'snp-asi-sec-count' },
-              activeSubIdx + ' of ' + s.subs.length
-            ),
-            React.createElement('span', { dangerouslySetInnerHTML: { __html: isSec ? SVG_CHEVRON_UP_12 : SVG_CHEVRON_DOWN_12 } })
+    React.createElement('div', { className: 'snp-asi-nav-list' },
+      React.createElement('div', { className: 'snp-asi-instructions' },
+        React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_DOC_16 } }),
+        'Instructions'
+      ),
+      ASSESSMENT_SECTIONS.map(function(s, sIdx) {
+        var isSec = s.id === activeSectionId;
+        var activeSubLabel = isSec && activeSub ? activeSub.label : s.subs[0].label;
+        return React.createElement('div', { key: s.id, className: 'snp-asi-sec-item' },
+          React.createElement('div', {
+            className: 'snp-asi-sec-header',
+            onClick: function() { setActiveSectionId(s.id); setActiveSubId(s.subs[0].id); },
+          },
+            React.createElement('span', { className: 'snp-asi-sec-num-badge' + (isSec ? ' active' : '') }, sIdx + 1),
+            React.createElement('div', { className: 'snp-asi-sec-name-block' },
+              React.createElement('div', { className: 'snp-asi-sec-name' }, s.label),
+              React.createElement('div', { className: 'snp-asi-sec-context' }, activeSubLabel)
+            )
+          ),
+          isSec && React.createElement('div', { className: 'snp-asi-subs' },
+            s.subs.map(function(sub) {
+              var isSub = sub.id === activeSubId;
+              return React.createElement('div', {
+                key: sub.id,
+                className: 'snp-asi-sub-item' + (isSub ? ' active' : ''),
+                onClick: function() { setActiveSubId(sub.id); },
+              },
+                React.createElement('span', { dangerouslySetInnerHTML: { __html: isSub ? SVG_CIRCLE_ACTIVE_12 : SVG_CIRCLE_12 } }),
+                sub.label
+              );
+            })
           )
-        ),
-        isSec && React.createElement('div', { className: 'snp-asi-subs-container' },
-          s.subs.map(function(sub) {
-            var isSub = sub.id === activeSubId;
-            return React.createElement('div', {
-              key: sub.id,
-              className: 'snp-asi-sub-row' + (isSub ? ' active' : ''),
-              onClick: function() { setActiveSubId(sub.id); },
-            },
-              React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_CIRCLE }, style: { flexShrink: 0, display: 'inline-flex' } }),
-              React.createElement('span', { className: 'snp-asi-sub-label' }, sub.label)
-            );
-          })
-        )
-      );
-    })
+        );
+      })
+    )
   );
 
-  // ── Right panel ─────────────────────────────────────────────────────────────
+  // ── Right panel ──────────────────────────────────────────────────────────────
   var email = assessment.user.toLowerCase().replace(/\s+/g, '.') + '@example.com';
   var rightPanel = React.createElement('div', { className: 'snp-asi-right' },
     React.createElement('div', { className: 'snp-asi-details-hdr' }, 'Details'),
@@ -1925,7 +1910,7 @@ function SmartAssessmentInstanceView(props) {
       React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Scope'),
       React.createElement('div', { className: 'snp-asi-detail-item' },
         React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Entity'),
-        React.createElement('div', { className: 'snp-asi-detail-val' }, demand.name)
+        React.createElement('div', { className: 'snp-asi-detail-val' }, demand.name.length > 20 ? demand.name.slice(0, 20) + '\u2026' : demand.name)
       )
     ),
     React.createElement('div', { className: 'snp-asi-detail-sec' },
@@ -1940,6 +1925,10 @@ function SmartAssessmentInstanceView(props) {
       React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Dates'),
       React.createElement('div', { className: 'snp-asi-detail-item' },
         React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Requested'),
+        React.createElement('div', { className: 'snp-asi-detail-val' }, '2026-01-19')
+      ),
+      React.createElement('div', { className: 'snp-asi-detail-item' },
+        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Due'),
         React.createElement('div', { className: 'snp-asi-detail-val' }, assessment.dueDate.split(' ')[0])
       )
     )
@@ -1953,44 +1942,37 @@ function SmartAssessmentInstanceView(props) {
         'Demands'
       ),
       React.createElement('span', { className: 'snp-bc-sep' }, '>'),
-      React.createElement('span', { className: 'snp-bc-link', onClick: onBack }, demand.name),
+      React.createElement('span', { className: 'snp-bc-link', onClick: onBack }, demand.name.length > 15 ? demand.name.slice(0, 15) + '\u2026' : demand.name),
       React.createElement('span', { className: 'snp-bc-sep' }, '>'),
       React.createElement('span', { style: { color: '#293e40' } }, assessment.number)
     ),
 
     // Header
     React.createElement('div', { className: 'snp-asi-hdr' },
-      // Top row: title + saved badge  |  action buttons
       React.createElement('div', { className: 'snp-asi-hdr-top' },
         React.createElement('div', { className: 'snp-asi-hdr-title-row' },
           React.createElement('span', { className: 'snp-asi-title' }, assessment.template),
           React.createElement('div', { className: 'snp-asi-saved' },
-            React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8.85275 5.85435C9.04846 5.65953 9.04917 5.34295 8.85435 5.14725C8.65953 4.95154 8.34295 4.95083 8.14725 5.14565L6.4992 6.78625L5.85195 6.14485C5.6558 5.95047 5.33922 5.95191 5.14485 6.14805C4.95047 6.3442 4.95191 6.66078 5.14805 6.85515L6.14805 7.84612C6.34326 8.03956 6.65799 8.0392 6.85275 7.84532L8.85275 5.85435Z" fill="#151920"/><path d="M8 2C6.97504 2 6.07086 2.51382 5.5299 3.297C5.22534 3.10869 4.86549 3 4.48077 3C3.39412 3 2.5 3.86942 2.5 4.95809C2.5 4.97209 2.50015 4.98606 2.50045 5C1.11974 5 0 6.11929 0 7.5C0 8.88071 1.11929 10 2.5 10C2.53136 10 2.56261 9.99942 2.59374 9.99827C2.60092 9.99857 2.60813 9.99873 2.61539 9.99873H9.30211C9.32952 9.99957 9.35702 9.99999 9.38462 9.99999C10.8217 9.99999 12 8.8508 12 7.41701C12 6.57996 11.5971 5.83892 10.9775 5.36829C10.9924 5.24731 11 5.12425 11 4.99958C11 3.34288 9.65677 2 8 2ZM2.61539 9C2.61539 9 2.52925 9 2.5 9C1.67157 9 1 8.32843 1 7.5C1 6.67157 1.67157 6 2.5 6C2.67319 6 2.83852 6.02915 2.99199 6.0824C3.18468 6.14927 3.39867 6.09238 3.53273 5.93867C3.66679 5.78495 3.69404 5.56521 3.60159 5.3834C3.5366 5.25561 3.5 5.11164 3.5 4.95809C3.5 4.4362 3.9318 4 4.48077 4C4.80654 4 5.09308 4.15441 5.27135 4.39097C5.38041 4.53568 5.55923 4.61007 5.73874 4.58539C5.91826 4.56072 6.07038 4.44085 6.13635 4.27208C6.42772 3.52668 7.15292 3 8 3C9.10465 3 10 3.89532 10 4.99958C10 5.16698 9.97953 5.32891 9.94121 5.48329C9.88686 5.70219 9.9858 5.93038 10.1827 6.04033C10.6744 6.31482 11 6.83071 11 7.41701C11 8.28402 10.2841 8.99999 9.38462 8.99999C9.36538 8.99999 9.34624 8.99967 9.32719 8.99902L9.31018 8.99873L2.61539 9Z" fill="#151920"/></svg>' } }),
+            React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_CLOUD_CHECK } }),
             React.createElement('span', { className: 'snp-asi-saved-text' }, 'Saved')
           )
         ),
         React.createElement('div', { className: 'snp-asi-hdr-actions' },
-        React.createElement('button', { className: 'snp-asi-draft-btn' },
-          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.00005 7.98242C1.0018 7.18692 1.59561 6.52631 2.37896 6.3877C3.34688 6.21631 4.27211 5.75822 5.01763 5.0127C5.76284 4.26733 6.22025 3.34267 6.39165 2.375C6.53025 1.59173 7.19096 0.997941 7.98638 0.996094L8.01763 0.996094C8.81302 0.997953 9.47374 1.59166 9.61235 2.375C9.78377 3.34284 10.2418 4.26715 10.9874 5.0127C11.7328 5.75814 12.6572 6.21628 13.625 6.38769C14.4084 6.52631 15.0022 7.18692 15.004 7.98242C15.0041 7.99281 15.004 8.00341 15.004 8.01367C15.002 8.80897 14.4083 9.4698 13.625 9.6084C12.6575 9.77969 11.7328 10.2371 10.9874 10.9824C10.2418 11.7279 9.78374 12.6532 9.61235 13.6211C9.47374 14.4044 8.81313 14.9982 8.01763 15C8.00723 15.0001 7.99665 15 7.98638 15C7.19096 14.9982 6.53025 14.4044 6.39165 13.6211C6.22037 12.6533 5.76322 11.728 5.01763 10.9824C4.27212 10.2369 3.34686 9.77979 2.37896 9.6084C1.59568 9.4698 1.00191 8.80908 1.00005 8.01367C0.999939 8.0033 1.00005 7.9927 1.00005 7.98242ZM5.50005 8C5.50005 9.38055 6.61956 10.4997 8.00005 10.5C9.38076 10.5 10.5 9.38071 10.5 8C10.5 6.61945 9.38151 5.50026 8.00103 5.5C6.62031 5.5 5.50005 6.61929 5.50005 8Z" fill="#004F65"/></svg>' } }),
-          'Draft responses with Otto'
-        ),
-        React.createElement('button', { className: 'snp-asi-filter-btn' },
-          React.createElement('now-icon', { icon: 'filter-outline', size: 'sm' }),
-          'All Questions',
-          React.createElement('now-icon', { icon: 'chevron-down-outline', size: 'sm' })
-        ),
-        React.createElement('now-button', { label: 'Submit', variant: 'primary', size: 'md' }),
-        React.createElement('button', { className: 'snp-icon-btn' },
-          React.createElement('now-icon', { icon: 'ellipsis-h-outline', size: 'sm' })
+          React.createElement('button', { className: 'snp-asi-filter-btn' },
+            React.createElement('now-icon', { icon: 'filter-outline', size: 'sm' }),
+            'All Questions',
+            React.createElement('now-icon', { icon: 'chevron-down-outline', size: 'sm' })
+          ),
+          React.createElement('now-button', { label: 'Submit', variant: 'primary', size: 'md' }),
+          React.createElement('button', { className: 'snp-icon-btn' },
+            React.createElement('now-icon', { icon: 'ellipsis-h-outline', size: 'sm' })
+          )
         )
-      )
-      // close snp-asi-hdr-top
-    ),
-      // Tabbed metadata below the title row
+      ),
       React.createElement('div', { className: 'snp-asi-tabbed-meta' },
         React.createElement('div', { className: 'snp-asi-meta-item' },
           React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Entity'),
-          React.createElement('div', { className: 'snp-asi-meta-val' }, demand.name.length > 15 ? demand.name.slice(0, 15) + '…' : demand.name)
+          React.createElement('div', { className: 'snp-asi-meta-val' }, demand.name.length > 15 ? demand.name.slice(0, 15) + '\u2026' : demand.name)
         ),
         React.createElement('div', { className: 'snp-asi-meta-item' },
           React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'State'),
@@ -2011,28 +1993,37 @@ function SmartAssessmentInstanceView(props) {
     React.createElement('div', { className: 'snp-asi-body' },
       leftPanel,
       React.createElement('div', { className: 'snp-asi-main' },
-        React.createElement('div', { className: 'snp-asi-content-hdr' },
-          React.createElement('h2', { className: 'snp-asi-section-title' }, activeSection.label),
-          React.createElement('p', { className: 'snp-asi-sub-heading' }, activeSub.label)
+        React.createElement('div', { className: 'snp-asi-assess-label' }, 'Demand Assessment'),
+        React.createElement('div', { className: 'snp-asi-content-title' }, assessment.template),
+        React.createElement('div', { className: 'snp-asi-content-context' },
+          React.createElement('span', { className: 'snp-asi-context-lbl' }, 'Demand'),
+          React.createElement('span', { className: 'snp-asi-context-val' }, '  ' + demand.name)
         ),
-        activeSub.questions.map(function(q, idx) { return renderQ(q, idx + 1); }),
-        React.createElement('div', { className: 'snp-asi-nav-row' },
-          React.createElement('button', {
-            className: 'snp-asi-nav-text',
-            onClick: function() { navigate(currentIdx - 1); },
-            disabled: currentIdx === 0,
-          }, '← Back'),
-          React.createElement('button', {
-            className: 'snp-asi-nav-text',
-            onClick: function() { navigate(currentIdx + 1); },
-            disabled: currentIdx === allSubs.length - 1,
-          }, 'Next →')
-        )
+        React.createElement('div', { className: 'snp-asi-section-heading' }, activeSection.label),
+        React.createElement('div', { className: 'snp-asi-sub-heading' }, activeSub.label),
+        activeSub.questions.map(function(q, idx) { return renderQ(q, idx + 1); })
       ),
       rightPanel
+    ),
+
+    // Footer
+    React.createElement('div', { className: 'snp-asi-footer' },
+      React.createElement('button', {
+        className: 'snp-asi-back-btn',
+        onClick: function() { navigate(currentIdx - 1); },
+        disabled: currentIdx === 0,
+      }, 'back'),
+      React.createElement('span', { className: 'snp-asi-page-num' }, currentIdx + 1),
+      React.createElement('button', {
+        className: 'snp-asi-next-btn',
+        onClick: function() { navigate(currentIdx + 1); },
+        disabled: currentIdx === allSubs.length - 1,
+      }, 'next')
     )
   );
 }
+
+
 
 // ─── Demand Detail Page ────────────────────────────────────────────────────────
 function DemandDetailPage(props) {
