@@ -570,7 +570,10 @@ var injectStyles = function() {
       font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
     }
     .snp-asi-saved {
-      font-size: 12px; color: #4A5E65; flex-shrink: 0;
+      display: inline-flex; align-items: flex-end; gap: 6px; flex-shrink: 0;
+    }
+    .snp-asi-saved-text {
+      font-size: 12px; font-weight: 400; color: #454D5B;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-tabbed-meta { display: flex; align-items: center; gap: 16px; }
@@ -1961,7 +1964,10 @@ function SmartAssessmentInstanceView(props) {
       React.createElement('div', { className: 'snp-asi-hdr-top' },
         React.createElement('div', { className: 'snp-asi-hdr-title-row' },
           React.createElement('span', { className: 'snp-asi-title' }, assessment.template),
-          React.createElement('span', { className: 'snp-asi-saved' }, '✉ Saved')
+          React.createElement('div', { className: 'snp-asi-saved' },
+            React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8.85275 5.85435C9.04846 5.65953 9.04917 5.34295 8.85435 5.14725C8.65953 4.95154 8.34295 4.95083 8.14725 5.14565L6.4992 6.78625L5.85195 6.14485C5.6558 5.95047 5.33922 5.95191 5.14485 6.14805C4.95047 6.3442 4.95191 6.66078 5.14805 6.85515L6.14805 7.84612C6.34326 8.03956 6.65799 8.0392 6.85275 7.84532L8.85275 5.85435Z" fill="#151920"/><path d="M8 2C6.97504 2 6.07086 2.51382 5.5299 3.297C5.22534 3.10869 4.86549 3 4.48077 3C3.39412 3 2.5 3.86942 2.5 4.95809C2.5 4.97209 2.50015 4.98606 2.50045 5C1.11974 5 0 6.11929 0 7.5C0 8.88071 1.11929 10 2.5 10C2.53136 10 2.56261 9.99942 2.59374 9.99827C2.60092 9.99857 2.60813 9.99873 2.61539 9.99873H9.30211C9.32952 9.99957 9.35702 9.99999 9.38462 9.99999C10.8217 9.99999 12 8.8508 12 7.41701C12 6.57996 11.5971 5.83892 10.9775 5.36829C10.9924 5.24731 11 5.12425 11 4.99958C11 3.34288 9.65677 2 8 2ZM2.61539 9C2.61539 9 2.52925 9 2.5 9C1.67157 9 1 8.32843 1 7.5C1 6.67157 1.67157 6 2.5 6C2.67319 6 2.83852 6.02915 2.99199 6.0824C3.18468 6.14927 3.39867 6.09238 3.53273 5.93867C3.66679 5.78495 3.69404 5.56521 3.60159 5.3834C3.5366 5.25561 3.5 5.11164 3.5 4.95809C3.5 4.4362 3.9318 4 4.48077 4C4.80654 4 5.09308 4.15441 5.27135 4.39097C5.38041 4.53568 5.55923 4.61007 5.73874 4.58539C5.91826 4.56072 6.07038 4.44085 6.13635 4.27208C6.42772 3.52668 7.15292 3 8 3C9.10465 3 10 3.89532 10 4.99958C10 5.16698 9.97953 5.32891 9.94121 5.48329C9.88686 5.70219 9.9858 5.93038 10.1827 6.04033C10.6744 6.31482 11 6.83071 11 7.41701C11 8.28402 10.2841 8.99999 9.38462 8.99999C9.36538 8.99999 9.34624 8.99967 9.32719 8.99902L9.31018 8.99873L2.61539 9Z" fill="#151920"/></svg>' } }),
+            React.createElement('span', { className: 'snp-asi-saved-text' }, 'Saved')
+          )
         ),
         React.createElement('div', { className: 'snp-asi-hdr-actions' },
         React.createElement('button', { className: 'snp-asi-draft-btn' },
