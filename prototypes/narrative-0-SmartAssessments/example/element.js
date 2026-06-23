@@ -692,11 +692,11 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-q-card {
-      border: 1px solid #e0e5e8; border-radius: 6px;
+      border-radius: 6px;
       padding: 16px 20px; margin-bottom: 16px;
     }
     .snp-asi-q-card.first-q {
-      outline: 2px solid #4F52BD;
+      outline: 2px solid #0080A3;
       box-shadow: 0px 2px 4px rgba(56,56,56,0.25);
     }
     .snp-asi-q-layout { display: flex; gap: 24px; align-items: flex-start; }
