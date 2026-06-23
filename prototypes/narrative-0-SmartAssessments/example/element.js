@@ -623,38 +623,34 @@ var injectStyles = function() {
     }
     .snp-asi-sec-group { margin-bottom: 2px; }
     .snp-asi-sec-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 16px; min-height: 44px; cursor: pointer;
-      font-size: 16px; font-weight: 600; color: #10171a;
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 16px; min-height: 46px; cursor: pointer;
+      font-size: 16px; font-weight: 600; color: #172B31;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+      border-radius: 6px;
+    }
+    .snp-asi-sec-row:hover { background: rgba(189,222,231,0.06); }
+    .snp-asi-sec-row.active { background: rgba(189,222,231,0.10); }
+    .snp-asi-sec-label { flex: 1; }
+    .snp-asi-sec-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .snp-asi-sec-count {
+      font-size: 12px; color: #4A5E65;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-sec-row:hover { background: #f5f4f2; }
-    .snp-asi-sec-row.active { color: #00566E; }
-    .snp-asi-sec-dot {
-      width: 12px; height: 12px; border-radius: 50%;
-      border: 2px solid #9ca3af; flex-shrink: 0; display: inline-block;
-    }
-    .snp-asi-sec-dot.active { background: #00566E; border-color: #00566E; }
+    .snp-asi-subs-container { padding: 0 8px 8px; }
     .snp-asi-sub-row {
-      display: flex; align-items: center; gap: 6px;
-      padding: 6px 8px 6px 24px; min-height: 32px; cursor: pointer;
-      font-size: 16px; font-weight: 400; color: #4A5E65;
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 8px; min-height: 32px; cursor: pointer;
+      border-radius: 6px;
+      font-size: 16px; font-weight: 400; color: #172B31;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-sub-row:hover { background: #f5f4f2; }
+    .snp-asi-sub-row:hover:not(.active) { background: rgba(0,0,0,0.03); }
     .snp-asi-sub-row.active {
-      background: rgba(0,86,110,0.04); border-radius: 6px;
+      background: rgba(0,128,163,0.10);
       color: #00566E; font-weight: 700;
     }
     .snp-asi-sub-label { flex: 1; }
-    .snp-asi-sub-req {
-      font-size: 12px; color: #9ca3af; white-space: nowrap;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
-    }
-    .snp-asi-sub-progress {
-      height: 2px; background: #00566E; border-radius: 1px;
-      margin: 1px 8px 3px 24px;
-    }
     /* Main content */
     .snp-asi-content-hdr { margin-bottom: 20px; }
     .snp-asi-section-title {
@@ -1854,28 +1850,41 @@ function SmartAssessmentInstanceView(props) {
     ),
     ASSESSMENT_SECTIONS.map(function(s) {
       var isSec = s.id === activeSectionId;
+      var activeSubIdx = 0;
+      if (isSec) {
+        for (var k = 0; k < s.subs.length; k++) {
+          if (s.subs[k].id === activeSubId) { activeSubIdx = k + 1; break; }
+        }
+      }
+      var SVG_CHEVRON_UP_12 = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.17075 7.87629C2.37857 8.05813 2.69445 8.03707 2.8763 7.82925L6.00001 4.2593L9.12372 7.82925C9.30556 8.03707 9.62144 8.05813 9.82926 7.87629C10.0371 7.69445 10.0581 7.37857 9.8763 7.17075L6.3763 3.17075C6.28135 3.06224 6.14419 3 6.00001 3C5.85583 3 5.71866 3.06224 5.62372 3.17075L2.12372 7.17075C1.94188 7.37857 1.96294 7.69445 2.17075 7.87629Z" fill="#384E55"/></svg>';
+      var SVG_CHEVRON_DOWN_12 = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M9.82925 4.12371C9.62143 3.94187 9.30555 3.96293 9.1237 4.17075L6.00001 7.74069L2.87629 4.17075C2.69445 3.96293 2.37857 3.94187 2.17075 4.12371C1.96293 4.30555 1.94187 4.62143 2.12371 4.82925L5.62371 8.82925C5.71866 8.93776 5.85582 9 6.00001 9C6.14419 9 6.28135 8.93776 6.37629 8.82925L9.87629 4.82925C10.0581 4.62143 10.0371 4.30555 9.82925 4.12371Z" fill="#384E55"/></svg>';
+      var SVG_CIRCLE = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7.5 2C4.46243 2 2 4.46243 2 7.5C2 10.5376 4.46243 13 7.5 13C10.5376 13 13 10.5376 13 7.5C13 4.46243 10.5376 2 7.5 2ZM0 7.5C0 3.35786 3.35786 0 7.5 0C11.6421 0 15 3.35786 15 7.5C15 11.6421 11.6421 15 7.5 15C3.35786 15 0 11.6421 0 7.5Z" fill="#00566E"/></svg>';
       return React.createElement('div', { key: s.id, className: 'snp-asi-sec-group' },
         React.createElement('div', {
           className: 'snp-asi-sec-row' + (isSec ? ' active' : ''),
           onClick: function() { setActiveSectionId(s.id); setActiveSubId(s.subs[0].id); },
         },
-          React.createElement('span', { className: 'snp-asi-sec-dot' + (isSec ? ' active' : '') }),
-          s.label
-        ),
-        s.subs.map(function(sub) {
-          var isSub = isSec && sub.id === activeSubId;
-          return React.createElement('div', { key: sub.id },
-            React.createElement('div', {
-              className: 'snp-asi-sub-row' + (isSub ? ' active' : ''),
-              onClick: function() { setActiveSectionId(s.id); setActiveSubId(sub.id); },
-            },
-              React.createElement('now-icon', { icon: isSub ? 'document-outline' : 'circle-outline', size: 'sm' }),
-              React.createElement('span', { className: 'snp-asi-sub-label' }, sub.label),
-              React.createElement('span', { className: 'snp-asi-sub-req' }, '✵ ' + sub.required)
+          React.createElement('span', { className: 'snp-asi-sec-label' }, s.label),
+          React.createElement('div', { className: 'snp-asi-sec-right' },
+            isSec && React.createElement('span', { className: 'snp-asi-sec-count' },
+              activeSubIdx + ' of ' + s.subs.length
             ),
-            isSub && React.createElement('div', { className: 'snp-asi-sub-progress' })
-          );
-        })
+            React.createElement('span', { dangerouslySetInnerHTML: { __html: isSec ? SVG_CHEVRON_UP_12 : SVG_CHEVRON_DOWN_12 } })
+          )
+        ),
+        isSec && React.createElement('div', { className: 'snp-asi-subs-container' },
+          s.subs.map(function(sub) {
+            var isSub = sub.id === activeSubId;
+            return React.createElement('div', {
+              key: sub.id,
+              className: 'snp-asi-sub-row' + (isSub ? ' active' : ''),
+              onClick: function() { setActiveSubId(sub.id); },
+            },
+              React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_CIRCLE }, style: { flexShrink: 0, display: 'inline-flex' } }),
+              React.createElement('span', { className: 'snp-asi-sub-label' }, sub.label)
+            );
+          })
+        )
       );
     })
   );
