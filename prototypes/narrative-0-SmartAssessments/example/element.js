@@ -85,7 +85,7 @@ var injectStyles = function() {
     }
 
     /* ── Detail page ───────────────────────────────────────────────── */
-    .snp-detail-page { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; }
+    .snp-detail-page { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; position: relative; }
     .snp-detail-cols { flex: 1; display: flex; overflow: hidden; min-height: 0; }
 
     /* Sidebar */
@@ -630,7 +630,7 @@ var injectStyles = function() {
     @keyframes snp-sparkle { 0%,100%{transform:rotate(0)scale(1);opacity:1} 50%{transform:rotate(20deg)scale(1.3);opacity:.65} }
     /* Modal overlay */
     .snp-modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      position: absolute; inset: 0; background: rgba(0,0,0,0.5);
       z-index: 1000; display: flex; align-items: center; justify-content: center;
     }
     .snp-modal {
