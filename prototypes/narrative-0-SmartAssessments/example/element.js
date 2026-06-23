@@ -558,11 +558,13 @@ var injectStyles = function() {
     /* ── Smart Assessment Instance View ──────────────────────────────────── */
     .snp-asi-hdr {
       padding: 16px; border-bottom: 1px solid #e0e5e8;
-      display: flex; justify-content: space-between; align-items: flex-start;
-      flex-shrink: 0; gap: 16px;
+      display: flex; flex-direction: column; gap: 6px;
+      flex-shrink: 0;
     }
-    .snp-asi-hdr-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .snp-asi-hdr-title-row { display: flex; align-items: center; gap: 12px; }
+    .snp-asi-hdr-top {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    }
+    .snp-asi-hdr-title-row { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
     .snp-asi-title {
       font-size: 20px; font-weight: 700; color: #032d42;
       font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
@@ -1955,31 +1957,13 @@ function SmartAssessmentInstanceView(props) {
 
     // Header
     React.createElement('div', { className: 'snp-asi-hdr' },
-      React.createElement('div', { className: 'snp-asi-hdr-meta' },
+      // Top row: title + saved badge  |  action buttons
+      React.createElement('div', { className: 'snp-asi-hdr-top' },
         React.createElement('div', { className: 'snp-asi-hdr-title-row' },
           React.createElement('span', { className: 'snp-asi-title' }, assessment.template),
           React.createElement('span', { className: 'snp-asi-saved' }, '✉ Saved')
         ),
-        React.createElement('div', { className: 'snp-asi-tabbed-meta' },
-          React.createElement('div', { className: 'snp-asi-meta-item' },
-            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Entity'),
-            React.createElement('div', { className: 'snp-asi-meta-val' }, demand.name)
-          ),
-          React.createElement('div', { className: 'snp-asi-meta-item' },
-            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'State'),
-            React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.state)
-          ),
-          React.createElement('div', { className: 'snp-asi-meta-item' },
-            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Assigned to'),
-            React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.user)
-          ),
-          React.createElement('div', { className: 'snp-asi-meta-item' },
-            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Due date'),
-            React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.dueDate.split(' ')[0])
-          )
-        )
-      ),
-      React.createElement('div', { className: 'snp-asi-hdr-actions' },
+        React.createElement('div', { className: 'snp-asi-hdr-actions' },
         React.createElement('button', { className: 'snp-asi-draft-btn' },
           React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.00005 7.98242C1.0018 7.18692 1.59561 6.52631 2.37896 6.3877C3.34688 6.21631 4.27211 5.75822 5.01763 5.0127C5.76284 4.26733 6.22025 3.34267 6.39165 2.375C6.53025 1.59173 7.19096 0.997941 7.98638 0.996094L8.01763 0.996094C8.81302 0.997953 9.47374 1.59166 9.61235 2.375C9.78377 3.34284 10.2418 4.26715 10.9874 5.0127C11.7328 5.75814 12.6572 6.21628 13.625 6.38769C14.4084 6.52631 15.0022 7.18692 15.004 7.98242C15.0041 7.99281 15.004 8.00341 15.004 8.01367C15.002 8.80897 14.4083 9.4698 13.625 9.6084C12.6575 9.77969 11.7328 10.2371 10.9874 10.9824C10.2418 11.7279 9.78374 12.6532 9.61235 13.6211C9.47374 14.4044 8.81313 14.9982 8.01763 15C8.00723 15.0001 7.99665 15 7.98638 15C7.19096 14.9982 6.53025 14.4044 6.39165 13.6211C6.22037 12.6533 5.76322 11.728 5.01763 10.9824C4.27212 10.2369 3.34686 9.77979 2.37896 9.6084C1.59568 9.4698 1.00191 8.80908 1.00005 8.01367C0.999939 8.0033 1.00005 7.9927 1.00005 7.98242ZM5.50005 8C5.50005 9.38055 6.61956 10.4997 8.00005 10.5C9.38076 10.5 10.5 9.38071 10.5 8C10.5 6.61945 9.38151 5.50026 8.00103 5.5C6.62031 5.5 5.50005 6.61929 5.50005 8Z" fill="#004F65"/></svg>' } }),
           'Draft responses with Otto'
@@ -1992,6 +1976,27 @@ function SmartAssessmentInstanceView(props) {
         React.createElement('now-button', { label: 'Submit', variant: 'primary', size: 'md' }),
         React.createElement('button', { className: 'snp-icon-btn' },
           React.createElement('now-icon', { icon: 'ellipsis-h-outline', size: 'sm' })
+        )
+      )
+      // close snp-asi-hdr-top
+    ),
+      // Tabbed metadata below the title row
+      React.createElement('div', { className: 'snp-asi-tabbed-meta' },
+        React.createElement('div', { className: 'snp-asi-meta-item' },
+          React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Entity'),
+          React.createElement('div', { className: 'snp-asi-meta-val' }, demand.name)
+        ),
+        React.createElement('div', { className: 'snp-asi-meta-item' },
+          React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'State'),
+          React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.state)
+        ),
+        React.createElement('div', { className: 'snp-asi-meta-item' },
+          React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Assigned to'),
+          React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.user)
+        ),
+        React.createElement('div', { className: 'snp-asi-meta-item' },
+          React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Due date'),
+          React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.dueDate.split(' ')[0])
         )
       )
     ),
