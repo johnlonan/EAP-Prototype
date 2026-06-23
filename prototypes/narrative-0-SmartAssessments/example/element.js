@@ -585,15 +585,15 @@ var injectStyles = function() {
       display: inline-flex; align-items: center; gap: 2px;
       padding: 6px 16px; min-height: 32px; border: none;
       border-radius: 6px;
-      background: linear-gradient(135deg, rgba(0,191,222,0.12) 5%, rgba(0,79,101,0.20) 95%);
-      box-shadow: inset 0 0 0 1px rgba(0,79,101,0.18);
+      background: linear-gradient(135deg, #86F673 5%, #71D5FE 95%);
+      box-shadow: none;
       color: #004F65;
       font-size: 16px; font-weight: 700;
       font-family: var(--now-font-family, 'Lato', sans-serif);
       cursor: pointer; white-space: nowrap;
     }
     .snp-asi-draft-btn:hover {
-      background: linear-gradient(135deg, rgba(0,191,222,0.18) 5%, rgba(0,79,101,0.26) 95%);
+      background: linear-gradient(135deg, #79e968 5%, #5ec8f0 95%);
     }
     .snp-asi-filter-btn {
       display: inline-flex; align-items: center; gap: 4px;
