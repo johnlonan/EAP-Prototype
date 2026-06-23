@@ -618,24 +618,31 @@ var injectStyles = function() {
     /* Left panel */
     .snp-asi-sections-hdr {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 16px 8px;
-      font-size: 12px; font-weight: 400; color: #4A5E65;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
+      padding: 16px 8px 16px 16px; flex-shrink: 0;
     }
-    .snp-asi-sections-close {
-      background: none; border: none; cursor: pointer; padding: 2px;
-      display: inline-flex; color: #4A5E65;
+    .snp-asi-sections-title {
+      flex: 1; color: #294149;
+      font-size: 20px; font-weight: 700;
+      font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
+      line-height: 1.3;
     }
-    .snp-asi-sec-group { margin-bottom: 2px; }
+    .snp-asi-sections-actions { display: flex; align-items: flex-start; }
+    .snp-asi-icon-action {
+      background: none; border: none; cursor: pointer; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 32px; min-height: 32px; border-radius: 6px; flex-shrink: 0;
+    }
+    .snp-asi-icon-action:hover { background: rgba(74,94,101,0.08); }
+    .snp-asi-sec-group { margin-bottom: 2px; padding: 0 8px; }
     .snp-asi-sec-row {
       display: flex; align-items: center; gap: 12px;
-      padding: 8px 16px; min-height: 46px; cursor: pointer;
+      padding: 8px 8px; min-height: 46px; cursor: pointer;
       font-size: 16px; font-weight: 600; color: #172B31;
       font-family: var(--now-font-family, 'Lato', sans-serif);
       border-radius: 6px;
     }
-    .snp-asi-sec-row:hover { background: rgba(189,222,231,0.06); }
-    .snp-asi-sec-row.active { background: rgba(189,222,231,0.10); }
+    .snp-asi-sec-row:hover { background: rgba(189,222,231,0.08); }
+    .snp-asi-sec-row.active { background: rgba(189,222,231,0.22); }
     .snp-asi-sec-label { flex: 1; }
     .snp-asi-sec-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .snp-asi-sec-count {
@@ -1848,9 +1855,17 @@ function SmartAssessmentInstanceView(props) {
   // ── Left panel ─────────────────────────────────────────────────────────────
   var leftPanel = React.createElement('div', { className: 'snp-asi-left' },
     React.createElement('div', { className: 'snp-asi-sections-hdr' },
-      'Sections',
-      React.createElement('button', { className: 'snp-asi-sections-close' },
-        React.createElement('now-icon', { icon: 'list-outline', size: 'sm' })
+      React.createElement('div', { className: 'snp-asi-sections-title' }, assessment.template),
+      React.createElement('div', { className: 'snp-asi-sections-actions' },
+        React.createElement('button', { className: 'snp-asi-icon-action' },
+          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.05444 1.27311C2.13978 1.10553 2.31194 1 2.5 1H13.5C13.6881 1 13.8602 1.10553 13.9456 1.27311C14.0309 1.4407 14.015 1.64199 13.9044 1.79409L10 7.16259V13C10 13.1894 9.893 13.3625 9.72361 13.4472L6.72361 14.9472C6.56861 15.0247 6.38455 15.0164 6.23714 14.9253C6.08973 14.8342 6 14.6733 6 14.5V7.16259L2.09563 1.79409C1.98502 1.64199 1.96911 1.4407 2.05444 1.27311ZM3.48189 2L6.90437 6.70591C6.96652 6.79137 7 6.89433 7 7V13.691L9 12.691V7C9 6.89433 9.03348 6.79137 9.09563 6.70591L12.5181 2H3.48189Z" fill="#4A5E65"/></svg>' } })
+        ),
+        React.createElement('button', { className: 'snp-asi-icon-action' },
+          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9.5 3.5C9.5 4.32843 8.82843 5 8 5C7.17157 5 6.5 4.32843 6.5 3.5C6.5 2.67157 7.17157 2 8 2C8.82843 2 9.5 2.67157 9.5 3.5Z" fill="#4A5E65"/><path d="M9.5 8C9.5 8.82843 8.82843 9.5 8 9.5C7.17157 9.5 6.5 8.82843 6.5 8C6.5 7.17157 7.17157 6.5 8 6.5C8.82843 6.5 9.5 7.17157 9.5 8Z" fill="#4A5E65"/><path d="M9.5 12.5C9.5 13.3284 8.82843 14 8 14C7.17157 14 6.5 13.3284 6.5 12.5C6.5 11.6716 7.17157 11 8 11C8.82843 11 9.5 11.6716 9.5 12.5Z" fill="#4A5E65"/></svg>' } })
+        ),
+        React.createElement('button', { className: 'snp-asi-icon-action' },
+          React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.16214 10.8686C2.3657 11.0552 2.68198 11.0414 2.86858 10.8379L8 5.23995L13.1314 10.8379C13.318 11.0414 13.6343 11.0552 13.8379 10.8686C14.0414 10.682 14.0552 10.3657 13.8686 10.1621L8.36858 4.16214C8.27387 4.05882 8.14016 4 8 4C7.85985 4 7.72613 4.05882 7.63143 4.16214L2.13143 10.1621C1.94483 10.3657 1.95858 10.682 2.16214 10.8686Z" fill="#4A5E65"/></svg>' } })
+        )
       )
     ),
     ASSESSMENT_SECTIONS.map(function(s) {
@@ -1950,7 +1965,7 @@ function SmartAssessmentInstanceView(props) {
       React.createElement('div', { className: 'snp-asi-hdr-actions' },
         React.createElement('button', { className: 'snp-asi-draft-btn' },
           React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.00005 7.98242C1.0018 7.18692 1.59561 6.52631 2.37896 6.3877C3.34688 6.21631 4.27211 5.75822 5.01763 5.0127C5.76284 4.26733 6.22025 3.34267 6.39165 2.375C6.53025 1.59173 7.19096 0.997941 7.98638 0.996094L8.01763 0.996094C8.81302 0.997953 9.47374 1.59166 9.61235 2.375C9.78377 3.34284 10.2418 4.26715 10.9874 5.0127C11.7328 5.75814 12.6572 6.21628 13.625 6.38769C14.4084 6.52631 15.0022 7.18692 15.004 7.98242C15.0041 7.99281 15.004 8.00341 15.004 8.01367C15.002 8.80897 14.4083 9.4698 13.625 9.6084C12.6575 9.77969 11.7328 10.2371 10.9874 10.9824C10.2418 11.7279 9.78374 12.6532 9.61235 13.6211C9.47374 14.4044 8.81313 14.9982 8.01763 15C8.00723 15.0001 7.99665 15 7.98638 15C7.19096 14.9982 6.53025 14.4044 6.39165 13.6211C6.22037 12.6533 5.76322 11.728 5.01763 10.9824C4.27212 10.2369 3.34686 9.77979 2.37896 9.6084C1.59568 9.4698 1.00191 8.80908 1.00005 8.01367C0.999939 8.0033 1.00005 7.9927 1.00005 7.98242ZM5.50005 8C5.50005 9.38055 6.61956 10.4997 8.00005 10.5C9.38076 10.5 10.5 9.38071 10.5 8C10.5 6.61945 9.38151 5.50026 8.00103 5.5C6.62031 5.5 5.50005 6.61929 5.50005 8Z" fill="#004F65"/></svg>' } }),
-          'Draft responses with AI'
+          'Draft responses with Otto'
         ),
         React.createElement('button', { className: 'snp-asi-filter-btn' },
           React.createElement('now-icon', { icon: 'filter-outline', size: 'sm' }),
