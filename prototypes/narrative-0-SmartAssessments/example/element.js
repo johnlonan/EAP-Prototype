@@ -571,13 +571,14 @@ var injectStyles = function() {
       font-size: 12px; color: #4A5E65; flex-shrink: 0;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-entity-row { display: flex; align-items: center; gap: 6px; }
-    .snp-asi-entity-lbl {
-      font-size: 12px; color: #4A5E65;
+    .snp-asi-tabbed-meta { display: flex; align-items: center; gap: 16px; }
+    .snp-asi-meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .snp-asi-meta-lbl {
+      font-size: 12px; font-weight: 400; color: #4A5E65;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-entity-val {
-      font-size: 12px; color: #006F8E; cursor: pointer;
+    .snp-asi-meta-val {
+      font-size: 12px; font-weight: 400; color: #172B31;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-hdr-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -1959,9 +1960,23 @@ function SmartAssessmentInstanceView(props) {
           React.createElement('span', { className: 'snp-asi-title' }, assessment.template),
           React.createElement('span', { className: 'snp-asi-saved' }, '✉ Saved')
         ),
-        React.createElement('div', { className: 'snp-asi-entity-row' },
-          React.createElement('span', { className: 'snp-asi-entity-lbl' }, 'Entity'),
-          React.createElement('span', { className: 'snp-asi-entity-val' }, demand.name)
+        React.createElement('div', { className: 'snp-asi-tabbed-meta' },
+          React.createElement('div', { className: 'snp-asi-meta-item' },
+            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Entity'),
+            React.createElement('div', { className: 'snp-asi-meta-val' }, demand.name)
+          ),
+          React.createElement('div', { className: 'snp-asi-meta-item' },
+            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'State'),
+            React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.state)
+          ),
+          React.createElement('div', { className: 'snp-asi-meta-item' },
+            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Assigned to'),
+            React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.user)
+          ),
+          React.createElement('div', { className: 'snp-asi-meta-item' },
+            React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Due date'),
+            React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.dueDate.split(' ')[0])
+          )
         )
       ),
       React.createElement('div', { className: 'snp-asi-hdr-actions' },
