@@ -604,8 +604,9 @@ var injectStyles = function() {
     }
     .snp-asi-main { flex: 1; overflow-y: auto; padding: 32px; background: #fff; }
     .snp-asi-right {
-      width: 220px; flex-shrink: 0; border-left: 1px solid #e0e5e8;
-      overflow-y: auto; padding: 16px; background: #fff;
+      width: 320px; flex-shrink: 0; border-left: 1px solid #e0e5e8;
+      overflow-y: auto; padding: 24px 24px 12px;
+      background: #E6F2F6; display: flex; flex-direction: column; gap: 16px;
     }
     /* Left panel — progress */
     .snp-asi-progress-block {
@@ -771,33 +772,43 @@ var injectStyles = function() {
     .snp-asi-next-btn:disabled { opacity: 0.35; cursor: default; }
     /* Right panel */
     .snp-asi-details-hdr {
-      font-size: 16px; font-weight: 700; color: #172B31; margin-bottom: 16px;
-      font-family: var(--now-font-family, 'Lato', sans-serif);
+      font-size: 24px; font-weight: 700; color: #2C323F;
+      font-family: 'Cabin', var(--now-font-family, 'Source Sans Pro', sans-serif);
     }
+    .snp-asi-detail-cards { display: flex; flex-direction: column; gap: 12px; }
     .snp-asi-detail-sec {
-      box-shadow: inset 0 0 0 1px #e0e5e8; border-radius: 6px;
-      padding: 12px; margin-bottom: 12px;
+      background: #fff;
+      box-shadow: 0px 2px 4px rgba(56,56,56,0.25);
+      outline: 1px solid #D3D6DC; outline-offset: -1px;
+      border-radius: 4px; padding: 16px;
+      display: flex; flex-direction: column; gap: 8px;
+      overflow: hidden;
     }
+    .snp-asi-detail-sec.people { gap: 12px; }
     .snp-asi-detail-cat {
-      font-size: 12px; font-weight: 600; color: #4A5E65; margin-bottom: 8px;
-      text-transform: uppercase; letter-spacing: 0.4px;
+      font-size: 16px; font-weight: 600; color: #151920;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-asi-detail-item { margin-bottom: 6px; }
+    .snp-asi-detail-item { display: flex; flex-direction: column; gap: 0; }
+    .snp-asi-detail-contact { display: flex; flex-direction: column; gap: 4px; }
     .snp-asi-detail-lbl {
-      font-size: 12px; color: #4A5E65; margin-bottom: 2px;
+      font-size: 12px; color: #454D5B;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-detail-val {
-      font-size: 12px; color: #172B31; line-height: 1.4;
+      font-size: 16px; color: #151920; line-height: 1.4;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-detail-name {
-      font-size: 12px; font-weight: 600; color: #172B31;
+      font-size: 16px; font-weight: 400; color: #151920;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-asi-detail-link {
+      font-size: 12px; color: #3C59E7;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-detail-sub {
-      font-size: 12px; color: #4A5E65;
+      font-size: 12px; color: #3C59E7;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
   `;
@@ -1933,34 +1944,50 @@ function SmartAssessmentInstanceView(props) {
     )
   );
 
-  // ── Right panel ──────────────────────────────────────────────────────────────
+  // ── Right panel ──────────────────────────────────────────────────────────────────────────
   var email = assessment.user.toLowerCase().replace(/\s+/g, '.') + '@example.com';
   var rightPanel = React.createElement('div', { className: 'snp-asi-right' },
     React.createElement('div', { className: 'snp-asi-details-hdr' }, 'Details'),
-    React.createElement('div', { className: 'snp-asi-detail-sec' },
-      React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Scope'),
-      React.createElement('div', { className: 'snp-asi-detail-item' },
-        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Entity'),
-        React.createElement('div', { className: 'snp-asi-detail-val' }, demand.name.length > 20 ? demand.name.slice(0, 20) + '\u2026' : demand.name)
-      )
-    ),
-    React.createElement('div', { className: 'snp-asi-detail-sec' },
-      React.createElement('div', { className: 'snp-asi-detail-cat' }, 'People'),
-      React.createElement('div', { className: 'snp-asi-detail-item' },
-        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Assigned to'),
-        React.createElement('div', { className: 'snp-asi-detail-name' }, assessment.user),
-        React.createElement('div', { className: 'snp-asi-detail-sub' }, email)
-      )
-    ),
-    React.createElement('div', { className: 'snp-asi-detail-sec' },
-      React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Dates'),
-      React.createElement('div', { className: 'snp-asi-detail-item' },
-        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Requested'),
-        React.createElement('div', { className: 'snp-asi-detail-val' }, '2026-01-19')
+    React.createElement('div', { className: 'snp-asi-detail-cards' },
+      React.createElement('div', { className: 'snp-asi-detail-sec' },
+        React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Scope'),
+        React.createElement('div', { className: 'snp-asi-detail-item' },
+          React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Demand'),
+          React.createElement('div', { className: 'snp-asi-detail-val' }, demand.name.length > 28 ? demand.name.slice(0, 28) + '\u2026' : demand.name)
+        ),
+        React.createElement('div', { className: 'snp-asi-detail-item' },
+          React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Assessment'),
+          React.createElement('div', { className: 'snp-asi-detail-val' }, assessment.template)
+        ),
+        React.createElement('div', { className: 'snp-asi-detail-item' },
+          React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'State'),
+          React.createElement('div', { className: 'snp-asi-detail-val' }, assessment.state)
+        )
       ),
-      React.createElement('div', { className: 'snp-asi-detail-item' },
-        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Due'),
-        React.createElement('div', { className: 'snp-asi-detail-val' }, assessment.dueDate.split(' ')[0])
+      React.createElement('div', { className: 'snp-asi-detail-sec people' },
+        React.createElement('div', { className: 'snp-asi-detail-cat' }, 'People'),
+        React.createElement('div', { className: 'snp-asi-detail-contact' },
+          React.createElement('div', { className: 'snp-asi-detail-item' },
+            React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Assigned to'),
+            React.createElement('div', { className: 'snp-asi-detail-name' }, assessment.user)
+          ),
+          React.createElement('div', { className: 'snp-asi-detail-link' }, email)
+        )
+      ),
+      React.createElement('div', { className: 'snp-asi-detail-sec' },
+        React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Dates'),
+        React.createElement('div', { className: 'snp-asi-detail-item' },
+          React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Requested'),
+          React.createElement('div', { className: 'snp-asi-detail-val' }, '2026-01-19')
+        ),
+        React.createElement('div', { className: 'snp-asi-detail-item' },
+          React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Due'),
+          React.createElement('div', { className: 'snp-asi-detail-val' }, assessment.dueDate.split(' ')[0])
+        ),
+        React.createElement('div', { className: 'snp-asi-detail-item' },
+          React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Completed'),
+          React.createElement('div', { className: 'snp-asi-detail-val' }, '\u2014')
+        )
       )
     )
   );
