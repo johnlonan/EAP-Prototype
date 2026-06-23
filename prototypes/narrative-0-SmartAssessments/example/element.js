@@ -554,6 +554,147 @@ var injectStyles = function() {
       display: inline-flex; align-items: center; justify-content: center;
     }
     .snp-sa-page-btn-active { background: #032d42; color: #fff; border-color: #032d42; }
+
+    /* ── Smart Assessment Instance View ──────────────────────────────────── */
+    .snp-asi-hdr {
+      padding: 12px 20px 10px; border-bottom: 1px solid #e0e5e8;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-shrink: 0; gap: 16px;
+    }
+    .snp-asi-hdr-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .snp-asi-hdr-title-row { display: flex; align-items: center; gap: 12px; }
+    .snp-asi-title { font-size: 17px; font-weight: 600; color: #10171a; }
+    .snp-asi-saved { font-size: 12px; color: #9ca3af; flex-shrink: 0; }
+    .snp-asi-entity-row { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .snp-asi-entity-lbl { color: #9ca3af; }
+    .snp-asi-entity-val { color: #0f7aab; cursor: pointer; }
+    .snp-asi-hdr-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .snp-asi-draft-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0 12px; height: 32px;
+      border: 1px solid #4ade80; border-radius: 6px;
+      background: #fff; color: #00718F; font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+    }
+    .snp-asi-filter-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 0 10px; height: 32px;
+      border: 1px solid #d1d5db; border-radius: 6px;
+      background: #fff; color: #374151; font-size: 13px;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+    }
+    /* Body layout */
+    .snp-asi-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+    .snp-asi-left {
+      width: 268px; flex-shrink: 0; border-right: 1px solid #e0e5e8;
+      overflow-y: auto; padding-bottom: 16px;
+    }
+    .snp-asi-main { flex: 1; overflow-y: auto; padding: 20px 24px; }
+    .snp-asi-right {
+      width: 220px; flex-shrink: 0; border-left: 1px solid #e0e5e8;
+      overflow-y: auto; padding: 16px;
+    }
+    .snp-asi-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 24px; border-top: 1px solid #e0e5e8; flex-shrink: 0;
+    }
+    /* Left panel */
+    .snp-asi-sections-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px 8px; font-size: 13px; font-weight: 600; color: #10171a;
+    }
+    .snp-asi-sections-close {
+      background: none; border: none; cursor: pointer; padding: 2px;
+      display: inline-flex; color: #6b7280;
+    }
+    .snp-asi-sec-group { margin-bottom: 2px; }
+    .snp-asi-sec-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 16px; cursor: pointer; font-size: 13px; color: #374151;
+    }
+    .snp-asi-sec-row:hover { background: #f5f4f2; }
+    .snp-asi-sec-row.active { color: #0e4e69; font-weight: 500; }
+    .snp-asi-sec-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid #9ca3af; flex-shrink: 0; display: inline-block;
+    }
+    .snp-asi-sec-dot.active { background: #0e4e69; border-color: #0e4e69; }
+    .snp-asi-sub-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 16px 5px 30px; cursor: pointer;
+      font-size: 13px; color: #6b7280;
+    }
+    .snp-asi-sub-row:hover { background: #f5f4f2; }
+    .snp-asi-sub-row.active { color: #0e4e69; }
+    .snp-asi-sub-label { flex: 1; }
+    .snp-asi-sub-req { font-size: 11px; color: #9ca3af; white-space: nowrap; }
+    .snp-asi-sub-progress {
+      height: 2px; background: #0e4e69; border-radius: 1px;
+      margin: 1px 16px 3px 30px;
+    }
+    /* Main content */
+    .snp-asi-content-hdr { margin-bottom: 16px; }
+    .snp-asi-section-title { font-size: 20px; font-weight: 700; color: #10171a; margin-bottom: 3px; }
+    .snp-asi-sub-heading { font-size: 13px; color: #6b7280; }
+    .snp-asi-q-card {
+      border: 1px solid #d1d5db; border-radius: 6px;
+      padding: 14px 16px; margin-bottom: 12px; position: relative;
+    }
+    .snp-asi-q-card.focused { border-color: #5CAEC4; border-left: 3px solid #5CAEC4; }
+    .snp-asi-q-row { display: flex; gap: 14px; align-items: flex-start; }
+    .snp-asi-q-num { font-size: 14px; font-weight: 600; color: #374151; flex-shrink: 0; min-width: 18px; }
+    .snp-asi-q-text { font-size: 14px; color: #10171a; line-height: 1.5; flex: 1; padding-right: 80px; }
+    .snp-asi-q-req { position: absolute; top: 12px; right: 14px; font-size: 11px; color: #6b7280; }
+    .snp-asi-q-body { margin-top: 10px; padding-left: 32px; }
+    .snp-asi-radio { display: flex; flex-direction: column; gap: 8px; }
+    .snp-asi-radio-opt { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #374151; }
+    .snp-asi-textarea {
+      width: 100%; min-height: 72px; border: 1px solid #d1d5db; border-radius: 4px;
+      padding: 8px 10px; font-size: 14px; font-family: inherit; resize: vertical; color: #374151;
+      box-sizing: border-box;
+    }
+    .snp-asi-textarea:focus { outline: none; border-color: #5CAEC4; }
+    .snp-asi-chars { font-size: 11px; color: #9ca3af; margin-top: 3px; }
+    .snp-asi-select {
+      width: 100%; border: 1px solid #d1d5db; border-radius: 4px;
+      padding: 7px 10px; font-size: 14px; font-family: inherit; color: #374151; background: #fff;
+    }
+    .snp-asi-ai-sug {
+      margin-top: 12px; margin-left: 32px;
+      border: 1px solid #e0e5e8; border-radius: 4px;
+      padding: 10px 12px; background: #f9fafb;
+    }
+    .snp-asi-ai-sug-lbl {
+      font-size: 12px; color: #00718F; font-weight: 600;
+      display: flex; align-items: center; gap: 4px; margin-bottom: 5px;
+    }
+    .snp-asi-ai-sug-val { font-size: 14px; color: #374151; margin-bottom: 5px; }
+    .snp-asi-ai-sug-src { font-size: 12px; color: #0f7aab; cursor: pointer; margin-bottom: 8px; }
+    .snp-asi-ai-sug-actions { display: flex; align-items: center; gap: 8px; }
+    .snp-asi-apply {
+      padding: 4px 12px; border: 1px solid #d1d5db; border-radius: 4px;
+      background: #f3f4f6; font-size: 13px; color: #374151; cursor: pointer; font-family: inherit;
+    }
+    .snp-asi-discard { background: none; border: none; font-size: 13px; color: #6b7280; cursor: pointer; font-family: inherit; }
+    /* Right panel */
+    .snp-asi-details-hdr { font-size: 15px; font-weight: 700; color: #10171a; margin-bottom: 16px; }
+    .snp-asi-detail-sec {
+      border: 1px solid #e0e5e8; border-radius: 6px; padding: 12px; margin-bottom: 12px;
+    }
+    .snp-asi-detail-cat { font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px; }
+    .snp-asi-detail-item { margin-bottom: 6px; }
+    .snp-asi-detail-lbl { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+    .snp-asi-detail-val { font-size: 13px; color: #10171a; line-height: 1.4; }
+    .snp-asi-detail-name { font-size: 13px; font-weight: 600; color: #10171a; }
+    .snp-asi-detail-sub { font-size: 12px; color: #6b7280; }
+    /* Footer nav */
+    .snp-asi-nav-btn {
+      padding: 6px 20px; border: 1px solid #d1d5db; border-radius: 6px;
+      background: #fff; font-size: 14px; color: #374151; cursor: pointer; font-family: inherit;
+    }
+    .snp-asi-nav-btn:disabled { opacity: 0.4; cursor: default; }
+    .snp-asi-nav-btn-primary { background: #032d42; color: #fff; border-color: #032d42; }
+    .snp-asi-page-num { font-size: 14px; color: #374151; font-weight: 500; }
   `;
   document.head.appendChild(el);
 };
@@ -1384,15 +1525,14 @@ var NAV_SVG = {
 
 // ─── Smart Assessments Tab ────────────────────────────────────────────────────
 var SMART_ASSESSMENTS = [
-  { key: 'sa1', number: 'ASMT0002460', template: 'Smart Assessment Standard',  state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-15 10:00:00' },
-  { key: 'sa2', number: 'ASMT0002458', template: 'Smart Assessment Standard',  state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-15 09:30:00' },
-  { key: 'sa3', number: 'ASMT0002455', template: 'Demand Feasibility Review',  state: 'Open', user: 'James Wilson',  dueDate: '2026-07-20 14:00:00' },
-  { key: 'sa4', number: 'ASMT0002452', template: 'Risk Impact Assessment',     state: 'Open', user: 'Sarah Chen',    dueDate: '2026-06-30 16:00:00' },
-  { key: 'sa5', number: 'ASMT0002449', template: 'Demand Feasibility Review',  state: 'Open', user: 'James Wilson',  dueDate: '2026-08-01 11:00:00' },
-  { key: 'sa6', number: 'ASMT0002446', template: 'Compliance Readiness Check', state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-25 13:00:00' },
+  { key: 'sa1', number: 'ASMT0002460', template: 'Financial Impact Assessment', state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-15 10:00:00' },
+  { key: 'sa3', number: 'ASMT0002455', template: 'Demand Feasibility',          state: 'Open', user: 'James Wilson',  dueDate: '2026-07-20 14:00:00' },
+  { key: 'sa4', number: 'ASMT0002452', template: 'Risk Impact Assessment',      state: 'Open', user: 'Sarah Chen',    dueDate: '2026-06-30 16:00:00' },
+  { key: 'sa5', number: 'ASMT0002449', template: 'Demand Feasibility',          state: 'Open', user: 'James Wilson',  dueDate: '2026-08-01 11:00:00' },
+  { key: 'sa6', number: 'ASMT0002446', template: 'Compliance Readiness Check',  state: 'Open', user: 'Amelia Caputo', dueDate: '2026-07-25 13:00:00' },
 ];
 
-function SmartAssessmentsTab() {
+function SmartAssessmentsTab(props) {
   var colDefs = JSON.stringify({
     columns: [
       { key: 'number',   type: 'link',   label: 'Assessment instance', grow: 2   },
@@ -1422,7 +1562,7 @@ function SmartAssessmentsTab() {
 
     React.createElement('div', { className: 'snp-sa-hdr' },
       React.createElement('div', { className: 'snp-sa-hdr-left' },
-        React.createElement('h2', { className: 'snp-sa-title' }, 'All - Demand assessments'),
+        React.createElement('h2', { className: 'snp-sa-title' }, 'Demand assessments'),
         React.createElement('p', { className: 'snp-sa-subtitle' }, 'Last refreshed 1m ago.')
       ),
       React.createElement('div', { className: 'snp-sa-hdr-right' },
@@ -1439,7 +1579,14 @@ function SmartAssessmentsTab() {
       ref: function(el) {
         if (!el || el._bound) return;
         el._bound = true;
-        el.addEventListener('NOW_LIST#CELL_LINK_CLICKED', function() {});
+        el.addEventListener('NOW_LIST#CELL_LINK_CLICKED', function(e) {
+          var cell = e.detail && e.detail.payload && e.detail.payload.cell;
+          var key = cell && cell.value;
+          if (!key || !props.onSelectAssessment) return;
+          for (var i = 0; i < SMART_ASSESSMENTS.length; i++) {
+            if (SMART_ASSESSMENTS[i].key === key) { props.onSelectAssessment(SMART_ASSESSMENTS[i]); return; }
+          }
+        });
       },
     },
       React.createElement('now-list', {
@@ -1451,8 +1598,297 @@ function SmartAssessmentsTab() {
     ),
 
     React.createElement('div', { className: 'snp-sa-footer' },
-      React.createElement('span', null, 'Showing 1–6 of 6'),
+      React.createElement('span', null, 'Showing 1–5 of 5'),
       React.createElement('button', { className: 'snp-sa-page-btn snp-sa-page-btn-active' }, '1')
+    )
+  );
+}
+
+// ─── Assessment sections data ────────────────────────────────────────────────
+var ASSESSMENT_SECTIONS = [
+  { id: 'general', label: 'General Information', subs: [
+    { id: 'overview', label: 'Demand Overview', required: 3, questions: [
+      { id: 'gq1', type: 'textarea',  text: 'What business problem does this demand address? Describe the current pain point and its impact on the organisation.', required: true },
+      { id: 'gq2', type: 'dropdown', text: 'Which business unit is the primary owner of this demand?', required: true, options: ['IT', 'Finance', 'HR', 'Operations', 'Legal', 'Marketing', 'Product'] },
+      { id: 'gq3', type: 'radio',    text: 'Has this demand been formally approved at the executive or leadership level?', required: true, aiSuggestion: 'Yes' },
+    ]},
+    { id: 'objectives', label: 'Objectives & Scope', required: 2, questions: [
+      { id: 'gq4', type: 'textarea', text: 'What are the primary success criteria and measurable outcomes for this demand?', required: true },
+      { id: 'gq5', type: 'textarea', text: 'What is explicitly out of scope for this demand?', required: true },
+    ]},
+  ]},
+  { id: 'financial', label: 'Financial Assessment', subs: [
+    { id: 'cost', label: 'Cost Estimation', required: 4, questions: [
+      { id: 'fq1', type: 'textarea', text: 'What is the estimated total implementation cost, including infrastructure and licensing?', required: true },
+      { id: 'fq2', type: 'textarea', text: 'What is the estimated annual maintenance and operational cost?', required: true },
+      { id: 'fq3', type: 'textarea', text: 'What is the estimated resource cost including FTE and contractor expenses?', required: true },
+      { id: 'fq4', type: 'radio',    text: 'Has a budget been formally allocated and approved for this demand?', required: true, aiSuggestion: 'No' },
+    ]},
+    { id: 'roi', label: 'Return on Investment', required: 3, questions: [
+      { id: 'fq5', type: 'textarea', text: 'What annual savings or revenue gains are expected from fulfilling this demand?', required: true },
+      { id: 'fq6', type: 'textarea', text: 'What is the estimated payback period in months?', required: true },
+      { id: 'fq7', type: 'radio',    text: 'Has a formal ROI calculation been completed and documented?', required: true },
+    ]},
+  ]},
+  { id: 'risk', label: 'Risk Evaluation', subs: [
+    { id: 'tech', label: 'Technical Risks', required: 3, questions: [
+      { id: 'rq1', type: 'dropdown', text: 'What is the overall technical complexity level of this demand?', required: true, options: ['Low', 'Medium', 'High', 'Very High'] },
+      { id: 'rq2', type: 'textarea', text: 'List any critical system integration dependencies required to fulfil this demand.', required: true },
+      { id: 'rq3', type: 'radio',    text: 'Is there a significant risk of delivery failure based on current technical readiness?', required: true },
+    ]},
+    { id: 'biz', label: 'Business Risks', required: 2, questions: [
+      { id: 'rq4', type: 'textarea', text: 'What is the potential business impact if this demand is not fulfilled or significantly delayed?', required: true },
+      { id: 'rq5', type: 'radio',    text: 'Does the identified risk level exceed the organisation\'s risk tolerance threshold?', required: true },
+    ]},
+  ]},
+  { id: 'resources', label: 'Resource Requirements', subs: [
+    { id: 'people', label: 'People & Skills', required: 3, questions: [
+      { id: 'req1', type: 'radio',    text: 'Are the skills required to deliver this demand available internally without external hiring?', required: true, aiSuggestion: 'No' },
+      { id: 'req2', type: 'textarea', text: 'What is the estimated FTE count required to deliver this demand?', required: true },
+      { id: 'req3', type: 'radio',    text: 'Is there a dependency on external vendors or contracted resources?', required: true },
+    ]},
+    { id: 'timeline', label: 'Timeline', required: 2, questions: [
+      { id: 'req4', type: 'textarea', text: 'What is the estimated delivery date for the initial release or first milestone?', required: true },
+      { id: 'req5', type: 'radio',    text: 'Is the proposed timeline realistic given current team capacity and organisational priorities?', required: true },
+    ]},
+  ]},
+  { id: 'compliance', label: 'Compliance & Governance', subs: [
+    { id: 'regulatory', label: 'Regulatory Alignment', required: 3, questions: [
+      { id: 'cq1', type: 'radio',    text: 'Does this demand involve the processing or storage of personal or sensitive data?', required: true, aiSuggestion: 'Yes' },
+      { id: 'cq2', type: 'textarea', text: 'List any specific regulatory or compliance obligations applicable to this demand.', required: true },
+      { id: 'cq3', type: 'radio',    text: 'Is GDPR, CCPA, or equivalent data protection regulation applicable to this demand?', required: true },
+    ]},
+    { id: 'policy', label: 'Policy Compliance', required: 2, questions: [
+      { id: 'cq4', type: 'radio', text: 'Is this demand fully aligned with enterprise architecture and technology standards?', required: true },
+      { id: 'cq5', type: 'radio', text: 'Has this demand been reviewed and cleared by the legal and compliance team?', required: true },
+    ]},
+  ]},
+  { id: 'approval', label: 'Review & Approval', subs: [
+    { id: 'signoff', label: 'Stakeholder Sign-off', required: 2, questions: [
+      { id: 'aq1', type: 'radio', text: 'Has the business sponsor formally confirmed and endorsed this demand?', required: true },
+      { id: 'aq2', type: 'radio', text: 'Has the finance team approved the budget allocation for this demand?', required: true },
+    ]},
+  ]},
+];
+
+// ─── Smart Assessment Instance View ──────────────────────────────────────────
+function SmartAssessmentInstanceView(props) {
+  var demand     = props.demand;
+  var assessment = props.assessment;
+  var onBack     = props.onBack;
+
+  var secS = React.useState('general');
+  var activeSectionId = secS[0]; var setActiveSectionId = secS[1];
+  var subS = React.useState('overview');
+  var activeSubId = subS[0]; var setActiveSubId = subS[1];
+
+  // Flat ordered list of all sub-sections for pagination
+  var allSubs = [];
+  ASSESSMENT_SECTIONS.forEach(function(s) {
+    s.subs.forEach(function(sub) { allSubs.push({ sId: s.id, subId: sub.id }); });
+  });
+  var currentIdx = 0;
+  for (var i = 0; i < allSubs.length; i++) {
+    if (allSubs[i].sId === activeSectionId && allSubs[i].subId === activeSubId) { currentIdx = i; break; }
+  }
+  function navigate(idx) {
+    if (idx < 0 || idx >= allSubs.length) return;
+    setActiveSectionId(allSubs[idx].sId);
+    setActiveSubId(allSubs[idx].subId);
+  }
+
+  var activeSection = ASSESSMENT_SECTIONS[0];
+  for (var si = 0; si < ASSESSMENT_SECTIONS.length; si++) {
+    if (ASSESSMENT_SECTIONS[si].id === activeSectionId) { activeSection = ASSESSMENT_SECTIONS[si]; break; }
+  }
+  var activeSub = activeSection.subs[0];
+  for (var sj = 0; sj < activeSection.subs.length; sj++) {
+    if (activeSection.subs[sj].id === activeSubId) { activeSub = activeSection.subs[sj]; break; }
+  }
+
+  // ── Question renderer ──────────────────────────────────────────────────────
+  function renderQ(q, num) {
+    var inputEl;
+    if (q.type === 'radio') {
+      inputEl = React.createElement('div', { className: 'snp-asi-radio' },
+        ['Yes', 'No', 'Not Applicable'].map(function(opt) {
+          return React.createElement('label', { key: opt, className: 'snp-asi-radio-opt' },
+            React.createElement('input', { type: 'radio', name: q.id }),
+            opt
+          );
+        })
+      );
+    } else if (q.type === 'textarea') {
+      inputEl = React.createElement('div', null,
+        React.createElement('textarea', { className: 'snp-asi-textarea', rows: 3 }),
+        React.createElement('div', { className: 'snp-asi-chars' }, '○ Characters left: 1000')
+      );
+    } else {
+      inputEl = React.createElement('select', { className: 'snp-asi-select' },
+        React.createElement('option', { value: '' }, ''),
+        q.options.map(function(o) { return React.createElement('option', { key: o, value: o }, o); })
+      );
+    }
+
+    var aiBlock = null;
+    if (q.aiSuggestion) {
+      aiBlock = React.createElement('div', { className: 'snp-asi-ai-sug' },
+        React.createElement('div', { className: 'snp-asi-ai-sug-lbl' },
+          React.createElement('span', { style: { marginRight: '3px' } }, '✶'),
+          'AI Suggestions'
+        ),
+        React.createElement('div', { className: 'snp-asi-ai-sug-val' }, q.aiSuggestion),
+        React.createElement('div', { className: 'snp-asi-ai-sug-src' }, 'View sources'),
+        React.createElement('div', { className: 'snp-asi-ai-sug-actions' },
+          React.createElement('button', { className: 'snp-asi-apply' }, 'Apply'),
+          React.createElement('button', { className: 'snp-asi-discard' }, 'Discard')
+        )
+      );
+    }
+
+    return React.createElement('div', { key: q.id, className: 'snp-asi-q-card' + (num === 1 ? ' focused' : '') },
+      q.required && React.createElement('span', { className: 'snp-asi-q-req' }, '✦ Required'),
+      React.createElement('div', { className: 'snp-asi-q-row' },
+        React.createElement('span', { className: 'snp-asi-q-num' }, num),
+        React.createElement('span', { className: 'snp-asi-q-text' }, q.text)
+      ),
+      React.createElement('div', { className: 'snp-asi-q-body' }, inputEl),
+      aiBlock
+    );
+  }
+
+  // ── Left panel ─────────────────────────────────────────────────────────────
+  var leftPanel = React.createElement('div', { className: 'snp-asi-left' },
+    React.createElement('div', { className: 'snp-asi-sections-hdr' },
+      'Sections',
+      React.createElement('button', { className: 'snp-asi-sections-close' },
+        React.createElement('now-icon', { icon: 'list-outline', size: 'sm' })
+      )
+    ),
+    ASSESSMENT_SECTIONS.map(function(s) {
+      var isSec = s.id === activeSectionId;
+      return React.createElement('div', { key: s.id, className: 'snp-asi-sec-group' },
+        React.createElement('div', {
+          className: 'snp-asi-sec-row' + (isSec ? ' active' : ''),
+          onClick: function() { setActiveSectionId(s.id); setActiveSubId(s.subs[0].id); },
+        },
+          React.createElement('span', { className: 'snp-asi-sec-dot' + (isSec ? ' active' : '') }),
+          s.label
+        ),
+        s.subs.map(function(sub) {
+          var isSub = isSec && sub.id === activeSubId;
+          return React.createElement('div', { key: sub.id },
+            React.createElement('div', {
+              className: 'snp-asi-sub-row' + (isSub ? ' active' : ''),
+              onClick: function() { setActiveSectionId(s.id); setActiveSubId(sub.id); },
+            },
+              React.createElement('now-icon', { icon: isSub ? 'document-outline' : 'circle-outline', size: 'sm' }),
+              React.createElement('span', { className: 'snp-asi-sub-label' }, sub.label),
+              React.createElement('span', { className: 'snp-asi-sub-req' }, '✵ ' + sub.required)
+            ),
+            isSub && React.createElement('div', { className: 'snp-asi-sub-progress' })
+          );
+        })
+      );
+    })
+  );
+
+  // ── Right panel ─────────────────────────────────────────────────────────────
+  var email = assessment.user.toLowerCase().replace(/\s+/g, '.') + '@example.com';
+  var rightPanel = React.createElement('div', { className: 'snp-asi-right' },
+    React.createElement('div', { className: 'snp-asi-details-hdr' }, 'Details'),
+    React.createElement('div', { className: 'snp-asi-detail-sec' },
+      React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Scope'),
+      React.createElement('div', { className: 'snp-asi-detail-item' },
+        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Entity'),
+        React.createElement('div', { className: 'snp-asi-detail-val' }, demand.name)
+      )
+    ),
+    React.createElement('div', { className: 'snp-asi-detail-sec' },
+      React.createElement('div', { className: 'snp-asi-detail-cat' }, 'People'),
+      React.createElement('div', { className: 'snp-asi-detail-item' },
+        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Assigned to'),
+        React.createElement('div', { className: 'snp-asi-detail-name' }, assessment.user),
+        React.createElement('div', { className: 'snp-asi-detail-sub' }, email)
+      )
+    ),
+    React.createElement('div', { className: 'snp-asi-detail-sec' },
+      React.createElement('div', { className: 'snp-asi-detail-cat' }, 'Dates'),
+      React.createElement('div', { className: 'snp-asi-detail-item' },
+        React.createElement('div', { className: 'snp-asi-detail-lbl' }, 'Requested'),
+        React.createElement('div', { className: 'snp-asi-detail-val' }, assessment.dueDate.split(' ')[0])
+      )
+    )
+  );
+
+  return React.createElement('div', { className: 'snp-detail-page' },
+    // Breadcrumb
+    React.createElement('div', { className: 'snp-bc' },
+      React.createElement('span', { className: 'snp-bc-link', onClick: onBack },
+        React.createElement('now-icon', { icon: 'inbox-outline', size: 'sm' }),
+        'Demands'
+      ),
+      React.createElement('span', { className: 'snp-bc-sep' }, '>'),
+      React.createElement('span', { className: 'snp-bc-link', onClick: onBack }, demand.name),
+      React.createElement('span', { className: 'snp-bc-sep' }, '>'),
+      React.createElement('span', { style: { color: '#293e40' } }, assessment.number)
+    ),
+
+    // Header
+    React.createElement('div', { className: 'snp-asi-hdr' },
+      React.createElement('div', { className: 'snp-asi-hdr-meta' },
+        React.createElement('div', { className: 'snp-asi-hdr-title-row' },
+          React.createElement('span', { className: 'snp-asi-title' }, assessment.template),
+          React.createElement('span', { className: 'snp-asi-saved' }, '✉ Saved')
+        ),
+        React.createElement('div', { className: 'snp-asi-entity-row' },
+          React.createElement('span', { className: 'snp-asi-entity-lbl' }, 'Entity'),
+          React.createElement('span', { className: 'snp-asi-entity-val' }, demand.name)
+        )
+      ),
+      React.createElement('div', { className: 'snp-asi-hdr-actions' },
+        React.createElement('button', { className: 'snp-asi-draft-btn' },
+          React.createElement('span', { style: { color: '#00718F' } }, '✶'),
+          'Draft responses with AI'
+        ),
+        React.createElement('button', { className: 'snp-asi-filter-btn' },
+          React.createElement('now-icon', { icon: 'filter-outline', size: 'sm' }),
+          'All Questions',
+          React.createElement('now-icon', { icon: 'chevron-down-outline', size: 'sm' })
+        ),
+        React.createElement('now-button', { label: 'Submit', variant: 'primary', size: 'md' }),
+        React.createElement('button', { className: 'snp-icon-btn' },
+          React.createElement('now-icon', { icon: 'ellipsis-h-outline', size: 'sm' })
+        )
+      )
+    ),
+
+    // Body
+    React.createElement('div', { className: 'snp-asi-body' },
+      leftPanel,
+      React.createElement('div', { className: 'snp-asi-main' },
+        React.createElement('div', { className: 'snp-asi-content-hdr' },
+          React.createElement('h2', { className: 'snp-asi-section-title' }, activeSection.label),
+          React.createElement('p', { className: 'snp-asi-sub-heading' }, activeSub.label)
+        ),
+        activeSub.questions.map(function(q, idx) { return renderQ(q, idx + 1); })
+      ),
+      rightPanel
+    ),
+
+    // Footer
+    React.createElement('div', { className: 'snp-asi-footer' },
+      React.createElement('button', {
+        className: 'snp-asi-nav-btn',
+        onClick: function() { navigate(currentIdx - 1); },
+        disabled: currentIdx === 0,
+      }, 'Back'),
+      React.createElement('span', { className: 'snp-asi-page-num' }, currentIdx + 1),
+      React.createElement('button', {
+        className: 'snp-asi-nav-btn snp-asi-nav-btn-primary',
+        onClick: function() { navigate(currentIdx + 1); },
+        disabled: currentIdx === allSubs.length - 1,
+      }, 'Next')
     )
   );
 }
@@ -1464,6 +1900,17 @@ function DemandDetailPage(props) {
   var setTab   = props.setTab;
   var onBack   = props.onBack;
   var variant  = props.variant || 1;
+
+  var saS = React.useState(null);
+  var selectedAssessment = saS[0]; var setSelectedAssessment = saS[1];
+
+  if (selectedAssessment && tab === 'smart-assessments') {
+    return React.createElement(SmartAssessmentInstanceView, {
+      demand: demand,
+      assessment: selectedAssessment,
+      onBack: function() { setSelectedAssessment(null); },
+    });
+  }
 
   return React.createElement('div', { className: 'snp-detail-page' },
 
@@ -1528,7 +1975,10 @@ function DemandDetailPage(props) {
         tab === 'resource-assignments'
           ? React.createElement(ResourceAssignmentsTab, { demand: demand, variant: variant })
           : tab === 'smart-assessments'
-            ? React.createElement(SmartAssessmentsTab)
+            ? React.createElement(SmartAssessmentsTab, {
+                demand: demand,
+                onSelectAssessment: function(a) { setSelectedAssessment(a); },
+              })
             : React.createElement(OverviewTab, { demand: demand })
       )
     )
