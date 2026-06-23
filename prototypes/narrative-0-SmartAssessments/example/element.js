@@ -626,7 +626,168 @@ var injectStyles = function() {
       font-size: 14px; font-weight: 700;
       color: var(--Primary-primary-1, #0080A3);
     }
-    /* Body layout */
+    /* ── Option 2 AI Drafting — animations & components ────────────────── */
+    @keyframes snp-sparkle { 0%,100%{transform:rotate(0)scale(1);opacity:1} 50%{transform:rotate(20deg)scale(1.3);opacity:.65} }
+    /* Modal overlay */
+    .snp-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+    }
+    .snp-modal {
+      background: var(--Derived-Background---now-color_background--primary, #fff);
+      border-radius: 8px; width: 760px; max-height: 80vh; overflow-y: auto;
+      padding: 24px 28px;
+      box-shadow: 0 8px 32px rgba(56,56,56,0.22);
+    }
+    .snp-modal-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .snp-modal-title {
+      font-size: 20px; font-weight: 700; color: var(--Derived-Text---now-color_text--secondary, #2C323F);
+      font-family: 'Cabin', var(--now-font-family, sans-serif);
+    }
+    .snp-modal-close {
+      background: none; border: none; cursor: pointer; font-size: 20px;
+      color: var(--Derived-Text---now-color_text--tertiary, #454D5B); line-height: 1; padding: 0;
+    }
+    .snp-modal-sub {
+      font-size: 14px; color: var(--Derived-Text---now-color_text--tertiary, #454D5B);
+      line-height: 1.55; margin-bottom: 20px;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-modal-row {
+      border: 1px solid #D3D6DC; border-radius: 4px; padding: 16px;
+      margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    }
+    .snp-modal-row-content { flex: 1; }
+    .snp-modal-row-title {
+      font-size: 16px; font-weight: 600; color: var(--Derived-Text---now-color_text--primary, #151920);
+      margin-bottom: 4px; font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-modal-row-desc {
+      font-size: 14px; color: var(--Derived-Text---now-color_text--tertiary, #454D5B);
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    /* Toggle */
+    .snp-toggle {
+      position: relative; width: 40px; height: 22px; border-radius: 11px;
+      background: #d1d5db; border: none; cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+    }
+    .snp-toggle.on { background: #0080A3; }
+    .snp-toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 18px; height: 18px; border-radius: 50%; background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: left 0.2s;
+    }
+    .snp-toggle.on::after { left: 20px; }
+    /* Documents expansion */
+    .snp-modal-info {
+      background: var(--Surface-Brand-surface--brand-2, #E6F2F6);
+      border-radius: 4px; padding: 12px 14px; margin: 10px 0 6px;
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 14px; color: #0080A3; font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-modal-docs-label {
+      font-size: 14px; font-weight: 600; color: #151920; margin: 10px 0 6px;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-modal-doc-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #E4E6EA; }
+    .snp-modal-doc-name { flex: 1; font-size: 14px; color: #151920; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    .snp-modal-supported { background: rgba(22,163,74,0.10); color: #15803D; font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+    .snp-modal-doc-src { font-size: 12px; color: #454D5B; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    .snp-modal-warn {
+      font-size: 12px; color: #D97706; margin-top: 8px; display: flex; align-items: center; gap: 6px;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    /* Auto-apply checkbox row */
+    .snp-modal-auto { display: flex; align-items: flex-start; gap: 10px; margin: 20px 0 0; }
+    .snp-modal-auto-texts { display: flex; flex-direction: column; gap: 3px; }
+    .snp-modal-auto-title { font-size: 16px; font-weight: 600; color: #151920; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    .snp-modal-auto-desc { font-size: 13px; color: #454D5B; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    /* Modal footer */
+    .snp-modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #E4E6EA; }
+    .snp-modal-cancel-btn {
+      padding: 6px 16px; min-height: 32px; border-radius: 6px; border: none;
+      box-shadow: inset 0 0 0 1px #B1C3C9; background: transparent;
+      color: #006F8E; font-size: 16px; font-weight: 700; cursor: pointer;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-modal-gen-btn {
+      padding: 6px 16px; min-height: 32px; border-radius: 6px; border: none;
+      background: #0080A3; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-modal-gen-btn:disabled { opacity: 0.4; cursor: default; }
+    /* Drafting / ready panel */
+    .snp-draft-panel {
+      border-left: 3px solid #0080A3; background: #fff; border-radius: 4px;
+      padding: 12px 16px; margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(56,56,56,0.10);
+    }
+    .snp-draft-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .snp-drafting-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--Surface-Brand-surface--brand-2, #E6F2F6);
+      color: #0080A3; padding: 3px 10px; border-radius: 12px;
+      font-size: 12px; font-weight: 600; font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-drafting-sparkle { display: inline-flex; animation: snp-sparkle 1.2s ease-in-out infinite; }
+    .snp-ready-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(22,163,74,0.10); color: #15803D;
+      padding: 3px 10px; border-radius: 12px;
+      font-size: 12px; font-weight: 600; font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-draft-dismiss { background: none; border: none; cursor: pointer; color: #454D5B; font-size: 18px; line-height: 1; padding: 0; }
+    .snp-draft-counter {
+      font-size: 16px; font-weight: 600; color: #151920; margin: 4px 0;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-draft-prog-bg { height: 3px; background: #E4E6EA; border-radius: 2px; overflow: hidden; margin: 6px 0; }
+    .snp-draft-prog-fill { height: 100%; background: #0080A3; border-radius: 2px; transition: width 0.4s ease; }
+    .snp-draft-body-txt { font-size: 14px; color: #454D5B; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    .snp-ready-stats { font-size: 14px; color: #151920; margin: 4px 0 0; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    .snp-ready-filter-link { font-size: 14px; color: #0080A3; cursor: pointer; text-decoration: underline; margin-left: 8px; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    /* AI suggestion block */
+    .snp-q-ai-sug {
+      margin-top: 12px; margin-left: 56px; position: relative;
+      border: 1px solid #0080A3; border-radius: 6px;
+      padding: 10px 12px; background: #f9fafb;
+    }
+    .snp-q-ai-sug-lbl {
+      font-size: 12px; font-weight: 600; color: #0080A3;
+      display: flex; align-items: center; gap: 4px; margin-bottom: 5px;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-q-ai-sug-val { font-size: 14px; color: #151920; margin-bottom: 5px; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    .snp-q-ai-sug-src {
+      font-size: 12px; color: var(--Base-Link---now-color--link-2, #3C59E7);
+      cursor: pointer; margin-bottom: 8px; text-decoration: underline;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    .snp-q-ai-sug-actions { display: flex; align-items: center; gap: 8px; }
+    .snp-q-applied-badge {
+      background: rgba(22,163,74,0.10); color: #15803D;
+      padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    /* View sources popover */
+    .snp-src-pop {
+      position: absolute; left: calc(100% + 8px); top: 0; width: 380px; z-index: 200;
+      background: var(--Derived-Background---now-color_background--primary, #fff);
+      border-radius: 4px;
+      box-shadow: 0px 2px 4px rgba(56,56,56,0.25);
+      outline: 1px solid #D3D6DC; outline-offset: -1px;
+      padding: 16px; max-height: 320px; overflow-y: auto;
+    }
+    .snp-src-pop-item { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E4E6EA; }
+    .snp-src-pop-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .snp-src-pop-q { font-size: 12px; font-weight: 600; color: #151920; font-family: var(--now-font-family, 'Lato', sans-serif); }
+    .snp-src-pop-a { font-size: 12px; color: #454D5B; font-family: var(--now-font-family, 'Lato', sans-serif); margin-bottom: 4px; }
+    .snp-src-pop-ref {
+      font-size: 12px; color: var(--Base-Link---now-color--link-2, #3C59E7);
+      font-family: var(--now-font-family, 'Lato', sans-serif); cursor: pointer; display: flex; align-items: center; gap: 4px;
+    }
+        /* Body layout */
     .snp-asi-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
     .snp-asi-left {
       width: 360px; flex-shrink: 0; border-right: 1px solid #e0e5e8;
@@ -1857,6 +2018,90 @@ function SmartAssessmentInstanceView(props) {
     { id: 'ai-assisted', label: 'AI assisted' },
   ];
   var filterLabel = (FILTER_OPTIONS.filter(function(o) { return o.id === filterVal; })[0] || FILTER_OPTIONS[0]).label;
+  // ── Option 2: AI drafting state ────────────────────────────────────────────
+  var isV2 = props.variant === 2;
+  var modalOpenS   = React.useState(false); var modalOpen   = modalOpenS[0]; var setModalOpen   = modalOpenS[1];
+  var docsTogS     = React.useState(false); var docsOn      = docsTogS[0];   var setDocsOn      = docsTogS[1];
+  var prevTogS     = React.useState(false); var prevOn      = prevTogS[0];   var setPrevOn      = prevTogS[1];
+  var docCheckS    = React.useState(false); var docChecked  = docCheckS[0]; var setDocChecked  = docCheckS[1];
+  var autoApplyS   = React.useState(false); var autoApply   = autoApplyS[0]; var setAutoApply   = autoApplyS[1];
+  var draftStateS  = React.useState(null);  var draftState  = draftStateS[0]; var setDraftState = draftStateS[1];
+  var draftProgS   = React.useState(0);     var draftProg   = draftProgS[0]; var setDraftProg   = draftProgS[1];
+  var viewSrcQS    = React.useState(null);  var viewSrcQ    = viewSrcQS[0];  var setViewSrcQ    = viewSrcQS[1];
+  var showPanelS   = React.useState(true);  var showPanel   = showPanelS[0]; var setShowPanel   = showPanelS[1];
+
+  var canGenerate = docsOn || prevOn;
+
+  function handleGenerate() {
+    setModalOpen(false);
+    setDraftState('drafting');
+    setDraftProg(0);
+    setShowPanel(true);
+    var total = totalQuestions;
+    function tick() {
+      setDraftProg(function(p) {
+        var next = p + 2;
+        if (next >= total) {
+          setTimeout(function() { setDraftState('ready'); }, 200);
+          return total;
+        }
+        setTimeout(tick, 120);
+        return next;
+      });
+    }
+    setTimeout(tick, 400);
+  }
+
+  var AI_SUGS = {
+    gq1: 'This demand addresses the need for automated enforcement of data retention and deletion policies across IT systems to ensure regulatory compliance and reduce manual overhead.',
+    gq2: 'IT',
+    gq3: 'Yes',
+    gq4: 'Automated enforcement of retention policies with zero-touch operation, 95% reduction in manual data tasks, and full audit trail within 6 months of deployment.',
+    gq5: 'Physical data destruction, third-party SaaS data not under direct IT governance, and legal hold archival processes.',
+    fq1: '$170,000 including server infrastructure, software licensing, and implementation professional services.',
+    fq2: '$35,000 annually covering support, enhancements, and licence renewals.',
+    fq3: '2.5 FTE over 6 months plus approximately $40,000 in contracted specialist resources.',
+    fq4: 'Yes',
+    fq5: '$280,000 in annual storage and compliance cost savings based on current operational spend.',
+    fq6: '8 months',
+    fq7: 'Yes',
+    rq1: 'High',
+    rq2: 'HR Information System (HRIS), Legal Document Management, Azure Blob Storage, and Enterprise Data Warehouse.',
+    rq3: 'No',
+    rq4: 'Risk of regulatory fines ($50K–$500K per breach), reputational damage, and potential legal action from data subjects.',
+    rq5: 'No',
+    req1: 'No',
+    req2: '3 FTE — Solution Architect, Backend Developer, and QA Engineer.',
+    req3: 'Yes',
+    req4: '2026-12-31',
+    req5: 'Yes',
+    cq1: 'Yes',
+    cq2: 'GDPR (EU), Privacy Act 1988 (Australia), and internal Data Governance Policy v3.2.',
+    cq3: 'Yes',
+    cq4: 'Yes',
+    cq5: 'Yes',
+    aq1: 'Yes',
+    aq2: 'Yes',
+  };
+
+  var VIEW_SOURCES = [
+    {
+      question: 'Does this demand involve the processing or storage of personal data?',
+      answer: 'Yes — multiple personal data categories identified across HR, Finance, and Legal systems.',
+      ref: 'ASMT0001041: Application Risk & Compliance Assessment 2024',
+    },
+    {
+      question: 'Has a formal budget been allocated for data management initiatives?',
+      answer: 'Yes — budget allocation approved Q3 2025, $170K capital expenditure confirmed.',
+      ref: 'ASMT0001028: IT Demand Feasibility Review 2025',
+    },
+    {
+      question: 'What is the estimated implementation cost?',
+      answer: 'Previous similar implementations ranged $120K–$200K including infrastructure and professional services.',
+      ref: 'DMND410099: Automated Data Retention System — prior demand record',
+    },
+  ];
+
 
   // Flat ordered list for pagination
   var allSubs = [];
@@ -1900,14 +2145,20 @@ function SmartAssessmentInstanceView(props) {
       inputEl = React.createElement('div', { className: 'snp-asi-radio' },
         ['Yes', 'No', 'Not Applicable'].map(function(opt) {
           return React.createElement('label', { key: opt, className: 'snp-asi-radio-opt' },
-            React.createElement('input', { type: 'radio', name: q.id }),
+            React.createElement('input', {
+              type: 'radio', name: q.id,
+              defaultChecked: isV2 && draftState === 'ready' && AI_SUGS[q.id] === opt,
+            }),
             opt
           );
         })
       );
     } else if (q.type === 'textarea') {
       inputEl = React.createElement('div', null,
-        React.createElement('textarea', { className: 'snp-asi-textarea', rows: 2 }),
+        React.createElement('textarea', {
+          className: 'snp-asi-textarea', rows: 2,
+          defaultValue: isV2 && draftState === 'ready' ? (AI_SUGS[q.id] || '') : '',
+        }),
         React.createElement('div', { className: 'snp-asi-chars' }, '○ Characters left: 1000')
       );
     } else {
@@ -1916,6 +2167,30 @@ function SmartAssessmentInstanceView(props) {
         (q.options || []).map(function(o) { return React.createElement('option', { key: o, value: o }, o); })
       );
     }
+    // AI suggestion block (Option 2 only, after drafting completes)
+    var aiSugBlock = isV2 && draftState === 'ready' && AI_SUGS[q.id]
+      ? React.createElement('div', { className: 'snp-q-ai-sug' },
+          React.createElement('div', { className: 'snp-q-ai-sug-lbl' }, '✶ AI Suggestions'),
+          React.createElement('div', { className: 'snp-q-ai-sug-val' }, AI_SUGS[q.id]),
+          React.createElement('div', {
+            className: 'snp-q-ai-sug-src',
+            onClick: function() { setViewSrcQ(viewSrcQ === q.id ? null : q.id); },
+          }, 'View sources'),
+          React.createElement('div', { className: 'snp-q-ai-sug-actions' },
+            React.createElement('span', { className: 'snp-q-applied-badge' }, 'Applied')
+          ),
+          viewSrcQ === q.id && React.createElement('div', { className: 'snp-src-pop' },
+            VIEW_SOURCES.map(function(src, si) {
+              return React.createElement('div', { key: si, className: 'snp-src-pop-item' },
+                React.createElement('div', { className: 'snp-src-pop-q' }, src.question),
+                React.createElement('div', { className: 'snp-src-pop-a' }, src.answer),
+                React.createElement('div', { className: 'snp-src-pop-ref' }, '🔗 ', src.ref)
+              );
+            })
+          )
+        )
+      : null;
+
     return React.createElement('div', { key: q.id, className: 'snp-asi-q-card' + (num === 1 ? ' first-q' : '') },
       React.createElement('div', { className: 'snp-asi-q-layout' },
         React.createElement('span', { className: 'snp-asi-q-num' }, num),
@@ -1924,7 +2199,8 @@ function SmartAssessmentInstanceView(props) {
           q.fieldLabel && React.createElement('div', { className: 'snp-asi-q-field-lbl' }, q.fieldLabel),
           inputEl
         )
-      )
+      ),
+      aiSugBlock
     );
   }
 
@@ -2075,7 +2351,7 @@ function SmartAssessmentInstanceView(props) {
           )
         ),
         React.createElement('div', { className: 'snp-asi-hdr-actions' },
-          props.variant === 2 && React.createElement('button', { className: 'snp-asi-draft-btn' },
+          props.variant === 2 && React.createElement('button', { className: 'snp-asi-draft-btn', onClick: function() { setModalOpen(true); } },
             React.createElement('span', { dangerouslySetInnerHTML: { __html: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.00005 7.98242C1.0018 7.18692 1.59561 6.52631 2.37896 6.3877C3.34688 6.21631 4.27211 5.75822 5.01763 5.0127C5.76284 4.26733 6.22025 3.34267 6.39165 2.375C6.53025 1.59173 7.19096 0.997941 7.98638 0.996094L8.01763 0.996094C8.81302 0.997953 9.47374 1.59166 9.61235 2.375C9.78377 3.34284 10.2418 4.26715 10.9874 5.0127C11.7328 5.75814 12.6572 6.21628 13.625 6.38769C14.4084 6.52631 15.0022 7.18692 15.004 7.98242C15.0041 7.99281 15.004 8.00341 15.004 8.01367C15.002 8.80897 14.4083 9.4698 13.625 9.6084C12.6575 9.77969 11.7328 10.2371 10.9874 10.9824C10.2418 11.7279 9.78374 12.6532 9.61235 13.6211C9.47374 14.4044 8.81313 14.9982 8.01763 15C8.00723 15.0001 7.99665 15 7.98638 15C7.19096 14.9982 6.53025 14.4044 6.39165 13.6211C6.22037 12.6533 5.76322 11.728 5.01763 10.9824C4.27212 10.2369 3.34686 9.77979 2.37896 9.6084C1.59568 9.4698 1.00191 8.80908 1.00005 8.01367C0.999939 8.0033 1.00005 7.9927 1.00005 7.98242ZM5.50005 8C5.50005 9.38055 6.61956 10.4997 8.00005 10.5C9.38076 10.5 10.5 9.38071 10.5 8C10.5 6.61945 9.38151 5.50026 8.00103 5.5C6.62031 5.5 5.50005 6.61929 5.50005 8Z" fill="#004F65"/></svg>' } }),
             'Draft responses with AI'
           ),
@@ -2141,6 +2417,39 @@ function SmartAssessmentInstanceView(props) {
         ),
         React.createElement('div', { className: 'snp-asi-section-heading' }, activeSection.label),
         React.createElement('div', { className: 'snp-asi-sub-heading' }, activeSub.label),
+        // Draft panel (Option 2)
+        isV2 && draftState && showPanel && React.createElement('div', { className: 'snp-draft-panel' },
+          React.createElement('div', { className: 'snp-draft-panel-top' },
+            draftState === 'drafting'
+              ? React.createElement('span', { className: 'snp-drafting-pill' },
+                  React.createElement('span', { className: 'snp-drafting-sparkle' }, '✶'),
+                  'Drafting responses...'
+                )
+              : React.createElement('span', { className: 'snp-ready-pill' },
+                  '✶ AI suggestions ready'
+                ),
+            React.createElement('button', { className: 'snp-draft-dismiss', onClick: function() { setShowPanel(false); } }, '×')
+          ),
+          draftState === 'drafting'
+            ? React.createElement('div', null,
+                React.createElement('div', { className: 'snp-draft-counter' }, draftProg + ' / ' + totalQuestions + ' questions processed.'),
+                React.createElement('div', { className: 'snp-draft-prog-bg' },
+                  React.createElement('div', { className: 'snp-draft-prog-fill', style: { width: Math.round((draftProg / totalQuestions) * 100) + '%' } })
+                ),
+                React.createElement('div', { className: 'snp-draft-body-txt' }, 'Your current answers won’t be changed, and you can continue working on your assessment.')
+              )
+            : React.createElement('div', null,
+                React.createElement('div', { className: 'snp-ready-stats' },
+                  React.createElement('strong', null, totalQuestions + ' generated'),
+                  '   ',
+                  React.createElement('strong', null, totalQuestions + ' applied'),
+                  React.createElement('span', {
+                    className: 'snp-ready-filter-link',
+                    onClick: function() {},
+                  }, 'Filter all questions with AI suggestions')
+                )
+              )
+        ),
         activeSub.questions.map(function(q, idx) { return renderQ(q, idx + 1); }),
         // Pagination inside the content column
         React.createElement('div', { className: 'snp-asi-pagination' },
