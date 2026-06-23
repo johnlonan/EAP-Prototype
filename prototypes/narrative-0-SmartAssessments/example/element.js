@@ -640,7 +640,7 @@ var injectStyles = function() {
       min-width: 32px; min-height: 32px; border-radius: 6px; flex-shrink: 0;
     }
     .snp-asi-icon-action:hover { background: rgba(74,94,101,0.08); }
-    .snp-asi-sec-group { margin-bottom: 2px; padding: 0 8px; border-radius: 6px; }
+    .snp-asi-sec-group { margin: 0 8px 2px; padding: 0; border-radius: 6px; }
     .snp-asi-sec-group.active { background: rgba(189,222,231,0.22); }
     .snp-asi-sec-row {
       display: flex; align-items: center; gap: 12px;
@@ -1990,7 +1990,7 @@ function SmartAssessmentInstanceView(props) {
       React.createElement('div', { className: 'snp-asi-tabbed-meta' },
         React.createElement('div', { className: 'snp-asi-meta-item' },
           React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Entity'),
-          React.createElement('div', { className: 'snp-asi-meta-val' }, demand.name)
+          React.createElement('div', { className: 'snp-asi-meta-val' }, demand.name.length > 15 ? demand.name.slice(0, 15) + '…' : demand.name)
         ),
         React.createElement('div', { className: 'snp-asi-meta-item' },
           React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'State'),
