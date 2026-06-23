@@ -587,6 +587,14 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-asi-hdr-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .snp-asi-draft-btn {
+      display: inline-flex; align-items: center; gap: 2px;
+      padding: 6px 16px; min-height: 32px; border-radius: 6px; border: none;
+      background: linear-gradient(135deg, #86F673 5%, #71D5FE 95%);
+      color: #004F65; font-size: 16px; font-weight: 700;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+      cursor: pointer; white-space: nowrap;
+    }
     .snp-asi-filter-btn {
       display: inline-flex; align-items: center; gap: 4px;
       padding: 6px 16px; min-height: 32px;
