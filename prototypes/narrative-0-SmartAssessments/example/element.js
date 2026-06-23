@@ -2475,6 +2475,74 @@ function SmartAssessmentInstanceView(props) {
         )
       ),
       rightPanel
+    ),
+    // ── Modal (Option 2 only, absolute overlay inside relative snp-detail-page) ──
+    isV2 && modalOpen && React.createElement('div', {
+      className: 'snp-modal-overlay',
+      onClick: function(e) { if (e.target.className === 'snp-modal-overlay') setModalOpen(false); },
+    },
+      React.createElement('div', { className: 'snp-modal' },
+        React.createElement('div', { className: 'snp-modal-hdr' },
+          React.createElement('div', { className: 'snp-modal-title' }, 'Draft responses with AI'),
+          React.createElement('button', { className: 'snp-modal-close', onClick: function() { setModalOpen(false); } }, '×')
+        ),
+        React.createElement('div', { className: 'snp-modal-sub' },
+          'AI uses the sources you configure below — like past assessments and uploaded documents — to generate response suggestions. AI will not auto fill the responses by default.'
+        ),
+        React.createElement('div', { className: 'snp-modal-row' },
+          React.createElement('div', { className: 'snp-modal-row-content' },
+            React.createElement('div', { className: 'snp-modal-row-title' }, 'Previous assessments'),
+            React.createElement('div', { className: 'snp-modal-row-desc' }, 'Past assessments similar to this one, based on access and response history.')
+          ),
+          React.createElement('button', {
+            className: 'snp-toggle' + (prevOn ? ' on' : ''),
+            onClick: function() { setPrevOn(function(v) { return !v; }); },
+          })
+        ),
+        React.createElement('div', { className: 'snp-modal-row', style: { flexDirection: 'column' } },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', width: '100%' } },
+            React.createElement('div', { className: 'snp-modal-row-content' },
+              React.createElement('div', { className: 'snp-modal-row-title' }, 'Documents'),
+              React.createElement('div', { className: 'snp-modal-row-desc' }, 'Documents attached to this assessment or related records. Accepted formats: JPEG, PNG, PDF, DOCX — up to 20 MB and 200 pages.')
+            ),
+            React.createElement('button', {
+              className: 'snp-toggle' + (docsOn ? ' on' : ''),
+              onClick: function() { setDocsOn(function(v) { return !v; }); },
+            })
+          ),
+          docsOn && React.createElement('div', { style: { width: '100%' } },
+            React.createElement('div', { className: 'snp-modal-info' },
+              'ⓘ To attach a new document, go to the Attachments section of your assessment'
+            ),
+            React.createElement('div', { className: 'snp-modal-docs-label' }, 'Available documents 1'),
+            React.createElement('div', { className: 'snp-modal-doc-row' },
+              React.createElement('input', {
+                type: 'checkbox', checked: docChecked,
+                onChange: function() { setDocChecked(function(v) { return !v; }); },
+              }),
+              React.createElement('span', { className: 'snp-modal-doc-name' }, '📄 Demand_Assessment_Reference.pdf'),
+              React.createElement('span', { className: 'snp-modal-supported' }, 'Supported'),
+              React.createElement('span', { className: 'snp-modal-doc-src' }, 'Attachment')
+            ),
+            React.createElement('div', { className: 'snp-modal-warn' }, '⚠ Documents exceeding 200 pages cannot be processed by AI, even if selected.')
+          )
+        ),
+        React.createElement('div', { className: 'snp-modal-auto' },
+          React.createElement('input', { type: 'checkbox', checked: autoApply, onChange: function() { setAutoApply(function(v) { return !v; }); } }),
+          React.createElement('div', { className: 'snp-modal-auto-texts' },
+            React.createElement('div', { className: 'snp-modal-auto-title' }, 'Auto-apply top suggestion to each question'),
+            React.createElement('div', { className: 'snp-modal-auto-desc' }, 'You can still review and edit responses before submitting')
+          )
+        ),
+        React.createElement('div', { className: 'snp-modal-footer' },
+          React.createElement('button', { className: 'snp-modal-cancel-btn', onClick: function() { setModalOpen(false); } }, 'Cancel'),
+          React.createElement('button', {
+            className: 'snp-modal-gen-btn',
+            disabled: !canGenerate,
+            onClick: handleGenerate,
+          }, '✶ Generate draft responses')
+        )
+      )
     )
   );
 }
