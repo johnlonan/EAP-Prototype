@@ -1702,13 +1702,15 @@ function SmartAssessmentsTab(props) {
         if (!el || el._bound) return;
         el._bound = true;
         // Track checkbox selections to enable Combine button
-        ['NOW_LIST#SELECTION_CHANGED', 'NOW_LIST#ROW_SELECTED', 'NOW_LIST#ROW_CHECKED'].forEach(function(evt) {
-          el.addEventListener(evt, function(e) {
-            var payload = e.detail && e.detail.payload;
-            if (!payload) return;
-            var rows = payload.selectedRows || payload.checkedRows || payload.rows || [];
-            if (Array.isArray(rows)) setSelCount(rows.length);
-          });
+        // now-list fires NOW_LIST#ROW_SELECT_TOGGLED with payload.selectedRows[]
+        // and NOW_LIST#SELECT_ALL_TOGGLED for the header checkbox
+        el.addEventListener('NOW_LIST#ROW_SELECT_TOGGLED', function(e) {
+          var rows = e.detail && e.detail.payload && e.detail.payload.selectedRows;
+          if (Array.isArray(rows)) setSelCount(rows.length);
+        });
+        el.addEventListener('NOW_LIST#SELECT_ALL_TOGGLED', function(e) {
+          var rows = e.detail && e.detail.payload && e.detail.payload.selectedRows;
+          if (Array.isArray(rows)) setSelCount(rows.length);
         });
         el.addEventListener('NOW_LIST#CELL_LINK_CLICKED', function(e) {
           var cell = e.detail && e.detail.payload && e.detail.payload.cell;
