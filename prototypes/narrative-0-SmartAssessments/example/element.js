@@ -1649,6 +1649,8 @@ var SMART_ASSESSMENTS = [
 ];
 
 function SmartAssessmentsTab(props) {
+  var selS = React.useState(0); var selCount = selS[0]; var setSelCount = selS[1];
+
   var colDefs = JSON.stringify({
     columns: [
       { key: 'number',   type: 'link',   label: 'Assessment instance', grow: 2   },
@@ -1682,10 +1684,14 @@ function SmartAssessmentsTab(props) {
         React.createElement('p', { className: 'snp-sa-subtitle' }, 'Last refreshed 1m ago.')
       ),
       React.createElement('div', { className: 'snp-sa-hdr-right' },
-        iconBtn('arrow-clockwise-outline', 'Refresh', 'sm'),
-        iconBtn('gear-outline', 'Settings', 'sm'),
-        iconBtn('filter-outline', 'Filter', 'sm'),
-        React.createElement('now-button', { label: 'Combine (2)', variant: 'primary', size: 'md' }),
+        iconBtn('arrow-clockwise-outline', 'Refresh', 'md'),
+        iconBtn('gear-outline', 'Settings', 'md'),
+        iconBtn('filter-outline', 'Filter', 'md'),
+        React.createElement('now-button', {
+          label: selCount >= 2 ? 'Combine (' + selCount + ')' : 'Combine',
+          variant: 'primary', size: 'md',
+          ref: function(el) { if (el) el.disabled = selCount < 2; },
+        }),
         React.createElement('now-button', { label: 'Export', variant: 'secondary', size: 'md' })
       )
     ),
@@ -1695,6 +1701,15 @@ function SmartAssessmentsTab(props) {
       ref: function(el) {
         if (!el || el._bound) return;
         el._bound = true;
+        // Track checkbox selections to enable Combine button
+        ['NOW_LIST#SELECTION_CHANGED', 'NOW_LIST#ROW_SELECTED', 'NOW_LIST#ROW_CHECKED'].forEach(function(evt) {
+          el.addEventListener(evt, function(e) {
+            var payload = e.detail && e.detail.payload;
+            if (!payload) return;
+            var rows = payload.selectedRows || payload.checkedRows || payload.rows || [];
+            if (Array.isArray(rows)) setSelCount(rows.length);
+          });
+        });
         el.addEventListener('NOW_LIST#CELL_LINK_CLICKED', function(e) {
           var cell = e.detail && e.detail.payload && e.detail.payload.cell;
           var key = cell && cell.value;
@@ -2186,9 +2201,9 @@ function DemandDetailPage(props) {
 
 var OPTION_CARDS = [
   {
-    num: 3,
-    title: 'Role-Based Capacity Planning',
-    desc: 'Resources are defined by role type rather than named individual — Architect, Software Engineer, Quality Analyst, etc. Monthly effort is pre-calculated per role as read-only values. Suited to early-stage demands where you know what skills are needed but not yet who will fill them.',
+    num: 1,
+    title: 'Smart Assessments',
+    desc: 'Smart Assessments bring AI-assisted evaluation into the demand management process. Demands are assessed across key dimensions — financial impact, risk, compliance, and resourcing — with guided question sets, AI-suggested responses, and structured sign-off workflows.',
   },
 ];
 
@@ -2201,7 +2216,7 @@ function StartPage(props) {
       React.createElement('div', { className: 'hub-eyebrow' }, 'Demand Management'),
       React.createElement('h1', { className: 'hub-title' }, 'Smart Assessments'),
       React.createElement('p', { className: 'hub-subtitle' },
-        'Explore a design variant of the resource assignment view.'
+        'Evaluate demands through structured assessments — Financial Impact, Feasibility, Risk, and Compliance Readiness — to support informed prioritisation and approval decisions.'
       )
     ),
 
