@@ -2659,7 +2659,7 @@ var OPTION_CARDS = [
   {
     num: 2,
     title: 'AI Assisted Smart Assessment',
-    desc: 'Experience AI-accelerated demand evaluation — automated draft responses, intelligent scoring, and guided sign-off to reduce manual effort and surface insights faster across all assessment dimensions.',
+    desc: 'Experience AI-accelerated demand evaluation — automated draft responses to reduce manual effort and surface insights faster across all assessment dimensions.',
   },
 ];
 
