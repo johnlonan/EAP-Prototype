@@ -720,7 +720,7 @@ var injectStyles = function() {
     /* Drafting / ready panel */
     .snp-draft-panel {
       border-left: 3px solid #0080A3; background: #fff; border-radius: 4px;
-      padding: 12px 16px; margin-bottom: 20px;
+      padding: 12px 16px; margin-top: 6px;
       box-shadow: 0 1px 3px rgba(56,56,56,0.10);
     }
     .snp-draft-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
@@ -2402,6 +2402,34 @@ function SmartAssessmentInstanceView(props) {
           React.createElement('div', { className: 'snp-asi-meta-lbl' }, 'Due date'),
           React.createElement('div', { className: 'snp-asi-meta-val' }, assessment.dueDate.split(' ')[0])
         )
+      ),
+      // Draft / ready panel lives in the header (Option 2 only)
+      isV2 && draftState && showPanel && React.createElement('div', { className: 'snp-draft-panel' },
+        React.createElement('div', { className: 'snp-draft-panel-top' },
+          draftState === 'drafting'
+            ? React.createElement('span', { className: 'snp-drafting-pill' },
+                React.createElement('span', { className: 'snp-drafting-sparkle' }, '✶'),
+                'Drafting responses...'
+              )
+            : React.createElement('span', { className: 'snp-ready-pill' }, '✶ AI suggestions ready'),
+          React.createElement('button', { className: 'snp-draft-dismiss', onClick: function() { setShowPanel(false); } }, '×')
+        ),
+        draftState === 'drafting'
+          ? React.createElement('div', null,
+              React.createElement('div', { className: 'snp-draft-counter' }, draftProg + ' / ' + totalQuestions + ' questions processed.'),
+              React.createElement('div', { className: 'snp-draft-prog-bg' },
+                React.createElement('div', { className: 'snp-draft-prog-fill', style: { width: Math.round((draftProg / totalQuestions) * 100) + '%' } })
+              ),
+              React.createElement('div', { className: 'snp-draft-body-txt' }, "Your current answers won't be changed, and you can continue working on your assessment.")
+            )
+          : React.createElement('div', null,
+              React.createElement('div', { className: 'snp-ready-stats' },
+                React.createElement('strong', null, totalQuestions + ' generated'),
+                '   ',
+                React.createElement('strong', null, totalQuestions + ' applied'),
+                React.createElement('span', { className: 'snp-ready-filter-link' }, 'Filter all questions with AI suggestions')
+              )
+            )
       )
     ),
 
@@ -2417,39 +2445,6 @@ function SmartAssessmentInstanceView(props) {
         ),
         React.createElement('div', { className: 'snp-asi-section-heading' }, activeSection.label),
         React.createElement('div', { className: 'snp-asi-sub-heading' }, activeSub.label),
-        // Draft panel (Option 2)
-        isV2 && draftState && showPanel && React.createElement('div', { className: 'snp-draft-panel' },
-          React.createElement('div', { className: 'snp-draft-panel-top' },
-            draftState === 'drafting'
-              ? React.createElement('span', { className: 'snp-drafting-pill' },
-                  React.createElement('span', { className: 'snp-drafting-sparkle' }, '✶'),
-                  'Drafting responses...'
-                )
-              : React.createElement('span', { className: 'snp-ready-pill' },
-                  '✶ AI suggestions ready'
-                ),
-            React.createElement('button', { className: 'snp-draft-dismiss', onClick: function() { setShowPanel(false); } }, '×')
-          ),
-          draftState === 'drafting'
-            ? React.createElement('div', null,
-                React.createElement('div', { className: 'snp-draft-counter' }, draftProg + ' / ' + totalQuestions + ' questions processed.'),
-                React.createElement('div', { className: 'snp-draft-prog-bg' },
-                  React.createElement('div', { className: 'snp-draft-prog-fill', style: { width: Math.round((draftProg / totalQuestions) * 100) + '%' } })
-                ),
-                React.createElement('div', { className: 'snp-draft-body-txt' }, 'Your current answers won’t be changed, and you can continue working on your assessment.')
-              )
-            : React.createElement('div', null,
-                React.createElement('div', { className: 'snp-ready-stats' },
-                  React.createElement('strong', null, totalQuestions + ' generated'),
-                  '   ',
-                  React.createElement('strong', null, totalQuestions + ' applied'),
-                  React.createElement('span', {
-                    className: 'snp-ready-filter-link',
-                    onClick: function() {},
-                  }, 'Filter all questions with AI suggestions')
-                )
-              )
-        ),
         activeSub.questions.map(function(q, idx) { return renderQ(q, idx + 1); }),
         // Pagination inside the content column
         React.createElement('div', { className: 'snp-asi-pagination' },
