@@ -149,8 +149,8 @@ var injectStyles = function() {
 
     /* AI summary card */
     .snp-ai-card {
-      background: #fff; border-radius: 2px; overflow: hidden;
-      outline: 1px solid #7DE56B; outline-offset: -1px;
+      background: #fff; border-radius: 4px; overflow: hidden;
+      box-shadow: inset 0 0 0 1px #7DE56B;
     }
     .snp-ai-inner { display: flex; flex-direction: row; }
     .snp-ai-bar {
@@ -721,7 +721,7 @@ var injectStyles = function() {
     .snp-draft-panel {
       background: #fff; border-radius: 4px; position: relative; overflow: hidden;
       padding: 12px 12px 12px 20px; margin-top: 6px;
-      outline: 1px solid #7DE56B; outline-offset: -1px;
+      box-shadow: inset 0 0 0 1px #7DE56B;
     }
     .snp-draft-panel::before {
       content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
@@ -755,7 +755,7 @@ var injectStyles = function() {
     /* AI suggestion block */
     .snp-q-ai-sug {
       margin-top: 12px; margin-left: 56px; position: relative; overflow: hidden;
-      outline: 1px solid #7DE56B; outline-offset: -1px; border-radius: 4px;
+      box-shadow: inset 0 0 0 1px #7DE56B; border-radius: 4px;
       padding: 10px 12px 10px 18px; background: #fff;
     }
     .snp-q-ai-sug::before {
