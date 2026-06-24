@@ -730,12 +730,13 @@ var injectStyles = function() {
     }
     .snp-draft-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .snp-drafting-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: var(--Surface-Brand-surface--brand-2, #E6F2F6);
-      color: #0080A3; padding: 3px 10px; border-radius: 12px;
-      font-size: 12px; font-weight: 600; font-family: var(--now-font-family, 'Lato', sans-serif);
+      display: inline-flex; align-items: center; gap: 2px;
+      background: linear-gradient(135deg, #DDFCD8 10%, #D7F3FF 90%);
+      box-shadow: inset 0 0 0 1px #86F673;
+      color: #006F8E; padding: 2px 4px 2px 2px; border-radius: 12px;
+      font-size: 12px; font-weight: 400; font-family: var(--now-font-family, 'Lato', sans-serif);
     }
-    .snp-drafting-sparkle { display: inline-flex; animation: snp-sparkle 1.2s ease-in-out infinite; }
+    .snp-drafting-sparkle { display: inline-flex; animation: snp-sparkle 1.2s ease-in-out infinite; flex-shrink: 0; }
     .snp-ready-pill {
       display: inline-flex; align-items: center; gap: 5px;
       background: rgba(22,163,74,0.10); color: #15803D;
@@ -748,7 +749,7 @@ var injectStyles = function() {
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
     .snp-draft-prog-bg { height: 3px; background: #E4E6EA; border-radius: 2px; overflow: hidden; margin: 6px 0; }
-    .snp-draft-prog-fill { height: 100%; background: #0080A3; border-radius: 2px; transition: width 0.4s ease; }
+    .snp-draft-prog-fill { height: 100%; background: linear-gradient(90deg, #7DE56B 0%, #69C6EC 100%); border-radius: 2px; transition: width 0.4s ease; }
     .snp-draft-body-txt { font-size: 14px; color: #454D5B; font-family: var(--now-font-family, 'Lato', sans-serif); }
     .snp-ready-stats { font-size: 14px; color: #151920; margin: 4px 0 0; font-family: var(--now-font-family, 'Lato', sans-serif); }
     .snp-ready-filter-link { font-size: 14px; color: #0080A3; cursor: pointer; text-decoration: underline; margin-left: 8px; font-family: var(--now-font-family, 'Lato', sans-serif); }
@@ -2418,7 +2419,7 @@ function SmartAssessmentInstanceView(props) {
         React.createElement('div', { className: 'snp-draft-panel-top' },
           draftState === 'drafting'
             ? React.createElement('span', { className: 'snp-drafting-pill' },
-                React.createElement('span', { className: 'snp-drafting-sparkle' }, '✶'),
+                React.createElement('span', { className: 'snp-drafting-sparkle', dangerouslySetInnerHTML: { __html: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1.00003 5.98633C1.00151 5.41826 1.42597 4.94667 1.98538 4.84766C2.67671 4.7252 3.33766 4.3977 3.87015 3.86523C4.4025 3.33274 4.72918 2.67177 4.8516 1.98047C4.95072 1.42103 5.42308 0.997362 5.99124 0.996094L6.01371 0.996094C6.58158 0.99766 7.05326 1.42119 7.15238 1.98047C7.27481 2.67192 7.60216 3.3326 8.1348 3.86523C8.66736 4.39778 9.32811 4.72524 10.0196 4.84766C10.5788 4.9468 11.0025 5.41838 11.0039 5.98633C11.004 5.99366 11.0039 6.00155 11.0039 6.00879C11.0026 6.57683 10.579 7.0493 10.0196 7.14844C9.32833 7.27076 8.66738 7.59745 8.1348 8.12988C7.60234 8.66238 7.27484 9.32332 7.15238 10.0146C7.05334 10.574 6.58173 10.9985 6.01371 11C6.00636 11.0001 5.9985 11 5.99124 11C5.42302 10.9987 4.95066 10.5742 4.8516 10.0146C4.72921 9.3234 4.40268 8.66245 3.87015 8.12988C3.33766 7.5974 2.67672 7.27091 1.98538 7.14844C1.42584 7.04942 1.00135 6.57701 1.00003 6.00879C0.999959 6.00147 1.00003 5.99358 1.00003 5.98633ZM4.50003 6C4.50003 6.82843 5.17161 7.5 6.00003 7.5C6.82846 7.5 7.50003 6.82843 7.50003 6C7.50003 5.17157 6.82846 4.5 6.00003 4.5C5.17161 4.5 4.50003 5.17157 4.50003 6Z" fill="#006F8E"/></svg>' } }),
                 'Drafting responses...'
               )
             : React.createElement('span', { className: 'snp-ready-pill' }, '✶ AI suggestions ready'),
