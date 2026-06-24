@@ -150,12 +150,12 @@ var injectStyles = function() {
     /* AI summary card */
     .snp-ai-card {
       background: #fff; border-radius: 2px; overflow: hidden;
-      box-shadow: inset 0 0 0 1px #4ade80;
+      outline: 1px solid #7DE56B; outline-offset: -1px;
     }
     .snp-ai-inner { display: flex; flex-direction: row; }
     .snp-ai-bar {
       width: 4px; flex-shrink: 0; align-self: stretch;
-      background: linear-gradient(180deg, #26BFC8 0%, #00718F 100%);
+      background: linear-gradient(180deg, #7DE56B 0%, #69C6EC 100%);
       border-radius: 3px 0 0 3px;
     }
     .snp-ai-content { flex: 1; display: flex; flex-direction: column; padding: 4px 4px 0; gap: 4px; min-width: 0; }
@@ -719,9 +719,14 @@ var injectStyles = function() {
     .snp-modal-gen-btn:disabled { opacity: 0.4; cursor: default; }
     /* Drafting / ready panel */
     .snp-draft-panel {
-      border-left: 3px solid #0080A3; background: #fff; border-radius: 4px;
-      padding: 12px 16px; margin-top: 6px;
-      box-shadow: 0 1px 3px rgba(56,56,56,0.10);
+      background: #fff; border-radius: 4px; position: relative; overflow: hidden;
+      padding: 12px 12px 12px 20px; margin-top: 6px;
+      outline: 1px solid #7DE56B; outline-offset: -1px;
+    }
+    .snp-draft-panel::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: linear-gradient(180deg, #7DE56B 0%, #69C6EC 100%);
+      border-top-left-radius: 3px; border-bottom-left-radius: 3px;
     }
     .snp-draft-panel-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .snp-drafting-pill {
@@ -749,9 +754,14 @@ var injectStyles = function() {
     .snp-ready-filter-link { font-size: 14px; color: #0080A3; cursor: pointer; text-decoration: underline; margin-left: 8px; font-family: var(--now-font-family, 'Lato', sans-serif); }
     /* AI suggestion block */
     .snp-q-ai-sug {
-      margin-top: 12px; margin-left: 56px; position: relative;
-      border: 1px solid #0080A3; border-radius: 6px;
-      padding: 10px 12px; background: #f9fafb;
+      margin-top: 12px; margin-left: 56px; position: relative; overflow: hidden;
+      outline: 1px solid #7DE56B; outline-offset: -1px; border-radius: 4px;
+      padding: 10px 12px 10px 18px; background: #fff;
+    }
+    .snp-q-ai-sug::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: linear-gradient(180deg, #7DE56B 0%, #69C6EC 100%);
+      border-top-left-radius: 3px; border-bottom-left-radius: 3px;
     }
     .snp-q-ai-sug-lbl {
       font-size: 12px; font-weight: 600; color: #0080A3;
