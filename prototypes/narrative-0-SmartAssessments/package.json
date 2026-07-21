@@ -8,14 +8,13 @@
     "start": "npm run dev"
   },
   "dependencies": {
-    "claude-horizon-prototyping-plugin": "git+https://code.devsnc.com/jason-ziccardi/claude-horizon-prototyping-plugin.git",
     "@devsnc/library-enhanced-test": "^29.0.47",
-    "@servicenow/theme-coral": "^29.0.47",
     "@servicenow/now-avatar": "^29.0.49",
     "@servicenow/now-badge": "29.0.49",
     "@servicenow/now-button": "^29.0.47",
     "@servicenow/now-checkbox": "29.0.49",
     "@servicenow/now-dropdown": "^29.0.49",
+    "@servicenow/now-grouped-button": "29.2.0",
     "@servicenow/now-heading": "29.0.49",
     "@servicenow/now-highlighted-value": "^29.0.49",
     "@servicenow/now-icon": "^29.0.49",
@@ -28,8 +27,10 @@
     "@servicenow/now-select": "29.0.49",
     "@servicenow/now-tabs": "29.0.49",
     "@servicenow/now-toggle": "29.0.49",
+    "@servicenow/theme-coral": "^29.0.47",
     "@servicenow/ui-core": "29.1.0-paxeintegration.3",
-    "@tectonic/cli": "^1.0.1-project-paxe-master"
+    "@tectonic/cli": "^1.0.1-project-paxe-master",
+    "claude-horizon-prototyping-plugin": "git+https://code.devsnc.com/jason-ziccardi/claude-horizon-prototyping-plugin.git"
   },
   "pnpm": {
     "overrides": {

@@ -22,6 +22,13 @@ import {
 
 var WorkspaceAppShell = createWorkspaceAppShell(React);
 
+// Otto brand mark — exact asset provided by the user (Desktop/Otto.png), embedded
+// as a data URI so it stays self-contained like every other asset in this file.
+var OTTO_MARK_URI = 'data:image/png;base64,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';
+
+// AI Empty Illustration — exact asset provided by the user (Desktop/AI Empty Illustration.png)
+var AI_EMPTY_ILLUSTRATION_URI = 'data:image/png;base64,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';
+
 // ─── Styles ────────────────────────────────────────────────────────────────────
 var injectStyles = function() {
   var el = document.createElement('style');
@@ -329,7 +336,7 @@ var injectStyles = function() {
       flex: 1; display: flex; align-items: center; justify-content: center;
       padding: 48px 60px;
     }
-    .hub-cards { display: flex; gap: 20px; max-width: 1000px; width: 100%; }
+    .hub-cards { display: flex; gap: 20px; max-width: 1300px; width: 100%; }
     .hub-card {
       flex: 1; background: #fff; border-radius: 14px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.06);
@@ -1013,6 +1020,196 @@ var injectStyles = function() {
       font-size: 12px; color: #3C59E7;
       font-family: var(--now-font-family, 'Lato', sans-serif);
     }
+
+    /* ── Track Overview (Options 3 & 4) — quick-look strip ────────────── */
+    .snp-ai-card.snp-trk-card .snp-ai-content { padding-bottom: 16px; }
+    .snp-trk-strip-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #6b7280; flex-shrink: 0;
+    }
+    .snp-trk-strip { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 0 24px 16px; }
+    .snp-trk-page-disclaimer { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+    /* Empty state (Option 4) — nothing has generated yet, user triggers it */
+    .snp-trk-empty {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      padding: 64px 24px 48px; max-width: 420px; margin: 0 auto;
+    }
+    .snp-trk-empty-img { width: 300px; height: auto; margin-bottom: 24px; }
+    .snp-trk-empty-title { font-size: 18px; font-weight: 700; color: #10171a; margin-bottom: 8px; }
+    .snp-trk-empty-sub { font-size: 14px; color: #6b7280; line-height: 1.5; margin-bottom: 20px; }
+
+    /* Skeleton loading — shape vocabulary per spec: squares for icons,
+       rectangles for badges/lines, animated shimmer on the fill only.
+       Border stays constant (not part of the animation) so it holds 3:1
+       contrast against the page throughout the loop. */
+    @keyframes snp-skel-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+    .snp-skel {
+      background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%);
+      background-size: 400% 100%;
+      animation: snp-skel-shimmer 1.4s ease-in-out infinite;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+    }
+    .snp-skel-card { border-radius: 8px; padding: 12px; margin-bottom: 0; }
+    .snp-skel-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .snp-skel-icon { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; }
+    .snp-skel-title { height: 12px; width: 140px; border-radius: 3px; }
+    .snp-skel-badge { height: 16px; width: 90px; border-radius: 10px; margin-left: auto; }
+    .snp-skel-line { height: 10px; border-radius: 3px; margin-bottom: 8px; }
+    .snp-skel-line:last-child { margin-bottom: 0; }
+
+    /* Bolder pass — stronger hierarchy and weight contrast, track-scoped only
+       (never touches the shared classes Options 1 & 2 also render through) */
+    .snp-ov-title.snp-trk-title { font-size: 20px; letter-spacing: -0.2px; }
+
+    /* Per-card refresh action — spins while "reloading" the same data */
+    @keyframes snp-trk-sync-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .snp-trk-sync-spin { display: inline-flex; animation: snp-trk-sync-spin 0.7s linear infinite; }
+
+    /* Two-column body — left (60%) business-judgment content, right (40%)
+       record-hygiene content (Auto-fill + Conformance Check) */
+    .snp-trk-cols { display: flex; gap: 24px; align-items: flex-start; }
+    .snp-trk-col-left { flex: 3 1 0; min-width: 0; }
+    .snp-trk-col-right { flex: 2 1 0; min-width: 0; }
+    .snp-trk-chip {
+      display: flex; align-items: stretch; border-radius: 8px; cursor: pointer;
+      border: 1px solid; transition: box-shadow 0.15s;
+    }
+    .snp-trk-chip:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    /* Semantic state via background tint + border tint, not a side-stripe */
+    .snp-trk-chip-attn  { background: rgba(255,178,0,0.06); border-color: rgba(255,178,0,0.35); }
+    .snp-trk-chip-info  { background: rgba(1,119,142,0.05); border-color: rgba(1,119,142,0.3); }
+    .snp-trk-chip-ready { background: rgba(75,166,107,0.06); border-color: rgba(75,166,107,0.3); }
+    .snp-trk-chip-body  { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
+    .snp-trk-chip-text  { display: flex; flex-direction: column; gap: 1px; }
+    .snp-trk-chip-label { font-size: 14px; font-weight: 700; color: #10171a; }
+    .snp-trk-chip-sub   { font-size: 12px; font-weight: 500; color: #4b5563; }
+
+    /* Track card badges — real Horizon presence/brand tokens (RGB triplets) */
+    .snp-trk-badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 10px;
+      font-size: 11px; font-weight: 600; margin-left: 6px; white-space: nowrap;
+    }
+    .snp-trk-badge-attn  { background: rgba(255,178,0,0.15); color: rgb(153,107,0); }
+    .snp-trk-badge-info  { background: rgba(1,119,142,0.10); color: rgb(1,119,142); }
+    .snp-trk-badge-ready { background: rgba(75,166,107,0.15); color: rgb(27,94,32); }
+
+    /* Card metadata byline — attribution, scope, recency */
+    .snp-trk-meta-row {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      padding: 0 12px; margin: 2px 0 8px;
+      font-size: 11px; color: #6b7280;
+    }
+    .snp-trk-meta-sep { color: #9ca3af; font-weight: 700; }
+
+    /* Executive Summary — extra breathing room between sections. Scoped to
+       .snp-trk-exec-body only (not the shared .snp-ai-sec class) so Options 1 & 2's
+       original summary/assessment cards are untouched. */
+    .snp-trk-exec-body .snp-ai-sec { margin-bottom: 10px; }
+    .snp-trk-exec-body .snp-ai-sec:last-child { margin-bottom: 0; }
+
+    /* Clamp + show more — reused by Executive Summary, Similar Demands, and
+       Resource Estimate so long content doesn't push other cards' titles
+       below the fold. .snp-trk-clamp-tall gives chunkier content (cards,
+       tables) more room than prose before it clips. */
+    .snp-trk-clamp { max-height: 140px; overflow: hidden; position: relative; }
+    .snp-trk-clamp.snp-trk-clamp-tall { max-height: 190px; }
+    .snp-trk-clamp.is-full { max-height: none; overflow: visible; }
+    .snp-trk-clamp-fade {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+      pointer-events: none;
+    }
+    .snp-trk-showmore-btn {
+      display: inline-flex; align-items: center; background: none; border: none; cursor: pointer;
+      color: #0f7aab; font-size: 13px; font-weight: 600; padding: 8px 12px 4px; font-family: inherit;
+    }
+    .snp-trk-showmore-btn:hover { text-decoration: underline; }
+
+    /* Validation checklist */
+    .snp-trk-link { color: #0f7aab; text-decoration: none; }
+    .snp-trk-link:hover { text-decoration: underline; }
+    .snp-trk-check-hdr {
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #9ca3af; margin: 10px 0 2px;
+    }
+    .snp-trk-check-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .snp-trk-check-row { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: #374151; line-height: 1.5; }
+
+    /* Auto-fill — compact list, awareness model (values already applied, amend inline) */
+    .snp-trk-fill-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .snp-trk-af-list { display: flex; flex-direction: column; }
+    .snp-trk-af-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 7px 12px; border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .snp-trk-af-row:last-child { border-bottom: none; }
+    .snp-trk-af-lbl { flex: 0 0 42%; font-size: 12px; color: #6b7280; }
+    .snp-trk-af-val { flex: 1; font-size: 14px; font-weight: 600; color: #10171a; min-width: 0; }
+    .snp-trk-af-edit-btn {
+      background: none; border: none; cursor: pointer; padding: 3px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 4px; color: #9ca3af; flex-shrink: 0;
+    }
+    .snp-trk-af-edit-btn:hover { background: rgba(0,0,0,0.06); color: #374151; }
+    .snp-trk-af-input {
+      flex: 1; font-size: 13px; color: #10171a; font-family: inherit;
+      padding: 3px 6px; border: 1px solid #0f7aab; border-radius: 4px; min-width: 0;
+    }
+
+    /* Similarity cards */
+    .snp-trk-sim-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+    .snp-trk-sim-card {
+      border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;
+      display: flex; flex-direction: column; gap: 6px; background: #fafbfc;
+    }
+    .snp-trk-sim-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .snp-trk-sim-name { font-size: 15px; font-weight: 700; color: #10171a; }
+    .snp-trk-sim-basis { font-size: 13px; color: #4b5563; line-height: 1.5; }
+    .snp-trk-sim-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280; }
+    .snp-trk-sim-sep { color: #d1d5db; }
+    .snp-trk-sim-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+
+    /* Resource estimation — T-shirt sizing (Option 4 only) */
+    /* Sizing pills use the AI/link accent (teal), never the navy CTA color —
+       "this is what AI determined" must read differently from "click me." */
+    .snp-trk-tshirt-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 16px; align-items: flex-end; }
+    .snp-trk-tshirt-col { display: flex; flex-direction: column; align-items: center; }
+    .snp-trk-tshirt-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+      color: #0f7aab; margin-bottom: 6px;
+    }
+    .snp-trk-tshirt-pill {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-width: 64px; padding: 10px 14px; border-radius: 10px;
+      border: 1px solid #e5e7eb; background: #fff;
+    }
+    .snp-trk-tshirt-pill-label { font-size: 15px; font-weight: 700; color: #9ca3af; }
+    .snp-trk-tshirt-pill-range { font-size: 11px; color: #9ca3af; margin-top: 2px; white-space: nowrap; }
+    .snp-trk-tshirt-check { color: #0f7aab; display: inline-flex; margin-bottom: 2px; }
+    .snp-trk-tshirt-pill.is-picked {
+      border: 2px solid #0f7aab; background: #eef7fa;
+      padding: 12px 18px 14px;
+      box-shadow: 0 6px 16px rgba(15,122,171,0.18);
+      transform: translateY(-3px);
+    }
+    .snp-trk-tshirt-pill.is-picked .snp-trk-tshirt-pill-label { font-size: 22px; color: #0f7aab; }
+    .snp-trk-tshirt-pill.is-picked .snp-trk-tshirt-pill-range { color: #0f7aab; font-weight: 600; }
+    .snp-trk-tshirt-reason {
+      font-size: 13px; color: #374151; line-height: 1.5;
+      background: #f9fafb; border-radius: 8px; padding: 12px 14px; margin-top: 8px;
+    }
+
+    /* Resource estimation */
+    .snp-trk-basis-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+    .snp-trk-basis-chip { background: #eef7fa; color: #0f7aab; font-size: 12px; padding: 3px 9px; border-radius: 10px; }
+    .snp-trk-tbl { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+    .snp-trk-tbl th, .snp-trk-tbl td { padding: 6px 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .snp-trk-tbl th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; font-weight: 600; }
+    .snp-trk-tbl td:last-child, .snp-trk-tbl th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .snp-trk-tbl-total td { font-weight: 700; font-size: 15px; border-top: 2px solid #d1d5db; border-bottom: none; }
   `;
   document.head.appendChild(el);
 };
@@ -1241,7 +1438,6 @@ function OverviewTab(props) {
   var demand = props.demand;
 
   // ── SVG assets from design spec ───────────────────────────────────────────
-  var SVG_SPARKLE = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M11.8642 1.77543C11.6803 2.47109 11.137 3.01439 10.4413 3.19816L9.52015 3.44151C9.28852 3.5027 9.28849 3.83145 9.5201 3.89269L10.4418 4.13638C11.1372 4.32025 11.6803 4.86343 11.8641 5.55889L12.1076 6.48014C12.1688 6.71176 12.4976 6.71176 12.5588 6.48014L12.8023 5.55889C12.9861 4.86343 13.5292 4.32025 14.2247 4.13638L15.1463 3.89269C15.3779 3.83145 15.3779 3.5027 15.1463 3.44151L14.2251 3.19816C13.5294 3.01439 12.9861 2.47109 12.8023 1.77543L12.5588 0.854083C12.4976 0.622451 12.1688 0.622451 12.1076 0.854083L11.8642 1.77543Z" fill="#00718F"/><path d="M6.27752 5.05811C5.90008 6.65427 4.65381 7.90054 3.05765 8.27798L1.6478 8.61136C1.23728 8.70843 1.23716 9.2926 1.64763 9.38985L3.05941 9.7243C4.65463 10.1022 5.90001 11.348 6.27742 12.9433L6.6109 14.353C6.70801 14.7635 7.2921 14.7636 7.38938 14.3532L7.72394 12.9416C8.10183 11.3472 9.34672 10.1023 10.9411 9.7244L12.3527 9.38984C12.7631 9.29256 12.763 8.70847 12.3526 8.61136L10.9429 8.27788C9.34754 7.90047 8.10176 6.65509 7.72384 5.05988L7.38939 3.64809C7.29214 3.23762 6.70797 3.23774 6.61089 3.64826L6.27752 5.05811Z" fill="#00718F"/></svg>';
   var SVG_INFO = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 3.25C5 3.11193 5.11193 3 5.25 3H5.75C5.88807 3 6 3.11193 6 3.25V3.75C6 3.88807 5.88807 4 5.75 4H5.25C5.11193 4 5 3.88807 5 3.75V3.25Z" fill="#37444A"/><path d="M5 5.25C5 5.11193 5.11193 5 5.25 5H5.75C5.88807 5 6 5.11193 6 5.25V7.75C6 7.88807 5.88807 8 5.75 8H5.25C5.11193 8 5 7.88807 5 7.75V5.25Z" fill="#37444A"/><path d="M11 5.5C11 2.46243 8.53757 0 5.5 0C2.46243 0 0 2.46243 0 5.5C0 8.53757 2.46243 11 5.5 11C8.53757 11 11 8.53757 11 5.5ZM10 5.5C10 7.98528 7.98528 10 5.5 10C3.01472 10 1 7.98528 1 5.5C0.999999 3.01472 3.01472 1 5.5 1C7.98528 1 10 3.01472 10 5.5Z" fill="#37444A"/></svg>';
   var SVG_SYNC = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.8635 2.45976C7.61156 2.32941 7.34181 2.22403 7.05656 2.14759C4.9227 1.57583 2.72935 2.84216 2.15758 4.97602C2.1047 5.17339 2.06758 5.37096 2.04536 5.56746C2.01434 5.84186 1.76676 6.03915 1.49236 6.00813C1.42396 6.0004 1.36035 5.97921 1.30387 5.9475C1.12178 5.8566 1.00657 5.65916 1.03024 5.44506C1.30665 2.94456 3.42577 1 5.99975 1C6.8392 1 7.63016 1.20688 8.32457 1.57227C8.99259 1.91813 9.56029 2.4044 10 2.98285V2.49993C10 2.22379 10.2239 1.99993 10.5 1.99993C10.7761 1.99993 11 2.22379 11 2.49993V4.49993C11 4.77607 10.7761 4.99993 10.5 4.99993L8.5 4.99993C8.22386 4.99993 8 4.77607 8 4.49993C8 4.22379 8.22386 3.99993 8.5 3.99993L9.46469 3.99993C9.08723 3.34751 8.53113 2.81192 7.8635 2.45976Z" fill="#37444A"/><path d="M9.95404 6.60708C9.96221 6.55342 9.9693 6.4994 9.97531 6.44506C10.0005 6.21746 10.1747 6.04251 10.3899 6.00669C10.4348 5.99918 10.4815 5.99772 10.5289 6.00308C10.8033 6.0341 11.0006 6.28169 10.9696 6.55608C10.9621 6.62269 10.9532 6.68935 10.9429 6.75603C10.8684 7.24652 10.7228 7.7136 10.5168 8.14639C9.84038 9.57395 8.53502 10.5733 7.03763 10.8922C6.50631 11.0053 5.95081 11.0328 5.39065 10.9633C4.75286 10.8858 4.15219 10.6882 3.6119 10.394C3.03965 10.0835 2.54384 9.66891 2.14255 9.18161C2.09368 9.12243 2.04615 9.06211 2 9.00069V9.49993C2 9.77607 1.77614 9.99993 1.5 9.99993C1.22386 9.99993 1 9.77607 1 9.49993V7.49993C1 7.22379 1.22386 6.99993 1.5 6.99993H3.5C3.77614 6.99993 4 7.22379 4 7.49993C4 7.77607 3.77614 7.99993 3.5 7.99993H2.53587C2.6516 8.20041 2.78458 8.39085 2.93341 8.56885C3.25013 8.9465 3.63522 9.26467 4.06956 9.50439C4.34644 9.65659 4.6459 9.77819 4.96472 9.86362C5.15092 9.91351 5.33757 9.94941 5.52355 9.97195C5.67971 9.99047 5.83862 10 5.99975 10C6.28877 10 6.57065 9.96934 6.8423 9.91109C7.40027 9.79045 7.9246 9.55164 8.37986 9.21511C9.08215 8.69599 9.6201 7.94433 9.8637 7.03519C9.90196 6.89243 9.93196 6.74957 9.95404 6.60708Z" fill="#37444A"/></svg>';
   var SVG_CHEVRON_UP = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.17075 7.87629C2.37857 8.05813 2.69445 8.03707 2.8763 7.82925L6.00001 4.2593L9.12372 7.82925C9.30556 8.03707 9.62144 8.05813 9.82926 7.87629C10.0371 7.69445 10.0581 7.37857 9.8763 7.17075L6.3763 3.17075C6.28135 3.06224 6.14419 3 6.00001 3C5.85583 3 5.71866 3.06224 5.62372 3.17075L2.12372 7.17075C1.94188 7.37857 1.96294 7.69445 2.17075 7.87629Z" fill="#37444A"/></svg>';
@@ -1269,7 +1465,9 @@ function OverviewTab(props) {
         React.createElement('div', { className: 'snp-ai-content' },
           React.createElement('div', { className: 'snp-ai-hdr' },
             React.createElement('div', { className: 'snp-ai-hdr-left' },
-              React.createElement('span', { className: 'snp-ai-sparkle', dangerouslySetInnerHTML: { __html: SVG_SPARKLE } }),
+              React.createElement('span', { className: 'snp-ai-sparkle' },
+                React.createElement('img', { src: OTTO_MARK_URI, width: 16, height: 16, alt: '', style: { display: 'block' } })
+              ),
               React.createElement('span', { className: 'snp-ai-lbl' }, titleStr),
               React.createElement('button', { className: 'snp-icon-btn' },
                 React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_INFO } })
@@ -1286,7 +1484,7 @@ function OverviewTab(props) {
           ),
           bodyEl,
           React.createElement('div', { className: 'snp-ai-ftr' },
-            React.createElement('span', null, 'Check AI-generated summaries for accuracy'),
+            React.createElement('span', null, 'Be sure to check AI-generated content for accuracy.'),
             React.createElement('div', { className: 'snp-ai-thumbs' },
               React.createElement('button', { className: 'snp-thumb' },
                 React.createElement('span', { dangerouslySetInnerHTML: { __html: SVG_THUMBS_UP } })
@@ -1399,10 +1597,682 @@ function OverviewTab(props) {
         React.createElement('h1', { className: 'snp-ov-title' }, demand.name)
       ),
       React.createElement('div', { className: 'snp-ov-body' },
-        aiCard('Summary by Now Assist', summaryBody),
+        aiCard('AI Summary', summaryBody),
         React.createElement('div', { style: { height: '16px' } }),
-        aiCard('Assessment by Now Assist', React.createElement('div', null, assessmentChildren))
+        aiCard('AI Assessment', React.createElement('div', null, assessmentChildren))
       )
+    ),
+    React.createElement('div', { className: 'snp-ov-right-panel' },
+      iconBtn('plus-outline', 'Add', 'sm'),
+      iconBtn('paperclip-outline', 'Attach', 'sm'),
+      iconBtn('clipboard-outline', 'Notes', 'sm')
+    )
+  );
+}
+
+// ─── Track Overview (Options 3 & 4) ────────────────────────────────────────────
+// Shared stages: Validation → Auto-fill. Track-specific final block:
+//   Option 3 → Similarity / Dedup      Option 4 → Resource Estimation
+
+var TRK_CHEVRON = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.17075 7.87629C2.37857 8.05813 2.69445 8.03707 2.8763 7.82925L6.00001 4.2593L9.12372 7.82925C9.30556 8.03707 9.62144 8.05813 9.82926 7.87629C10.0371 7.69445 10.0581 7.37857 9.8763 7.17075L6.3763 3.17075C6.28135 3.06224 6.14419 3 6.00001 3C5.85583 3 5.71866 3.06224 5.62372 3.17075L2.12372 7.17075C1.94188 7.37857 1.96294 7.69445 2.17075 7.87629Z" fill="#37444A"/></svg>';
+
+var TRK_SYNC = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.8635 2.45976C7.61156 2.32941 7.34181 2.22403 7.05656 2.14759C4.9227 1.57583 2.72935 2.84216 2.15758 4.97602C2.1047 5.17339 2.06758 5.37096 2.04536 5.56746C2.01434 5.84186 1.76676 6.03915 1.49236 6.00813C1.42396 6.0004 1.36035 5.97921 1.30387 5.9475C1.12178 5.8566 1.00657 5.65916 1.03024 5.44506C1.30665 2.94456 3.42577 1 5.99975 1C6.8392 1 7.63016 1.20688 8.32457 1.57227C8.99259 1.91813 9.56029 2.4044 10 2.98285V2.49993C10 2.22379 10.2239 1.99993 10.5 1.99993C10.7761 1.99993 11 2.22379 11 2.49993V4.49993C11 4.77607 10.7761 4.99993 10.5 4.99993L8.5 4.99993C8.22386 4.99993 8 4.77607 8 4.49993C8 4.22379 8.22386 3.99993 8.5 3.99993L9.46469 3.99993C9.08723 3.34751 8.53113 2.81192 7.8635 2.45976Z" fill="#37444A"/><path d="M9.95404 6.60708C9.96221 6.55342 9.9693 6.4994 9.97531 6.44506C10.0005 6.21746 10.1747 6.04251 10.3899 6.00669C10.4348 5.99918 10.4815 5.99772 10.5289 6.00308C10.8033 6.0341 11.0006 6.28169 10.9696 6.55608C10.9621 6.62269 10.9532 6.68935 10.9429 6.75603C10.8684 7.24652 10.7228 7.7136 10.5168 8.14639C9.84038 9.57395 8.53502 10.5733 7.03763 10.8922C6.50631 11.0053 5.95081 11.0328 5.39065 10.9633C4.75286 10.8858 4.15219 10.6882 3.6119 10.394C3.03965 10.0835 2.54384 9.66891 2.14255 9.18161C2.09368 9.12243 2.04615 9.06211 2 9.00069V9.49993C2 9.77607 1.77614 9.99993 1.5 9.99993C1.22386 9.99993 1 9.77607 1 9.49993V7.49993C1 7.22379 1.22386 6.99993 1.5 6.99993H3.5C3.77614 6.99993 4 7.22379 4 7.49993C4 7.77607 3.77614 7.99993 3.5 7.99993H2.53587C2.6516 8.20041 2.78458 8.39085 2.93341 8.56885C3.25013 8.9465 3.63522 9.26467 4.06956 9.50439C4.34644 9.65659 4.6459 9.77819 4.96472 9.86362C5.15092 9.91351 5.33757 9.94941 5.52355 9.97195C5.67971 9.99047 5.83862 10 5.99975 10C6.28877 10 6.57065 9.96934 6.8423 9.91109C7.40027 9.79045 7.9246 9.55164 8.37986 9.21511C9.08215 8.69599 9.6201 7.94433 9.8637 7.03519C9.90196 6.89243 9.93196 6.74957 9.95404 6.60708Z" fill="#37444A"/></svg>';
+
+function trkBadge(text, tone) {
+  return React.createElement('span', { className: 'snp-trk-badge snp-trk-badge-' + tone }, text);
+}
+
+// Byline-style metadata row — attribution, scope of evaluation, recency.
+// Gives each card a substantiated basis instead of just a bigger box.
+function trkMetaRow(parts) {
+  var children = [];
+  parts.forEach(function(p, i) {
+    if (i > 0) children.push(React.createElement('span', { key: 's' + i, className: 'snp-trk-meta-sep' }, '•'));
+    children.push(React.createElement('span', { key: 'p' + i }, p));
+  });
+  return React.createElement('div', { className: 'snp-trk-meta-row' }, children);
+}
+
+// Shared collapsible card shell for all track blocks — mirrors the aiCard
+// visual language from OverviewTab (sparkle bar, header, chevron) but the
+// chevron here actually toggles content, and the footer is action-specific
+// per block rather than a generic thumbs-up/down.
+// Skeleton placeholder — mirrors a real card's outer shell (bar, radius,
+// shadow) so nothing shifts when the real content swaps in. Line widths
+// vary per call so the loading state doesn't read as identical repeated cards.
+function trkSkeletonCard(lineWidths) {
+  return React.createElement('div', { className: 'snp-ai-card snp-trk-card' },
+    React.createElement('div', { className: 'snp-ai-inner' },
+      React.createElement('div', { className: 'snp-ai-bar' }),
+      React.createElement('div', { className: 'snp-ai-content' },
+        React.createElement('div', { className: 'snp-skel-card' },
+          React.createElement('div', { className: 'snp-skel-hdr' },
+            React.createElement('div', { className: 'snp-skel snp-skel-icon' }),
+            React.createElement('div', { className: 'snp-skel snp-skel-title' }),
+            React.createElement('div', { className: 'snp-skel snp-skel-badge' })
+          ),
+          lineWidths.map(function(w, i) {
+            return React.createElement('div', { key: i, className: 'snp-skel snp-skel-line', style: { width: w } });
+          })
+        )
+      )
+    )
+  );
+}
+
+function trkCard(opts) {
+  var expanded = opts.expanded;
+  return React.createElement('div', { className: 'snp-ai-card snp-trk-card', id: opts.anchorId },
+    React.createElement('div', { className: 'snp-ai-inner' },
+      React.createElement('div', { className: 'snp-ai-bar' }),
+      React.createElement('div', { className: 'snp-ai-content' },
+        React.createElement('div', { className: 'snp-ai-hdr' },
+          React.createElement('div', { className: 'snp-ai-hdr-left' },
+            React.createElement('span', { className: 'snp-ai-sparkle' },
+              React.createElement('img', { src: OTTO_MARK_URI, width: 16, height: 16, alt: '', style: { display: 'block' } })
+            ),
+            React.createElement('span', { className: 'snp-ai-lbl' }, opts.title),
+            opts.badge ? trkBadge(opts.badge.text, opts.badge.tone) : null
+          ),
+          React.createElement('div', { className: 'snp-ai-hdr-right' },
+            opts.onRefresh ? React.createElement('button', {
+              className: 'snp-icon-btn', title: 'Refresh with latest data', onClick: opts.onRefresh,
+            },
+              React.createElement('span', {
+                className: opts.refreshing ? 'snp-trk-sync-spin' : '',
+                dangerouslySetInnerHTML: { __html: TRK_SYNC },
+              })
+            ) : null,
+            React.createElement('button', { className: 'snp-icon-btn', onClick: opts.onToggle },
+              React.createElement('span', {
+                style: expanded ? {} : { transform: 'rotate(180deg)' },
+                dangerouslySetInnerHTML: { __html: TRK_CHEVRON },
+              })
+            )
+          )
+        ),
+        expanded ? opts.children : null
+      )
+    )
+  );
+}
+
+// ── Executive Summary block (shared) — same content as OverviewTab's "AI
+// Summary" card, reused here since Options 3 & 4 also need it. No badge:
+// it's foundational reading, not a status/action item, so it stays visually calm.
+function trkSec(title, lines, key) {
+  var textChildren = Array.isArray(lines)
+    ? lines.reduce(function(acc, line, i) {
+        if (i > 0) acc.push(React.createElement('br', { key: 'b' + i }));
+        acc.push(line);
+        return acc;
+      }, [])
+    : lines;
+  return React.createElement('div', { key: key, className: 'snp-ai-sec' },
+    React.createElement('div', { className: 'snp-ai-sec-title' }, title),
+    React.createElement('div', { className: 'snp-ai-sec-text' }, textChildren)
+  );
+}
+
+function trkExecutiveSummaryBlock(props) {
+  var body = React.createElement('div', { className: 'snp-trk-exec-body' },
+    trkSec('Business requirement',
+      'The Automated Data Retention & Deletion System demand aims to implement a compliant, automated solution to enforce data retention schedules and secure deletion of data past its regulatory or operational lifetime across IT systems. Automation will reduce manual errors, ensure audit-readiness, optimize storage costs, and help avoid regulatory fines, supporting the organization\'s data privacy and governance objectives.',
+      'br'
+    ),
+    trkSec('Key risks of performing', ['Accidental data deletion', 'Misconfiguration of automation policies'], 'kr'),
+    trkSec('Key risks of not performing', ['Regulatory fines and compliance violations', 'Higher data storage/maintenance costs'], 'knr'),
+    trkSec('Cost', ['$170,000 implementation', '$35,000 annual maintenance'], 'cost'),
+    trkSec('Monetary Benefit', ['$280,000 annual savings', '$1.4–$12.9 million annual cost avoidance (errors, fines, storage)'], 'mb'),
+    trkSec('ROI', '65% first year', 'roi')
+  );
+
+  var showMore = props.showMore;
+
+  return trkCard({
+    anchorId: 'trk-exec-summary',
+    title: 'Executive Summary',
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Summarized by AI', 'Covers business requirement, risk, cost & ROI', props.refreshed ? 'Generated just now' : 'Generated 2 hours ago']),
+      React.createElement('div', { className: 'snp-trk-clamp' + (showMore ? ' is-full' : '') },
+        body,
+        showMore ? null : React.createElement('div', { className: 'snp-trk-clamp-fade' })
+      ),
+      React.createElement('button', { className: 'snp-trk-showmore-btn', onClick: props.onToggleShowMore }, showMore ? 'Show less' : 'Show more')
+    ),
+  });
+}
+
+// ── Validation block (shared) ───────────────────────────────────────────────
+function trkValidationBlock(props) {
+  var demand = props.demand;
+  var present = [
+    'Name provided. Demand has a clear title: "' + demand.name + '."',
+    'Description provided. Includes a summary of the work required.',
+    'Demand manager assigned. A valid demand manager is populated on the record.',
+    'Priority set. Matches an allowed priority value.',
+  ];
+  var missing = [
+    'Estimated cost: not provided. Required for financial screening.',
+    'Target business unit: not provided. Required to route for portfolio approval.',
+  ];
+
+  return trkCard({
+    anchorId: 'trk-validation',
+    title: 'Conformance Check',
+    badge: { text: missing.length + ' items missing', tone: 'attn' },
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Run by demand.specialist', present.length + ' of ' + (present.length + missing.length) + ' required fields present', props.refreshed ? 'Evaluated just now' : 'Evaluated 2 hours ago']),
+      React.createElement('div', { className: 'snp-ai-sec' },
+      React.createElement('div', { className: 'snp-ai-sec-text' },
+        'Evaluated against ',
+        React.createElement('a', { className: 'snp-trk-link', href: '#' }, 'KB8810001: Demand Management, Minimum Data Set (MDS) Policy'),
+        '.'
+      ),
+      React.createElement('div', { className: 'snp-trk-check-hdr' }, 'Present'),
+      React.createElement('ul', { className: 'snp-trk-check-list' },
+        present.map(function(t, i) {
+          return React.createElement('li', { key: 'p' + i, className: 'snp-trk-check-row' },
+            React.createElement('span', { style: { color: '#16a34a', display: 'inline-flex', alignItems: 'center', flexShrink: 0 } },
+              React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' })
+            ),
+            React.createElement('span', null, t)
+          );
+        })
+      ),
+      React.createElement('div', { className: 'snp-trk-check-hdr' }, 'Missing (required)'),
+      React.createElement('ul', { className: 'snp-trk-check-list' },
+        missing.map(function(t, i) {
+          return React.createElement('li', { key: 'm' + i, className: 'snp-trk-check-row' },
+            React.createElement('span', { style: { color: '#dc2626', display: 'inline-flex', alignItems: 'center', flexShrink: 0 } },
+              React.createElement('now-icon', { icon: 'circle-close-fill', size: 'sm' })
+            ),
+            React.createElement('span', null, t)
+          );
+        })
+      )
+      )
+    ),
+  });
+}
+
+// ── Auto-fill block (shared) ────────────────────────────────────────────────
+// 12 fields — illustrates auto-fill at real scale. Model is awareness, not a
+// per-item gate: values are already applied, user amends inline if wrong.
+var TRK_AUTOFILL_FIELDS = [
+  { key: 'cost', label: 'Estimated cost', value: '$170,000' },
+  { key: 'unit', label: 'Target business unit', value: 'IT Operations' },
+  { key: 'priority', label: 'Priority', value: 'Medium' },
+  { key: 'targetDate', label: 'Target completion date', value: '2026-12-31' },
+  { key: 'dataClass', label: 'Data classification', value: 'Regulated (PII / Financial)' },
+  { key: 'retentionRef', label: 'Retention policy reference', value: 'KB8810001' },
+  { key: 'regDriver', label: 'Regulatory driver', value: 'GDPR / SOX data retention mandate' },
+  { key: 'complianceOwner', label: 'Compliance owner', value: 'Legal & Compliance team' },
+  { key: 'riskTier', label: 'Risk tier', value: 'Tier 2 (Moderate)' },
+  { key: 'budgetCode', label: 'Budget code', value: 'OPEX-4471' },
+  { key: 'sponsor', label: 'Executive sponsor', value: 'VP, IT Operations' },
+  { key: 'program', label: 'Program alignment', value: 'Enterprise Data Governance Program' },
+];
+
+function trkAutoFillBlock(props) {
+  var values = props.values;
+  var editingKey = props.editingKey;
+  var onEdit = props.onEdit;
+  var onSave = props.onSave;
+  var onCancelEdit = props.onCancelEdit;
+
+  function commit(e, key) {
+    onSave(key, e.target.value);
+  }
+
+  function row(field) {
+    var isEditing = editingKey === field.key;
+    return React.createElement('div', { key: field.key, className: 'snp-trk-af-row' },
+      React.createElement('div', { className: 'snp-trk-af-lbl' }, field.label),
+      isEditing
+        ? React.createElement('input', {
+            className: 'snp-trk-af-input',
+            defaultValue: values[field.key],
+            autoFocus: true,
+            onBlur: function(e) { commit(e, field.key); },
+            onKeyDown: function(e) {
+              if (e.key === 'Enter') { e.target.blur(); }
+              if (e.key === 'Escape') { onCancelEdit(); }
+            },
+          })
+        : React.createElement('div', { className: 'snp-trk-af-val' }, values[field.key]),
+      !isEditing ? React.createElement('button', {
+        className: 'snp-trk-af-edit-btn', title: 'Amend', onClick: function() { onEdit(field.key); },
+      }, React.createElement('now-icon', { icon: 'pencil-outline', size: 'sm' })) : null
+    );
+  }
+
+  return trkCard({
+    anchorId: 'trk-autofill',
+    title: 'Auto-Fill',
+    badge: { text: TRK_AUTOFILL_FIELDS.length + ' fields auto-filled', tone: 'info' },
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Suggested by AI', props.refreshed ? 'Generated just now' : 'Generated 2 hours ago']),
+      React.createElement('div', { className: 'snp-ai-sec' },
+        React.createElement('div', { className: 'snp-ai-sec-text' },
+          'All ' + TRK_AUTOFILL_FIELDS.length + ' fields below were auto-filled, cross-referenced against 3 comparable demands and KB8810001 policy defaults. Review and amend any value directly.'
+        ),
+        React.createElement('div', { className: 'snp-trk-af-list' }, TRK_AUTOFILL_FIELDS.map(row))
+      )
+    ),
+  });
+}
+
+// ── Similarity / Dedup block (Option 3) ─────────────────────────────────────
+var TRK_SIMILAR_DEMANDS = [
+  {
+    key: 'sim1', name: 'Legacy Data Purge & Archival Initiative', relationship: 'encompasses',
+    basis: 'Same target systems (Finance ERP, HR records) and identical regulatory driver.',
+    status: 'In Progress', timeframe: 'Nov 2025 – Jun 2026',
+  },
+  {
+    key: 'sim2', name: 'GCC Data Lifecycle Governance Rollout', relationship: 'sibling',
+    basis: 'Shares the data-classification taxonomy work planned for this demand.',
+    status: 'Draft', timeframe: 'Aug 2026 – Dec 2026',
+  },
+  {
+    key: 'sim3', name: 'Automated Retention Policy Enforcement (Pilot)', relationship: 'sibling',
+    basis: 'Same policy-driven deletion approach, narrower pilot scope.',
+    status: 'Recently converted · WIP', timeframe: 'Sep 2025 – Feb 2026',
+  },
+];
+
+function trkSimilarityBlock(props) {
+  var encompassing = TRK_SIMILAR_DEMANDS.filter(function(d) { return d.relationship === 'encompasses'; });
+  var siblings = TRK_SIMILAR_DEMANDS.filter(function(d) { return d.relationship !== 'encompasses'; });
+
+  function card(d) {
+    var isEncompassing = d.relationship === 'encompasses';
+    return React.createElement('div', { key: d.key, className: 'snp-trk-sim-card' },
+      React.createElement('div', { className: 'snp-trk-sim-top' },
+        React.createElement('div', { className: 'snp-trk-sim-name' }, d.name),
+        trkBadge(isEncompassing ? 'Encompasses this demand' : 'Related: parallel scope', isEncompassing ? 'attn' : 'info')
+      ),
+      React.createElement('div', { className: 'snp-trk-sim-basis' }, d.basis),
+      React.createElement('div', { className: 'snp-trk-sim-meta' },
+        React.createElement('span', null, d.status),
+        React.createElement('span', { className: 'snp-trk-sim-sep' }, '|'),
+        React.createElement('span', null, d.timeframe)
+      ),
+      React.createElement('div', { className: 'snp-trk-sim-actions' },
+        isEncompassing
+          ? React.createElement('button', { className: 'snp-dd-btn snp-dd-btn-primary' }, 'Review for merge')
+          : React.createElement('button', { className: 'snp-dd-btn' }, 'Mark as related'),
+        React.createElement('button', { className: 'snp-dd-btn' }, 'View demand'),
+        React.createElement('button', { className: 'snp-dd-btn' }, 'Not a duplicate')
+      )
+    );
+  }
+
+  return trkCard({
+    anchorId: 'trk-similarity',
+    title: 'Similar Demands',
+    badge: { text: TRK_SIMILAR_DEMANDS.length + ' found · ' + encompassing.length + ' possible merge', tone: 'attn' },
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Run by demand.specialist', 'Scanned 18 draft, in-progress & recently-converted demands', props.refreshed ? 'Evaluated just now' : 'Evaluated 2 hours ago']),
+      React.createElement('div', { className: 'snp-ai-sec' },
+        React.createElement('div', { className: 'snp-ai-sec-text' },
+          'Found by matching requirement text, target systems, and business driver against draft, in-progress, and recently-converted demands.'
+        ),
+        React.createElement('div', { className: 'snp-trk-clamp snp-trk-clamp-tall' + (props.showMore ? ' is-full' : '') },
+          React.createElement('div', { className: 'snp-trk-sim-list' }, encompassing.map(card).concat(siblings.map(card))),
+          props.showMore ? null : React.createElement('div', { className: 'snp-trk-clamp-fade' })
+        ),
+        React.createElement('button', { className: 'snp-trk-showmore-btn', onClick: props.onToggleShowMore }, props.showMore ? 'Show less' : 'Show more')
+      )
+    ),
+  });
+}
+
+// ── Resource Estimation block (Option 4) ────────────────────────────────────
+var TRK_RESOURCE_BASIS = [
+  { name: 'Automated Security Audits', match: 'High' },
+  { name: 'Automated Incident Response for Cyber Threats', match: 'High' },
+  { name: 'Automated VPN Access Management', match: 'Medium' },
+];
+
+var TRK_RESOURCE_ROLES = [
+  { role: 'Software Engineer', hours: 220 },
+  { role: 'DevOps Engineer', hours: 80 },
+  { role: 'Architect', hours: 60 },
+  { role: 'Project Manager', hours: 50 },
+  { role: 'Business Analyst', hours: 40 },
+];
+
+function trkResourceBlock(props) {
+  var total = TRK_RESOURCE_ROLES.reduce(function(sum, r) { return sum + r.hours; }, 0);
+
+  return trkCard({
+    anchorId: 'trk-resource',
+    title: 'Resource Estimate',
+    badge: { text: total + ' hrs · ' + TRK_RESOURCE_ROLES.length + ' roles', tone: 'ready' },
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Modeled by AI', 'Learned from 3 comparable demands', props.refreshed ? 'Updated just now' : 'Updated 2 hours ago']),
+      React.createElement('div', { className: 'snp-ai-sec' },
+        React.createElement('div', { className: 'snp-ai-sec-text' },
+          'Estimated from the demands with the closest work-type match: quantum of work, not requirement similarity.'
+        ),
+        React.createElement('div', { className: 'snp-trk-clamp snp-trk-clamp-tall' + (props.showMore ? ' is-full' : '') },
+          React.createElement('div', { className: 'snp-trk-basis-row' },
+            TRK_RESOURCE_BASIS.map(function(b, i) {
+              return React.createElement('span', { key: i, className: 'snp-trk-basis-chip' }, b.name + ' · ' + b.match);
+            })
+          ),
+          React.createElement('table', { className: 'snp-trk-tbl' },
+            React.createElement('thead', null,
+              React.createElement('tr', null,
+                React.createElement('th', null, 'Role'),
+                React.createElement('th', null, 'Hours')
+              )
+            ),
+            React.createElement('tbody', null,
+              TRK_RESOURCE_ROLES.map(function(r, i) {
+                return React.createElement('tr', { key: i },
+                  React.createElement('td', null, r.role),
+                  React.createElement('td', null, r.hours)
+                );
+              }).concat([
+                React.createElement('tr', { key: 'total', className: 'snp-trk-tbl-total' },
+                  React.createElement('td', null, 'Total'),
+                  React.createElement('td', null, total)
+                ),
+              ])
+            )
+          ),
+          props.showMore ? null : React.createElement('div', { className: 'snp-trk-clamp-fade' })
+        ),
+        React.createElement('button', { className: 'snp-trk-showmore-btn', onClick: props.onToggleShowMore }, props.showMore ? 'Show less' : 'Show more'),
+        React.createElement('div', { className: 'snp-trk-fill-actions', style: { marginTop: '10px' } },
+          React.createElement('button', { className: 'snp-dd-btn snp-dd-btn-primary' }, 'Accept into resource assignment'),
+          React.createElement('button', { className: 'snp-dd-btn' }, 'Adjust manually')
+        )
+      )
+    ),
+  });
+}
+
+// ── Resource Estimate — Option 4 only ───────────────────────────────────────
+// Option 3 (locked) keeps trkResourceBlock as-is: named comparable demands +
+// hours/role table. Option 4 replaces both: no named comparables (general
+// "learned over time" framing instead) and T-shirt sizing instead of hours.
+var TRK_TSHIRT_SIZES = [
+  { key: 'xs', label: 'XS', range: '1-2 weeks' },
+  { key: 's', label: 'S', range: '2-4 weeks' },
+  { key: 'm', label: 'M', range: '1-3 months' },
+  { key: 'l', label: 'L', range: '3-6 months' },
+  { key: 'xl', label: 'XL', range: '6+ months' },
+];
+var TRK_TSHIRT_PICK = 'm';
+var TRK_TSHIRT_REASON = 'Sized as Medium based on scope and complexity patterns learned across past data governance and automation demands. This work spans data classification, retention policy enforcement, and cross-system integration, typically completed within 1 to 3 months by a small cross-functional team.';
+
+function trkResourceBlockV4(props) {
+  var pickedSize = TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0];
+
+  return trkCard({
+    anchorId: 'trk-resource',
+    title: 'Resource Estimate',
+    badge: { text: pickedSize.label + ' · ' + pickedSize.range, tone: 'ready' },
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Modeled by AI', 'Learned from patterns across past demands over time', props.refreshed ? 'Updated just now' : 'Updated 2 hours ago']),
+      React.createElement('div', { className: 'snp-ai-sec' },
+        React.createElement('div', { className: 'snp-ai-sec-text' },
+          'Sized from patterns learned across past demands over time and this demand\'s own requirements, not from specific comparable demands.'
+        ),
+        React.createElement('div', { className: 'snp-trk-tshirt-row' },
+          TRK_TSHIRT_SIZES.map(function(s) {
+            var isPicked = s.key === TRK_TSHIRT_PICK;
+            return React.createElement('div', { key: s.key, className: 'snp-trk-tshirt-col' },
+              isPicked ? React.createElement('div', { className: 'snp-trk-tshirt-tag' }, 'AI pick') : null,
+              React.createElement('div', { className: 'snp-trk-tshirt-pill' + (isPicked ? ' is-picked' : '') },
+                isPicked ? React.createElement('span', { className: 'snp-trk-tshirt-check' },
+                  React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' })
+                ) : null,
+                React.createElement('div', { className: 'snp-trk-tshirt-pill-label' }, s.label),
+                React.createElement('div', { className: 'snp-trk-tshirt-pill-range' }, s.range)
+              )
+            );
+          })
+        ),
+        React.createElement('div', { className: 'snp-trk-check-hdr' }, 'Reasoning'),
+        React.createElement('div', { className: 'snp-trk-tshirt-reason' }, TRK_TSHIRT_REASON),
+        React.createElement('div', { className: 'snp-trk-fill-actions', style: { marginTop: '14px' } },
+          React.createElement('button', { className: 'snp-dd-btn snp-dd-btn-primary' }, 'Accept into resource assignment'),
+          React.createElement('button', { className: 'snp-dd-btn' }, 'Adjust manually')
+        )
+      )
+    ),
+  });
+}
+
+// ── Quick-look strip ─────────────────────────────────────────────────────────
+// Uniform quiet treatment for all chips (white body, colored left bar + icon) —
+// a solid-fill background on every chip made all three compete for attention
+// instead of letting the copy (e.g. "2 items missing") carry the signal.
+var TRK_TONE_ICON_COLOR = {
+  attn: 'rgb(153,107,0)',   // darkened tint of --now-color_presence--away for icon legibility on white
+  info: 'rgb(1,119,142)',   // --now-color--secondary-1
+  ready: 'rgb(75,166,107)', // --now-color_presence--available
+};
+
+function trkStripChip(item, onJump) {
+  return React.createElement('div', {
+    key: item.id, className: 'snp-trk-chip snp-trk-chip-' + item.tone,
+    onClick: function() { onJump(item); },
+  },
+    React.createElement('div', { className: 'snp-trk-chip-body' },
+      React.createElement('span', { style: { color: TRK_TONE_ICON_COLOR[item.tone], display: 'inline-flex', alignItems: 'center', flexShrink: 0 } },
+        React.createElement('now-icon', { icon: item.icon, size: 'md' })
+      ),
+      React.createElement('div', { className: 'snp-trk-chip-text' },
+        React.createElement('div', { className: 'snp-trk-chip-label' }, item.label),
+        React.createElement('div', { className: 'snp-trk-chip-sub' }, item.sub)
+      )
+    )
+  );
+}
+
+// ── Track Overview root — Options 3 & 4 ─────────────────────────────────────
+function OverviewTrack(props) {
+  var demand = props.demand;
+  var variant = props.variant;
+
+  // Option 3: auto-generates (starts 'loading'). Option 4: waits for the user
+  // to click Generate insights (starts 'empty'). Same skeleton/content either way.
+  var phaseS = React.useState(variant === 4 ? 'empty' : 'loading');
+  var phase = phaseS[0]; var setPhase = phaseS[1];
+  var loading = phase === 'loading';
+
+  React.useEffect(function() {
+    if (phase !== 'loading') return;
+    var t = setTimeout(function() { setPhase('loaded'); }, 1000);
+    return function() { clearTimeout(t); };
+  }, [phase]);
+
+  var exS = React.useState({
+    exec: true, // foundational reading — expanded by default
+    validation: false, // collapsed on initial load
+    autofill: false,
+    similarity: true, // has an actionable merge — open by default
+    resource: true, // open by default
+  });
+  var expandedMap = exS[0]; var setExpandedMap = exS[1];
+
+  var afValS = React.useState(function() {
+    var v = {};
+    TRK_AUTOFILL_FIELDS.forEach(function(f) { v[f.key] = f.value; });
+    return v;
+  });
+  var autofillValues = afValS[0]; var setAutofillValues = afValS[1];
+
+  var afEditS = React.useState(null); // key of the row currently being amended, or null
+  var autofillEditingKey = afEditS[0]; var setAutofillEditingKey = afEditS[1];
+
+  // Per-card refresh — shows progress (spin), then "reloads" (same data, timestamp flips to now)
+  var spinS = React.useState({});
+  var spinningMap = spinS[0]; var setSpinningMap = spinS[1];
+  var refreshedS = React.useState({});
+  var refreshedMap = refreshedS[0]; var setRefreshedMap = refreshedS[1];
+
+  function handleRefresh(key) {
+    setSpinningMap(function(m) { var n = Object.assign({}, m); n[key] = true; return n; });
+    setTimeout(function() {
+      setSpinningMap(function(m) { var n = Object.assign({}, m); n[key] = false; return n; });
+      setRefreshedMap(function(m) { var n = Object.assign({}, m); n[key] = true; return n; });
+    }, 800);
+  }
+
+  var execMoreS = React.useState(false); // clamped preview by default
+  var execShowMore = execMoreS[0]; var setExecShowMore = execMoreS[1];
+
+  var simMoreS = React.useState(false);
+  var simShowMore = simMoreS[0]; var setSimShowMore = simMoreS[1];
+
+  var resMoreS = React.useState(false);
+  var resShowMore = resMoreS[0]; var setResShowMore = resMoreS[1];
+
+  function toggle(key) {
+    setExpandedMap(function(m) { var n = Object.assign({}, m); n[key] = !n[key]; return n; });
+  }
+
+  function jumpTo(item) {
+    setExpandedMap(function(m) { var n = Object.assign({}, m); n[item.mapKey] = true; return n; });
+    setTimeout(function() {
+      var el = document.getElementById(item.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
+  var missingCount = 2;
+  var resourceTotal = TRK_RESOURCE_ROLES.reduce(function(s, r) { return s + r.hours; }, 0);
+
+  var stripItems = [
+    { id: 'trk-validation', mapKey: 'validation', icon: 'circle-check-outline', label: 'Conformance', sub: missingCount + ' items missing', tone: 'attn' },
+    { id: 'trk-autofill', mapKey: 'autofill', icon: 'pencil-outline', label: 'Auto-fill', sub: TRK_AUTOFILL_FIELDS.length + ' fields auto-filled', tone: 'info' },
+    { id: 'trk-similarity', mapKey: 'similarity', icon: 'magnifying-glass-outline', label: 'Similar demands', sub: TRK_SIMILAR_DEMANDS.length + ' found · 1 possible merge', tone: 'attn' },
+    { id: 'trk-resource', mapKey: 'resource', icon: 'user-group-outline', label: 'Resource estimate',
+      sub: variant === 4
+        ? TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0].label + ' · ' + TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0].range
+        : resourceTotal + ' hrs · ' + TRK_RESOURCE_ROLES.length + ' roles',
+      tone: 'ready' },
+  ];
+
+  return React.createElement('div', { className: 'snp-ov-layout' },
+    React.createElement('div', { className: 'snp-ov-scroll' },
+      React.createElement('div', { className: 'snp-ov-title-area' },
+        React.createElement('h1', { className: 'snp-ov-title snp-trk-title' }, 'AI summary for ' + demand.name),
+        phase === 'empty' ? null : React.createElement('p', { className: 'snp-trk-page-disclaimer' }, 'This entire page is AI-generated. Be sure to check AI-generated content for accuracy.')
+      ),
+      phase === 'empty'
+      ? React.createElement('div', { className: 'snp-trk-empty' },
+          React.createElement('img', { src: AI_EMPTY_ILLUSTRATION_URI, className: 'snp-trk-empty-img', alt: '' }),
+          React.createElement('div', { className: 'snp-trk-empty-title' }, 'No insights yet'),
+          React.createElement('div', { className: 'snp-trk-empty-sub' }, 'AI checks this demand for missing details, fills them in, finds similar demands, and estimates the resources it\'ll need.'),
+          React.createElement('button', { className: 'snp-asi-draft-btn snp-trk-empty-btn', onClick: function() { setPhase('loading'); } },
+            React.createElement('img', { src: OTTO_MARK_URI, width: 16, height: 16, alt: '', style: { display: 'block' } }),
+            'Generate insights'
+          )
+        )
+      : [
+      React.createElement('div', { key: 'strip', className: 'snp-trk-strip' },
+        [React.createElement('div', { key: 'lbl', className: 'snp-trk-strip-label' }, 'At a glance')].concat(
+          stripItems.map(function(item) { return trkStripChip(item, jumpTo); })
+        )
+      ),
+      React.createElement('div', { key: 'body', className: 'snp-ov-body' },
+        React.createElement('div', { className: 'snp-trk-cols' },
+          loading
+          ? [
+              React.createElement('div', { key: 'skel-left', className: 'snp-trk-col-left' },
+                trkSkeletonCard(['92%', '78%', '55%']),
+                React.createElement('div', { style: { height: '16px' } }),
+                trkSkeletonCard(['85%', '60%']),
+                React.createElement('div', { style: { height: '24px' } }),
+                trkSkeletonCard(['70%', '90%', '50%'])
+              ),
+              React.createElement('div', { key: 'skel-right', className: 'snp-trk-col-right' },
+                trkSkeletonCard(['80%', '65%', '90%', '40%']),
+                React.createElement('div', { style: { height: '12px' } }),
+                trkSkeletonCard(['75%', '55%'])
+              ),
+            ]
+          : [
+          // Left (60%) — business-judgment content
+          React.createElement('div', { key: 'col-left', className: 'snp-trk-col-left' },
+            trkExecutiveSummaryBlock({
+              expanded: expandedMap.exec, onToggle: function() { toggle('exec'); },
+              showMore: execShowMore, onToggleShowMore: function() { setExecShowMore(function(v) { return !v; }); },
+              onRefresh: function() { handleRefresh('exec'); }, refreshing: !!spinningMap.exec, refreshed: !!refreshedMap.exec,
+            }),
+            React.createElement('div', { style: { height: '16px' } }),
+            variant === 4
+              ? trkResourceBlockV4({
+                  expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
+                  onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
+                })
+              : trkResourceBlock({
+                  expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
+                  onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
+                  showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
+                }),
+            React.createElement('div', { style: { height: '24px' } }),
+            trkSimilarityBlock({
+              expanded: expandedMap.similarity, onToggle: function() { toggle('similarity'); },
+              onRefresh: function() { handleRefresh('similarity'); }, refreshing: !!spinningMap.similarity, refreshed: !!refreshedMap.similarity,
+              showMore: simShowMore, onToggleShowMore: function() { setSimShowMore(function(v) { return !v; }); },
+            })
+          ),
+          // Right (40%) — record-hygiene content: Auto-fill leads, Conformance Check beneath it (deliberate)
+          React.createElement('div', { key: 'col-right', className: 'snp-trk-col-right' },
+            trkAutoFillBlock({
+              expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
+              values: autofillValues, editingKey: autofillEditingKey,
+              onEdit: function(key) { setAutofillEditingKey(key); },
+              onSave: function(key, val) {
+                setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
+                setAutofillEditingKey(null);
+              },
+              onCancelEdit: function() { setAutofillEditingKey(null); },
+              onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
+            }),
+            React.createElement('div', { style: { height: '12px' } }),
+            trkValidationBlock({
+              demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
+              onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
+            })
+          ),
+        ]
+        )
+      ),
+    ]
     ),
     React.createElement('div', { className: 'snp-ov-right-panel' },
       iconBtn('plus-outline', 'Add', 'sm'),
@@ -2419,7 +3289,9 @@ function SmartAssessmentInstanceView(props) {
         React.createElement('div', { className: 'snp-draft-panel-top' },
           draftState === 'drafting'
             ? React.createElement('span', { className: 'snp-drafting-pill' },
-                React.createElement('span', { className: 'snp-drafting-sparkle', dangerouslySetInnerHTML: { __html: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1.00003 5.98633C1.00151 5.41826 1.42597 4.94667 1.98538 4.84766C2.67671 4.7252 3.33766 4.3977 3.87015 3.86523C4.4025 3.33274 4.72918 2.67177 4.8516 1.98047C4.95072 1.42103 5.42308 0.997362 5.99124 0.996094L6.01371 0.996094C6.58158 0.99766 7.05326 1.42119 7.15238 1.98047C7.27481 2.67192 7.60216 3.3326 8.1348 3.86523C8.66736 4.39778 9.32811 4.72524 10.0196 4.84766C10.5788 4.9468 11.0025 5.41838 11.0039 5.98633C11.004 5.99366 11.0039 6.00155 11.0039 6.00879C11.0026 6.57683 10.579 7.0493 10.0196 7.14844C9.32833 7.27076 8.66738 7.59745 8.1348 8.12988C7.60234 8.66238 7.27484 9.32332 7.15238 10.0146C7.05334 10.574 6.58173 10.9985 6.01371 11C6.00636 11.0001 5.9985 11 5.99124 11C5.42302 10.9987 4.95066 10.5742 4.8516 10.0146C4.72921 9.3234 4.40268 8.66245 3.87015 8.12988C3.33766 7.5974 2.67672 7.27091 1.98538 7.14844C1.42584 7.04942 1.00135 6.57701 1.00003 6.00879C0.999959 6.00147 1.00003 5.99358 1.00003 5.98633ZM4.50003 6C4.50003 6.82843 5.17161 7.5 6.00003 7.5C6.82846 7.5 7.50003 6.82843 7.50003 6C7.50003 5.17157 6.82846 4.5 6.00003 4.5C5.17161 4.5 4.50003 5.17157 4.50003 6Z" fill="#006F8E"/></svg>' } }),
+                React.createElement('span', { className: 'snp-drafting-sparkle' },
+                  React.createElement('img', { src: OTTO_MARK_URI, width: 12, height: 12, alt: '', style: { display: 'block' } })
+                ),
                 'Drafting responses...'
               )
             : React.createElement('span', { className: 'snp-ready-pill' }, '✶ AI suggestions ready'),
@@ -2642,7 +3514,9 @@ function DemandDetailPage(props) {
                 demand: demand,
                 onSelectAssessment: function(a) { setSelectedAssessment(a); },
               })
-            : React.createElement(OverviewTab, { demand: demand })
+            : (variant === 3 || variant === 4)
+              ? React.createElement(OverviewTrack, { demand: demand, variant: variant })
+              : React.createElement(OverviewTab, { demand: demand })
       )
     )
   );
@@ -2661,6 +3535,16 @@ var OPTION_CARDS = [
     title: 'AI Assisted Smart Assessment',
     desc: 'Experience AI-accelerated demand evaluation — automated draft responses to reduce manual effort and surface insights faster across all assessment dimensions.',
   },
+  {
+    num: 3,
+    title: 'Demand Intelligence',
+    desc: 'Validate demand completeness against policy, auto-fill missing data, surface similar or overlapping demands in flight, and estimate role-level resourcing from comparable past demands, plus structured Smart Assessments without AI-drafted responses.',
+  },
+  {
+    num: 4,
+    title: 'Demand Intelligence (On Demand)',
+    desc: 'Same as Demand Intelligence, but nothing generates automatically. The Overview tab opens empty until the user chooses to generate insights.',
+  },
 ];
 
 function StartPage(props) {
@@ -2670,9 +3554,9 @@ function StartPage(props) {
 
     React.createElement('div', { className: 'hub-header' },
       React.createElement('div', { className: 'hub-eyebrow' }, 'Demand Management'),
-      React.createElement('h1', { className: 'hub-title' }, 'Smart Assessments'),
+      React.createElement('h1', { className: 'hub-title' }, 'Prototype'),
       React.createElement('p', { className: 'hub-subtitle' },
-        'Evaluate demands through structured assessments — Financial Impact, Feasibility, Risk, and Compliance Readiness — to support informed prioritisation and approval decisions.'
+        'Four explorations in AI-assisted demand management: structured assessments, automated validation, similarity detection, and resource estimation.'
       )
     ),
 

@@ -26,6 +26,9 @@ importers:
       '@servicenow/now-dropdown':
         specifier: ^29.0.49
         version: 29.3.0
+      '@servicenow/now-grouped-button':
+        specifier: 29.2.0
+        version: 29.2.0(@servicenow/now-tooltip@29.3.0)
       '@servicenow/now-heading':
         specifier: 29.0.49
         version: 29.0.49
@@ -2053,6 +2056,10 @@ packages:
     resolution: {integrity: sha512-fsoDHK3c0+no7oSn6YvkAuk8tcNL9bCa0eL5eVU/YTMfFBocaJtRX9m6ErvRmxR1LdALW4Qe22f3PHoVs7jc5A==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
 
+  '@servicenow/behavior-reduce-motion@29.2.0':
+    resolution: {integrity: sha512-7tNFH+SUvb18xNWtPZOBHE4K9a+WlZApDV6s5cjY2Wk8a3aBHcB4nSjOaJhv+hCt7cC3/LxORfIyVWWLqgbukA==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
   '@servicenow/behavior-reduce-motion@29.3.0':
     resolution: {integrity: sha512-874qAe3ZbYgHKOw801YGfTP61STkkUHixftzT396PkN3PO8zgDGAHU+nKiMy8dS0QrvvlP8D2UZ9RmCvgj2rRA==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
@@ -2109,6 +2116,10 @@ packages:
     resolution: {integrity: sha512-T6ErTWmzHum9bfGKUrAFcD/H9O7mLh5DvfYsPSbRxv1/qrVsahAItYbL7vPzJM2cZcYmrDVVOeNtjC+9w43N4Q==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
 
+  '@servicenow/behavior-ripple@29.2.0':
+    resolution: {integrity: sha512-fg9EcjRa3EGXkCs0qFI7VZByRNNOd19L3id/5RbgvY5P9ikXRULo+83geMyM15ZAla2NzQ9NNcN1kC8zQklngQ==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
   '@servicenow/behavior-ripple@29.3.0':
     resolution: {integrity: sha512-rJn8+Nseh4CUIz/nnqoqvNP7+XhAYpasRkfiU2nG1WszC4lpvf84O0p9FLe4WqnJ/Obj1vZJg7b3IsgalMd7ZQ==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
@@ -2159,6 +2170,10 @@ packages:
 
   '@servicenow/behavior-rtl@29.0.49':
     resolution: {integrity: sha512-o/G347sd/Ae5eJHouH6bXcdRWo6sCMhMD8GcAr/yAqtai10g/ClEOl7XCEe8FLLBBwSK8UePzyaL1GHweHo0Rw==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
+  '@servicenow/behavior-rtl@29.2.0':
+    resolution: {integrity: sha512-bKugXDEkHcxhX3QxxzNyXiy68abOoHt5cjo+QwrB/ENX/1ZFVdhHj/3yUW2kq9NEfFvaiT5cUfmPRnb+Nsdv6g==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
 
   '@servicenow/behavior-rtl@29.3.0':
@@ -2231,6 +2246,12 @@ packages:
 
   '@servicenow/behavior-tooltip@29.0.49':
     resolution: {integrity: sha512-ox/aijR8KJgTgtZmysp9oVLhR6w8qJzSoZvrvhv/5QJMpAYmWQSYF8x+k3/4BeUNWcMdCuvtFiaZxVc6r3OZug==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+    peerDependencies:
+      '@servicenow/now-tooltip': ^29.0.0
+
+  '@servicenow/behavior-tooltip@29.2.0':
+    resolution: {integrity: sha512-yFT+ScEDKF1/zi0CeQ61UT/xllPOY7IBCZhUGRvmd7mI+QP3rpHuLC3z3wm0bq1S00XvmFeV1N6qmFiLS8ZkQw==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
     peerDependencies:
       '@servicenow/now-tooltip': ^29.0.0
@@ -2336,6 +2357,10 @@ packages:
     resolution: {integrity: sha512-/+IgwyVb67vdOq2MWrfL3u+FciD6bgQDsTBdIqtR0/tPeEyS3XiD3mcZ7jYrLpNlR8ELhnDzlhwVq/oNB7iHaw==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
 
+  '@servicenow/library-enhanced-element@29.2.0':
+    resolution: {integrity: sha512-/2/X1ExOh+pojCekWhu9Yx0oN57jhbbr3wU1csVsD3Q3vOEZEgjOgUd13ixhKcierNM52PkV63QZhsyEEJE8Xw==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
   '@servicenow/library-enhanced-element@29.3.0':
     resolution: {integrity: sha512-ajKlyQyKzx6xk35MtytgMi+rVdMkUCJN5ubWlcFKwPUMMOjdFsCeTtUWQ7HxvOQpP3Ynqs4cSBoO5bOjF15woQ==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
@@ -2388,6 +2413,10 @@ packages:
     resolution: {integrity: sha512-AB6oKMkrogxaxfkFOJ61RQYCS5ZVvE6TSWfJSncyyd1FvhLxdvBgJT/7VfyuL5ZXvq7csp5D8zk72if+AVbd2g==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
 
+  '@servicenow/library-enhanced-utils@29.2.0':
+    resolution: {integrity: sha512-Lt7vS9p+LiTcuXEchQ5nMYg8Hm/VUTlSXyErssAMdoDD/HCWU3SVc7LKkZpej/VreEEwvTIpePyeLlWV51jVIg==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
   '@servicenow/library-enhanced-utils@29.3.0':
     resolution: {integrity: sha512-51Irm3C862XbPycZXi2HwR82cb/+AZpTDEifVREhEgza+G0V0xIVTDr+ZBuQaq7CyakaGEzrW+NsIAZ5u+8Q1w==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
@@ -2430,6 +2459,10 @@ packages:
 
   '@servicenow/library-schemas@29.0.49':
     resolution: {integrity: sha512-5nNsAHM5kHiLFPrJMXAv6ZJEstfOu7QCsTOx5z6OG4WPUqkq0SDHe/ObOFhesJmBXpg7IuoZ0k6pmfltGoDLQg==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
+  '@servicenow/library-schemas@29.2.0':
+    resolution: {integrity: sha512-TI/DRoQvmlCtjSYwtTNRELOpf1v0gHh6yipZLY/Gttl8TCGXnkidGRQIsEnqUORJlQlz8FHmRb3NjrJh6+P0Gg==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
 
   '@servicenow/library-schemas@29.3.0':
@@ -2612,6 +2645,10 @@ packages:
     resolution: {integrity: sha512-iCZrsEB5ID0hoZSWVAzlNtT0QSNYVNGfBhHdtRCr0N2SElYcJVvQRUTy1zuoY2Eqa6Za64qxgyR1Gr29epfAwA==}
     engines: {node: 16.20.2, npm: 8.5.5}
 
+  '@servicenow/now-grouped-button@29.2.0':
+    resolution: {integrity: sha512-sSZMm76fS/xGH98ZWwRz9ZR9W/EtJy0Bafut16BWhOoy0rHhJTu/gYAD2AXiYQxuc/TIBUj9VDV8v0ATDVuO8A==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
   '@servicenow/now-heading@23.1.1':
     resolution: {integrity: sha512-QLbQLlXvFuQvVe74ktKoW1+7Xav88lRtTkptOx5fpDXzEQqtghyLU3XSXLmO0uIzvQ1+mgFE5V22UDNl/rne4A==}
     engines: {node: '>=14.16.0', npm: '>=6.14.11'}
@@ -2674,6 +2711,10 @@ packages:
 
   '@servicenow/now-icon@29.0.49':
     resolution: {integrity: sha512-PQNqOiTYblTx7mSAmoMxg+zvIOBmtEea2D+2TEQ4f62M1P4tB3qy3T6tSZZXuhDgvAJ/RRjtCDlBuPK3wvW1sQ==}
+    engines: {node: 22.5.1, pnpm: 9.5.0}
+
+  '@servicenow/now-icon@29.2.0':
+    resolution: {integrity: sha512-9glmkfxCfupvQcr/pWfaLjhy/lLXQjb4iXv02Pv89a4v5oOo6yJsoDoF3TC01rjTV+//asTzX8WYzbeFZJD5Xw==}
     engines: {node: 22.5.1, pnpm: 9.5.0}
 
   '@servicenow/now-icon@29.3.0':
@@ -3050,6 +3091,9 @@ packages:
   '@servicenow/sass-generic@29.0.49':
     resolution: {integrity: sha512-i98c7WwffxmqvnVXM1TvftyVsgZKF0hyvK+qzS2s/lkKfqALIVAMWsqSVxhAOKsjtIEhUEAMOsV+wpL4mZyMhw==}
 
+  '@servicenow/sass-generic@29.2.0':
+    resolution: {integrity: sha512-rEunnn0pErrN3/zziYEi2OIXNOg5HKSPebamXfwteUHBzJN21t63Yqx/oCB3OiNBBW2SoGPjvFhyQ8cgMtEfjA==}
+
   '@servicenow/sass-generic@29.3.0':
     resolution: {integrity: sha512-WiBM3i4EdGi0BpSwWIQ21JD3RcVlDW/zd5IYWZt1khEA7ZYY8HaxAj550hJpHsxZKj83n6NaaX6W8TKJWeiHtw==}
 
@@ -3089,6 +3133,9 @@ packages:
   '@servicenow/sass-global@29.0.49':
     resolution: {integrity: sha512-mzcJyHRfLNSQ0km0Cjfbvp4Zccko+qHZXvtKysryfUtM4CiXV2Jdi8qnMxZoGJev8PEZWBOYWRpgq40JmbglZQ==}
 
+  '@servicenow/sass-global@29.2.0':
+    resolution: {integrity: sha512-YC14V3G8EUXLxnhClMHon6USpFcjVitkpoUjhoQkNjiHplXV6aSN8HAFqVt79Jv6BmrsxIZ+gnbWYGLVr4fiUA==}
+
   '@servicenow/sass-global@29.3.0':
     resolution: {integrity: sha512-/i0OOBsj8iXgnyMWDZh4cpbq7ggYqPTQxIp051OoSCmjWu6lnq+Y7tIUl3xv4j4QKAXhDd+qIXId7qlmE1u+qw==}
 
@@ -3121,6 +3168,9 @@ packages:
 
   '@servicenow/sass-kit@29.0.49':
     resolution: {integrity: sha512-4VHu0opwmjw1S58ZGeZ8JLzLOPu7/dS1S6OqLEf7UDNsx+FRig3kFlruCFvpTOTdoY+HzVIyyH9Ud1VBtfHuDw==}
+
+  '@servicenow/sass-kit@29.2.0':
+    resolution: {integrity: sha512-/1Fc4FsqXVXDIzVwjlVd41J59P0bSUK0qoN4avrmibbeAZhhHSgWpuHukQr9RLHulZeHcJvXCEQCzFBrgooH5g==}
 
   '@servicenow/sass-kit@29.3.0':
     resolution: {integrity: sha512-OsuvTwy+92zhRter/Iscw3+O7BMhyM1Blbh6ng/CQ2aedhI6z1R2LW+uhbOg7kDjsjtoUKklBudQGMuBCQPg4Q==}
@@ -3169,6 +3219,9 @@ packages:
 
   '@servicenow/sass-utility@29.0.49':
     resolution: {integrity: sha512-yPX/oQmDvmtw49lu+LfV9Uv7kobjTbO/vB4ELOf5mt5QoCa40Fm2E0YuXsjoxpQpwb/2E6dCD0MWV72gUBKoVg==}
+
+  '@servicenow/sass-utility@29.2.0':
+    resolution: {integrity: sha512-UorRwjxyq6l3ma6prTMnnw2oau+85Xi0Q6ITr2gUMXjBKKn1J6UWNsarcLHBbG4KDhInRwakuLZIdli/7RuUCA==}
 
   '@servicenow/sass-utility@29.3.0':
     resolution: {integrity: sha512-IKiQ9vVxiFg4Kc9jwM/R4H/AZx+BjwkMivT3l3E17YwSIxYEsBNU8p9U9T+iJxsJGOFdTiiHkqHJ8NcecMU3Pw==}
@@ -17028,6 +17081,12 @@ snapshots:
       '@servicenow/ui-core': 29.2.2-paxeintegration.1
       sn-ux-core: 26.0.1
 
+  '@servicenow/behavior-reduce-motion@29.2.0':
+    dependencies:
+      '@devsnc/uxf-runtime-utils': 24.1.1
+      '@servicenow/ui-core': 29.2.2-paxeintegration.1
+      sn-ux-core: 26.0.1
+
   '@servicenow/behavior-reduce-motion@29.3.0':
     dependencies:
       '@devsnc/uxf-runtime-utils': 24.1.1
@@ -17123,6 +17182,11 @@ snapshots:
       '@servicenow/behavior-reduce-motion': 29.0.49
       '@servicenow/ui-core': 29.2.2-paxeintegration.1
 
+  '@servicenow/behavior-ripple@29.2.0':
+    dependencies:
+      '@servicenow/behavior-reduce-motion': 29.2.0
+      '@servicenow/ui-core': 29.2.2-paxeintegration.1
+
   '@servicenow/behavior-ripple@29.3.0':
     dependencies:
       '@servicenow/behavior-reduce-motion': 29.3.0
@@ -17176,6 +17240,8 @@ snapshots:
   '@servicenow/behavior-rtl@29.0.22': {}
 
   '@servicenow/behavior-rtl@29.0.49': {}
+
+  '@servicenow/behavior-rtl@29.2.0': {}
 
   '@servicenow/behavior-rtl@29.3.0': {}
 
@@ -17297,6 +17363,11 @@ snapshots:
   '@servicenow/behavior-tooltip@29.0.49(@servicenow/now-tooltip@29.3.0)':
     dependencies:
       '@servicenow/library-enhanced-utils': 29.0.49
+      '@servicenow/now-tooltip': 29.3.0
+
+  '@servicenow/behavior-tooltip@29.2.0(@servicenow/now-tooltip@29.3.0)':
+    dependencies:
+      '@servicenow/library-enhanced-utils': 29.2.0
       '@servicenow/now-tooltip': 29.3.0
 
   '@servicenow/behavior-tooltip@29.3.0(@servicenow/now-tooltip@29.3.0)':
@@ -17522,6 +17593,13 @@ snapshots:
       '@servicenow/ui-effect-update-state': 29.2.2-paxeintegration.1
       lodash: 4.17.21
 
+  '@servicenow/library-enhanced-element@29.2.0':
+    dependencies:
+      '@servicenow/behavior-rtl': 29.2.0
+      '@servicenow/ui-core': 29.2.2-paxeintegration.1
+      '@servicenow/ui-effect-update-state': 29.2.2-paxeintegration.1
+      lodash: 4.17.21
+
   '@servicenow/library-enhanced-element@29.3.0':
     dependencies:
       '@servicenow/behavior-rtl': 29.3.0
@@ -17590,6 +17668,13 @@ snapshots:
       lodash: 4.17.21
       sn-translate: 24.0.1
 
+  '@servicenow/library-enhanced-utils@29.2.0':
+    dependencies:
+      '@servicenow/ui-config': 29.2.2-paxeintegration.1
+      '@servicenow/ui-renderer-snabbdom': 29.2.2-paxeintegration.1
+      lodash: 4.17.21
+      sn-translate: 24.0.1
+
   '@servicenow/library-enhanced-utils@29.3.0':
     dependencies:
       '@servicenow/ui-config': 29.2.2-paxeintegration.1
@@ -17616,6 +17701,8 @@ snapshots:
   '@servicenow/library-schemas@29.0.22': {}
 
   '@servicenow/library-schemas@29.0.49': {}
+
+  '@servicenow/library-schemas@29.2.0': {}
 
   '@servicenow/library-schemas@29.3.0': {}
 
@@ -18333,6 +18420,24 @@ snapshots:
       '@servicenow/ui-core': 27.0.8
       '@servicenow/ui-renderer-snabbdom': 27.0.8
 
+  '@servicenow/now-grouped-button@29.2.0(@servicenow/now-tooltip@29.3.0)':
+    dependencies:
+      '@servicenow/behavior-reduce-motion': 29.2.0
+      '@servicenow/behavior-ripple': 29.2.0
+      '@servicenow/behavior-tooltip': 29.2.0(@servicenow/now-tooltip@29.3.0)
+      '@servicenow/library-enhanced-element': 29.2.0
+      '@servicenow/library-enhanced-utils': 29.2.0
+      '@servicenow/library-schemas': 29.2.0
+      '@servicenow/now-icon': 29.2.0
+      '@servicenow/sass-kit': 29.2.0
+      '@servicenow/sass-utility': 29.2.0
+      '@servicenow/ui-core': 29.2.2-paxeintegration.1
+      '@servicenow/ui-renderer-snabbdom': 29.2.2-paxeintegration.1
+      '@tectonic/test-api': 29.4.4
+      resize-observer-polyfill: 1.5.1
+    transitivePeerDependencies:
+      - '@servicenow/now-tooltip'
+
   '@servicenow/now-heading@23.1.1':
     dependencies:
       '@servicenow/library-enhanced-element': 23.1.1
@@ -18516,6 +18621,22 @@ snapshots:
       '@servicenow/library-enhanced-utils': 29.0.49
       '@servicenow/library-schemas': 29.0.49
       '@servicenow/sass-kit': 29.0.49
+      '@servicenow/ui-core': 29.2.2-paxeintegration.1
+      '@servicenow/ui-effect-http': 29.2.2-paxeintegration.1
+      '@servicenow/ui-renderer-snabbdom': 29.2.2-paxeintegration.1
+      '@tectonic/test-api': 29.4.4
+      dompurify: 3.2.6
+      lodash: 4.17.21
+      lottie-web: 5.13.0
+      sn-translate: 24.0.1
+
+  '@servicenow/now-icon@29.2.0':
+    dependencies:
+      '@servicenow/behavior-reduce-motion': 29.2.0
+      '@servicenow/library-enhanced-element': 29.2.0
+      '@servicenow/library-enhanced-utils': 29.2.0
+      '@servicenow/library-schemas': 29.2.0
+      '@servicenow/sass-kit': 29.2.0
       '@servicenow/ui-core': 29.2.2-paxeintegration.1
       '@servicenow/ui-effect-http': 29.2.2-paxeintegration.1
       '@servicenow/ui-renderer-snabbdom': 29.2.2-paxeintegration.1
@@ -19879,6 +20000,8 @@ snapshots:
 
   '@servicenow/sass-generic@29.0.49': {}
 
+  '@servicenow/sass-generic@29.2.0': {}
+
   '@servicenow/sass-generic@29.3.0': {}
 
   '@servicenow/sass-global@22.1.0':
@@ -19912,6 +20035,10 @@ snapshots:
       sass: 1.78.0
 
   '@servicenow/sass-global@29.0.49':
+    dependencies:
+      sass: 1.78.0
+
+  '@servicenow/sass-global@29.2.0':
     dependencies:
       sass: 1.78.0
 
@@ -19969,6 +20096,11 @@ snapshots:
       '@servicenow/sass-generic': 29.0.49
       '@servicenow/sass-global': 29.0.49
 
+  '@servicenow/sass-kit@29.2.0':
+    dependencies:
+      '@servicenow/sass-generic': 29.2.0
+      '@servicenow/sass-global': 29.2.0
+
   '@servicenow/sass-kit@29.3.0':
     dependencies:
       '@servicenow/sass-generic': 29.3.0
@@ -20024,6 +20156,10 @@ snapshots:
   '@servicenow/sass-utility@29.0.49':
     dependencies:
       '@servicenow/sass-global': 29.0.49
+
+  '@servicenow/sass-utility@29.2.0':
+    dependencies:
+      '@servicenow/sass-global': 29.2.0
 
   '@servicenow/sass-utility@29.3.0':
     dependencies:
@@ -23352,7 +23488,7 @@ snapshots:
       chai: 4.2.0
       chai-a11y-axe: 1.4.0
       got: 11.8.5
-      lodash: 4.17.21
+      lodash: 4.18.1
 
   '@tectonic/tool-validate-dependencies@1.0.1-project-paxe-master':
     dependencies:
