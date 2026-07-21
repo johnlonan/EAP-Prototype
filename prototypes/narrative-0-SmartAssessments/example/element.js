@@ -227,9 +227,9 @@ var injectStyles = function() {
     }
     .snp-dd-btn:hover { background: #f3f6f8; }
     .snp-dd-btn-primary {
-      background: var(--now-color--primary, #032d42); color: #fff; border-color: transparent;
+      background: #032d42; color: #fff; border-color: transparent;
     }
-    .snp-dd-btn-primary:hover { background: var(--now-color--primary-1, #0f3349); }
+    .snp-dd-btn-primary:hover { background: #0f3349; }
     .snp-ra-meta {
       display: flex; align-items: center; gap: 24px;
       padding: 7px 20px; border-bottom: 1px solid #e0e5e8; font-size: 12px; flex-shrink: 0;
@@ -1128,6 +1128,17 @@ var injectStyles = function() {
     }
     .snp-trk-showmore-btn:hover { text-decoration: underline; }
 
+    /* Key Signals (Option 4) */
+    .snp-trk-signal-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: rgba(255,178,0,0.06); border: 1px solid rgba(255,178,0,0.2); border-radius: 8px;
+      padding: 12px 14px; margin-bottom: 8px;
+    }
+    .snp-trk-signal-row:last-child { margin-bottom: 0; }
+    .snp-trk-signal-num { font-size: 22px; font-weight: 700; color: #92400e; flex-shrink: 0; width: 30px; line-height: 1.2; }
+    .snp-trk-signal-title { font-size: 16px; font-weight: 700; color: #10171a; }
+    .snp-trk-signal-desc { font-size: 13px; color: #6b7280; line-height: 1.5; margin-top: 4px; }
+
     /* Validation checklist */
     .snp-trk-link { color: #0f7aab; text-decoration: none; }
     .snp-trk-link:hover { text-decoration: underline; }
@@ -1167,6 +1178,10 @@ var injectStyles = function() {
     }
     .snp-trk-sim-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
     .snp-trk-sim-name { font-size: 15px; font-weight: 700; color: #10171a; }
+    /* Resource Estimate evidence names only (Option 4) — Similarity block's own
+       names stay as plain text, unaffected, since that's shared with locked Option 3 */
+    .snp-trk-basis-link { color: #0f7aab; text-decoration: none; cursor: pointer; display: inline-block; }
+    .snp-trk-basis-link:hover { text-decoration: underline; }
     .snp-trk-sim-basis { font-size: 13px; color: #4b5563; line-height: 1.5; }
     .snp-trk-sim-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280; }
     .snp-trk-sim-sep { color: #d1d5db; }
@@ -1662,7 +1677,7 @@ function trkSkeletonCard(lineWidths) {
 
 function trkCard(opts) {
   var expanded = opts.expanded;
-  return React.createElement('div', { className: 'snp-ai-card snp-trk-card', id: opts.anchorId },
+  return React.createElement('div', { key: opts.anchorId, className: 'snp-ai-card snp-trk-card', id: opts.anchorId },
     React.createElement('div', { className: 'snp-ai-inner' },
       React.createElement('div', { className: 'snp-ai-bar' }),
       React.createElement('div', { className: 'snp-ai-content' },
@@ -1748,6 +1763,43 @@ function trkExecutiveSummaryBlock(props) {
 }
 
 // ── Validation block (shared) ───────────────────────────────────────────────
+// ── Key Signals — Option 4 only, replaces Conformance Check in that slot ───
+// Not a general risk summary (Exec Summary already narrates risk in prose).
+// This isolates only the signals that trigger a process consequence —
+// mandatory approval, escalation, special handling — grounded in facts
+// already established elsewhere on this page, not invented for this card.
+var TRK_KEY_SIGNALS = [
+  { title: 'Irreversible data deletion', desc: 'Automates deletion of regulated data (PII, Financial) across HR, Finance, and Legal systems. Once executed, it cannot be undone.' },
+  { title: 'Legal & Compliance sign-off required', desc: 'Regulatory driver (GDPR / SOX) means this cannot proceed without Legal & Compliance approval.' },
+  { title: 'Spans HR, Finance, and Legal systems', desc: 'Affects multiple personal data categories across systems. Each system owner should be notified before automation goes live.' },
+];
+
+function trkKeySignalsBlock(props) {
+  return trkCard({
+    anchorId: 'trk-key-signals',
+    title: 'Key Signals',
+    badge: { text: TRK_KEY_SIGNALS.length + ' flagged', tone: 'attn' },
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Flagged by AI', 'Pulled from demand details and policy drivers', props.refreshed ? 'Evaluated just now' : 'Evaluated 2 hours ago']),
+      React.createElement('div', { className: 'snp-ai-sec' },
+        TRK_KEY_SIGNALS.map(function(s, i) {
+          return React.createElement('div', { key: i, className: 'snp-trk-signal-row' },
+            React.createElement('div', { className: 'snp-trk-signal-num' }, String(i + 1).padStart(2, '0')),
+            React.createElement('div', null,
+              React.createElement('div', { className: 'snp-trk-signal-title' }, s.title),
+              React.createElement('div', { className: 'snp-trk-signal-desc' }, s.desc)
+            )
+          );
+        })
+      )
+    ),
+  });
+}
+
 function trkValidationBlock(props) {
   var demand = props.demand;
   var present = [
@@ -2028,7 +2080,17 @@ var TRK_TSHIRT_SIZES = [
   { key: 'xl', label: 'XL', range: '6+ months' },
 ];
 var TRK_TSHIRT_PICK = 'm';
-var TRK_TSHIRT_REASON = 'Sized as Medium based on scope and complexity patterns learned across past data governance and automation demands. This work spans data classification, retention policy enforcement, and cross-system integration, typically completed within 1 to 3 months by a small cross-functional team.';
+var TRK_TSHIRT_REASON = 'Spans data classification, retention policy enforcement, and cross-system integration across HR, Finance, and Legal systems. Tier 2 risk and mandatory Legal & Compliance sign-off add coordination overhead beyond a single-team build, but scope stays within one system domain rather than a multi-department rollout, keeping it short of Large. Typically completed within 1 to 3 months by a small cross-functional team.';
+
+// Same demand pool as the Similarity block — not-yet-converted demands only
+// carry their own T-shirt size (direct comparison); a converted one has a
+// real hours/role breakdown, which the AI has to interpret into a size,
+// a genuine inferential step, not a lookup.
+var TRK_TSHIRT_BASIS = [
+  { name: 'Legacy Data Purge & Archival Initiative', kind: 'similar', ownSize: 'L' },
+  { name: 'GCC Data Lifecycle Governance Rollout', kind: 'similar', ownSize: 'M' },
+  { name: 'Automated Retention Policy Enforcement (Pilot)', kind: 'converted', actualBreakdown: 'Software Engineer 180 hrs, DevOps Engineer 60 hrs, Architect 30 hrs', actualHours: 270, interpretedSize: 'M' },
+];
 
 function trkResourceBlockV4(props) {
   var pickedSize = TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0];
@@ -2036,17 +2098,15 @@ function trkResourceBlockV4(props) {
   return trkCard({
     anchorId: 'trk-resource',
     title: 'Resource Estimate',
-    badge: { text: pickedSize.label + ' · ' + pickedSize.range, tone: 'ready' },
+    badge: { text: pickedSize.label + ' · ' + pickedSize.range, tone: 'info' },
     expanded: props.expanded,
     onToggle: props.onToggle,
     onRefresh: props.onRefresh,
     refreshing: props.refreshing,
     children: React.createElement('div', null,
-      trkMetaRow(['Modeled by AI', 'Learned from patterns across past demands over time', props.refreshed ? 'Updated just now' : 'Updated 2 hours ago']),
+      trkMetaRow(['Modeled by AI', 'Compared against 3 related demands', props.refreshed ? 'Updated just now' : 'Updated 2 hours ago']),
       React.createElement('div', { className: 'snp-ai-sec' },
-        React.createElement('div', { className: 'snp-ai-sec-text' },
-          'Sized from patterns learned across past demands over time and this demand\'s own requirements, not from specific comparable demands.'
-        ),
+        // Result first
         React.createElement('div', { className: 'snp-trk-tshirt-row' },
           TRK_TSHIRT_SIZES.map(function(s) {
             var isPicked = s.key === TRK_TSHIRT_PICK;
@@ -2062,8 +2122,30 @@ function trkResourceBlockV4(props) {
             );
           })
         ),
+        // Then why
         React.createElement('div', { className: 'snp-trk-check-hdr' }, 'Reasoning'),
         React.createElement('div', { className: 'snp-trk-tshirt-reason' }, TRK_TSHIRT_REASON),
+        // Then the evidence — collapsed by default so Similarity below stays reachable
+        React.createElement('div', { className: 'snp-trk-check-hdr', style: { marginTop: '14px' } }, 'Comparable demands'),
+        props.showMore
+          ? React.createElement('div', { className: 'snp-trk-sim-list' },
+              TRK_TSHIRT_BASIS.map(function(b) {
+                var isConverted = b.kind === 'converted';
+                return React.createElement('div', { key: b.name, className: 'snp-trk-sim-card' },
+                  React.createElement('div', { className: 'snp-trk-sim-top' },
+                    React.createElement('a', { className: 'snp-trk-sim-name snp-trk-basis-link', href: '#' }, b.name),
+                    trkBadge(isConverted ? 'Derived from actuals' : 'Similar sizing', isConverted ? 'info' : 'ready')
+                  ),
+                  React.createElement('div', { className: 'snp-trk-sim-basis' },
+                    isConverted
+                      ? b.actualBreakdown + ' (' + b.actualHours + ' hrs total).'
+                      : 'Sized as ' + b.ownSize + '.'
+                  )
+                );
+              })
+            )
+          : null,
+        React.createElement('button', { className: 'snp-trk-showmore-btn', onClick: props.onToggleShowMore }, props.showMore ? 'Show less' : 'Show more'),
         React.createElement('div', { className: 'snp-trk-fill-actions', style: { marginTop: '14px' } },
           React.createElement('button', { className: 'snp-dd-btn snp-dd-btn-primary' }, 'Accept into resource assignment'),
           React.createElement('button', { className: 'snp-dd-btn' }, 'Adjust manually')
@@ -2119,7 +2201,7 @@ function OverviewTrack(props) {
 
   var exS = React.useState({
     exec: true, // foundational reading — expanded by default
-    validation: false, // collapsed on initial load
+    validation: variant === 4, // Key Signals (Option 4) open by default; Conformance Check (Option 3) collapsed
     autofill: false,
     similarity: true, // has an actionable merge — open by default
     resource: true, // open by default
@@ -2175,14 +2257,16 @@ function OverviewTrack(props) {
   var resourceTotal = TRK_RESOURCE_ROLES.reduce(function(s, r) { return s + r.hours; }, 0);
 
   var stripItems = [
-    { id: 'trk-validation', mapKey: 'validation', icon: 'circle-check-outline', label: 'Conformance', sub: missingCount + ' items missing', tone: 'attn' },
+    variant === 4
+      ? { id: 'trk-key-signals', mapKey: 'validation', icon: 'clipboard-outline', label: 'Key Signals', sub: TRK_KEY_SIGNALS.length + ' flagged', tone: 'attn' }
+      : { id: 'trk-validation', mapKey: 'validation', icon: 'circle-check-outline', label: 'Conformance', sub: missingCount + ' items missing', tone: 'attn' },
     { id: 'trk-autofill', mapKey: 'autofill', icon: 'pencil-outline', label: 'Auto-fill', sub: TRK_AUTOFILL_FIELDS.length + ' fields auto-filled', tone: 'info' },
     { id: 'trk-similarity', mapKey: 'similarity', icon: 'magnifying-glass-outline', label: 'Similar demands', sub: TRK_SIMILAR_DEMANDS.length + ' found · 1 possible merge', tone: 'attn' },
     { id: 'trk-resource', mapKey: 'resource', icon: 'user-group-outline', label: 'Resource estimate',
       sub: variant === 4
         ? TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0].label + ' · ' + TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0].range
         : resourceTotal + ' hrs · ' + TRK_RESOURCE_ROLES.length + ' roles',
-      tone: 'ready' },
+      tone: variant === 4 ? 'info' : 'ready' },
   ];
 
   return React.createElement('div', { className: 'snp-ov-layout' },
@@ -2237,6 +2321,7 @@ function OverviewTrack(props) {
               ? trkResourceBlockV4({
                   expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
                   onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
+                  showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
                 })
               : trkResourceBlock({
                   expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
@@ -2250,24 +2335,46 @@ function OverviewTrack(props) {
               showMore: simShowMore, onToggleShowMore: function() { setSimShowMore(function(v) { return !v; }); },
             })
           ),
-          // Right (40%) — record-hygiene content: Auto-fill leads, Conformance Check beneath it (deliberate)
+          // Right (40%). Option 3 (locked): Auto-fill leads, Conformance Check beneath it (deliberate, unchanged).
+          // Option 4: Key Signals leads instead (replaces Conformance Check in this slot), Auto-fill beneath it.
           React.createElement('div', { key: 'col-right', className: 'snp-trk-col-right' },
-            trkAutoFillBlock({
-              expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
-              values: autofillValues, editingKey: autofillEditingKey,
-              onEdit: function(key) { setAutofillEditingKey(key); },
-              onSave: function(key, val) {
-                setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
-                setAutofillEditingKey(null);
-              },
-              onCancelEdit: function() { setAutofillEditingKey(null); },
-              onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
-            }),
-            React.createElement('div', { style: { height: '12px' } }),
-            trkValidationBlock({
-              demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
-              onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
-            })
+            variant === 4
+              ? [
+                  trkKeySignalsBlock({
+                    expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
+                    onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
+                  }),
+                  React.createElement('div', { key: 'rsp1', style: { height: '12px' } }),
+                  trkAutoFillBlock({
+                    expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
+                    values: autofillValues, editingKey: autofillEditingKey,
+                    onEdit: function(key) { setAutofillEditingKey(key); },
+                    onSave: function(key, val) {
+                      setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
+                      setAutofillEditingKey(null);
+                    },
+                    onCancelEdit: function() { setAutofillEditingKey(null); },
+                    onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
+                  }),
+                ]
+              : [
+                  trkAutoFillBlock({
+                    expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
+                    values: autofillValues, editingKey: autofillEditingKey,
+                    onEdit: function(key) { setAutofillEditingKey(key); },
+                    onSave: function(key, val) {
+                      setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
+                      setAutofillEditingKey(null);
+                    },
+                    onCancelEdit: function() { setAutofillEditingKey(null); },
+                    onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
+                  }),
+                  React.createElement('div', { key: 'rsp2', style: { height: '12px' } }),
+                  trkValidationBlock({
+                    demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
+                    onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
+                  }),
+                ]
           ),
         ]
         )
