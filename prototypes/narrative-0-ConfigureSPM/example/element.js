@@ -10,7 +10,6 @@ import ReactDOM from '../node_modules/.pnpm/react-dom@16.14.0_react@16.14.0/node
 
 import '@servicenow/now-button';
 import '@servicenow/now-icon';
-import '@servicenow/now-highlighted-value';
 
 // ─── Embedded SVG icons (real ServiceNow wordmark + header glyphs) ─────────────
 var ICONS = {
@@ -225,6 +224,11 @@ var CHECKS = [
     failTail: ' to correct the data.',
   }
 ];
+
+// Checks that flip to passing after a re-run, simulating the admin having
+// fixed some items and re-checked. 2 of 7 originally-failing checks stay
+// failing so a re-run still reads as real progress, not a clean sweep.
+var RERUN_PASS_IDS = ['resource-cost-plan', 'labor-cost-types', 'budget-allocation', 'budget-migration', 'baseline-migration'];
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 // Every value below is traced to a real Horizon token (building-custom-components-or-CSS.md)
@@ -508,10 +512,16 @@ function LoadingState() {
 
 // ─── Run Environment Diagnostic — post-run state ───────────────────────────
 function PostRunState(props) {
-  var failCount = CHECKS.filter(function(c) { return c.state === 'fail'; }).length;
+  var hasRerun = props.runCount > 1;
+  var checks = hasRerun
+    ? CHECKS.map(function(c) {
+        return RERUN_PASS_IDS.indexOf(c.id) !== -1 ? Object.assign({}, c, { state: 'pass' }) : c;
+      })
+    : CHECKS;
+  var failCount = checks.filter(function(c) { return c.state === 'fail'; }).length;
   var summaryText = failCount > 0
-    ? (failCount + ' of ' + CHECKS.length + ' conditions may need your attention')
-    : 'All ' + CHECKS.length + ' conditions reviewed';
+    ? (failCount + ' of ' + checks.length + ' conditions may need your attention')
+    : 'All ' + checks.length + ' conditions reviewed';
   return React.createElement(React.Fragment, null,
     React.createElement('p', { className: 'csp-reassurance' },
       'This check is informational only — it won’t block you from continuing your setup.'
@@ -524,7 +534,7 @@ function PostRunState(props) {
       React.createElement(NowButton, { label: 'Re-run diagnostics', variant: 'secondary', size: 'sm', onClick: props.onRun })
     ),
     React.createElement('div', { className: 'csp-check-list' },
-      CHECKS.map(function(c, i) {
+      checks.map(function(c, i) {
         var isPass = c.state === 'pass';
         var text = isPass
           ? React.createElement('span', null, c.passText)
@@ -595,7 +605,7 @@ function ContentArea(props) {
         ? (props.diagnosticRunning
             ? React.createElement(LoadingState, null)
             : props.diagnosticRan
-              ? React.createElement(PostRunState, { onRun: props.onRunDiagnostics, onFixClick: props.onFixClick, cardVariant: props.cardVariant })
+              ? React.createElement(PostRunState, { onRun: props.onRunDiagnostics, onFixClick: props.onFixClick, cardVariant: props.cardVariant, runCount: props.runCount })
               : React.createElement(PreRunState, { onRun: props.onRunDiagnostics }))
         : React.createElement(StepStub, { label: node ? node.label : '' })
     ),
@@ -614,7 +624,8 @@ function App() {
   var selS = React.useState('run-environment-diagnostic'); var selectedId = selS[0]; var setSelectedId = selS[1];
   var expS = React.useState({ financials: true, 'pre-configuration-diagnostics': true, 'foundation-setup': false, 'multi-currency': false });
   var expanded = expS[0]; var setExpanded = expS[1];
-  var ranS = React.useState(false); var diagnosticRan = ranS[0]; var setDiagnosticRan = ranS[1];
+  var runCountS = React.useState(0); var runCount = runCountS[0]; var setRunCount = runCountS[1];
+  var diagnosticRan = runCount > 0;
   var runningS = React.useState(false); var diagnosticRunning = runningS[0]; var setDiagnosticRunning = runningS[1];
   var confS = React.useState({}); var configuredMap = confS[0]; var setConfiguredMap = confS[1];
   var secBannerS = React.useState(true); var showSecurity = secBannerS[0]; var setShowSecurity = secBannerS[1];
@@ -672,13 +683,14 @@ function App() {
         selectedId: selectedId,
         diagnosticRan: diagnosticRan,
         diagnosticRunning: diagnosticRunning,
+        runCount: runCount,
         cardVariant: cardVariant,
         configuredMap: configuredMap,
         onRunDiagnostics: function() {
           setDiagnosticRunning(true);
           setTimeout(function() {
             setDiagnosticRunning(false);
-            setDiagnosticRan(true);
+            setRunCount(function(n) { return n + 1; });
           }, 1100);
         },
         onFixClick: selectStepAndReveal,
