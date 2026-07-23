@@ -325,6 +325,7 @@ function injectStyles() {
     .csp-overflow-menu { position: absolute; right: 0; top: 28px; background: #fff; border: 1px solid ${TOKENS.borderSubtle}; border-radius: 6px; box-shadow: ${TOKENS.shadowSm}; min-width: 150px; z-index: 5; padding: 4px 0; }
     .csp-overflow-menu-item { padding: 8px 14px; font-size: 13px; color: ${TOKENS.textSecondary}; cursor: pointer; }
     .csp-overflow-menu-item:hover { background: ${TOKENS.surfaceTint}; }
+    .csp-overflow-menu-item-dev { border-top: 1px solid ${TOKENS.borderSubtle}; margin-top: 4px; padding-top: 12px; }
     .csp-desc { font-size: 14px; color: ${TOKENS.textSecondary}; line-height: 1.6; margin: 0 0 16px; }
     .csp-reassurance { font-size: 12.5px; color: ${TOKENS.textTertiary}; margin: 0 0 24px; }
 
@@ -597,7 +598,11 @@ function ContentArea(props) {
           ),
           overflowOpen ? React.createElement('div', { className: 'csp-overflow-menu' },
             React.createElement('div', { className: 'csp-overflow-menu-item', onClick: function() { setOverflowOpen(false); } }, 'Skip this step'),
-            React.createElement('div', { className: 'csp-overflow-menu-item', onClick: function() { setOverflowOpen(false); } }, 'View history')
+            React.createElement('div', { className: 'csp-overflow-menu-item', onClick: function() { setOverflowOpen(false); } }, 'View history'),
+            React.createElement('div', {
+              className: 'csp-overflow-menu-item csp-overflow-menu-item-dev',
+              onClick: function() { setOverflowOpen(false); window.open('https://johnlonan.github.io/EAP-Prototype/prototypes/narrative-0-ConfigureSPM/dev-spec.html', '_blank'); }
+            }, 'View dev spec')
           ) : null
         )
       ),

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Run Environment Diagnostic — Dev Spec</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: rgba(0,0,0,0.9);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
+    line-height: 1.5;
+  }
+  h1 { font-size: 26px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { color: rgba(0,0,0,0.5); font-size: 14px; margin: 0 0 40px; }
+  h2 { font-size: 18px; font-weight: 700; margin: 40px 0 12px; padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.1); }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  p { font-size: 14px; color: rgba(0,0,0,0.8); }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 24px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(0,0,0,0.08); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(0,0,0,0.5); font-weight: 600; }
+  code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; font-family: 'SF Mono', Menlo, monospace; }
+  .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: middle; margin-right: 6px; border: 1px solid rgba(0,0,0,0.15); }
+  .diagram { background: #fafafa; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 24px; font-family: 'SF Mono', Menlo, monospace; font-size: 12.5px; white-space: pre; color: rgba(0,0,0,0.75); overflow-x: auto; }
+  .real { color: #16A34A; font-weight: 600; }
+  .custom { color: #D97706; font-weight: 600; }
+  .note { background: rgba(1,119,142,0.06); border: 1px solid rgba(1,119,142,0.2); border-radius: 6px; padding: 12px 16px; font-size: 13px; color: rgba(0,0,0,0.8); margin: 0 0 32px; }
+  @media print {
+    body { padding: 0 8px; }
+    .note { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <h1>Run Environment Diagnostic — Result Cards (Option B)</h1>
+  <p class="subtitle">Dev handoff spec — component structure, icon, color, and typography for the post-run results screen.</p>
+
+  <div class="note">To get a PDF: <strong>Cmd/Ctrl + P</strong> → Save as PDF.</div>
+
+  <h2>Layout — Summary strip + card list</h2>
+  <div class="diagram">┌─────────────────────────────────────────────────┐
+│  Summary strip                    [Re-run button]│
+├─────────────────────────────────────────────────┤
+│  ┌───────────────────────────────────────────┐  │
+│  │ ○  1. Check title            Learn more ↗ │  │
+│  │    subtitle (optional)                     │  │
+│  │    Result sentence...                      │  │
+│  └───────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────┐  │
+│  │ ○  2. Check title            Learn more ↗ │  │  ← repeats × 8
+│  └───────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────┘</div>
+
+  <h2>Summary strip</h2>
+  <table>
+    <tr><th>Element</th><th>Spec</th></tr>
+    <tr><td>Container</td><td><code>border-radius: 6px</code>, <code>padding: 14px 16px</code>, 1px border, light neutral fill</td></tr>
+    <tr><td>Fill</td><td><span class="swatch" style="background:rgba(0,0,0,0.03)"></span> black at 3% opacity over page background — <code>rgba(0,0,0,0.03)</code></td></tr>
+    <tr><td>Border</td><td>black at 10% opacity — <code>rgba(0,0,0,0.1)</code></td></tr>
+    <tr><td>Headline text</td><td>18px / 700 weight / <code>rgba(0,0,0,0.9)</code></td></tr>
+    <tr><td>Meta caption</td><td>12px / <code>rgba(0,0,0,0.5)</code>, directly under headline</td></tr>
+    <tr><td>Right side</td><td>"Re-run diagnostics" button — <code>now-button</code>, variant <code>secondary</code>, size <code>sm</code></td></tr>
+  </table>
+  <p><strong>Copy logic:</strong> <code>{failCount} of {total} conditions may need your attention</code> when any fail; <code>All {total} conditions reviewed</code> when all pass. Meta caption: <code>Checked just now</code>.</p>
+
+  <h2>Card (Option B — outlined)</h2>
+  <table>
+    <tr><th>Element</th><th>Spec</th></tr>
+    <tr><td>Container</td><td>white background always, <code>border-radius: 10px</code>, <code>padding: 18px 20px</code>, <code>gap: 16px</code> icon↔body, 12px gap between cards, soft drop shadow <code>0 2px 4px 0 rgba(56,56,56,0.25)</code></td></tr>
+    <tr><td>Border — pass</td><td><span class="swatch" style="background:rgba(75,166,107,0.35)"></span> green tint, <code>rgba(75,166,107,0.35)</code></td></tr>
+    <tr><td>Border — fail</td><td><span class="swatch" style="background:rgba(255,178,0,0.5)"></span> amber tint, <code>rgba(255,178,0,0.5)</code> — visibly stronger than pass, intentional so fails read first</td></tr>
+    <tr><td>Border — default/neutral</td><td>black at 10% opacity, same hairline value used everywhere else in the UI</td></tr>
+  </table>
+
+  <h2>Icon + circle</h2>
+  <table>
+    <tr><th>Element</th><th>Spec</th></tr>
+    <tr><td>Component</td><td><span class="real">Real</span> <code>&lt;now-icon&gt;</code> (Seismic) — not a custom SVG</td></tr>
+    <tr><td>Icon name — pass</td><td><code>circle-check-fill</code></td></tr>
+    <tr><td>Icon name — fail</td><td><code>triangle-exclamation-fill</code></td></tr>
+    <tr><td>Circle wrapper</td><td><span class="custom">Custom</span> — plain div, 36px, <code>border-radius: 50%</code>, centers the icon. No real component covers "static icon in colored circle, no label, no click" — checked <code>now-highlighted-value</code> (label is required), <code>now-badge</code> (numeric value only), <code>now-button-circular</code>/<code>now-button-iconic</code> (interactive, wrong semantics for a passive status marker)</td></tr>
+    <tr><td>Circle fill — pass</td><td><span class="swatch" style="background:rgba(75,166,107,0.18)"></span> green 18% opacity, icon color solid <code>rgb(75,166,107)</code></td></tr>
+    <tr><td>Circle fill — fail</td><td><span class="swatch" style="background:rgba(255,178,0,0.22)"></span> amber 22% opacity, icon color a <strong>darkened</strong> amber <code>rgb(140,98,0)</code> (manually darkened derivative — the raw amber token is too light for icon contrast on white)</td></tr>
+  </table>
+
+  <h2>Card body text (top to bottom)</h2>
+  <table>
+    <tr><th>Element</th><th>Spec</th></tr>
+    <tr><td>Number + title row</td><td>Number: 12.5px / 700 / <code>rgba(0,0,0,0.5)</code>, tabular-nums. Title: 16px / 700 / <code>rgba(0,0,0,0.9)</code></td></tr>
+    <tr><td>Subtitle</td><td>Only on 4 of 8 checks (jargon-heavy ones). 13px, <code>rgba(0,0,0,0.5)</code>, own line under title</td></tr>
+    <tr><td>Result sentence</td><td>13.5px, <code>rgba(0,0,0,0.8)</code>, <code>line-height: 1.55</code></td></tr>
+    <tr><td>Inline fix-link</td><td>Inside the sentence, fail state only — <code>rgb(1,119,142)</code>, underline on hover</td></tr>
+  </table>
+
+  <h2>Learn More (all 8 cards, not just fails)</h2>
+  <p>Right-aligned, <strong>vertically centered against the full card height</strong> (<code>align-self: center</code> on a flex row shared with the icon circle and body) — not top-aligned with the title. Text + real <code>&lt;now-icon icon="open-link-right-outline"&gt;</code>, both <code>rgb(1,119,142)</code>. Present on every card regardless of pass/fail — tied to whether the check name is jargon-heavy, not to status.</p>
+
+  <h2>Real components vs custom</h2>
+  <table>
+    <tr><th>Real (Seismic)</th><th>Custom (documented, not a shortcut)</th></tr>
+    <tr><td><code>now-button</code> — Re-run, Mark as configured, Package and download<br/><code>now-icon</code> — status glyph, Learn More glyph</td><td>Circular icon wrapper · card container · summary strip container<br/>— none have a matching Seismic component; all built on token values, not arbitrary hex</td></tr>
+  </table>
+
+</body>
+</html>
