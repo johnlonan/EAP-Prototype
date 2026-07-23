@@ -1,0 +1,11 @@
+{
+  "styles": {
+    "themes": [
+      {
+        "module": "@servicenow/theme-coral",
+        "main": ["theme.scss", "fonts.scss"]
+      }
+    ]
+  },
+  "version": "2"
+}

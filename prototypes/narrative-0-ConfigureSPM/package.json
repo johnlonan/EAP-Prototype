@@ -1,0 +1,43 @@
+{
+  "name": "narrative-0-configure-spm",
+  "version": "1.0.0",
+  "description": "ServiceNow Configure SPM — Horizon/Polaris design reference (narrative-0-ConfigureSPM)",
+  "scripts": {
+    "dev": "npx tectonic develop --disable-glide-emulation --disable-asset-fetching",
+    "dev:open": "npx tectonic develop --disable-glide-emulation --disable-asset-fetching --open",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "claude-horizon-prototyping-plugin": "git+https://code.devsnc.com/jason-ziccardi/claude-horizon-prototyping-plugin.git",
+    "@devsnc/library-enhanced-test": "^29.0.47",
+    "@servicenow/theme-coral": "^29.0.47",
+    "@servicenow/now-accordion": "^29.0.49",
+    "@servicenow/now-alert": "^29.0.49",
+    "@servicenow/now-avatar": "^29.0.49",
+    "@servicenow/now-badge": "29.0.49",
+    "@servicenow/now-button": "^29.0.47",
+    "@servicenow/now-card": "^29.0.49",
+    "@servicenow/now-checkbox": "29.0.49",
+    "@servicenow/now-dropdown": "^29.0.49",
+    "@servicenow/now-heading": "29.0.49",
+    "@servicenow/now-highlighted-value": "^29.0.49",
+    "@servicenow/now-icon": "^29.0.49",
+    "@servicenow/now-input": "29.0.22",
+    "@servicenow/now-list": "29.0.19",
+    "@servicenow/now-loader": "29.0.49",
+    "@servicenow/now-modal": "^29.0.49",
+    "@servicenow/now-pagination-control": "29.0.49",
+    "@servicenow/now-pill": "29.0.49",
+    "@servicenow/now-select": "29.0.49",
+    "@servicenow/now-tabs": "29.0.49",
+    "@servicenow/now-toggle": "29.0.49",
+    "@servicenow/ui-core": "29.1.0-paxeintegration.3",
+    "@tectonic/cli": "^1.0.1-project-paxe-master"
+  },
+  "pnpm": {
+    "overrides": {
+      "@servicenow/now-tooltip": "29.0.47",
+      "@servicenow/sass-global": "29.0.49"
+    }
+  }
+}

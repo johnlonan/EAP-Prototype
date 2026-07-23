@@ -1,0 +1,16 @@
+allowBuilds:
+  '@servicenow/now-record-html-editor': true
+  '@tectonic/archetype': true
+  '@tectonic/cli': true
+  '@tectonic/component-archetype': true
+  '@tectonic/jest-plugin': true
+  '@tectonic/performance-plugin': true
+  '@tectonic/seismic-archetype': true
+  core-js: true
+  core-js-pure: true
+  edgedriver: false
+  fsevents: true
+  geckodriver: false
+  libxmljs2: false
+  nx: true
+  sn-http-request: true
