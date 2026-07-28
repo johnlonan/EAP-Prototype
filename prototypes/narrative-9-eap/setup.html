@@ -1,0 +1,3127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Setup — Agile Planning</title>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="../../assets/js/icons.js"></script>
+
+<style>
+:root {
+  --ai-accent:      #16A34A;
+  --ai-accent-deep: #15803D;
+  --ai-bg:          rgba(22,163,74,0.08);
+  --ink:    #111111;
+  --sub:    #585753;
+  --muted:  #797874;
+  --border: #CCCBC8;
+  --surface:#FFFFFF;
+  --raised: #F8F7F4;
+  --bg:     #F1F0ED;
+  --charcoal:#383733;
+  --warning: #D97706;
+  --warning-bg: rgba(217,119,6,0.09);
+  --warning-border: rgba(217,119,6,0.22);
+}
+
+html, body { height: 100%; margin: 0; padding: 0; }
+body {
+  background: var(--bg) !important;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.liquid-bg { display: none; }
+/* Setup has its own footer chrome — suppress the global floating Otto bar */
+#floating-bar { display: none !important; }
+.page-shell { position: relative; z-index: 2; display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Split-screen viewport ── */
+.content-viewport {
+  flex: 1; min-width: 0;
+  margin: 0 0 0 64px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 10px; /* lifts footer so its bottom corners are visible */
+  background: transparent;
+  border: none; box-shadow: none; border-radius: 0;
+}
+
+/* Holds the two panels side by side, filling the space between chrome and footer */
+.setup-split {
+  flex: 1; min-height: 0;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+/* ─────── LEFT: WIZARD ─────── */
+.setup-wizard {
+  /* 75 % — gives the form cards comfortable breathing room */
+  flex: 0 0 75%;
+  min-width: 520px;
+  max-width: 1020px;
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  border-right: none;
+  background: var(--bg);
+}
+.setup-wizard::-webkit-scrollbar { width: 4px; }
+.setup-wizard::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+/* ── Responsive: collapse preview on narrow viewports ── */
+@media (max-width: 960px) {
+  .setup-wizard  { flex: 1; min-width: 0; max-width: none; border-right: none; }
+  .setup-preview { display: none; }
+}
+@media (min-width: 961px) and (max-width: 1200px) {
+  .setup-wizard { flex: 0 0 62%; max-width: 720px; }
+}
+
+/* Chrome — full-width bar, centred stepper only */
+.setup-chrome {
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 16px 24px 0; /* layout: 2px more top air */
+  flex-shrink: 0;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+
+/* ── Stepper ── */
+.setup-stepper {
+  display: flex; align-items: flex-start; gap: 0;
+  padding-bottom: 12px;
+}
+.stepper-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer; outline: none;
+}
+.stepper-item:focus-visible .stepper-node { outline: 2px solid var(--charcoal); outline-offset: 2px; }
+.stepper-node {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,0.08); color: var(--muted);
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 220ms cubic-bezier(0.22,1,0.36,1), color 180ms ease, transform 220ms cubic-bezier(0.22,1,0.36,1);
+}
+.stepper-item:hover:not(.active):not(.done) .stepper-node { background: rgba(0,0,0,0.13); }
+.stepper-item.active .stepper-node {
+  background: var(--ai-accent); color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(22,163,74,0.16); /* colorize: green halo on active step */
+}
+.stepper-item.done .stepper-node {
+  background: var(--ai-accent); color: #fff;
+  font-size: 0; /* hide number, show checkmark */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.5 9l3 3 6-6' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: center; background-size: 13px;
+  animation: step-done 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+/* overdrive: overshoot spring — node pops to 1.18× then settles to 1.0 */
+@keyframes step-done {
+  0%   { transform: scale(0.55); }
+  60%  { transform: scale(1.18); }
+  80%  { transform: scale(0.95); }
+  100% { transform: scale(1.0); }
+}
+.stepper-label {
+  font-size: 10px; font-weight: 400; color: var(--muted);
+  white-space: nowrap; letter-spacing: 0.01em; line-height: 1;
+  transition: color 180ms ease;
+}
+.stepper-item.active .stepper-label { color: var(--ink); font-weight: 600; }
+.stepper-item.done .stepper-label { color: var(--sub); }
+
+/* Connecting line between steps */
+.stepper-line {
+  width: 36px; height: 1.5px;
+  background: rgba(0,0,0,0.10); flex-shrink: 0;
+  margin-top: 11px; /* vertically center with node (24px/2 - 0.75px) */
+  border-radius: 1px;
+  transition: background 300ms ease;
+}
+.stepper-line.done { background: var(--ai-accent); }
+
+/* ── Scrum fast-path: collapse steps 2 and 4 into the flow ── */
+/* Step order in .setup-stepper: item(1) line item(2) line item(3) line item(4) line item(5)
+   = nth-child:       1       2    3    4    5    6    7    8    9
+   Scrum skips 2 and 4 — hide those nodes + the lines that connect TO them */
+.scrum-flow > :nth-child(2),
+.scrum-flow > :nth-child(3),
+.scrum-flow > :nth-child(6),
+.scrum-flow > :nth-child(7) {
+  display: none;
+}
+
+/* Panes */
+.setup-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.setup-pane {
+  display: none; flex-direction: column; gap: 24px;
+  padding: 28px 28px 24px; flex: 1;
+}
+/* overdrive: cinematic pane entry — scale+translate+fade for a physical feel */
+.setup-pane.is-active { display: flex; animation: pane-in 300ms cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes pane-in { from { opacity:0; transform:translateY(14px) scale(0.988); } to { opacity:1; transform:none; } }
+
+.pane-heading { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+/* bolder + typeset: 38→44px, 600→700, tighter tracking — commands the step entry */
+.pane-title { font-size: 36px; font-weight: 700; color: var(--ink); letter-spacing:-0.028em; line-height:1.08; margin:0; }
+/* typeset: lift sub from muted to sub for legibility; slightly looser leading */
+.pane-sub   { font-size: 13px; color: var(--sub); line-height:1.65; margin:0; max-width:54ch; }
+
+/* Framework grid */
+.fw-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.fw-grid .fw-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.fw-card {
+  background: var(--surface); border: 1.5px solid transparent;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  border-radius: 16px; padding: 18px;
+  cursor: pointer; user-select: none; outline: none;
+  transition: box-shadow 220ms cubic-bezier(0.22,1,0.36,1), transform 220ms cubic-bezier(0.22,1,0.36,1), border-color 180ms ease, background 180ms ease, color 180ms ease;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.fw-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07);
+  transform: translateY(-2px);
+}
+/* delight: tactile press — card drops back down on click, shadows collapse */
+.fw-card:active {
+  transform: translateY(0) scale(0.988);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+.fw-card.is-selected {
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(56,55,51,0.12), 0 6px 20px rgba(0,0,0,0.14);
+  transform: translateY(-1px);
+}
+.fw-card.is-selected:hover { background: #262521; }
+.fw-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.fw-hd-left { display: flex; flex-direction: column; gap: 3px; }
+.fw-eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.fw-card.is-selected .fw-eyebrow { color: rgba(255,255,255,0.62); }
+.fw-name { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing:-0.012em; line-height:1.2; }
+.fw-card.is-selected .fw-name { color: #fff; }
+.fw-check {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 180ms cubic-bezier(0.22,1,0.36,1);
+}
+.fw-check svg { opacity: 0; transition: opacity 160ms; }
+.fw-card.is-selected .fw-check { background: var(--ai-accent); border-color: var(--ai-accent); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
+.fw-card.is-selected .fw-check svg { opacity: 1; }
+.fw-desc { font-size: 13px; color: var(--sub); line-height: 1.55; }
+.fw-card.is-selected .fw-desc { color: rgba(255,255,255,0.78); }
+.fw-meta { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; } /* typeset */
+.fw-meta strong { color: var(--sub); font-weight: 600; }
+.fw-card.is-selected .fw-meta { color: rgba(255,255,255,0.62); }
+.fw-card.is-selected .fw-meta strong { color: rgba(255,255,255,0.90); }
+/* Smooth child colour transitions during invert */
+.fw-eyebrow, .fw-name, .fw-desc, .fw-meta { transition: color 200ms ease; }
+/* Focus states — keyboard accessibility */
+.fw-card:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
+.fw-card.is-selected:focus-visible { outline: 2px solid rgba(255,255,255,0.55); outline-offset: 2px; }
+
+/* Method cards */
+.method-list { display: flex; flex-direction: column; gap: 10px; }
+.method-card {
+  background: var(--surface); border: 1.5px solid transparent;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  border-radius: 14px; padding: 16px 18px;
+  cursor: pointer; user-select: none; outline: none;
+  transition: box-shadow 220ms cubic-bezier(0.22,1,0.36,1), transform 220ms cubic-bezier(0.22,1,0.36,1), border-color 160ms ease;
+  display: flex; gap: 14px; align-items: flex-start; position: relative;
+}
+.method-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); transform: translateY(-2px); }
+.method-card:active { transform: translateY(0) scale(0.99); box-shadow: 0 1px 4px rgba(0,0,0,0.08); transition: transform 80ms ease, box-shadow 80ms ease; }
+.method-card.is-selected { border-color: var(--charcoal); box-shadow: 0 0 0 4px rgba(56,55,51,0.10); transform:translateY(-1px); }
+.method-card:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
+.method-card.is-hero { border-color: rgba(22,163,74,0.45); background: rgba(22,163,74,0.09); }
+.method-card.is-hero:hover { border-color: rgba(22,163,74,0.55); }
+.method-card.is-hero.is-selected { border-color: var(--ai-accent); box-shadow: 0 0 0 4px rgba(22,163,74,0.12); }
+.method-badge {
+  position: absolute; top: -1px; right: 16px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em;
+  color: #fff; background: var(--ai-accent); padding: 3px 8px; border-radius: 0 0 7px 7px;
+}
+.method-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  background: var(--raised); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: var(--sub); transition: transform 200ms cubic-bezier(0.22,1,0.36,1);
+}
+.method-card:hover .method-icon { transform: scale(1.08); }
+.method-card.is-hero .method-icon { background: rgba(22,163,74,0.12); color: var(--ai-accent); }
+.method-name { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 3px; line-height: 1.25; letter-spacing: -0.014em; }
+.method-card.is-hero .method-name { color: var(--ai-accent-deep); }
+.method-desc { font-size: 13px; color: var(--sub); line-height: 1.55; }
+.method-check {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 8px; transition: all 180ms cubic-bezier(0.22,1,0.36,1);
+}
+.method-check svg { opacity: 0; transition: opacity 160ms; }
+.method-card.is-selected .method-check { background: var(--charcoal); border-color: var(--charcoal); animation: step-done 220ms cubic-bezier(0.22,1,0.36,1) both; }
+.method-card.is-selected .method-check svg { opacity: 1; }
+.method-card.is-hero.is-selected .method-check { background: var(--ai-accent); border-color: var(--ai-accent); }
+.method-info { flex: 1; }
+
+/* AI Input — green tint signals this is AI territory */
+.ai-input-card {
+  background: rgba(22,163,74,0.11);
+  border: 1px solid rgba(22,163,74,0.26);
+  border-radius: 14px; padding: 18px 20px;
+}
+.ai-card-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.ai-otto { width: 28px; height: 28px; border-radius: 50%; background: var(--ai-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ai-accent); animation: otto-pulse 3s ease-in-out infinite; }
+@keyframes otto-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0)} 50%{box-shadow:0 0 0 5px rgba(22,163,74,0.12)} }
+.ai-otto svg { width: 14px; height: 14px; }
+.ai-card-label { font-size: 13px; font-weight: 600; color: var(--ai-accent-deep); }
+.ai-textarea {
+  width: 100%; border: 1px solid #E1E0DD; outline: none;
+  background: var(--raised); border-radius: 9px;
+  font-family: var(--font-sans); font-size: 13px; color: var(--ink);
+  line-height: 1.6; resize: none; padding: 11px 13px;
+  transition: border-color 180ms, background 180ms, box-shadow 180ms;
+  min-height: 88px;
+}
+.ai-textarea:focus { border-color: rgba(56,55,51,0.32); background: var(--surface); box-shadow: 0 0 0 3px rgba(56,55,51,0.08); }
+.ai-textarea::placeholder { color: var(--muted); }
+.ai-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 9px; }
+.ai-chip {
+  font-family: inherit; cursor: pointer; font-size: 11px; font-weight: 500; color: var(--sub);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 11px; transition: background 140ms, color 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms;
+}
+.ai-chip:hover { background: var(--raised); color: var(--ink); transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.10); }
+.ai-chip:active { transform: scale(0.94) translateY(0); box-shadow: none; transition: transform 70ms ease; }
+
+/* Gen card — same AI green territory as the input card it replaces */
+.gen-card { background: rgba(22,163,74,0.04); border: 1px solid rgba(22,163,74,0.14); border-radius: 14px; padding: 18px 20px; display: none; flex-direction: column; gap: 12px; }
+.gen-card.is-visible { display: flex; animation: pane-in 200ms ease both; }
+.gen-status-row { display: flex; align-items: center; gap: 10px; }
+.gen-spinner { width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(22,163,74,0.18); border-top-color: var(--ai-accent); animation: spin 0.7s linear infinite; }
+.gen-spinner.done { animation: done-spin 280ms cubic-bezier(0.22,1,0.36,1) both; border-color: transparent; background: rgba(22,163,74,0.12); background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none'%3E%3Cpath d='M4.5 9l3 3 6-6' stroke='%2316A34A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:center; background-size:12px; border-radius:50%; }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes done-spin { from{transform:scale(0.5)rotate(-90deg);opacity:0} to{transform:scale(1)rotate(0deg);opacity:1} }
+.gen-txt { font-size: 13px; font-weight: 500; color: var(--sub); }
+.gen-txt strong { color: var(--ai-accent-deep); }
+.gen-items { display: flex; flex-direction: column; gap: 3px; }
+.gen-item { font-size: 12px; color: var(--sub); display: flex; align-items: flex-start; gap: 7px; opacity: 0; transform: translateX(-5px); animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes gen-in { to{opacity:1;transform:none} }
+.gen-tick { color: var(--ai-accent); font-weight: 700; flex-shrink: 0; }
+.gen-key { color: var(--ink); font-weight: 600; }
+
+/* Done screen */
+.done-wrap { display: flex; flex-direction: column; align-items: center; padding: 32px 24px 28px; text-align: center; flex: 1; }
+.done-ring { width: 80px; height: 80px; border-radius: 50%; background: rgba(22,163,74,0.10); border: 2px solid rgba(22,163,74,0.28); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; color: var(--ai-accent); animation: done-pop 360ms cubic-bezier(0.22,1,0.36,1) 80ms both; }
+/* overdrive: overshoot spring on the success ring */
+@keyframes done-pop {
+  0%   { opacity:0; transform:scale(0.5); }
+  65%  { opacity:1; transform:scale(1.12); }
+  82%  { transform:scale(0.96); }
+  100% { transform:scale(1); }
+}
+.done-ring.glowed { animation: done-pop 420ms cubic-bezier(0.22,1,0.36,1) 80ms both, done-glow 900ms cubic-bezier(0.22,1,0.36,1) 560ms both; }
+/* delight: double-pulse glow ring expands and fades */
+@keyframes done-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(22,163,74,0.38); }
+  55%  { box-shadow: 0 0 0 22px rgba(22,163,74,0.06); }
+  100% { box-shadow: 0 0 0 30px rgba(22,163,74,0); }
+}
+.done-ring svg { width: 34px; height: 34px; }
+.done-title { font-size: 36px; font-weight: 600; color: var(--ink); letter-spacing: -0.028em; line-height: 1.06; margin-bottom: 6px; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 300ms both; }
+.done-sub { font-size: 14px; color: var(--sub); line-height: 1.6; max-width: 44ch; margin-bottom: 24px; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 360ms both; }
+.done-actions { display: flex; gap: 10px; align-items: center; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 420ms both; }
+
+/* Footer — full-width, card rising from the bottom */
+.setup-footer {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-radius: 16px; /* all four corners — bottom radius visible since content-viewport has padding-bottom */
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.04);
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 10px;
+  margin: 0 0 0 0;
+}
+.btn-back { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: background 140ms, color 140ms; visibility: hidden; }
+.btn-back:hover { background: var(--raised); color: var(--ink); }
+.btn-back:active { transform: translateY(1px); box-shadow: none; transition: transform 70ms ease; }
+.btn-back:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 2px; }
+.btn-continue { margin-left: auto; font-family: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 8px 22px; cursor: pointer; transition: background 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms; }
+.btn-continue:hover:not(:disabled) { background: #262521; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
+.btn-continue:active:not(:disabled) { transform: translateY(1px) scale(0.98); box-shadow: none; transition: transform 70ms ease, box-shadow 70ms ease; }
+.btn-continue:disabled { background: #CCCBC8; cursor: not-allowed; }
+.btn-continue:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
+.btn-open { font-family: inherit; font-size: 13px; font-weight: 600; color: #fff; background: var(--charcoal); border: none; border-radius: 999px; padding: 10px 24px; cursor: pointer; transition: background 140ms, transform 160ms cubic-bezier(0.22,1,0.36,1), box-shadow 160ms; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-open:hover { background: #262521; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
+.btn-open:active { transform: translateY(1px) scale(0.98); box-shadow: none; transition: transform 70ms ease; }
+.btn-open:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 3px; }
+.btn-ghost { font-family: inherit; font-size: 12.5px; font-weight: 500; color: var(--sub); background: none; border: 1px solid var(--border); border-radius: 999px; padding: 8px 18px; cursor: pointer; transition: background 140ms, color 140ms; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-ghost:hover { background: var(--raised); color: var(--ink); }
+.btn-ghost:focus-visible { outline: 2px solid var(--charcoal); outline-offset: 2px; }
+
+/* ─────── RIGHT: PREVIEW PANEL ─────── */
+/* Sand background wrapping the preview card — creates a shallow inset
+   so the white card reads as a floating panel within the overall layout */
+.setup-preview {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  background: transparent;
+  overflow: hidden;
+  padding: 12px 14px 12px 10px; /* 10px left gives the card shadow room on that edge */
+}
+.preview-card {
+  flex: 1; display: flex; flex-direction: column;
+  /* Dot-grid canvas — signals "preview viewport", white cards float clearly above it */
+  background-color: #F8F7F4;
+  background-image: radial-gradient(circle, rgba(56,55,51,0.18) 1px, transparent 1px);
+  background-size: 18px 18px;
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 0;
+  box-shadow: -3px 0 10px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.07), 0 4px 20px rgba(0,0,0,0.07);
+}
+
+.prev-hd {
+  flex-shrink: 0;
+  padding: 11px 20px 11px;
+  border-bottom: 1px solid rgba(0,0,0,0.10);
+  display: flex; align-items: center; gap: 10px;
+  background: #FFFFFF; /* white toolbar contrasts against the sand content area below */
+}
+.prev-hd-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--muted);
+}
+.prev-hd-sub {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  transition: opacity 200ms ease;
+  margin-left: auto; /* push to right — balances 'LIVE PREVIEW' label on the left */
+}
+
+.prev-scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 20px;
+}
+.prev-scroll::-webkit-scrollbar { width: 4px; }
+.prev-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 4px; }
+
+/* Preview panes */
+.prev-pane { display: none; }
+.prev-pane.is-active { display: block; animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ── HIERARCHY DIAGRAM (Step 1) ── */
+/* Left-aligned, fills the preview panel — no centering, no max-width cap */
+.hier-diagram { display: flex; flex-direction: column; gap: 0; padding: 4px 0; }
+
+.hier-tier {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 12px; padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  animation: tier-in 300ms cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes tier-in { from { opacity:0; transform:scale(0.97) translateY(6px); } to { opacity:1; transform:none; } }
+.hier-tier:nth-child(1) { animation-delay: 0ms; }
+.hier-tier:nth-child(3) { animation-delay: 80ms; }
+.hier-tier:nth-child(5) { animation-delay: 160ms; }
+.hier-tier:nth-child(7) { animation-delay: 240ms; }
+
+.hier-tier-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.hier-tier-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.hier-tier-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.hier-tier-note { font-size: 11px; color: var(--muted); margin-left: auto; }
+.hier-entities { display: flex; gap: 6px; flex-wrap: wrap; }
+.hier-entity {
+  font-size: 12px; font-weight: 500; color: var(--sub);
+  background: #F1F0ED; border: 1.5px solid rgba(0,0,0,0.10);
+  border-radius: 999px; padding: 4px 12px;
+  transition: border-color 200ms, background 200ms;
+}
+.hier-entity.primary {
+  background: var(--charcoal); border-color: var(--charcoal); color: #fff;
+}
+
+/* Connector between tiers */
+.hier-connector {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 4px 0; width: 100%;
+  animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.hier-conn-line { width: 1.5px; height: 12px; background: rgba(0,0,0,0.18); }
+.hier-conn-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--sub); background: #FFFFFF; padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.12); }
+.hier-conn-line-b { width: 1.5px; height: 12px; background: rgba(0,0,0,0.18); }
+
+/* ── METHOD PREVIEW (Step 2) ── */
+.method-prev-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 12px; padding: 18px;
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.method-prev-icon { font-size: 32px; margin-bottom: 4px; }
+.method-prev-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
+.method-prev-sub { font-size: 13px; color: var(--sub); line-height: 1.55; }
+.method-prev-items { display: flex; flex-direction: column; gap: 8px; }
+.method-prev-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; background: var(--raised); border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.05);
+  animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.method-prev-item:nth-child(1) { animation-delay: 30ms; }
+.method-prev-item:nth-child(2) { animation-delay: 90ms; }
+.method-prev-item:nth-child(3) { animation-delay: 150ms; }
+.method-prev-item:nth-child(4) { animation-delay: 210ms; }
+.method-prev-item:nth-child(5) { animation-delay: 270ms; }
+.mpi-icon { font-size: 14px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 16px; color: var(--sub); }
+.mpi-body { flex: 1; }
+.mpi-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
+.mpi-note { font-size: 11px; color: var(--sub); line-height: 1.45; }
+
+/* ── ART BUILD PREVIEW (Step 3) ── */
+.art-build { display: flex; flex-direction: column; gap: 20px; }
+
+.art-build-section { display: flex; flex-direction: column; gap: 8px; }
+.art-build-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.10em; color: var(--muted);
+}
+
+/* Team cards — appear during generation */
+.art-teams-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.art-team-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 12px; padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  opacity: 0; transform: translateY(6px);
+  animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+  position: relative;
+}
+.art-team-name {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  margin-bottom: 3px; line-height: 1.3;
+  /* EDITABLE: click to rename */
+  cursor: text; border-radius: 4px;
+  transition: background 160ms;
+}
+.art-team-name:hover { background: rgba(56,55,51,0.06); }
+.art-team-name[contenteditable="true"] {
+  background: rgba(56,55,51,0.08); outline: 2px solid var(--charcoal);
+  outline-offset: 1px; border-radius: 4px; padding: 0 3px;
+}
+.art-team-count { font-size: 11px; color: var(--muted); }
+.art-team-sprints { font-size: 10.5px; color: var(--muted); margin-top: 6px; display: none; }
+.art-team-sprints.visible { display: block; animation: gen-in 200ms cubic-bezier(0.22,1,0.36,1) both; }
+.edit-hint {
+  position: absolute; top: 8px; right: 8px;
+  width: 20px; height: 20px; border-radius: 6px;
+  background: rgba(56,55,51,0.08); display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 160ms; cursor: pointer;
+}
+.art-team-card:hover .edit-hint { opacity: 1; }
+.edit-hint svg { width: 10px; height: 10px; color: var(--sub); }
+
+/* PI row */
+.art-pi-row {
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 12px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  opacity: 0; animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.art-pi-pill { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.art-pi-pill.active { background: rgba(22,163,74,0.10); color: var(--ai-accent-deep); }
+.art-pi-body { flex: 1; }
+.art-pi-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
+.art-pi-dates {
+  font-size: 11px; color: var(--muted);
+  cursor: text; border-radius: 3px; display: inline-block;
+  transition: background 120ms;
+}
+.art-pi-dates:hover { background: rgba(56,55,51,0.06); }
+.art-pi-dates[contenteditable="true"] { background: rgba(56,55,51,0.08); outline: 2px solid var(--charcoal); outline-offset: 1px; padding: 0 3px; }
+
+/* Connection badges */
+.art-connections { display: flex; flex-direction: column; gap: 6px; }
+.art-conn-badge {
+  display: flex; align-items: center; gap: 10px;
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 10px; padding: 9px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  opacity: 0; animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.conn-icon { width: 26px; height: 26px; border-radius: 7px; background: var(--raised); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--sub); flex-shrink: 0; }
+.conn-name { font-size: 13px; font-weight: 500; color: var(--ink); flex: 1; }
+.conn-note { font-size: 11px; color: var(--ai-accent-deep); font-weight: 600; }
+
+/* Placeholder state (before generation) */
+.art-placeholder { display: flex; flex-direction: column; gap: 16px; opacity: 0.70; pointer-events: none; }
+.placeholder-row { height: 60px; background: var(--surface); border-radius: 12px; border: 1.5px solid rgba(0,0,0,0.22); }
+.placeholder-label { font-size: 11px; color: var(--muted); text-align: center; padding-top: 8px; }
+
+/* Edit mode CTA */
+.edit-mode-hint {
+  display: none; align-items: center; gap: 8px;
+  padding: 10px 14px; background: rgba(56,55,51,0.05);
+  border: 1px solid rgba(56,55,51,0.12); border-radius: 10px;
+  font-size: 11px; color: var(--sub);
+}
+.edit-mode-hint.visible { display: flex; animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) 400ms both; }
+.edit-mode-hint svg { width: 14px; height: 14px; color: var(--charcoal); flex-shrink: 0; }
+
+/* ── READINESS (Step 4) ── */
+.readiness-score {
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 14px;
+  padding: 20px; display: flex; flex-direction: column; gap: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  animation: pane-in 300ms cubic-bezier(0.22,1,0.36,1) 200ms both;
+}
+.readiness-header { display: flex; align-items: center; gap: 14px; }
+.readiness-ring-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.readiness-ring-wrap > svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+.readiness-ring-bg { fill: none; stroke: rgba(0,0,0,0.08); stroke-width: 6; }
+.readiness-ring-fill { fill: none; stroke: var(--ai-accent); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 164; stroke-dashoffset: 23; transition: stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1) 400ms; }
+.readiness-ring-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.readiness-pct { font-size: 18px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.readiness-text { flex: 1; }
+.readiness-title { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 2px; }
+.readiness-sub { font-size: 13px; color: var(--sub); line-height: 1.5; }
+
+.readiness-checklist { display: flex; flex-direction: column; gap: 8px; }
+.checklist-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 12px; border-radius: 10px;
+  animation: gen-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.checklist-item.done  { background: rgba(22,163,74,0.08); }
+.checklist-item.warn  { background: var(--warning-bg); }
+.checklist-item:nth-child(1){animation-delay:300ms}
+.checklist-item:nth-child(2){animation-delay:380ms}
+.checklist-item:nth-child(3){animation-delay:460ms}
+.checklist-item:nth-child(4){animation-delay:540ms}
+.ci-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; width: 16px; }
+.ci-body { flex: 1; }
+.ci-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 1px; }
+.ci-note { font-size: 11px; color: var(--sub); line-height: 1.45; }
+.ci-action { font-size: 11px; font-weight: 600; color: var(--charcoal); cursor: pointer; }
+.ci-action:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── AUTO-CONFIGURED SECTION (Step 1 preview) ── */
+.auto-config-section {
+  margin-top: 20px;
+  animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) 320ms both;
+}
+.auto-config-hd {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.auto-config-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.10em; color: var(--muted);
+}
+.auto-config-ai-tag {
+  font-size: 9.5px; font-weight: 600; color: var(--ai-accent);
+  background: var(--ai-bg); padding: 2px 8px; border-radius: 999px;
+}
+.auto-config-rows {
+  display: flex; flex-direction: column;
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+}
+.auto-config-row {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  animation: gen-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.auto-config-row:last-child { border-bottom: none; }
+.acr-key {
+  font-size: 11px; font-weight: 500; color: var(--muted);
+  min-width: 84px; flex-shrink: 0;
+}
+.acr-val {
+  font-size: 13px; color: var(--ink); line-height: 1.4; flex: 1;
+}
+
+/* ── OTTO QA FORM ─────────────────────────────────── */
+.otto-qa-form { display: flex; flex-direction: column; gap: 16px; }
+.otto-q-card {
+  background: var(--surface); border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px; padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  animation: pane-in 280ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.otto-q-hd { display: flex; align-items: center; }
+.otto-q-label { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+.otto-q-note { font-size: 11px; color: var(--muted); font-weight: 400; }
+.otto-sub-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px; }
+
+.otto-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.otto-pill {
+  font-family: inherit; font-size: 12px; font-weight: 500;
+  background: var(--raised); border: 1.5px solid var(--border);
+  color: var(--sub); border-radius: 999px; padding: 5px 14px;
+  cursor: pointer; transition: all 140ms ease; outline: none;
+}
+.otto-pill:hover { background: var(--bg); color: var(--ink); border-color: rgba(0,0,0,0.20); }
+.otto-pill.osel { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+
+.otto-name-inputs { display: flex; flex-direction: column; gap: 6px; }
+.otto-name-row { display: flex; align-items: center; gap: 8px; }
+.otto-name-num { font-size: 11px; color: var(--muted); min-width: 14px; text-align: right; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.otto-name-input {
+  flex: 1; border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 11px; font-family: inherit; font-size: 13px; color: var(--ink);
+  background: var(--raised); outline: none; transition: border-color 160ms, background 160ms;
+}
+.otto-name-input:focus { border-color: rgba(56,55,51,0.30); background: var(--surface); box-shadow: 0 0 0 3px rgba(56,55,51,0.07); }
+
+.otto-tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.otto-tool {
+  font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub);
+  background: var(--raised); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  transition: all 140ms ease; display: flex; align-items: center; gap: 5px; outline: none;
+}
+.otto-tool:hover { background: var(--bg); color: var(--ink); }
+.otto-tool.osel { background: rgba(22,163,74,0.09); border-color: rgba(22,163,74,0.32); color: var(--ai-accent-deep); }
+
+.otto-date-input {
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 11px; font-family: inherit; font-size: 13px; color: var(--ink);
+  background: var(--raised); outline: none; transition: border-color 160ms; width: 100%; box-sizing: border-box;
+}
+.otto-date-input:focus { border-color: rgba(56,55,51,0.30); background: var(--surface); }
+/* Contextual help text that appears/updates below pill rows */
+.otto-pill-help { font-size: 11.5px; color: var(--muted); line-height: 1.5; margin-top: 4px; min-height: 1.5em; transition: opacity 180ms ease; }
+
+/* Config summary card shown in right preview during step 3 */
+.otto-config-card {
+  background: var(--surface); border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 3px 8px rgba(0,0,0,0.04);
+  margin-bottom: 16px;
+  animation: pane-in 260ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.otto-config-hd {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-bottom: 1px solid rgba(0,0,0,0.07);
+  background: rgba(22,163,74,0.05);
+}
+.otto-config-hd-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--ai-accent-deep); }
+.otto-config-rows { display: flex; flex-direction: column; }
+.otto-config-row { display: flex; align-items: baseline; gap: 10px; padding: 8px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.otto-config-row:last-child { border-bottom: none; }
+.otto-config-key { font-size: 11px; color: var(--muted); min-width: 62px; flex-shrink: 0; }
+.otto-config-val { font-size: 13px; color: var(--ink); font-weight: 500; line-height: 1.4; }
+
+/* ── SCRUM FRAMEWORK FLOW ─────────────────────────────────── */
+/* Scrum template detail (pane 2 when scrum selected) */
+.scrum-detail { display: flex; flex-direction: column; gap: 12px; }
+.scrum-feature-card {
+  background: var(--surface); border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 13px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.scrum-feature {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 18px; border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+.scrum-feature:last-child { border-bottom: none; }
+.scrum-feature-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  background: var(--raised); display: flex; align-items: center; justify-content: center;
+  color: var(--sub);
+}
+.scrum-feature-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.scrum-feature-desc { font-size: 12px; color: var(--sub); line-height: 1.55; }
+.scrum-meta-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.scrum-meta-card {
+  flex: 1; min-width: 130px; background: var(--surface);
+  border: 1px solid rgba(0,0,0,0.08); border-radius: 11px; padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.scrum-meta-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+.scrum-meta-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.scrum-meta-chip { font-size: 12px; font-weight: 500; color: var(--sub); background: var(--raised); border: 1.5px solid var(--border); border-radius: 999px; padding: 4px 12px; }
+.scrum-meta-chip.primary { background: var(--charcoal); color: #fff; border-color: var(--charcoal); }
+.scrum-meta-chip[onclick] { cursor: pointer; transition: all 140ms ease; }
+.scrum-meta-chip[onclick]:hover { background: var(--bg); color: var(--ink); border-color: rgba(0,0,0,0.22); }
+.scrum-meta-chip.smc-sel { background: var(--charcoal); color: #fff; border-color: var(--charcoal); font-weight: 600; }
+.scrum-meta-chip.smc-sel:hover { background: #262521; }
+
+/* Scrum config form (pane 3) */
+.scrum-name-input {
+  width: 100%; border: 1px solid var(--border); border-radius: 9px;
+  padding: 10px 13px; font-family: inherit; font-size: 14px; color: var(--ink);
+  background: var(--raised); outline: none; transition: border-color 160ms, background 160ms;
+  box-sizing: border-box; font-weight: 500;
+}
+.scrum-name-input:focus { border-color: rgba(56,55,51,0.32); background: var(--surface); box-shadow: 0 0 0 3px rgba(56,55,51,0.07); }
+.scrum-list { display: flex; flex-direction: column; gap: 5px; }
+.scrum-list-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--raised); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 10px; transition: background 140ms;
+}
+.scrum-drag { cursor: grab; color: var(--muted); flex-shrink: 0; }
+.scrum-list-input {
+  flex: 1; border: none; background: transparent; outline: none;
+  font-family: inherit; font-size: 13px; color: var(--ink); padding: 0;
+}
+.scrum-del {
+  width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;
+  background: none; border: none; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 120ms, color 120ms;
+}
+.scrum-del:hover { background: rgba(220,38,38,0.08); color: #DC2626; }
+.scrum-add-btn {
+  display: flex; align-items: center; gap: 6px;
+  font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub);
+  background: none; border: 1.5px dashed rgba(0,0,0,0.18); border-radius: 8px;
+  padding: 7px 12px; cursor: pointer; width: 100%; text-align: left;
+  transition: all 140ms ease;
+}
+.scrum-add-btn:hover { background: var(--raised); color: var(--ink); border-color: rgba(0,0,0,0.28); }
+.scrum-view-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.scrum-view-chip {
+  font-family: inherit; font-size: 12px; font-weight: 500;
+  background: var(--raised); border: 1.5px solid var(--border);
+  color: var(--muted); border-radius: 8px; padding: 5px 12px;
+  cursor: pointer; transition: all 140ms ease;
+}
+.scrum-view-chip:hover { background: var(--bg); color: var(--sub); }
+.scrum-view-chip.ssel { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+
+/* Mini Scrum board in right preview */
+.scrum-board-preview { display: flex; flex-direction: column; gap: 10px; }
+.scrum-board { display: flex; gap: 6px; }
+.scrum-col {
+  flex: 1; min-width: 0; background: var(--surface);
+  border: 1px solid rgba(0,0,0,0.09); border-radius: 10px; padding: 9px 9px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.scrum-col-hd {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--muted); margin-bottom: 7px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.scrum-card-ph {
+  height: 30px; background: var(--raised); border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 6px; margin-bottom: 5px;
+  animation: pane-in 240ms cubic-bezier(0.22,1,0.36,1) both;
+}
+.scrum-board-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--muted); margin-bottom: 6px;
+}
+
+/* Reduced motion — disable all decorative animations */
+@media (prefers-reduced-motion: reduce) {
+  .setup-pane.is-active, .prev-pane.is-active { animation: none; }
+  .hier-tier, .art-team-card, .art-pi-row, .art-conn-badge,
+  .method-prev-item, .gen-item, .checklist-item,
+  .auto-config-row, .gen-card.is-visible, .edit-mode-hint.visible { animation: none; opacity: 1; transform: none; }
+  .done-ring, .done-ring.glowed { animation: none; opacity: 1; transform: none; }
+  .done-title, .done-sub, .done-actions { animation: none; opacity: 1; transform: none; }
+  .setup-step-btn.done .step-num { animation: none; }
+  .ai-otto { animation: none; }
+  .gen-spinner { animation: none; border-color: var(--ai-accent); border-top-color: var(--ai-accent); }
+}
+</style>
+</head>
+<body>
+<div class="liquid-bg" aria-hidden="true"></div>
+<div class="page-shell">
+  <nav id="left-nav" aria-label="Primary navigation"></nav>
+
+  <main class="content-viewport">
+
+    <!-- ═══════════════════════════════════════════════
+         CHROME — full-width, spans both panels
+    ════════════════════════════════════════════════ -->
+    <div class="setup-chrome">
+      <div class="setup-stepper" id="step-tabs">
+        <div class="stepper-item active" data-step="1" tabindex="0" onclick="goStep(1)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(1)">
+          <div class="stepper-node">1</div>
+          <span class="stepper-label">Framework</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="2" tabindex="0" onclick="goStep(2)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(2)">
+          <div class="stepper-node">2</div>
+          <span class="stepper-label" id="slabel-2">Configure</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="3" tabindex="0" onclick="goStep(3)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(3)">
+          <div class="stepper-node">3</div>
+          <span class="stepper-label" id="slabel-3">Review</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="4" tabindex="0" onclick="goStep(4)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(4)">
+          <div class="stepper-node">4</div>
+          <span class="stepper-label" id="slabel-4">Invite</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="5" tabindex="0" onclick="goStep(5)" onkeydown="if(event.key==='Enter'||event.key===' ')goStep(5)">
+          <div class="stepper-node">5</div>
+          <span class="stepper-label">Ready</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         SPLIT — wizard left · preview right
+    ════════════════════════════════════════════════ -->
+    <div class="setup-split">
+
+    <!-- ═══════════════════════════════════════════════
+         LEFT PANEL — wizard
+    ════════════════════════════════════════════════ -->
+    <div class="setup-wizard">
+      <div class="setup-body">
+
+        <!-- PANE 1 — Framework -->
+        <section class="setup-pane is-active" id="pane-1">
+          <div class="pane-heading">
+            <h1 class="pane-title">Pick your framework</h1>
+            <p class="pane-sub">Your hierarchy, cadence, and terminology are configured automatically based on your choice.</p>
+          </div>
+          <div class="fw-grid" role="radiogroup" aria-label="Framework selection">
+            <div class="fw-card is-selected" data-fw="scrum" tabindex="0" role="radio" aria-checked="true">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow" style="color:var(--ai-accent)">Recommended</div><div class="fw-name">Scrum</div></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Iterative delivery with time-boxed sprints, a prioritised backlog, and daily standups. The most widely adopted agile framework.</div>
+              <div class="fw-meta"><strong>1–4 week sprints</strong> · Backlog · Velocity tracking</div>
+            </div>
+            <div class="fw-card" data-fw="essential" tabindex="0" role="radio" aria-checked="false">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Multi-team · SAFe</div><div class="fw-name">Essential SAFe</div></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">One ART, 50–125 people. Single program, single PI cadence.</div>
+              <div class="fw-meta"><strong>2–12 teams</strong> · 2-week sprints · 10-week PIs</div>
+            </div>
+            <div class="fw-card" data-fw="portfolio" tabindex="0" role="radio" aria-checked="false">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Large orgs</div><div class="fw-name">Portfolio SAFe</div></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Multiple ARTs, Solution Trains, and portfolio-level budgeting.</div>
+              <div class="fw-meta"><strong>12+ teams</strong> · Multi-ART · LPM cadence</div>
+            </div>
+            <div class="fw-card" data-fw="kanban" tabindex="0" role="radio" aria-checked="false">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Flow-based</div><div class="fw-name">Lean Kanban</div></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Continuous flow, no fixed sprints. For ops, support, or mixed teams.</div>
+              <div class="fw-meta"><strong>No sprint cadence</strong> · Pull-based · WIP limits</div>
+            </div>
+            <div class="fw-card" data-fw="blank" tabindex="0" role="radio" aria-checked="false">
+              <div class="fw-hd">
+                <div class="fw-hd-left"><div class="fw-eyebrow">Custom</div><div class="fw-name">Blank</div></div>
+                <div class="fw-check" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="fw-desc">Start with a blank workspace. Define your own hierarchy and terminology from scratch.</div>
+              <div class="fw-meta" style="color:var(--muted)">Full flexibility</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PANE 2 — Method -->
+        <section class="setup-pane" id="pane-2">
+          <div class="pane-heading">
+            <h1 class="pane-title">How should we set up your ART?</h1>
+            <p class="pane-sub">Choose an approach. Nothing is saved until you review and confirm.</p>
+          </div>
+          <div class="method-list" id="method-list-section" role="radiogroup" aria-label="Setup method selection">
+            <div class="method-card is-hero is-selected" data-method="ai" tabindex="0" role="radio" aria-checked="true">
+              <div class="method-badge">Fastest</div>
+              <div class="method-icon"><svg width="18" height="18" viewBox="0 0 118 118" fill="none"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z" fill="currentColor"/></svg></div>
+              <div class="method-info">
+                <div class="method-name">Describe your team: Otto builds the ART</div>
+                <div class="method-desc">Write a plain-language description: team names, size, PI length, tools. Otto generates the full configuration in seconds. Review before anything is saved.</div>
+              </div>
+              <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <div class="method-card" data-method="template" tabindex="0" role="radio" aria-checked="false">
+              <div class="method-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg></div>
+              <div class="method-info">
+                <div class="method-name">Use an industry template</div>
+                <div class="method-desc">Pre-built for Digital Banking, Insurance, Retail Technology, and Healthcare IT. Teams, PI calendars, and feature categories already defined. Edit anything before launch.</div>
+              </div>
+              <div class="method-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+
+          <!-- Scrum template detail — shown instead of method cards when Scrum is selected -->
+          <div class="scrum-detail" id="scrum-detail" style="display:none">
+            <div class="scrum-feature-card">
+              <div class="scrum-feature">
+                <div class="scrum-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg></div>
+                <div>
+                  <div class="scrum-feature-title">Plan work in a prioritised backlog</div>
+                  <div class="scrum-feature-desc">Create epics and stories, estimate effort, and order your backlog so your team always knows what to build next. Drag items into sprints when you're ready to commit.</div>
+                </div>
+              </div>
+              <div class="scrum-feature">
+                <div class="scrum-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
+                <div>
+                  <div class="scrum-feature-title">Run focused, time-boxed sprints</div>
+                  <div class="scrum-feature-desc">Sprint planning, daily standups, reviews, and retrospectives all have a natural home. The board shows work in flight; the backlog shows what's coming next.</div>
+                </div>
+              </div>
+              <div class="scrum-feature">
+                <div class="scrum-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <div>
+                  <div class="scrum-feature-title">Track velocity and improve over time</div>
+                  <div class="scrum-feature-desc">Built-in burndown, sprint reports, and velocity charts let teams understand their capacity, forecast delivery, and iterate on their process each sprint.</div>
+                </div>
+              </div>
+            </div>
+            <div class="scrum-meta-row">
+              <div class="scrum-meta-card">
+                <div class="scrum-meta-label">Work items</div>
+                <div class="scrum-meta-chips">
+                  <span class="scrum-meta-chip primary">Story</span>
+                  <span class="scrum-meta-chip">Epic</span>
+                  <span class="scrum-meta-chip">Task</span>
+                  <span class="scrum-meta-chip">Defect</span>
+                </div>
+              </div>
+              <div class="scrum-meta-card">
+                <div class="scrum-meta-label">Workflow</div>
+                <div class="scrum-meta-chips">
+                  <span class="scrum-meta-chip">To Do</span>
+                  <span class="scrum-meta-chip primary">In Progress</span>
+                  <span class="scrum-meta-chip">In Review</span>
+                  <span class="scrum-meta-chip">Done</span>
+                </div>
+              </div>
+              <div class="scrum-meta-card">
+                <div class="scrum-meta-label">Views</div>
+                <div class="scrum-meta-chips">
+                  <span class="scrum-meta-chip">Board</span>
+                  <span class="scrum-meta-chip">Backlog</span>
+                  <span class="scrum-meta-chip">Timeline</span>
+                  <span class="scrum-meta-chip">Reports</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PANE 3 — Otto Q&A -->
+        <section class="setup-pane" id="pane-3">
+          <div class="pane-heading">
+            <h1 class="pane-title" id="pane3-title">Configure your ART</h1>
+            <p class="pane-sub" id="pane3-sub">Answer Otto's questions. The preview updates in real time and you review everything before it's saved.</p>
+          </div>
+          <div class="otto-qa-form" id="otto-qa-form">
+            <!-- rendered by renderOttoQuestions() when step 3 activates -->
+          </div>
+          <div class="gen-card" id="gen-card">
+            <div class="gen-status-row">
+              <div class="gen-spinner" id="gen-spinner"></div>
+              <span class="gen-txt" id="gen-txt">Configuring…</span>
+            </div>
+            <div class="gen-items" id="gen-items"></div>
+          </div>
+        </section>
+
+        <!-- PANE 4 — Invite -->
+        <section class="setup-pane" id="pane-4">
+          <div class="pane-heading">
+            <h1 class="pane-title">Invite your team</h1>
+            <p class="pane-sub">Add team members. You can add more or adjust roles in Settings after setup.</p>
+          </div>
+          <div id="invite-teams" style="display:flex;flex-direction:column;gap:10px;">
+            <!-- populated by JS from generated teams -->
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">
+            Roles and permissions can be changed any time in Settings.
+          </div>
+        </section>
+
+        <!-- PANE 5 — Done -->
+        <section class="setup-pane" id="pane-5">
+          <div class="done-wrap">
+            <div class="done-ring" id="done-ring">
+              <svg viewBox="0 0 28 28" fill="none"><path d="M6 14l5.5 5.5 11-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="done-title" id="done-title">Your ART is live</div>
+            <p class="done-sub" id="done-sub">Your first PI is scheduled. Open the board and start planning.</p>
+            <div class="done-actions">
+              <a href="home.html?p=ananya" class="btn-ghost">Back to home</a>
+              <a href="index.html?p=ananya&visit=new" class="btn-open">Open workspace</a>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /setup-body -->
+    </div><!-- /setup-wizard -->
+
+
+    <!-- ═══════════════════════════════════════════════
+         RIGHT PANEL — live preview
+    ════════════════════════════════════════════════ -->
+    <div class="setup-preview" id="setup-preview">
+      <div class="preview-card">
+
+      <div class="prev-hd">
+        <span class="prev-hd-title">Live Preview</span>
+        <span class="prev-hd-sub" id="prev-hd-sub-panel">Essential SAFe hierarchy</span>
+      </div>
+
+      <div class="prev-scroll" id="prev-scroll">
+
+        <!-- Step 1: Hierarchy diagram + auto-configured items -->
+        <div class="prev-pane is-active" id="prev-p1">
+          <div class="hier-diagram" id="hier-diagram"><!-- populated by JS --></div>
+          <div class="auto-config-section" id="auto-config-section"><!-- populated by JS --></div>
+          <div id="hier-legend" style="margin-top:16px;display:none;">
+            <div style="display:flex;align-items:center;gap:7px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.06);">
+              <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--charcoal);flex-shrink:0;"></span>
+              <span style="font-size:11px;color:var(--muted);line-height:1.45;">The highlighted chip marks each level's primary focus</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Method detail -->
+        <div class="prev-pane" id="prev-p2">
+          <div id="method-detail"><!-- populated by JS --></div>
+        </div>
+
+        <!-- Step 3: Progressive ART build -->
+        <div class="prev-pane" id="prev-p3">
+          <!-- Scrum board preview — shown when Scrum selected -->
+          <div id="scrum-board-container" style="display:none;margin-bottom:16px;">
+            <div class="scrum-board-label">Sprint board</div>
+            <div class="scrum-board" id="scrum-board-cols">
+              <!-- populated by renderScrumBoardPreview() -->
+            </div>
+          </div>
+          <!-- Live config summary — updates as user answers Otto questions -->
+          <div class="otto-config-card" id="otto-config-card">
+            <div class="otto-config-hd">
+              <svg width="12" height="12" viewBox="0 0 118 118" fill="currentColor" style="color:var(--ai-accent);flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>
+              <span class="otto-config-hd-label" id="otto-config-hd-label">Otto configuring</span>
+            </div>
+            <div class="otto-config-rows" id="otto-config-rows">
+              <!-- populated by updateOttoSummary() -->
+            </div>
+          </div>
+          <!-- Placeholder before generation -->
+          <div class="art-placeholder" id="art-placeholder">
+            <div class="art-build-label" id="plabel-teams">Teams</div>
+            <div class="art-teams-grid">
+              <div class="placeholder-row" style="height:72px"></div>
+              <div class="placeholder-row" style="height:72px"></div>
+              <div class="placeholder-row" style="height:72px"></div>
+              <div class="placeholder-row" style="height:72px"></div>
+            </div>
+            <div class="art-build-label" id="plabel-pi" style="margin-top:4px">PI Calendar</div>
+            <div class="placeholder-row" style="height:56px"></div>
+            <div class="art-build-label" id="plabel-conn" style="margin-top:4px">Configuration</div>
+            <div class="placeholder-row" style="height:44px"></div>
+            <div class="placeholder-row" style="height:44px"></div>
+            <div class="placeholder-label">Describe your team and Otto builds this out</div>
+          </div>
+          <!-- Built progressively during generation -->
+          <div class="art-build" id="art-build" style="display:none">
+            <div class="edit-mode-hint" id="edit-hint">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Click any team name or date to edit
+            </div>
+            <div class="art-build-section">
+              <div class="art-build-label" id="label-teams">Teams</div>
+              <div class="art-teams-grid" id="art-teams-grid"><!-- teams added by JS --></div>
+            </div>
+            <div class="art-build-section" id="art-pi-section" style="display:none">
+              <div class="art-build-label" id="label-pi">PI Calendar</div>
+              <div id="art-pi-rows"><!-- PI rows added by JS --></div>
+            </div>
+            <div class="art-build-section" id="art-conn-section" style="display:none">
+              <div class="art-build-label" id="label-conn">Configuration</div>
+              <div class="art-connections" id="art-conn-rows"><!-- connections added by JS --></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Invite (preview shows team member count updating) -->
+        <div class="prev-pane" id="prev-p4">
+          <div id="invite-preview" style="display:flex;flex-direction:column;gap:10px;"><!-- populated by JS --></div>
+        </div>
+
+        <!-- Step 5: Readiness score -->
+        <div class="prev-pane" id="prev-p5">
+          <div class="readiness-score">
+            <div class="readiness-header">
+              <div class="readiness-ring-wrap">
+                <svg viewBox="0 0 64 64">
+                  <circle class="readiness-ring-bg" cx="32" cy="32" r="26"/>
+                  <circle class="readiness-ring-fill" id="readiness-arc" cx="32" cy="32" r="26"/>
+                </svg>
+                <div class="readiness-ring-center"><span class="readiness-pct">86%</span></div>
+              </div>
+              <div class="readiness-text">
+                <div class="readiness-title">ART Readiness</div>
+                <div class="readiness-sub">86% ready for PI Planning. 2 items to complete first.</div>
+              </div>
+            </div>
+            <div class="readiness-checklist">
+              <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">4 teams configured</div><div class="ci-note">Auth · Payments · Mobile · Data &amp; Analytics</div></div></div>
+              <div class="checklist-item done"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="ci-body"><div class="ci-name">PI 26 scheduled</div><div class="ci-note">Jun 2 – Aug 10 · Sprint 2 active</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">PI Planning session not scheduled</div><div class="ci-note">Add PI Planning to the team calendar before Sprint 4</div></div></div>
+              <div class="checklist-item warn"><span class="ci-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="ci-body"><div class="ci-name">Team capacity not set for Sprint 1</div><div class="ci-note">Needed for accurate velocity forecasting</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /prev-scroll -->
+      </div><!-- /preview-card -->
+    </div><!-- /setup-preview -->
+
+    </div><!-- /setup-split -->
+
+    <!-- ═══════════════════════════════════════════════
+         FOOTER — full-width, spans both panels
+    ════════════════════════════════════════════════ -->
+    <div class="setup-footer" id="setup-footer">
+      <button class="btn-back" id="btn-back" onclick="prevStep()">Back</button>
+      <button class="btn-continue" id="btn-continue" onclick="nextStep()">Continue</button>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/nav.js"></script>
+<script src="js/data.js?v=20"></script>
+<script>
+(function() {
+
+  // ── Nav ──────────────────────────────────────────────────────────
+  renderNav('setup', {
+    avatar: '../../assets/images/SN Avatar-4.png',
+    name: 'Ananya Krishnan',
+    links: { 0: 'home.html?p=ananya', 2: 'setup.html', 3: 'index.html?p=ananya&tab=board' },
+    theme: 'sand'
+  });
+
+  // ── State ────────────────────────────────────────────────────────
+  var step       = 1;
+  var totalSteps = 5;
+  var aiDone     = false;
+  var selectedFw = 'scrum';
+  var selectedMethod = 'ai';
+  var genTimers  = [];
+  var generatedTeams = []; // populated at generation time from parsed input + selected framework
+
+  // ── Auto-configured items per framework ─────────────────────────
+  var autoConfigData = {
+    essential: [
+      { key: 'PI cadence',    val: '10 weeks — 4 sprints + IP sprint' },
+      { key: 'Sprint',        val: '2-week sprints' },
+      { key: 'Views',         val: 'Board · Backlog · Timeline · Hierarchy' },
+      { key: 'Roles',         val: 'RTE · Scrum Master · Product Owner' },
+      { key: 'Metrics',       val: 'Velocity · PI predictability · Flow efficiency' }
+    ],
+    portfolio: [
+      { key: 'PI cadence',    val: '10 weeks per ART · Solution Train cadence' },
+      { key: 'Sprint',        val: '2-week sprints across all teams' },
+      { key: 'Views',         val: 'Portfolio · ART · Team layers' },
+      { key: 'Roles',         val: 'LPM · RTE · Solution Architect' },
+      { key: 'Metrics',       val: 'Business outcomes · Epic health · Portfolio flow' }
+    ],
+    kanban: [
+      { key: 'Flow model',    val: 'Pull-based — no fixed sprints' },
+      { key: 'WIP limits',    val: 'Configurable per column' },
+      { key: 'Views',         val: 'Kanban board · CFD · Flow metrics' },
+      { key: 'Roles',         val: 'Flow manager · Work item owners' },
+      { key: 'Metrics',       val: 'Cycle time · Throughput · Queue length' }
+    ],
+    scrum: [
+      { key: 'Sprint',        val: '2-week sprints (configurable)' },
+      { key: 'Work items',    val: 'Epic · Story · Task · Defect' },
+      { key: 'Board columns', val: 'To Do · In Progress · In Review · Done' },
+      { key: 'Metrics',       val: 'Velocity · Burndown · Sprint report' }
+    ],
+    blank: [
+      { key: 'Hierarchy',     val: 'No preset — define your own levels' },
+      { key: 'Cadence',       val: 'Configure from scratch' },
+      { key: 'Views',         val: 'All views available to enable' },
+      { key: 'Roles',         val: 'No defaults — assign as needed' },
+      { key: 'Metrics',       val: 'No defaults. Add what you need.' }
+    ]
+  };
+
+  // ── Framework data ───────────────────────────────────────────────
+  var fwData = {
+    essential: {
+      label: 'Essential SAFe hierarchy',
+      tiers: [
+        { label: 'Portfolio', dot: '#383733', note: 'Strategic investment', entities: [{ name: 'Epic', primary: false }] },
+        { label: 'ART', dot: '#585753', note: '50–125 people', entities: [{ name: 'Capability', primary: false }, { name: 'Feature', primary: true }], connector: { before: 'Manages' } },
+        { label: 'Team', dot: '#999995', note: '2-week sprints', entities: [{ name: 'Story', primary: true }, { name: 'Work Item', primary: false }], connector: { before: 'Delivers' } }
+      ]
+    },
+    portfolio: {
+      label: 'Portfolio SAFe hierarchy',
+      tiers: [
+        { label: 'Portfolio', dot: '#383733', note: 'Strategic investment', entities: [{ name: 'Epic', primary: false }] },
+        { label: 'Solution Train', dot: '#4A4946', note: 'Cross-ART delivery', entities: [{ name: 'Capability', primary: true }], connector: { before: 'Funds' } },
+        { label: 'ART', dot: '#585753', note: 'Program increment', entities: [{ name: 'Feature', primary: true }], connector: { before: 'Delivers' } },
+        { label: 'Team', dot: '#999995', note: '2-week sprints', entities: [{ name: 'Story', primary: true }, { name: 'Work Item', primary: false }], connector: { before: 'Builds' } }
+      ]
+    },
+    kanban: {
+      label: 'Lean Kanban flow',
+      tiers: [
+        { label: 'Value Stream', dot: '#383733', note: 'End-to-end flow', entities: [{ name: 'Work Item Types', primary: false }] },
+        { label: 'Flow', dot: '#585753', note: 'Pull-based delivery', entities: [{ name: 'WIP Limits', primary: true }, { name: 'Pull Policy', primary: false }], connector: { before: 'Governed by' } },
+        { label: 'Analytics', dot: '#999995', note: 'Continuous improvement', entities: [{ name: 'CFD', primary: false }, { name: 'Cycle Time', primary: false }, { name: 'Throughput', primary: false }], connector: { before: 'Measured by' } }
+      ]
+    },
+    scrum: {
+      label: 'Scrum framework',
+      tiers: [
+        { label: 'Backlog', dot: '#383733', note: 'Prioritised work', entities: [{ name: 'Epic', primary: false }, { name: 'Story', primary: true }, { name: 'Task', primary: false }, { name: 'Defect', primary: false }] },
+        { label: 'Sprint', dot: '#585753', note: '1–4 week iteration', entities: [{ name: 'Sprint Goal', primary: true }, { name: 'Commitment', primary: false }], connector: { before: 'Pulls from' } },
+        { label: 'Board', dot: '#999995', note: 'In-flight work', entities: [{ name: 'To Do', primary: false }, { name: 'In Progress', primary: true }, { name: 'Done', primary: false }], connector: { before: 'Tracks' } }
+      ]
+    },
+    blank: {
+      label: 'Custom — no preset structure',
+      tiers: [
+        { label: 'Level 1', dot: '#CCCBC8', note: 'Define your own', entities: [{ name: 'Custom entity', primary: false }], custom: true },
+        { label: 'Level 2', dot: '#CCCBC8', note: 'Add entities', entities: [{ name: 'Custom entity', primary: false }], custom: true, connector: { before: 'Contains' } },
+        { label: 'Level 3', dot: '#CCCBC8', note: 'No constraints', entities: [{ name: 'Custom entity', primary: false }], custom: true, connector: { before: 'Contains' } }
+      ]
+    }
+  };
+
+  // ── Lucide icon helper + path constants ──────────────────────────
+  function icon(path, size) {
+    return '<svg width="' + (size||14) + '" height="' + (size||14) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
+  }
+  var IC = {
+    users:    '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    cal:      '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    msg:      '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    pencil:   '<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+    zap:      '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    chart:    '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+    arrowR:   '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+    warn:     '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    undo:     '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/>',
+    clip:     '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    jira:     '<rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/>'
+  };
+  var OTTO_ICON_SM = '<svg width="30" height="30" viewBox="0 0 118 118" fill="#16A34A" style="display:block;flex-shrink:0"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
+  // ── Framework step labels ────────────────────────────────────────
+  // Each framework has different step names that reflect its own logic.
+  // Step 1 is always "Framework"; step 5 is always "Ready".
+  var fwStepLabels = {
+    essential: ['ART',       'Teams',       'Roles'],
+    portfolio: ['Portfolio', 'Cadence',     'Governance'],
+    kanban:    ['System',    'Workflow',    'Policies'],
+    scrum:     ['Team',      'Sprint',      'Roles'],
+    blank:     ['Model',     'Terminology', 'People']
+  };
+
+  function updateStepperLabels(fw) {
+    var labels = fwStepLabels[fw] || ['Configure', 'Review', 'Invite'];
+    [['slabel-2', labels[0]], ['slabel-3', labels[1]], ['slabel-4', labels[2]]].forEach(function(pair) {
+      var el = document.getElementById(pair[0]);
+      if (el) el.textContent = pair[1];
+    });
+  }
+
+  // ── Scrum state ──────────────────────────────────────────────────
+  var scrumState = {
+    teamName: '',
+    sprintWeeks: 2,
+    workTypes: ['Epic', 'Story', 'Task', 'Defect'],
+    statuses: ['To Do', 'In Progress', 'In Review', 'Done'],
+    views: ['board', 'backlog', 'timeline'],
+    tools: []
+  };
+
+  var SCRUM_VIEW_OPTIONS = [
+    { key: 'board',    label: 'Board' },
+    { key: 'backlog',  label: 'Backlog' },
+    { key: 'timeline', label: 'Timeline' },
+    { key: 'reports',  label: 'Reports' }
+  ];
+
+  var DRAG_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="4" r="1.2" fill="currentColor"/><circle cx="5" cy="8" r="1.2" fill="currentColor"/><circle cx="5" cy="12" r="1.2" fill="currentColor"/><circle cx="10" cy="4" r="1.2" fill="currentColor"/><circle cx="10" cy="8" r="1.2" fill="currentColor"/><circle cx="10" cy="12" r="1.2" fill="currentColor"/></svg>';
+  var DEL_SVG  = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>';
+  var PLUS_SVG = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>';
+
+  // These are Scrum defaults — applied silently. Users don't choose them; Scrum already did.
+  var SCRUM_DEFAULT_WORK_TYPES = ['Story', 'Task', 'Defect'];
+  var SCRUM_DEFAULT_STATUSES   = ['To Do', 'In Progress', 'Done'];
+  // Extended options if the team wants more columns (shown as optional extras in step 2)
+  var SCRUM_EXTRA_STATUSES     = ['In Review', 'Blocked'];
+
+  function renderScrumDetail() {
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ml) ml.style.display = 'none';
+    if (ph2) ph2.textContent = 'Tell us about your team';
+    if (ps2) ps2.textContent = 'Name your team, set its size, and choose your board columns and work item types. The preview updates as you make changes.';
+
+    if (!sd) return;
+    sd.style.display = '';
+    var html = '';
+
+    // Q1: Team name — the board takes its name from here.
+    html += ottoQCard('What is this team called?',
+      '<input class="scrum-name-input" id="scrum-team-name-p2" type="text" value="' + (scrumState.teamName||'').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
+
+    // Q2: Team size. Scrum recommends 3–9. >9 is a documented anti-pattern.
+    var sizeOpts = ['3','4','5','6','7','8','9','10+'];
+    html += ottoQCard('How many people are on the team?',
+      ottoPillRow(sizeOpts, String(scrumState.teamSize || '6'), 'setScrumTeamCount') +
+      '<div class="otto-pill-help" id="help-scrum-size">Include the Product Owner and Scrum Master. Scrum recommends 3–9 people total.</div>');
+
+    // Q3: Board columns (swimlanes). Scrum defaults pre-selected.
+    // In Review and Blocked are optional extras — not all teams need them.
+    // Board columns — editable list so teams can rename, reorder, add, or remove.
+    // Chips were replaced: users need to customise names (e.g. "Building" instead of "In Progress").
+    var scrumColPresetsAvailable = ['To Do','In Progress','In Review','Done','Blocked','Testing','Ready for QA','Deployed'];
+    var scrumColQuickAdd = scrumColPresetsAvailable.filter(function(p) { return scrumState.statuses.indexOf(p) < 0; });
+    var colListHtml = '<div class="scrum-list" id="scrum-col-list">' +
+      scrumState.statuses.map(function(st, i) {
+        return '<div class="scrum-list-item">' +
+          '<span class="scrum-drag">' + DRAG_SVG + '</span>' +
+          '<input class="scrum-list-input" type="text" value="' + st.replace(/"/g,'&quot;') + '" data-col-idx="' + i + '" placeholder="Column name">' +
+          '<button class="scrum-del" onclick="delScrumCol(' + i + ')" type="button">' + DEL_SVG + '</button>' +
+          '</div>';
+      }).join('') +
+      '</div>' +
+      '<button class="scrum-add-btn" id="scrum-add-col" onclick="addScrumCol()" type="button">' + PLUS_SVG + 'Add column</button>';
+
+    // Quick-add presets: show common columns not already in the list as one-click adds
+    if (scrumColQuickAdd.length) {
+      colListHtml += '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">' +
+        '<span style="font-size:11px;color:var(--muted);align-self:center;">Quick add:</span>' +
+        scrumColQuickAdd.slice(0, 4).map(function(p) {
+          return '<button style="font-family:inherit;font-size:11.5px;font-weight:500;color:var(--sub);background:transparent;border:1.5px solid var(--border);border-radius:999px;padding:3px 10px;cursor:pointer;" onclick="quickAddScrumCol(\'' + p + '\')" type="button">+ ' + p + '</button>';
+        }).join('') +
+        '</div>';
+    }
+    colListHtml += '<div class="otto-pill-help">Drag to reorder. Columns appear left to right on your board. Rename any column to match your team’s language — “Building” works just as well as “In Progress”.</div>';
+
+    html += ottoQCard('What are your board columns?', colListHtml);
+
+    // Q4: Work item types. Story is the primary Scrum work item.
+    // Task breaks stories down within a sprint. Spike is a time-boxed investigation.
+    var scrumItemOpts = ['Story', 'Task', 'Bug', 'Epic', 'Spike'];
+    html += ottoQCard('What types of work will this team track?',
+      '<div class="scrum-meta-chips">' +
+      scrumItemOpts.map(function(wt) {
+        var sel = scrumState.workTypes.indexOf(wt) >= 0;
+        return '<button class="scrum-meta-chip' + (sel ? ' smc-sel' : '') + '" onclick="toggleScrumWorkType(\'' + wt + '\')" type="button">' + wt + '</button>';
+      }).join('') + '</div>' +
+      '<div class="otto-pill-help">Story is your primary item — it represents user-facing value. Task breaks a story into sub-work within a sprint. Spike is for research that has no direct deliverable.</div>');
+
+    // Informational only: ceremonies are Scrum-prescribed, not configurable here.
+    html += '<div class="otto-q-card" style="background:rgba(22,163,74,0.05);border-color:rgba(22,163,74,0.18);">' +
+      '<div class="otto-q-hd"><div class="otto-q-icon">' + OTTO_Q_SVG + '</div>' +
+      '<span class="otto-q-label" style="color:var(--ai-accent-deep)">Ceremonies — included automatically</span></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">' +
+      ['Sprint Planning', 'Daily Standup', 'Sprint Review', 'Retrospective'].map(function(c) {
+        return '<span style="font-size:11.5px;font-weight:500;color:var(--sub);background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.18);border-radius:999px;padding:3px 10px;">' + c + '</span>';
+      }).join('') +
+      '<div style="font-size:11px;color:var(--muted);width:100%;margin-top:4px;">All four ceremonies are created with your workspace. Cadence and duration are set in the next step.</div>' +
+      '</div></div>';
+
+    sd.innerHTML = html;
+
+    // Wire team name
+    var tn = document.getElementById('scrum-team-name-p2');
+    if (tn) tn.addEventListener('input', function() { scrumState.teamName = tn.value; updateScrumPreview(); });
+
+    // Wire column name inputs
+    wireScrumColInputs();
+
+    // Warn on >9
+    setTimeout(function() {
+      document.querySelectorAll('.otto-pill').forEach(function(p) {
+        if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamCount') >= 0 && p.textContent === '10+') {
+          p.addEventListener('click', function() {
+            var h = document.getElementById('help-scrum-size');
+            if (h) h.innerHTML = '<span style="color:#D97706;font-weight:600;">⚠ Teams over 9 struggle with coordination.</span> Scrum recommends splitting into two smaller teams rather than scaling one.';
+          });
+        }
+      });
+    }, 50);
+
+    updateScrumPreview();
+  }
+
+  window.setScrumTeamCount = function(s) {
+    scrumState.teamSize = s;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamCount') >= 0)
+        p.classList.toggle('osel', p.textContent === s);
+    });
+  };
+
+  function updateScrumPreview() {
+    // Populate method-detail (right panel prev-p2) with a live mini board
+    var md = document.getElementById('method-detail');
+    if (!md) return;
+    var statuses = scrumState.statuses.slice(0, 5);
+    var teamName = scrumState.teamName || 'Your team';
+    md.innerHTML =
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);">' + teamName + ' · Board</div>' +
+        '<div class="scrum-board">' +
+        statuses.map(function(st, i) {
+          return '<div class="scrum-col" style="animation-delay:' + (i*50) + 'ms">' +
+            '<div class="scrum-col-hd">' + (st || 'Column') + '</div>' +
+            '<div class="scrum-card-ph"></div>' +
+            '<div class="scrum-card-ph" style="opacity:0.4;animation-delay:' + (i*50+60) + 'ms"></div>' +
+            '</div>';
+        }).join('') +
+        '</div>' +
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">' +
+        scrumState.workTypes.map(function(wt) {
+          return '<span style="font-size:10px;font-weight:500;color:var(--muted);background:var(--raised);border:1px solid rgba(0,0,0,0.09);border-radius:999px;padding:2px 8px;">' + wt + '</span>';
+        }).join('') +
+      '</div>' +
+      '</div>';
+  }
+
+  window.toggleScrumWorkType = function(wt) {
+    var idx = scrumState.workTypes.indexOf(wt);
+    if (idx >= 0 && scrumState.workTypes.length > 1) scrumState.workTypes.splice(idx, 1);
+    else if (idx < 0) scrumState.workTypes.push(wt);
+    document.querySelectorAll('.scrum-meta-chip').forEach(function(c) {
+      var oc = c.getAttribute('onclick') || '';
+      if (oc.indexOf('toggleScrumWorkType(\'' + wt + '\')') >= 0)
+        c.classList.toggle('smc-sel', scrumState.workTypes.indexOf(wt) >= 0);
+    });
+    updateScrumPreview();
+  };
+
+  window.delScrumCol = function(i) {
+    if (scrumState.statuses.length <= 1) return; // always keep at least one column
+    scrumState.statuses.splice(i, 1);
+    renderScrumDetail();
+    updateScrumPreview();
+  };
+
+  window.addScrumCol = function() {
+    scrumState.statuses.push('New column');
+    renderScrumDetail();
+    setTimeout(function() {
+      var inputs = document.querySelectorAll('.scrum-list-input[data-col-idx]');
+      var last = inputs[inputs.length - 1];
+      if (last) { last.focus(); last.select(); }
+    }, 50);
+  };
+
+  window.quickAddScrumCol = function(name) {
+    scrumState.statuses.push(name);
+    renderScrumDetail();
+    updateScrumPreview();
+  };
+
+  function wireScrumColInputs() {
+    document.querySelectorAll('.scrum-list-input[data-col-idx]').forEach(function(inp) {
+      var idx = parseInt(inp.dataset.colIdx);
+      inp.addEventListener('input', function() {
+        scrumState.statuses[idx] = inp.value;
+        updateScrumPreview();
+      });
+    });
+  }
+
+  window.toggleScrumStatus2 = function(st) {
+    // Step-2 version: updates the master statuses array
+    var idx = scrumState.statuses.indexOf(st);
+    if (idx >= 0 && scrumState.statuses.length > 1) scrumState.statuses.splice(idx, 1);
+    else if (idx < 0) scrumState.statuses.push(st);
+    document.querySelectorAll('.scrum-meta-chip').forEach(function(c) {
+      var oc = c.getAttribute('onclick') || '';
+      if (oc.indexOf('toggleScrumStatus2(\'' + st + '\')') >= 0)
+        c.classList.toggle('smc-sel', scrumState.statuses.indexOf(st) >= 0);
+    });
+    renderScrumBoardPreview(); // keep step-3 board in sync
+    updateScrumPreview();
+  };
+
+  function hideScrumDetail() {
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ml) ml.style.display = '';
+    if (sd) sd.style.display = 'none';
+    if (ph2) ph2.textContent = 'How should we set up your ART?';
+    if (ps2) ps2.textContent = 'Choose an approach. Nothing is saved until you review and confirm.';
+  }
+
+  function renderScrumConfig() {
+    var form = document.getElementById('otto-qa-form');
+    if (!form) return;
+
+    var t = document.getElementById('pane3-title'); if (t) t.textContent = 'Set up your board';
+    var s = document.getElementById('pane3-sub');   if (s) s.textContent = 'Confirm your team name and sprint length. Board columns and work items are set to Scrum defaults — change them in Settings any time.';
+
+    // Hide SAFe panels — they don't apply to Scrum
+    var ottoCfg = document.getElementById('otto-config-card');
+    if (ottoCfg) ottoCfg.style.display = 'none';
+    var artPh = document.getElementById('art-placeholder');
+    if (artPh) artPh.style.display = 'none';
+
+    var html = '';
+
+    // Q1: Team name
+    html += ottoQCard('Team name',
+      '<input class="scrum-name-input" id="scrum-team-name" type="text" value="' + (scrumState.teamName || '').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking Team">');
+
+    // Q2: Sprint length — pills for common lengths + free input for any value
+    html += ottoQCard('Sprint length',
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+      [1,2,3,4].map(function(w) {
+        var sel = scrumState.sprintWeeks === w;
+        return '<button class="otto-pill' + (sel ? ' osel' : '') + '" onclick="setScrumSprint(' + w + ',\'help-scrum-sprint\')" type="button">' + w + '-week</button>';
+      }).join('') +
+      '<div style="display:flex;align-items:center;gap:6px;margin-left:4px;">' +
+      '<input id="scrum-sprint-custom" type="number" min="1" max="12" placeholder="other" ' +
+      'style="width:64px;border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-family:inherit;font-size:12px;color:var(--ink);background:var(--surface);outline:none;text-align:center;" ' +
+      'oninput="if(this.value){setScrumSprint(parseInt(this.value)||1,\'help-scrum-sprint\')}">' +
+      '<span style="font-size:12px;color:var(--muted);">weeks</span></div>' +
+      '</div>' +
+      '<div class="otto-pill-help" id="help-scrum-sprint" style="margin-top:6px;">' + (OTTO_SPRINT_HELP[scrumState.sprintWeeks] || '') + '</div>');
+
+    // Silent defaults — board columns and work items only (views are always available, not "configured")
+    // Optional: invite teammates — name search, chip-based selection
+    var suggestedPeople = ['Priya Nair', 'Marcus Cole', 'James Liu', 'Riya Shah'];
+    html += '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+      '<span style="font-size:12px;font-weight:600;color:var(--ink);">Invite teammates</span>' +
+      '<span style="font-size:11px;color:var(--muted);">Optional</span>' +
+      '</div>' +
+      '<input id="scrum-invite-search" type="text" placeholder="Enter names, separated by commas" autocomplete="off" ' +
+      'style="width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);outline:none;" ' +
+      'onfocus="this.style.borderColor=\'rgba(56,55,51,0.32)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+      '<div>' +
+      '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:7px;">Suggested</div>' +
+      '<div id="scrum-invite-chips" style="display:flex;flex-wrap:wrap;gap:6px;">' +
+      suggestedPeople.map(function(name) {
+        return '<button type="button" class="invite-chip" data-name="' + name + '" ' +
+          'onclick="toggleInviteChip(this)" ' +
+          'style="font-family:inherit;font-size:12px;font-weight:500;color:var(--sub);background:var(--raised);border:1.5px solid var(--border);border-radius:999px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 140ms ease;">' +
+          '<span class="chip-check" style="display:none;width:14px;height:14px;background:var(--ai-accent);border-radius:50%;align-items:center;justify-content:center;flex-shrink:0;"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+          name + '</button>';
+      }).join('') +
+      '</div></div></div>';
+
+    // Defaults — sits below invite so it reads as secondary/supplementary info
+    var colSummary  = scrumState.statuses.join(' → ');
+    var itemSummary = scrumState.workTypes.join(' · ');
+    html += '<div style="background:rgba(56,55,51,0.04);border:1px solid rgba(56,55,51,0.09);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
+      '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Defaults — change in Settings any time</div>' +
+      '<div style="display:flex;flex-direction:column;gap:5px;">' +
+      '<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:11px;font-weight:500;color:var(--sub);min-width:80px;">Board</span><span style="font-size:12px;color:var(--ink);">' + colSummary + '</span></div>' +
+      '<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:11px;font-weight:500;color:var(--sub);min-width:80px;">Work items</span><span style="font-size:12px;color:var(--ink);">' + itemSummary + '</span></div>' +
+      '</div></div>';
+
+    form.innerHTML = html;
+
+    // Wire team name input
+    var nameEl = document.getElementById('scrum-team-name');
+    if (nameEl) nameEl.addEventListener('input', function() {
+      scrumState.teamName = nameEl.value;
+      updateScrumPreview();
+    });
+
+    // Chip toggle handler
+    window.toggleInviteChip = function(btn) {
+      var active = btn.dataset.active === '1';
+      btn.dataset.active = active ? '0' : '1';
+      var tick = btn.querySelector('.chip-check');
+      if (tick) tick.style.display = active ? 'none' : 'inline-flex';
+      btn.style.background     = active ? 'var(--raised)' : 'rgba(22,163,74,0.08)';
+      btn.style.borderColor    = active ? 'var(--border)'  : 'rgba(22,163,74,0.30)';
+      btn.style.color          = active ? 'var(--sub)'     : 'var(--ai-accent-deep)';
+    };
+
+    renderScrumBoardPreview();
+  }
+
+  function wireScrumInputs() {
+    var dateEl = document.getElementById('scrum-start-date');
+    if (dateEl) dateEl.addEventListener('input', function() { scrumState.startDate = dateEl.value; });
+    var tn = document.getElementById('scrum-team-name-p2');
+    if (tn) tn.addEventListener('input', function() { scrumState.teamName = tn.value; updateScrumPreview(); });
+  }
+
+  window.setScrumTeamSize = function(s) {
+    scrumState.teamSize = s;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumTeamSize') >= 0)
+        p.classList.toggle('osel', p.textContent === s);
+    });
+  };
+
+  function renderScrumBoardPreview() {
+    var container = document.getElementById('scrum-board-container');
+    var board = document.getElementById('scrum-board-cols');
+    if (!container || !board) return;
+    if (selectedFw !== 'scrum') { container.style.display = 'none'; return; }
+    container.style.display = '';
+    var statuses = scrumState.statuses.slice(0, 5);
+    board.innerHTML = statuses.map(function(st) {
+      return '<div class="scrum-col">' +
+        '<div class="scrum-col-hd">' + (st || 'Column') + '</div>' +
+        '<div class="scrum-card-ph"></div>' +
+        '<div class="scrum-card-ph" style="opacity:0.5;animation-delay:60ms"></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  window.setScrumSprint = function(w, helpId) {
+    scrumState.sprintWeeks = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setScrumSprint') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    var h = document.getElementById(helpId || 'help-scrum-sprint');
+    if (h) h.textContent = OTTO_SPRINT_HELP[w] || '';
+  };
+
+  window.delScrumWorkType = function(i) {
+    scrumState.workTypes.splice(i, 1);
+    renderScrumConfig();
+  };
+
+  window.addScrumWorkType = function() {
+    scrumState.workTypes.push('New type');
+    renderScrumConfig();
+    var inputs = document.querySelectorAll('.scrum-list-input[data-wt]');
+    var last = inputs[inputs.length - 1];
+    if (last) { last.focus(); last.select(); }
+  };
+
+  window.delScrumStatus = function(i) {
+    if (scrumState.statuses.length <= 1) return;
+    scrumState.statuses.splice(i, 1);
+    renderScrumConfig();
+    renderScrumBoardPreview();
+  };
+
+  window.addScrumStatus = function() {
+    scrumState.statuses.push('New status');
+    renderScrumConfig();
+    renderScrumBoardPreview();
+    var inputs = document.querySelectorAll('.scrum-list-input[data-st]');
+    var last = inputs[inputs.length - 1];
+    if (last) { last.focus(); last.select(); }
+  };
+
+  window.toggleScrumView = function(key) {
+    var idx = scrumState.views.indexOf(key);
+    if (idx >= 0) { if (scrumState.views.length > 1) scrumState.views.splice(idx, 1); }
+    else { scrumState.views.push(key); }
+    document.querySelectorAll('.scrum-view-chip').forEach(function(btn) {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(key) >= 0) {
+        btn.classList.toggle('ssel', scrumState.views.indexOf(key) >= 0);
+      }
+    });
+  };
+
+  window.toggleScrumTool = function(key) {
+    var idx = scrumState.tools.indexOf(key);
+    if (idx >= 0) { scrumState.tools.splice(idx, 1); } else { scrumState.tools.push(key); }
+    document.querySelectorAll('.otto-tool').forEach(function(btn) {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(key) >= 0) {
+        var active = scrumState.tools.indexOf(key) >= 0;
+        btn.classList.toggle('osel', active);
+        btn.innerHTML = (active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') +
+          OTTO_TOOL_LIST.filter(function(t){ return t.key === key; }).map(function(t){ return t.label; })[0];
+      }
+    });
+  };
+
+  // ── Otto QA state ───────────────────────────────────────────────
+  var OTTO_Q_SVG = '<svg viewBox="0 0 118 118" fill="currentColor" width="12" height="12" style="display:block"><path d="M45.3968 11.6083C43.954 19.7583 40.0994 27.5449 33.8223 33.8221C27.544 40.1002 19.7575 43.9546 11.6084 45.3967C5.01277 46.5637 0.0151754 52.126 0.000405914 58.824C0.000405914 58.9106 -0.000507393 58.9982 0.000405914 59.0858C0.0151754 65.7838 5.01277 71.346 11.6084 72.513C19.7584 73.956 27.5449 77.8104 33.8223 84.0877C40.1003 90.3657 43.9548 98.1523 45.3968 106.301C46.5638 112.897 52.1271 117.894 58.8241 117.909C58.9107 117.909 58.9985 117.91 59.0861 117.909C65.784 117.894 71.3462 112.897 72.5133 106.301C73.9562 98.1514 77.8107 90.3648 84.088 84.0877C90.3661 77.8095 98.1517 73.956 106.302 72.513C112.897 71.346 117.894 65.7829 117.91 59.0858C117.91 58.9991 117.91 58.9106 117.91 58.824C117.895 52.126 112.897 46.5637 106.302 45.3967C98.1517 43.9537 90.3652 40.0992 84.088 33.8221C77.8107 27.5449 73.9562 19.7583 72.5133 11.6083C71.3462 5.01277 65.784 0.0151682 59.0861 0.000411711C58.9994 0.000411711 58.9116 -0.000514639 58.8241 0.000411711C52.1262 0.0151682 46.5638 5.01277 45.3968 11.6083ZM78.8897 39.0204C89.8996 50.0301 89.8996 67.8797 78.8897 78.8894C67.88 89.8992 50.0303 89.8992 39.0205 78.8894C28.0106 67.8797 28.0106 50.0301 39.0205 39.0204C50.0303 28.0106 67.88 28.0106 78.8897 39.0204Z"/></svg>';
+
+  var ottoState = {
+    teamCount: 4,
+    teamNames: ['Auth Team', 'Payments Team', 'Mobile Team', 'Data & Analytics'],
+    piWeeks: 10, sprintWeeks: 2,
+    teamSize: '6–8', // approx members per team
+    tools: ['jira'], piStart: '', wipLimit: 4
+  };
+
+  var OTTO_TOOL_LIST = [
+    { key: 'jira',        label: 'Jira' },
+    { key: 'servicenow',  label: 'ServiceNow' },
+    { key: 'slack',       label: 'Slack' },
+    { key: 'rally',       label: 'Rally' },
+    { key: 'azure',       label: 'Azure DevOps' },
+    { key: 'confluence',  label: 'Confluence' },
+    { key: 'other',       label: 'Other…' }
+  ];
+
+  // Contextual help text shown below cadence pills
+  var OTTO_PI_HELP = {
+    4:  '4-week planning cycle — lightweight, high-frequency.',
+    6:  '6-week planning cycle.',
+    8:  '8-week PI — faster delivery cycles. Good for high-velocity teams.',
+    10: '10-week PI — most common. 4 sprints + IP sprint.',
+    12: '12-week PI — 5 sprints + IP. More room for complex feature work.'
+  };
+  var OTTO_SPRINT_HELP = {
+    1: '1-week — high-frequency feedback, small increments.',
+    2: '2-week — industry standard. Balances velocity and planning.',
+    3: '3-week — more time per iteration for complex work.',
+    4: '4-week — long iterations; suits research-heavy teams.'
+  };
+
+  var OTTO_NAME_DEFAULTS = {
+    essential: ['Auth Team','Payments Team','Mobile Team','Data & Analytics','Platform Team','DevOps Team','QA Team','API Team'],
+    portfolio: ['Core Platform ART','Customer Experience ART','Data & Analytics ART','Infrastructure ART','Innovation ART'],
+    kanban:    ['Discovery Stream','Delivery Stream','Operations Stream','Support Stream','Platform Stream'],
+    scrum:     ['Digital Banking Team','Payments Team','Auth Team','Platform Team','Mobile Team']
+  };
+
+  // suffix: unit label appended to each pill (e.g. '-week', ' people')
+  // helpId: id of a <div> below the row that shows contextual help on selection
+  function ottoPillRow(values, selected, handler, suffix, helpId) {
+    var pills = values.map(function(v) {
+      var display = suffix ? v + suffix : v;
+      var arg = typeof v === 'string' ? '"' + v + '"' : v;
+      return '<button class="otto-pill' + (v === selected ? ' osel' : '') + '" onclick="' + handler + '(' + arg + (helpId ? ',\'' + helpId + '\'' : '') + ')" type="button">' + display + '</button>';
+    }).join('');
+    return '<div class="otto-pills">' + pills + '</div>';
+  }
+
+  function ottoQCard(label, content, noteText) {
+    var note = noteText ? ' <span class="otto-q-note">— ' + noteText + '</span>' : '';
+    return '<div class="otto-q-card">' +
+      '<div class="otto-q-hd">' +
+      '<span class="otto-q-label">' + label + note + '</span></div>' +
+      content + '</div>';
+  }
+
+  function renderNameRows(count, suffix) {
+    var defs = OTTO_NAME_DEFAULTS[selectedFw] || OTTO_NAME_DEFAULTS.essential;
+    var html = '<div class="otto-name-inputs">';
+    for (var i = 0; i < count; i++) {
+      var val = ottoState.teamNames[i] || defs[i] || (suffix + ' ' + (i + 1));
+      html += '<div class="otto-name-row"><span class="otto-name-num">' + (i + 1) + '</span>' +
+        '<input class="otto-name-input" type="text" value="' + val.replace(/"/g, '&quot;') + '" placeholder="' + (defs[i] || suffix + ' ' + (i+1)) + '" data-idx="' + i + '"></div>';
+    }
+    return html + '</div>';
+  }
+
+  function renderOttoQuestions() {
+    var fw = selectedFw;
+    var form = document.getElementById('otto-qa-form');
+    if (!form) return;
+
+    // Reset defaults per framework
+    var defs = OTTO_NAME_DEFAULTS[fw] || OTTO_NAME_DEFAULTS.essential;
+    if (!ottoState.teamNames.length || ottoState.teamNames[0] === defs[0]) {
+      ottoState.teamNames = defs.slice(0, ottoState.teamCount);
+    }
+
+    var pane3Title = { essential:'Configure your ART', portfolio:'Configure your Portfolio', kanban:'Configure your Kanban board', blank:'Set up your workspace', scrum:'Configure your Scrum board' };
+    var pane3Sub   = { essential:'Answer Otto\'s questions. The preview updates in real time.', portfolio:'Otto maps your ARTs and Solution Train. Review before saving.', kanban:'Define your value streams and flow policy. Otto configures the board.', blank:'Choose how work moves through your team. This shapes everything: your board, your cadence, your terminology.', scrum:'Set up your board — work types, statuses, and sprint length. Customise any time in settings.' };
+    var t = document.getElementById('pane3-title'); if (t) t.textContent = pane3Title[fw] || pane3Title.essential;
+    var s = document.getElementById('pane3-sub');   if (s) s.textContent = pane3Sub[fw]   || pane3Sub.essential;
+
+    // Update placeholder labels to match framework language
+    var plabelMap = {
+      essential: ['Teams', 'PI Calendar', 'Configuration'],
+      portfolio: ['ARTs', 'PI Calendar', 'Configuration'],
+      kanban:    ['Value Streams', 'Flow Policy', 'Configuration'],
+      blank:     ['Teams', 'Cadence', 'Configuration']
+    };
+    var plabels = plabelMap[fw] || plabelMap.essential;
+    ['plabel-teams','plabel-pi','plabel-conn'].forEach(function(id, i) {
+      var el = document.getElementById(id); if (el) el.textContent = plabels[i];
+    });
+
+    var countLabel   = fw === 'blank'    ? 'How many teams do you have?'       :
+                       fw === 'kanban'   ? 'How many value streams?'            :
+                       fw === 'portfolio'? 'How many ARTs will you configure?'  :
+                                          'How many teams are in your ART?';
+    var nameLabel    = fw === 'blank'    ? 'What are they called?'              :
+                       fw === 'kanban'   ? 'What are your value streams called?' :
+                       fw === 'portfolio'? 'What are your ARTs called?'         :
+                                          'What are they called?';
+    var nameSuffix   = fw === 'kanban' ? 'Stream' : fw === 'portfolio' ? 'ART' : 'Team';
+    // All frameworks get a full range of count options; blank includes 1
+    var countOptions = fw === 'blank' ? [1,2,3,4,5,6,8,10] : fw === 'portfolio' ? [2,3,4,5,6] : [2,3,4,5,6,8,10];
+
+    var html = '';
+
+    // Q1: Count — pills for common values + free-text for any number
+    html += ottoQCard(countLabel,
+      ottoPillRow(countOptions, ottoState.teamCount, 'setOttoCount') +
+      '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;">' +
+      '<span style="font-size:11px;color:var(--muted);">Other:</span>' +
+      '<input id="otto-count-custom" type="number" min="1" max="99" placeholder="e.g. 11" ' +
+      'style="width:72px;border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-family:inherit;font-size:12px;color:var(--ink);background:var(--surface);outline:none;" ' +
+      'oninput="if(this.value){setOttoCount(parseInt(this.value)||1)}">' +
+      '</div>');
+
+    // Q2: Names (with note that member invites happen in step 4)
+    html += ottoQCard(nameLabel,
+      '<div id="otto-name-inputs-wrap">' + renderNameRows(ottoState.teamCount, nameSuffix) + '</div>');
+
+    // Q2b: Approx team size — enough for capacity estimates; exact invites happen in step 4
+    var teamSizeOpts = ['1–3', '4–6', '6–8', '9–12', '13+'];
+    html += ottoQCard('Roughly how many people per ' + nameSuffix.toLowerCase() + '?',
+      ottoPillRow(teamSizeOpts, ottoState.teamSize, 'setOttoTeamSize') +
+      '<div class="otto-pill-help">Used for capacity planning. Exact members and invitations are set in the next step.</div>');
+
+    // Q3: Cadence — always shown; language adapts; includes contextual help per selection
+    var cadenceTitle = fw === 'kanban' ? 'What is your WIP limit per column?' :
+                       fw === 'blank'  ? 'What is your work cadence?' :
+                                         'What is your PI and sprint cadence?';
+    if (fw === 'kanban') {
+      // Per-stage WIP limits — each stage has its own limit.
+      // This is the correct Kanban model: limits reveal bottlenecks stage by stage.
+      // A single global limit is not meaningful and misrepresents how Kanban works.
+      var kanbanStages = ottoState.teamNames.length >= 2 ? ottoState.teamNames : ['Options', 'Committed', 'In Progress', 'In Review', 'Done'];
+      var kanbanWips   = ottoState.kanbanWips || [0, 10, 4, 2, 0]; // 0 = no limit
+      ottoState.kanbanWips = kanbanWips;
+
+      var wipsHtml = '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        kanbanStages.map(function(stage, i) {
+          var wip = kanbanWips[i] !== undefined ? kanbanWips[i] : 4;
+          var isUnlimited = wip === 0;
+          return '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span style="font-size:12.5px;font-weight:500;color:var(--ink);min-width:90px;flex-shrink:0;">' + (stage || 'Stage ' + (i+1)) + '</span>' +
+            '<div style="display:flex;gap:4px;">' +
+            [1,2,3,4,5,6,8,10,'∞'].map(function(n) {
+              var val = n === '∞' ? 0 : n;
+              var sel = (isUnlimited && n === '∞') || (!isUnlimited && val === wip);
+              return '<button class="otto-pill' + (sel ? ' osel' : '') + '" style="padding:3px 9px;font-size:11px;" onclick="setKanbanWip(' + i + ',' + val + ')" type="button">' + n + '</button>';
+            }).join('') +
+            '</div></div>';
+        }).join('') +
+        '</div>' +
+        '<div class="otto-pill-help">∞ = no limit. Set Options and Done to ∞ — they\'re not bottlenecks. Start conservative for In Progress (3–4) — you can always increase.</div>';
+
+      html += ottoQCard(cadenceTitle, wipsHtml);
+    } else if (fw === 'blank') {
+      html += ottoQCard(cadenceTitle,
+        '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div><div class="otto-sub-label">Iteration length</div>' +
+        ottoPillRow([1,2,3,4], ottoState.sprintWeeks, 'setOttoSprint', '-week', 'help-sprint') +
+        '<div class="otto-pill-help" id="help-sprint">' + (OTTO_SPRINT_HELP[ottoState.sprintWeeks] || '') + '</div></div>' +
+        '<div><div class="otto-sub-label">Planning cycle</div>' +
+        ottoPillRow([4,6,8,10,12], ottoState.piWeeks, 'setOttoPi', '-week', 'help-pi') +
+        '<div class="otto-pill-help" id="help-pi">' + (OTTO_PI_HELP[ottoState.piWeeks] || '') + '</div></div>' +
+        '</div>');
+    } else {
+      html += ottoQCard(cadenceTitle,
+        '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div><div class="otto-sub-label">PI length</div>' +
+        ottoPillRow([8,10,12], ottoState.piWeeks, 'setOttoPi', '-week', 'help-pi') +
+        '<div class="otto-pill-help" id="help-pi">' + (OTTO_PI_HELP[ottoState.piWeeks] || '') + '</div></div>' +
+        '<div><div class="otto-sub-label">Sprint length</div>' +
+        ottoPillRow([1,2,3], ottoState.sprintWeeks, 'setOttoSprint', '-week', 'help-sprint') +
+        '<div class="otto-pill-help" id="help-sprint">' + (OTTO_SPRINT_HELP[ottoState.sprintWeeks] || '') + '</div></div>' +
+        '</div>');
+    }
+
+    // PI start (optional, not kanban)
+    if (fw !== 'kanban') {
+      html += ottoQCard('When does your next PI kick off?',
+        '<input class="otto-date-input" id="otto-pi-start" type="text" placeholder="e.g. Jun 2, 2025" value="' + ottoState.piStart + '">',
+        'optional');
+    }
+
+    form.innerHTML = html;
+    wireOttoInputs();
+    updateOttoSummary();
+  }
+
+  function wireOttoInputs() {
+    var wrap = document.getElementById('otto-name-inputs-wrap');
+    if (wrap) {
+      wrap.querySelectorAll('.otto-name-input').forEach(function(input) {
+        var i = parseInt(input.dataset.idx);
+        input.addEventListener('input', function() {
+          ottoState.teamNames[i] = input.value;
+          updateOttoSummary();
+        });
+      });
+    }
+    var dateEl = document.getElementById('otto-pi-start');
+    if (dateEl) {
+      dateEl.addEventListener('input', function() {
+        ottoState.piStart = dateEl.value;
+        updateOttoSummary();
+      });
+    }
+  }
+
+  function updateOttoSummary() {
+    var card = document.getElementById('otto-config-card');
+    var rows = document.getElementById('otto-config-rows');
+    var hdLabel = document.getElementById('otto-config-hd-label');
+    if (!card || !rows) return;
+
+    var fw = selectedFw;
+    card.style.display = '';
+
+    var teamKey = fw === 'kanban' ? 'Streams' : fw === 'portfolio' ? 'ARTs' : 'Teams';
+    if (hdLabel) hdLabel.textContent = 'Otto is configuring';
+
+    var names = ottoState.teamNames.slice(0, ottoState.teamCount).filter(Boolean);
+    var namesStr = names.length ? names.join(' · ') : '—';
+    var toolsStr = ottoState.tools.map(function(k) {
+      var tl = OTTO_TOOL_LIST.filter(function(x){ return x.key === k; })[0];
+      return tl ? tl.label : k;
+    }).join(' · ') || 'None selected';
+
+    var rowData = [];
+    rowData.push([teamKey, ottoState.teamCount + ' · ' + namesStr]);
+    if (ottoState.teamSize) rowData.push(['~Size', ottoState.teamSize + ' people each']);
+    if (fw === 'kanban') {
+      var wipSummary = (ottoState.kanbanWips || []).map(function(w, i) {
+        var names = ottoState.teamNames.length >= 2 ? ottoState.teamNames : ['Options','Committed','In Progress','In Review','Done'];
+        return (names[i] || ('Stage ' + (i+1))) + ':' + (w === 0 ? '∞' : w);
+      }).join(' · ');
+      rowData.push(['WIP', wipSummary || ottoState.wipLimit + ' per column']);
+    } else if (fw === 'blank') {
+      rowData.push(['Iteration', ottoState.sprintWeeks + '-week']);
+      rowData.push(['Cycle', ottoState.piWeeks + '-week planning cycle']);
+    } else {
+      rowData.push(['PI', ottoState.piWeeks + '-week · ' + (Math.floor(ottoState.piWeeks / ottoState.sprintWeeks) - 1) + ' sprints + IP']);
+      rowData.push(['Sprint', ottoState.sprintWeeks + '-week']);
+    }
+    if (ottoState.piStart) rowData.push(['Starts', ottoState.piStart]);
+
+    rows.innerHTML = rowData.map(function(r) {
+      return '<div class="otto-config-row"><span class="otto-config-key">' + r[0] + '</span><span class="otto-config-val">' + r[1] + '</span></div>';
+    }).join('');
+  }
+
+  // Otto answer setters
+  window.setOttoCount = function(n) {
+    ottoState.teamCount = n;
+    var fw = selectedFw;
+    var defs = OTTO_NAME_DEFAULTS[fw] || OTTO_NAME_DEFAULTS.essential;
+    var suffix = fw === 'kanban' ? 'Stream' : fw === 'portfolio' ? 'ART' : 'Team';
+    while (ottoState.teamNames.length < n) {
+      ottoState.teamNames.push(defs[ottoState.teamNames.length] || suffix + ' ' + (ottoState.teamNames.length + 1));
+    }
+    // Update pill active states
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoCount') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === n);
+      }
+    });
+    // Re-render name inputs
+    var wrap = document.getElementById('otto-name-inputs-wrap');
+    if (wrap) {
+      wrap.innerHTML = renderNameRows(n, suffix);
+      wireOttoInputs();
+    }
+    updateOttoSummary();
+  };
+
+  window.setOttoPi = function(w, helpId) {
+    ottoState.piWeeks = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoPi') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    var h = document.getElementById(helpId || 'help-pi');
+    if (h) h.textContent = OTTO_PI_HELP[w] || '';
+    updateOttoSummary();
+  };
+
+  window.setOttoSprint = function(w, helpId) {
+    ottoState.sprintWeeks = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoSprint') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    var h = document.getElementById(helpId || 'help-sprint');
+    if (h) h.textContent = OTTO_SPRINT_HELP[w] || '';
+    updateOttoSummary();
+  };
+
+  window.setOttoTeamSize = function(s) {
+    ottoState.teamSize = s;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoTeamSize') >= 0) {
+        p.classList.toggle('osel', p.textContent === s);
+      }
+    });
+    updateOttoSummary();
+  };
+
+  window.setOttoWip = function(w) {
+    ottoState.wipLimit = w;
+    document.querySelectorAll('.otto-pill').forEach(function(p) {
+      if (p.getAttribute('onclick') && p.getAttribute('onclick').indexOf('setOttoWip') >= 0) {
+        p.classList.toggle('osel', parseInt(p.textContent) === w);
+      }
+    });
+    updateOttoSummary();
+  };
+
+  window.setKanbanWip = function(stageIdx, wip) {
+    if (!ottoState.kanbanWips) ottoState.kanbanWips = [0,10,4,2,0];
+    ottoState.kanbanWips[stageIdx] = wip;
+    // Re-render just the WIP section to update active states
+    renderOttoQuestions();
+    updateOttoSummary();
+  };
+
+  window.toggleOttoTool = function(key) {
+    var idx = ottoState.tools.indexOf(key);
+    if (idx >= 0) { ottoState.tools.splice(idx, 1); } else { ottoState.tools.push(key); }
+    // Re-render tool buttons
+    document.querySelectorAll('.otto-tool').forEach(function(btn) {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(key) >= 0) {
+        var active = ottoState.tools.indexOf(key) >= 0;
+        btn.classList.toggle('osel', active);
+        btn.innerHTML = (active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') +
+          OTTO_TOOL_LIST.filter(function(t){ return t.key === key; }).map(function(t){ return t.label; })[0];
+      }
+    });
+    updateOttoSummary();
+  };
+
+  function buildParsedFromOtto() {
+    var names = ottoState.teamNames.slice(0, ottoState.teamCount).filter(Boolean);
+    return {
+      teams: names, teamCount: ottoState.teamCount,
+      piWeeks: ottoState.piWeeks, sprintWeeks: ottoState.sprintWeeks,
+      piLabel: 'PI 1', piStart: ottoState.piStart || null,
+      jiraKey: ottoState.tools.indexOf('jira') >= 0 ? 'PROJ' : null,
+      hasJira: ottoState.tools.indexOf('jira') >= 0,
+      hasSlack: ottoState.tools.indexOf('slack') >= 0,
+      peopleCount: ottoState.teamCount * 6
+    };
+  }
+
+  // ── Input parser — extracts team names, PI info, integrations ────
+  function parseInput(text) {
+    var r = { teams: [], teamCount: 4, piWeeks: 10, sprintWeeks: 2,
+              piLabel: 'PI 1', piStart: null, jiraKey: null,
+              hasSlack: false, hasJira: false, peopleCount: null };
+
+    // Named teams from "X squads — Auth, Payments, Mobile, Data"
+    var nameM = text.match(/(?:squads?|teams?|groups?)[^.—\-\n]*[—\-:]\s*([^\n.]+)/i);
+    if (nameM) {
+      var parts = nameM[1].split(/,\s*|\s+and\s+/i)
+        .map(function(s){ return s.trim().replace(/^and\s+/i,''); })
+        .filter(function(s){ return s.length > 1 && s.length < 36; });
+      if (parts.length >= 2) r.teams = parts;
+    }
+    var countM = text.match(/(\d+)\s+(?:engineering\s+)?(?:teams?|squads?|groups?)/i);
+    if (countM) r.teamCount = parseInt(countM[1]);
+    if (r.teams.length) r.teamCount = r.teams.length;
+
+    var pplM = text.match(/(?:about\s+)?(\d+)\s+people/i);
+    if (pplM) r.peopleCount = parseInt(pplM[1]);
+    var piM = text.match(/(\d+)[- ]week\s*PI/i);
+    if (piM) r.piWeeks = parseInt(piM[1]);
+    var spM = text.match(/(\d+)[- ]week\s*sprint/i);
+    if (spM) r.sprintWeeks = parseInt(spM[1]);
+
+    var jM = text.match(/(?:key:?\s*|project\s+key:?\s*)([A-Z]{2,8})\b/i);
+    if (jM) r.jiraKey = jM[1].toUpperCase();
+    var piLM = text.match(/PI\s+(\d+)\s+kicks?\s+off\s+(.+?)(?:\.|$)/i);
+    if (piLM) { r.piLabel = 'PI ' + piLM[1]; r.piStart = piLM[2].trim(); }
+
+    r.hasSlack = /slack/i.test(text);
+    r.hasJira  = /jira/i.test(text);
+    return r;
+  }
+
+  // ── Per-framework generation profiles ────────────────────────────
+  var fwProfiles = {
+    essential: {
+      phase1: 'Identifying <strong>team structure…</strong>',
+      phase2: 'Mapping <strong>PI calendar…</strong>',
+      phase3: 'Finalising <strong>configuration…</strong>',
+      doneMsg: '<strong>ART configured.</strong> Review before saving',
+      doneLabel: function(){ return 'Your ART'; },
+      teamsLabel: 'Teams', piLabel: 'PI Calendar', connLabel: 'Configuration',
+      hintText: 'Click any team name or date to edit'
+    },
+    portfolio: {
+      phase1: 'Identifying <strong>ART structure…</strong>',
+      phase2: 'Mapping <strong>Solution Train…</strong>',
+      phase3: 'Building <strong>portfolio layer…</strong>',
+      doneMsg: '<strong>Portfolio configured.</strong> Review before saving',
+      doneLabel: function(){ return 'Multi-ART Portfolio'; },
+      teamsLabel: 'ARTs', piLabel: 'PI Calendar', connLabel: 'Configuration',
+      hintText: 'Click any ART name or date to edit'
+    },
+    kanban: {
+      phase1: 'Mapping <strong>value streams…</strong>',
+      phase2: 'Configuring <strong>WIP limits…</strong>',
+      phase3: 'Setting up <strong>flow metrics…</strong>',
+      doneMsg: '<strong>Kanban board configured.</strong> Review before saving',
+      doneLabel: function(){ return 'Lean Kanban Board'; },
+      teamsLabel: 'Value Streams', piLabel: 'Flow Policy', connLabel: 'Configuration',
+      hintText: 'Click any stream name to edit'
+    },
+    scrum: {
+      phase1: 'Setting up <strong>sprint board…</strong>',
+      phase2: 'Configuring <strong>work item types…</strong>',
+      phase3: 'Applying <strong>workflow statuses…</strong>',
+      doneMsg: '<strong>Scrum board ready.</strong> Review before saving',
+      doneLabel: function(){ return scrumState.teamName || 'Scrum Team'; },
+      teamsLabel: 'Team', piLabel: 'Sprint', connLabel: 'Tools',
+      hintText: 'Click any status or team name to rename'
+    },
+    blank: {
+      phase1: 'Creating <strong>blank workspace…</strong>',
+      phase2: 'Preparing <strong>custom structure…</strong>',
+      phase3: 'Finalising <strong>configuration…</strong>',
+      doneMsg: '<strong>Workspace ready.</strong> Configure as you go',
+      doneLabel: function(){ return 'Custom Workspace'; },
+      teamsLabel: 'Structure', piLabel: 'Cadence', connLabel: 'Configuration',
+      hintText: 'Tap any label to configure'
+    }
+  };
+
+  // ── Method preview data ──────────────────────────────────────────
+  var methodData = {
+    ai: {
+      icon: OTTO_ICON_SM,
+      title: 'What Otto will configure',
+      sub: 'Otto reads your description and generates a complete ART configuration in about 5 seconds.',
+      items: [
+        { icon: icon(IC.users),  name: 'Teams', note: 'Names, sizes, and sprint calendars for each team' },
+        { icon: icon(IC.cal),    name: 'PI Calendar', note: 'PI dates, sprint boundaries, and IP sprint for the next 4 PIs' },
+        { icon: icon(IC.pencil), name: 'Everything editable', note: 'Click any field in the preview to rename or adjust' }
+      ]
+    },
+    template: {
+      icon: icon(IC.clip, 28),
+      title: 'Digital Banking template',
+      sub: 'Pre-built for teams building digital banking and financial services products.',
+      items: [
+        { icon: icon(IC.users), name: '4 teams pre-configured', note: 'Auth · Payments · Mobile · Data & Analytics' },
+        { icon: icon(IC.cal),   name: 'PI cadence set', note: '12-week PIs · 2-week sprints · Starts next Monday' },
+        { icon: icon(IC.zap),   name: '32 feature categories', note: 'Authentication, Payments, Regulatory, Mobile, Reporting' },
+        { icon: icon(IC.chart), name: 'Velocity baselines', note: 'Realistic starting-point estimates from similar teams' }
+      ]
+    },
+    import: {
+      icon: icon(IC.download, 28),
+      title: 'Data import',
+      sub: 'Bring in existing work items from a spreadsheet or CSV. Review the mapping before anything is imported.',
+      items: [
+        { icon: icon(IC.arrowR), name: 'Epics → Features', note: 'Titles, descriptions, and owners carried over' },
+        { icon: icon(IC.arrowR), name: 'Stories', note: 'Estimates, status, and sprint history mapped automatically' },
+        { icon: icon(IC.warn),   name: 'Review before import', note: 'You confirm how fields map before anything is saved' },
+        { icon: icon(IC.undo),   name: 'Bulk undo available', note: 'One click removes the entire import if something looks wrong' }
+      ]
+    }
+  };
+
+  // ── Render hierarchy diagram ─────────────────────────────────────
+  // targetId: optional — defaults to 'hier-diagram' (step 1, prev-p1).
+  // Pass 'method-detail' for step-2 renders (prev-p2) to avoid writing into a hidden pane.
+  function renderHierarchy(fw, targetId) {
+    var data = fwData[fw] || fwData.essential;
+    var panelSub = document.getElementById('prev-hd-sub-panel');
+    if (panelSub) panelSub.textContent = data.label;
+    updateStepperLabels(fw);
+    var diag = document.getElementById(targetId || 'hier-diagram');
+    if (!diag) return;
+
+    // Render synchronously — no opacity fade, no setTimeout.
+    // Async opacity transitions caused blank preview when switching frameworks
+    // because the restore never fired if updateUI re-ran within the delay window.
+    var html = '';
+    data.tiers.forEach(function(tier, i) {
+      if (i > 0 && tier.connector) {
+        html += '<div class="hier-connector"><div class="hier-conn-line"></div>' +
+          '<div class="hier-conn-label">' + tier.connector.before + '</div>' +
+          '<div class="hier-conn-line-b"></div></div>';
+      }
+      var opacity = tier.custom ? 'opacity:0.45;' : '';
+      html += '<div class="hier-tier" style="' + opacity + 'animation-delay:' + (i * 80) + 'ms">' +
+        '<div class="hier-tier-hd">' +
+        '<div class="hier-tier-dot" style="background:' + tier.dot + '"></div>' +
+        '<span class="hier-tier-label" style="color:' + tier.dot + '">' + tier.label + '</span>' +
+        '<span class="hier-tier-note">' + tier.note + '</span>' +
+        '</div>' +
+        '<div class="hier-entities">' +
+        tier.entities.map(function(e) {
+          return '<span class="hier-entity' + (e.primary ? ' primary' : '') + '">' + e.name + '</span>';
+        }).join('') +
+        '</div></div>';
+    });
+    diag.innerHTML = html;
+    diag.style.opacity = '1';
+    diag.style.transition = '';
+
+    // Auto-configured section and legend — only relevant when rendering into step-1 pane
+    if (!targetId || targetId === 'hier-diagram') {
+      var acData = autoConfigData[fw] || autoConfigData.essential;
+      var acEl = document.getElementById('auto-config-section');
+      if (acEl) {
+        acEl.innerHTML =
+          '<div class="auto-config-hd">' +
+            '<span class="auto-config-label">Auto-configured</span>' +
+            '<span class="auto-config-ai-tag">AI</span>' +
+          '</div>' +
+          '<div class="auto-config-rows">' +
+          acData.map(function(row, i) {
+            return '<div class="auto-config-row" style="animation-delay:' + (360 + i * 55) + 'ms">' +
+              '<span class="acr-key">' + row.key + '</span>' +
+              '<span class="acr-val">' + row.val + '</span>' +
+              '</div>';
+          }).join('') +
+          '</div>';
+        var legend = document.getElementById('hier-legend');
+        if (legend) legend.style.display = '';
+      }
+    }
+  }
+
+  // ── Render method preview ────────────────────────────────────────
+  function renderMethodPreview(method) {
+    var data = methodData[method] || methodData.ai;
+    // prev-hd-sub-panel intentionally not updated here — framework label stays throughout
+    var container = document.getElementById('method-detail');
+    container.innerHTML = '<div class="method-prev-card">' +
+      '<div class="method-prev-icon">' + data.icon + '</div>' +
+      '<div>' +
+        '<div class="method-prev-title">' + data.title + '</div>' +
+        '<div class="method-prev-sub">' + data.sub + '</div>' +
+      '</div>' +
+      '<div class="method-prev-items">' +
+      data.items.map(function(item) {
+        return '<div class="method-prev-item">' +
+          '<span class="mpi-icon">' + item.icon + '</span>' +
+          '<div class="mpi-body"><div class="mpi-name">' + item.name + '</div>' +
+          '<div class="mpi-note">' + item.note + '</div></div>' +
+          '</div>';
+      }).join('') +
+      '</div></div>';
+  }
+
+  // ── Render invite preview ────────────────────────────────────────
+  // ── Readiness panel — Step 5, framework-aware ───────────────────
+  function renderReadinessPreview(fw) {
+    var panel = document.getElementById('prev-p5');
+    if (!panel) return;
+
+    // Update the preview header label
+    var hd = document.getElementById('prev-hd-sub-panel');
+    var hdLabels = {
+      essential: 'ART Readiness',
+      portfolio: 'Portfolio Readiness',
+      scrum:     'Sprint Readiness',
+      kanban:    'Board Readiness',
+      blank:     'Workspace Readiness'
+    };
+    if (hd) hd.textContent = hdLabels[fw] || hdLabels.essential;
+
+    // Framework-specific readiness data
+    var configs = {
+      essential: {
+        pct: 86,
+        title: 'ART Readiness',
+        sub: '86% ready for PI Planning. 2 items to complete first.',
+        items: [
+          { done: true,  name: (generatedTeams.length || 4) + ' teams configured',    note: generatedTeams.length ? generatedTeams.map(function(t){return t.name.replace(/ Team$/i,'');}).join(' · ') : 'Auth · Payments · Mobile · Data & Analytics' },
+          { done: true,  name: 'PI 26 scheduled',                                      note: 'Jun 2 – Aug 10 · Sprint 2 active' },
+          { done: false, name: 'PI Planning session not scheduled',                    note: 'Add PI Planning to the team calendar before Sprint 4' },
+          { done: false, name: 'Team capacity not set for Sprint 1',                   note: 'Needed for accurate velocity forecasting' }
+        ]
+      },
+      portfolio: {
+        pct: 80,
+        title: 'Portfolio Readiness',
+        sub: '80% ready. 2 items to complete before PI Planning.',
+        items: [
+          { done: true,  name: '2 ARTs configured',           note: 'Digital Banking · Lending & Mortgages' },
+          { done: true,  name: 'PI cadence set',              note: '10-week PIs · LPM sync every 2 PIs' },
+          { done: true,  name: 'Epics added',                  note: '12 Epics mapped to value streams' },
+          { done: false, name: 'Lean Budget guardrails not set',  note: 'Required for portfolio-level investment allocation' },
+          { done: false, name: 'Portfolio Kanban not configured', note: 'Add workflow states to track Epic flow' }
+        ]
+      },
+      scrum: (function() {
+        var tn   = scrumState.teamName || 'Your team';
+        var sw   = scrumState.sprintWeeks || 2;
+        var cols = scrumState.statuses.join(' → ');
+        var wt   = scrumState.workTypes.join(' · ');
+        return {
+          pct: 100,
+          title: tn + ' is ready',
+          sub: sw + '-week sprints · ' + scrumState.statuses.length + ' board columns · ready to start Sprint 1.',
+          items: [
+            { done: true, name: tn,                        note: sw + '-week sprints · board configured' },
+            { done: true, name: 'Board columns',           note: cols },
+            { done: true, name: 'Work item types',         note: wt },
+            { done: true, name: 'Ready to add backlog',    note: 'Open the board, add stories, and kick off Sprint 1' }
+          ]
+        };
+      })(),
+      kanban: {
+        pct: 90,
+        title: 'Board Readiness',
+        sub: '90% ready. 1 item to complete before going live.',
+        items: [
+          { done: true,  name: (generatedTeams.length || 4) + ' teams configured',    note: generatedTeams.length ? generatedTeams.map(function(t){return t.name.replace(/ Team$/i,'');}).join(' · ') : 'Teams ready' },
+          { done: true,  name: 'Board columns configured',    note: 'Backlog · In Progress · In Review · Done' },
+          { done: true,  name: 'WIP limits active',           note: 'In Progress: 6 · In Review: 4' },
+          { done: true,  name: '47 work items imported',      note: 'DBKG project connected · backlog mapped' },
+          { done: false, name: 'Throughput baseline not set', note: 'Run 2–3 weeks before cycle time data is reliable' }
+        ]
+      },
+      blank: {
+        pct: 100,
+        title: 'Workspace Ready',
+        sub: 'Nothing is locked in. Configure as you go.',
+        items: [
+          { done: true, name: 'Workspace created',     note: 'Hierarchy and terminology defined' },
+          { done: true, name: 'Roles assigned',        note: 'Admin access granted' },
+          { done: true, name: 'Ready to add work',     note: 'Start by adding teams and creating your first items' }
+        ]
+      }
+    };
+
+    var cfg = configs[fw] || configs.essential;
+    var CIRCUMFERENCE = 164;
+    var offset = Math.round(CIRCUMFERENCE * (1 - cfg.pct / 100));
+
+    var checkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    var warnIcon  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+    var itemsHtml = cfg.items.map(function(item) {
+      return '<div class="checklist-item ' + (item.done ? 'done' : 'warn') + '">' +
+        '<span class="ci-icon">' + (item.done ? checkIcon : warnIcon) + '</span>' +
+        '<div class="ci-body"><div class="ci-name">' + item.name + '</div><div class="ci-note">' + item.note + '</div></div>' +
+      '</div>';
+    }).join('');
+
+    panel.innerHTML =
+      '<div class="readiness-score">' +
+        '<div class="readiness-header">' +
+          '<div class="readiness-ring-wrap">' +
+            '<svg viewBox="0 0 64 64">' +
+              '<circle class="readiness-ring-bg" cx="32" cy="32" r="26"/>' +
+              '<circle class="readiness-ring-fill" id="readiness-arc" cx="32" cy="32" r="26" style="stroke-dashoffset:' + CIRCUMFERENCE + '"/>' +
+            '</svg>' +
+            '<div class="readiness-ring-center">' + (cfg.pct >= 100
+              ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+              : '<span class="readiness-pct">' + cfg.pct + '%</span>') + '</div>' +
+          '</div>' +
+          '<div class="readiness-text">' +
+            '<div class="readiness-title">' + cfg.title + '</div>' +
+            '<div class="readiness-sub">' + cfg.sub + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="readiness-checklist">' + itemsHtml + '</div>' +
+      '</div>';
+
+    // Animate the ring fill in
+    setTimeout(function() {
+      var arc = document.getElementById('readiness-arc');
+      if (arc) arc.style.strokeDashoffset = offset;
+    }, 80);
+  }
+
+  function renderInvitePreview() {
+    var prev = document.getElementById('invite-preview');
+    if (!generatedTeams.length) {
+      prev.innerHTML =
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:32px 20px;text-align:center;">' +
+          '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#BBBBB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' +
+          '<div style="font-size:12.5px;font-weight:600;color:var(--sub);">No teams configured yet</div>' +
+          '<div style="font-size:11.5px;color:var(--muted);max-width:22ch;line-height:1.5;">Invite by email below or set up teams in workspace settings after setup.</div>' +
+        '</div>';
+      return;
+    }
+    prev.innerHTML = generatedTeams.map(function(team) {
+      return '<div style="background:var(--raised);border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;">' +
+        '<div style="width:8px;height:8px;border-radius:50%;background:var(--charcoal);flex-shrink:0;"></div>' +
+        '<div style="flex:1;"><div style="font-size:12.5px;font-weight:600;color:var(--ink);">' + team.name + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);">' + team.count + ' members</div></div>' +
+        '<div style="font-size:11px;color:var(--ai-accent-deep);font-weight:600;">✓ Invited</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // ── Build invite pane ────────────────────────────────────────────
+  function buildInvitePane() {
+    var container = document.getElementById('invite-teams');
+    var inputStyle = 'width:100%;border:1px solid #E1E0DD;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--raised);outline:none;transition:border-color 160ms;box-sizing:border-box;';
+    var focusIn  = "this.style.borderColor='rgba(56,55,51,0.32)';this.style.background='#fff'";
+    var focusOut = "this.style.borderColor='#E1E0DD';this.style.background='var(--raised)'";
+
+    // For Scrum: show role-specific fields instead of generic email inputs
+    if (selectedFw === 'scrum') {
+      buildScrumRolesPane(container);
+      renderInvitePreview();
+      return;
+    }
+
+    if (!generatedTeams.length) {
+      // Blank framework: no teams yet — show two manual invite rows so the user can still send invites
+      var rows = ['Team 1', 'Team 2'].map(function(name) {
+        return '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<div style="font-size:13px;font-weight:600;color:var(--muted);">' + name + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-left:auto;font-style:italic;">Define in settings</div>' +
+          '</div>' +
+          '<input type="email" placeholder="Add email address…" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
+          '</div>';
+      }).join('');
+      container.innerHTML = rows +
+        '<div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;">Teams are set up in workspace settings. Invite collaborators now or skip this step.</div>' +
+        '<button style="font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;padding:2px 0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;">Skip for now</button>';
+      renderInvitePreview();
+      return;
+    }
+
+    container.innerHTML = generatedTeams.map(function(team) {
+      return '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.07);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<div style="width:7px;height:7px;border-radius:50%;background:var(--charcoal);flex-shrink:0;"></div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--ink);">' + team.name + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-left:auto;">' + team.count + ' members</div>' +
+        '</div>' +
+        '<input type="email" placeholder="Add email address…" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
+        '</div>';
+    }).join('') +
+    '<button style="font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;padding:2px 0;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;">I\'ll invite people later</button>';
+    renderInvitePreview();
+  }
+
+  function renderEssentialArtIdentity() {
+    // Step 2 for Essential SAFe: ART name + PI length + start date.
+    // These are the decisions that define the ART's structure and calendar.
+    // Sprint length is NOT asked — SAFe prescribes 2-week sprints.
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    if (ml) ml.style.display = 'none';
+    if (sd) sd.style.display = 'none';
+
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ph2) ph2.textContent = 'Define your ART';
+    if (ps2) ps2.textContent = 'The ART (Agile Release Train) is your unit of delivery. Its name and PI cadence define how the whole programme operates.';
+
+    // Render into method-detail (right panel) and the method-list area (left)
+    // We repurpose the method-list area to show the ART form
+    var methodListEl = document.getElementById('method-list-section');
+    if (!methodListEl) return;
+    methodListEl.style.display = '';
+
+    // Build form — ART name, PI length, start date
+    var piHelpTexts = {
+      8:  '8-week PI — 3 sprints + IP sprint. Faster cadence, less planning overhead. Suits mature ARTs that plan quickly.',
+      10: '10-week PI — 4 sprints + IP sprint. The most common choice. Balances planning depth with delivery speed.',
+      12: '12-week PI — 5 sprints + IP sprint. More capacity per PI. Suits larger ARTs or complex programmes.'
+    };
+
+    var html = ottoQCard('What is this ART called?',
+      '<input class="scrum-name-input" id="art-name-input" type="text" value="' + (ottoState.teamNames[0] || '').replace(/"/g,'&quot;') + '" placeholder="e.g. Digital Banking ART">' +
+      '<div class="otto-pill-help">The ART name is your programme identity — it appears in PI Planning, the board, and all team dashboards.</div>');
+
+    html += ottoQCard('How long are your PIs?',
+      ottoPillRow([8,10,12], ottoState.piWeeks, 'setOttoPi', '-week', 'help-art-pi') +
+      '<div class="otto-pill-help" id="help-art-pi">' + (piHelpTexts[ottoState.piWeeks] || '') + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Sprint length is always 2 weeks in SAFe — this is one of the framework\'s core constraints.</div>');
+
+    html += ottoQCard('When does PI 1 start?',
+      '<input class="otto-date-input" id="art-pi-start" type="text" placeholder="e.g. Sep 1, 2025" value="' + (ottoState.piStart || '') + '">' +
+      '<div class="otto-pill-help" style="margin-top:6px;">PI Planning — a 2-day event — typically happens 1–2 weeks before this date. All teams attend.</div>');
+
+    methodListEl.innerHTML = html;
+
+    var nameEl = document.getElementById('art-name-input');
+    if (nameEl) nameEl.addEventListener('input', function() {
+      if (!ottoState.teamNames.length) ottoState.teamNames = [''];
+      ottoState.teamNames[0] = nameEl.value;
+      var p = document.getElementById('prev-hd-sub-panel');
+      if (p) p.textContent = nameEl.value || 'Essential SAFe hierarchy';
+    });
+
+    var startEl = document.getElementById('art-pi-start');
+    if (startEl) startEl.addEventListener('input', function() { ottoState.piStart = startEl.value; });
+
+    // Right panel at step 2: write into method-detail (prev-p2), not hier-diagram (prev-p1)
+    renderHierarchy('essential', 'method-detail');
+  }
+
+  function renderPortfolioIdentity() {
+    // Step 2 for Portfolio SAFe: portfolio name + ARTs.
+    // Portfolio SAFe is NOT "Essential SAFe with more ARTs" — it adds a funded governance layer.
+    var ml = document.getElementById('method-list-section');
+    var sd = document.getElementById('scrum-detail');
+    if (ml) { ml.style.display = ''; }
+    if (sd) sd.style.display = 'none';
+
+    var ph2 = document.querySelector('#pane-2 .pane-heading h1');
+    var ps2 = document.querySelector('#pane-2 .pane-heading p');
+    if (ph2) ph2.textContent = 'Define your Portfolio';
+    if (ps2) ps2.textContent = 'A Portfolio in SAFe is a business unit with its own funding, strategy, and delivery trains. Unlike a single ART, the Portfolio layer adds investment governance and strategic alignment.';
+
+    var countOptions = [2,3,4,5,6,7];
+    var html = ottoQCard('What is this portfolio called?',
+      '<input class="scrum-name-input" id="portfolio-name-input" type="text" value="" placeholder="e.g. Enterprise Technology Portfolio">');
+
+    html += ottoQCard('How many ARTs are in this portfolio?',
+      ottoPillRow(countOptions, ottoState.teamCount, 'setOttoCount') +
+      '<div class="otto-pill-help">Each ART is a self-managing delivery team of 50–125 people. Name them in the next step.</div>');
+
+    html += '<div style="background:rgba(56,55,51,0.04);border:1px solid rgba(56,55,51,0.10);border-radius:11px;padding:14px 16px;margin-top:2px;">' +
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;">What Portfolio SAFe adds on top of Essential</div>' +
+      [['Portfolio Kanban', 'Epics flow through a funnel before entering any ART backlog'],
+       ['Lean Budgeting', 'Budget follows value streams and ARTs — not individual projects'],
+       ['LPM Sync', 'Monthly or bi-monthly portfolio governance meeting for investment decisions'],
+       ['Strategic Themes', 'Business outcomes that guide which Epics get funded']
+      ].map(function(r) {
+        return '<div style="display:flex;gap:10px;margin-bottom:5px;"><span style="font-size:12px;font-weight:500;color:var(--sub);min-width:100px;">' + r[0] + '</span><span style="font-size:12px;color:var(--muted);">' + r[1] + '</span></div>';
+      }).join('') +
+      '</div>';
+
+    ml.innerHTML = html;
+
+    // Right panel at step 2: write into method-detail (prev-p2), not hier-diagram (prev-p1)
+    renderHierarchy('portfolio', 'method-detail');
+  }
+
+  function buildScrumRolesPane(container) {
+    // Step 4 for Scrum is about roles, not generic invites.
+    // PO and SM are not optional — they are the framework.
+    var ph4 = document.querySelector('#pane-4 .pane-heading h1');
+    var ps4 = document.querySelector('#pane-4 .pane-heading p');
+    if (ph4) ph4.textContent = 'Assign your Scrum roles';
+    if (ps4) ps4.textContent = 'Scrum has three roles. Product Owner and Scrum Master are required for the framework to work — the team can only function when both are in place.';
+
+    var inputStyle = 'width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-family:inherit;font-size:13px;color:var(--ink);background:var(--raised);outline:none;transition:border-color 160ms;box-sizing:border-box;';
+    var focusIn  = "this.style.borderColor='rgba(56,55,51,0.32)';this.style.background='#fff'";
+    var focusOut = "this.style.borderColor='var(--border)';this.style.background='var(--raised)'";
+
+    var roles = [
+      {
+        title: 'Product Owner',
+        desc: 'Owns and orders the product backlog. Makes final decisions on what gets built and in what priority. The PO is accountable for product value.',
+        placeholder: 'Name or email address',
+        required: true,
+        note: 'Required — without a PO, priorities are unclear and the backlog has no single owner.'
+      },
+      {
+        title: 'Scrum Master',
+        desc: 'Facilitates Sprint Planning, Daily Standup, Sprint Review, and Retrospective. Removes blockers. Coaches the team on Scrum practice.',
+        placeholder: 'Name or email address',
+        required: true,
+        note: 'Required — without a SM, ceremonies don\'t happen and impediments pile up.'
+      }
+    ];
+
+    var html = roles.map(function(role) {
+      return '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">' +
+        '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">' + role.title +
+          (role.required ? ' <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ai-accent);background:rgba(22,163,74,0.08);padding:2px 7px;border-radius:999px;margin-left:4px;">Required</span>' : '') +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--sub);line-height:1.55;">' + role.desc + '</div></div>' +
+        '<input type="email" placeholder="' + role.placeholder + '" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
+        '<div style="font-size:11px;color:var(--muted);">' + role.note + '</div>' +
+        '</div>';
+    }).join('');
+
+    // Developers — the rest of the team
+    html += '<div style="background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">' +
+      '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">Development Team</div>' +
+      '<div style="font-size:12px;color:var(--sub);line-height:1.55;">Cross-functional team members who deliver the sprint increment. In Scrum, everyone on the development team is equal — there are no sub-titles or seniority levels on the Scrum board.</div></div>' +
+      '<input type="email" placeholder="Add email addresses…" style="' + inputStyle + '" onfocus="' + focusIn + '" onblur="' + focusOut + '">' +
+      '<div style="font-size:11px;color:var(--muted);">Add more members in workspace settings after setup. The team size from step 2 (' + (scrumState.teamSize || '6') + ' people) is used for initial capacity planning.</div>' +
+      '</div>';
+
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.6;">One practical note: the Product Owner and Scrum Master should be different people. Having the same person in both roles creates a conflict of interest — the PO sets direction, the SM serves the team.</div>';
+
+    container.innerHTML = html;
+  }
+
+  // ── Editable field helper ────────────────────────────────────────
+  function makeEditable(el) {
+    el.addEventListener('click', function() {
+      el.contentEditable = 'true'; el.focus();
+      var r = document.createRange(); r.selectNodeContents(el);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+    });
+    el.addEventListener('blur', function() { el.contentEditable = 'false'; });
+    el.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+  }
+
+  // ── Progressive preview — adapts to selected framework + parsed input ──
+  function buildArtPreview(parsed) {
+    var fw = selectedFw;
+    var prof = fwProfiles[fw] || fwProfiles.essential;
+    var spW = parsed.sprintWeeks, piLbl = parsed.piLabel, piSt = parsed.piStart;
+    var sprintCount = Math.max(2, Math.floor(parsed.piWeeks / spW) - 1);
+
+    document.getElementById('art-placeholder').style.display = 'none';
+    document.getElementById('art-build').style.display = 'flex';
+    var teamsGrid = document.getElementById('art-teams-grid');
+    teamsGrid.innerHTML = '';
+
+    // Update section labels to match framework
+    var lT = document.getElementById('label-teams'), lP = document.getElementById('label-pi'), lC = document.getElementById('label-conn');
+    if (lT) lT.textContent = prof.teamsLabel;
+    if (lP) lP.textContent = prof.piLabel;
+    if (lC) lC.textContent = prof.connLabel;
+
+    // ── Compute units (teams / ARTs / streams) ────────────────────
+    var units = [];
+    if (fw === 'kanban') {
+      var streamNames = parsed.teams.length >= 2
+        ? parsed.teams.map(function(n){ return n.replace(/ Team$/i,'') + ' Stream'; })
+        : ['Discovery Stream', 'Delivery Stream', 'Operations Stream'];
+      streamNames.forEach(function(n, i){ units.push({ name: n, sub: 'WIP limit: ' + (3 + i), sprId: null }); });
+
+    } else if (fw === 'portfolio') {
+      var artNames = parsed.teams.length >= 2
+        ? parsed.teams.map(function(n){ return n.replace(/ Team$/i,'') + ' ART'; })
+        : ['Core Platform ART', 'Customer Experience ART', 'Data & Analytics ART'];
+      artNames.forEach(function(n, i){ units.push({ name: n, sub: (3 + i%2) + ' teams', sprId: 'sprints-' + i }); });
+      generatedTeams = artNames.map(function(n, i){ return { name: n, count: 3 + i%2 }; });
+
+    } else if (fw === 'blank') {
+      ['Level 1 — Define your own', 'Level 2 — Add entities', 'Level 3 — No constraints'].forEach(function(n, i){
+        units.push({ name: n, sub: 'Tap to configure', sprId: null, muted: true });
+      });
+      generatedTeams = [];
+
+    } else if (fw === 'scrum') {
+      // Scrum: single team card — just the team name and sprint cadence
+      var scrumName = scrumState.teamName || 'Your team';
+      var scrumSw   = scrumState.sprintWeeks || 2;
+      units.push({ name: scrumName, sub: scrumSw + '-week sprints', sprId: null });
+      generatedTeams = [{ name: scrumName, count: 0 }];
+
+    } else { // essential (default)
+      var avg = Math.round((parsed.peopleCount || 80) / Math.max(1, parsed.teamCount));
+      var tms = parsed.teams.length >= 2
+        ? parsed.teams.map(function(n, i){ return { name: n, count: Math.max(3, avg + (i%2===0?1:-1)) }; })
+        : [{ name: 'Auth Team', count: 5 }, { name: 'Payments Team', count: 6 },
+           { name: 'Mobile Team', count: 5 }, { name: 'Data & Analytics', count: 4 }];
+      generatedTeams = tms;
+      tms.forEach(function(t, i){ units.push({ name: t.name, sub: t.count + ' members', sprId: 'sprints-' + i }); });
+    }
+
+    // ── Render units progressively ────────────────────────────────
+    var editSVG = '<svg viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    units.forEach(function(unit, i) {
+      genTimers.push(setTimeout(function() {
+        var card = document.createElement('div');
+        card.className = 'art-team-card';
+        card.style.animationDelay = '0ms';
+        if (unit.muted) card.style.opacity = '0.55';
+        card.innerHTML =
+          (unit.muted ? '' : '<div class="edit-hint">' + editSVG + '</div>') +
+          '<div class="art-team-name"' + (unit.muted ? '' : '') + ' contenteditable="false" spellcheck="false">' + unit.name + '</div>' +
+          '<div class="art-team-count">' + unit.sub + '</div>' +
+          (unit.sprId ? '<div class="art-team-sprints" id="' + unit.sprId + '">' + spW + '-week sprints · ' + piLbl + '</div>' : '');
+        if (!unit.muted) makeEditable(card.querySelector('.art-team-name'));
+        teamsGrid.appendChild(card);
+      }, 500 + i * 120));
+    });
+
+    // ── PI / Cadence section ──────────────────────────────────────
+    genTimers.push(setTimeout(function() {
+      var piSection = document.getElementById('art-pi-section');
+      piSection.style.display = 'flex';
+      var piRows = document.getElementById('art-pi-rows');
+      var piRow = document.createElement('div');
+      piRow.className = 'art-pi-row';
+      piRow.style.animationDelay = '0ms';
+
+      if (fw === 'kanban') {
+        piRow.innerHTML = '<span class="art-pi-pill active">● Active</span><div class="art-pi-body"><div class="art-pi-name">Pull-based · No fixed sprints</div><div class="art-pi-dates">Continuous flow — WIP enforced per column</div></div>';
+      } else if (fw === 'blank') {
+        piRow.innerHTML = '<div class="art-pi-body"><div class="art-pi-name" style="color:var(--muted);font-style:italic">No cadence set — configure from scratch</div></div>';
+      } else {
+        var piName = piLbl + ' — ' + sprintCount + ' sprints + IP sprint';
+        var piDate = piSt ? piSt + ' (auto-computed end)' : 'Dates auto-computed from today';
+        piRow.innerHTML = '<span class="art-pi-pill active">● Active</span><div class="art-pi-body"><div class="art-pi-name">' + piName + '</div><div class="art-pi-dates" contenteditable="false" spellcheck="false">' + piDate + '</div></div>';
+        var dEl = piRow.querySelector('.art-pi-dates');
+        if (dEl) makeEditable(dEl);
+        // Show sprint labels on cards
+        generatedTeams.forEach(function(_, i) {
+          var el = document.getElementById('sprints-' + i);
+          if (el) el.classList.add('visible');
+        });
+      }
+      piRows.appendChild(piRow);
+    }, 1850));
+
+
+    genTimers.push(setTimeout(function() {
+      document.getElementById('edit-hint').classList.add('visible');
+    }, 3600));
+  }
+
+  // ── Left-panel generation sequence — adapts to framework + input ─
+  function runGeneration() {
+    var fw = selectedFw;
+    var prof = fwProfiles[fw] || fwProfiles.essential;
+
+    var parsed = selectedFw === 'scrum'
+      ? { teams: [scrumState.teamName || 'Scrum Team'], teamCount: 1, piWeeks: scrumState.sprintWeeks, sprintWeeks: scrumState.sprintWeeks, piLabel: 'Sprint 1', piStart: null, jiraKey: null, hasJira: false, hasSlack: false, peopleCount: 8 }
+      : buildParsedFromOtto();
+
+    if (selectedFw === 'scrum') {
+      document.getElementById('otto-qa-form').style.display = 'none';
+      var sb = document.getElementById('scrum-board-container');
+      if (sb) sb.style.display = 'none';
+    } else {
+      document.getElementById('otto-qa-form').style.display = 'none';
+    }
+    var cfgCard = document.getElementById('otto-config-card');
+    if (cfgCard) cfgCard.style.display = 'none';
+    document.getElementById('gen-card').classList.add('is-visible');
+    document.getElementById('btn-continue').disabled = true;
+    // prev-hd-sub-panel not updated — framework label stays throughout
+
+    // Start progressive preview in right panel
+    if (fw === 'scrum') {
+      // Scrum has one team and uses a board preview, not SAFe team cards
+      var artPhEl = document.getElementById('art-placeholder');
+      if (artPhEl) artPhEl.style.display = 'none';
+      renderScrumBoardPreview();
+    } else {
+      buildArtPreview(parsed);
+    }
+
+    // Framework-specific status messages
+    var statuses = [
+      [0,    'Reading your description…'],
+      [600,  prof.phase1],
+      [1300, prof.phase2],
+      [2100, prof.phase3],
+      [3100, prof.doneMsg]
+    ];
+
+    // Framework-specific gen items
+    var fwLabel = { essential: 'Essential SAFe', portfolio: 'Portfolio SAFe', kanban: 'Lean Kanban', blank: 'Custom' }[fw] || 'Essential SAFe';
+    var teamCountStr = parsed.teamCount + (fw === 'portfolio' ? ' ARTs' : fw === 'kanban' ? ' value streams' : ' teams');
+    var teamNamesStr = parsed.teams.length ? parsed.teams.slice(0, 3).join(' · ') + (parsed.teams.length > 3 ? ' …' : '') : '';
+
+    var items = [];
+    if (fw === 'essential') {
+      items = [
+        [500,  teamCountStr,               teamNamesStr || 'From your description'],
+        [950,  'Framework',                fwLabel + ' — ' + parsed.piWeeks + '-week PI, ' + parsed.sprintWeeks + '-week sprints'],
+        [1400, parsed.piLabel,             parsed.piStart ? 'Starts ' + parsed.piStart : 'Cadence auto-computed'],
+        [1850, 'Sprint calendars',         parsed.teamCount + ' teams × ' + Math.max(2, Math.floor(parsed.piWeeks/parsed.sprintWeeks)-1) + ' sprints + IP sprint']
+      ];
+    } else if (fw === 'portfolio') {
+      items = [
+        [500,  teamCountStr,               teamNamesStr || 'Across your portfolio'],
+        [950,  'Framework',                'Portfolio SAFe — ' + parsed.piWeeks + '-week PI cadence'],
+        [1400, 'Solution Train',           'Cross-ART coordination layer configured'],
+        [1850, 'Portfolio budget',         'Lean portfolio management layer ready'],
+        [2300, parsed.piLabel,             parsed.piStart ? 'All ARTs start ' + parsed.piStart : 'Synchronised PI cadence']
+      ];
+    } else if (fw === 'kanban') {
+      items = [
+        [500,  teamCountStr,               teamNamesStr || 'Pull-based, no fixed teams'],
+        [950,  'Framework',                'Lean Kanban — continuous flow'],
+        [1400, 'WIP limits',               'Per-column limits configured for each stream'],
+        [1850, 'CFD dashboard',            'Cumulative flow, cycle time, throughput ready'],
+        [2300, 'Flow board',               'Kanban columns mapped to your value streams']
+      ];
+    } else if (fw === 'scrum') {
+      // Scrum gen-items reflect what was configured in the wizard
+      var sprintHelp = OTTO_SPRINT_HELP[scrumState.sprintWeeks] || (scrumState.sprintWeeks + '-week sprints');
+      items = [
+        [500,  scrumState.teamName || 'Your team',
+               scrumState.sprintWeeks + '-week sprints'],
+        [950,  'Board columns',
+               scrumState.statuses.join(' → ')],
+        [1400, 'Work items',
+               scrumState.workTypes.join(' · ')],
+        [1850, 'Ceremonies',
+               'Sprint Planning · Daily Standup · Sprint Review · Retrospective']
+      ];
+    } else {
+      items = [
+        [500,  'Blank workspace',   'No assumptions — full control'],
+        [1200, 'Custom hierarchy',  'Define levels, entities, and relationships'],
+        [2200, 'Ready to configure', 'Add teams, cadence, and work items as needed']
+      ];
+    }
+
+    statuses.forEach(function(s) {
+      genTimers.push(setTimeout(function() { document.getElementById('gen-txt').innerHTML = s[1]; }, s[0]));
+    });
+    var genItems = document.getElementById('gen-items');
+    items.forEach(function(item) {
+      genTimers.push(setTimeout(function() {
+        var el = document.createElement('div');
+        el.className = 'gen-item'; el.style.animationDelay = '0ms';
+        el.innerHTML = '<span class="gen-tick">✓</span><span><span class="gen-key">' + item[1] + '</span> — ' + item[2] + '</span>';
+        genItems.appendChild(el);
+      }, item[0]));
+    });
+
+    genTimers.push(setTimeout(function() {
+      document.getElementById('gen-spinner').className = 'gen-spinner done';
+      // prev-hd-sub-panel not updated — framework label stays throughout
+      aiDone = true;
+      var btn = document.getElementById('btn-continue');
+      btn.disabled = false;
+      btn.textContent = 'Confirm and continue';
+    }, 3500));
+  }
+
+  // ── Step update logic ────────────────────────────────────────────
+  function updateUI() {
+    // Wizard panes
+    document.querySelectorAll('.setup-pane').forEach(function(p, i) {
+      p.classList.toggle('is-active', i + 1 === step);
+    });
+    // Preview panes — toggle is-active by index
+    document.querySelectorAll('.prev-pane').forEach(function(p, i) {
+      p.classList.toggle('is-active', i + 1 === step);
+    });
+    // Explicit inline guard: step-1 hierarchy must never bleed through to other steps.
+    // Inline style overrides any class state, making this definitive regardless of
+    // how is-active was toggled across skipped steps in the Scrum fast-path.
+    var pp1 = document.getElementById('prev-p1');
+    if (pp1) pp1.style.display = (step === 1) ? '' : 'none';
+    // Collapse stepper for Scrum fast-path (shows 3 nodes instead of 5)
+    var stepTabs = document.getElementById('step-tabs');
+    if (stepTabs) stepTabs.classList.toggle('scrum-flow', selectedFw === 'scrum');
+    // Stepper nodes
+    document.querySelectorAll('.stepper-item').forEach(function(b) {
+      var s = parseInt(b.dataset.step);
+      b.classList.remove('active','done');
+      if (s === step) b.classList.add('active');
+      if (s < step)  b.classList.add('done');
+    });
+    // Stepper lines
+    document.querySelectorAll('.stepper-line').forEach(function(line, i) {
+      line.classList.toggle('done', i + 1 < step);
+    });
+    // Back btn
+    document.getElementById('btn-back').style.visibility = step > 1 ? 'visible' : 'hidden';
+    // Continue btn
+    var cont = document.getElementById('btn-continue');
+    var footer = document.getElementById('setup-footer');
+    if (step === totalSteps) {
+      footer.style.display = 'none';
+      // Populate done screen with framework-appropriate copy
+      var doneTitle = document.getElementById('done-title');
+      var doneSub   = document.getElementById('done-sub');
+      if (doneTitle && doneSub) {
+        var scrumTeam = scrumState.teamName || 'Your team';
+        var scrumSw   = scrumState.sprintWeeks || 2;
+        var fwTitles = {
+          essential: generatedTeams.length ? generatedTeams[0].name.replace(/ Team$/i,'') + ' ART is live' : 'Your ART is live',
+          portfolio: 'Portfolio is configured',
+          scrum:     scrumTeam + ' is ready',
+          kanban:    'Kanban board is live',
+          blank:     'Workspace is ready'
+        };
+        var fwSubs = {
+          essential: 'Your first PI is scheduled and teams are configured. Open the board and start planning.',
+          portfolio: 'ARTs and Solution Train are configured. Open the portfolio view to begin.',
+          scrum:     scrumSw + '-week sprints. Board columns and work items are set. Open the board and add your first stories.',
+          kanban:    'Value streams and WIP limits are active. Open the board and pull in work.',
+          blank:     'Your blank workspace is ready. Add teams, define hierarchy, and configure as you go.'
+        };
+        doneTitle.textContent = fwTitles[selectedFw] || fwTitles.essential;
+        doneSub.textContent   = fwSubs[selectedFw]   || fwSubs.essential;
+      }
+      // Update CTA label — framework-aware, never "EAP workspace" (we're already in EAP)
+      var btnOpen = document.querySelector('.done-actions .btn-open');
+      if (btnOpen) {
+        var ctaLabels = {
+          essential: 'Open Board',
+          portfolio: 'Open Portfolio',
+          scrum:     'Go to Backlog',
+          kanban:    'Open Board',
+          blank:     'Open Workspace'
+        };
+        btnOpen.textContent = ctaLabels[selectedFw] || 'Open Board';
+        if (selectedFw === 'scrum') btnOpen.href = 'index.html?p=ananya&tab=backlog';
+      }
+      // Render framework-appropriate readiness panel
+      renderReadinessPreview(selectedFw);
+      setTimeout(function() {
+        var ring = document.getElementById('done-ring');
+        if (ring) ring.classList.add('glowed');
+      }, 500);
+    } else {
+      footer.style.display = '';
+      if (step === 3 && !aiDone)      cont.textContent = selectedFw === 'blank' ? 'Set up workspace' : selectedFw === 'kanban' ? 'Configure board' : selectedFw === 'scrum' ? 'Create Scrum board' : 'Generate ART';
+      else if (step === 3 && aiDone)  cont.textContent = 'Confirm and continue';
+      else if (step === 4)            cont.textContent = 'Send invites';
+      else                            cont.textContent = 'Continue';
+      // Demo: only Scrum is fully built. Disable Continue at step 1 for all other frameworks.
+      cont.disabled = (step === 1 && selectedFw !== 'scrum');
+    }
+
+    // Preview-specific renders
+    if (step === 1) renderHierarchy(selectedFw);
+    if (step === 2) {
+      if (selectedFw === 'scrum') { renderScrumDetail(); }
+      else if (selectedFw === 'essential') { hideScrumDetail(); renderEssentialArtIdentity(); }
+      else if (selectedFw === 'portfolio') { hideScrumDetail(); renderPortfolioIdentity(); }
+      else { hideScrumDetail(); renderMethodPreview(selectedMethod); }
+    }
+    if (step === 3) { if (selectedFw === 'scrum') { renderScrumConfig(); } else { renderOttoQuestions(); } }
+    if (step === 4) { buildInvitePane(); renderInvitePreview(); }
+
+    document.querySelector('.setup-wizard').scrollTop = 0;
+    document.getElementById('prev-scroll').scrollTop = 0;
+  }
+
+  // ── Navigation ───────────────────────────────────────────────────
+  // Scrum fast-path skips steps 2 and 4: 1 → 3 → 5
+  // Demo: only the Scrum flow is fully built. All other frameworks are blocked at step 1.
+  window.nextStep = function() {
+    if (step === 1 && selectedFw !== 'scrum') return;
+    if (step === 3 && !aiDone) { runGeneration(); return; }
+    if (step === 3 && aiDone && selectedFw === 'scrum') { step = 5; updateUI(); return; }
+    if (step === 1 && selectedFw === 'scrum') { step = 3; updateUI(); return; }
+    if (step < totalSteps) { step++; updateUI(); }
+  };
+
+  function resetStep3() {
+    genTimers.forEach(clearTimeout); genTimers = [];
+    aiDone = false;
+    document.getElementById('gen-card').classList.remove('is-visible');
+    document.getElementById('otto-qa-form').style.display = '';
+    var cfgCard = document.getElementById('otto-config-card');
+    if (cfgCard) cfgCard.style.display = '';
+    if (selectedFw === 'scrum') {
+      var sb = document.getElementById('scrum-board-container');
+      if (sb) sb.style.display = '';
+      renderScrumBoardPreview();
+    }
+    document.getElementById('gen-items').innerHTML = '';
+    document.getElementById('gen-spinner').className = 'gen-spinner';
+    document.getElementById('art-placeholder').style.display = 'flex';
+    document.getElementById('art-build').style.display = 'none';
+    document.getElementById('art-teams-grid').innerHTML = '';
+    document.getElementById('art-pi-rows').innerHTML = '';
+    document.getElementById('art-conn-rows').innerHTML = '';
+    document.getElementById('art-pi-section').style.display = 'none';
+    document.getElementById('art-conn-section').style.display = 'none';
+    document.getElementById('edit-hint').classList.remove('visible');
+  }
+
+  window.prevStep = function() {
+    if (step > 1) {
+      if (step === 3) resetStep3();
+      if (selectedFw === 'scrum') {
+        if (step === 3) { step = 1; updateUI(); return; }
+        if (step === 5) { step = 3; updateUI(); return; }
+      }
+      step--;
+      updateUI();
+    }
+  };
+
+  window.goStep = function(n) {
+    // Scrum skips steps 2 and 4 — clicking them does nothing
+    if (selectedFw === 'scrum' && (n === 2 || n === 4)) return;
+    if (n <= step) { step = n; updateUI(); }
+  };
+
+  // ── Framework card interaction ───────────────────────────────────
+  document.querySelectorAll('.fw-card').forEach(function(c) {
+    c.addEventListener('click', function() {
+      document.querySelectorAll('.fw-card').forEach(function(x) {
+        x.classList.remove('is-selected');
+        x.setAttribute('aria-checked', 'false');
+      });
+      c.classList.add('is-selected');
+      c.setAttribute('aria-checked', 'true');
+      selectedFw = c.dataset.fw;
+      if (step === 1) updateUI(); // full sync: hierarchy + stepper scrum-flow + pane visibility
+    });
+    c.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.click(); } });
+  });
+
+  // ── Method card interaction ──────────────────────────────────────
+  document.querySelectorAll('.method-card').forEach(function(c) {
+    c.addEventListener('click', function() {
+      document.querySelectorAll('.method-card').forEach(function(x) {
+        x.classList.remove('is-selected');
+        x.setAttribute('aria-checked', 'false');
+      });
+      c.classList.add('is-selected');
+      c.setAttribute('aria-checked', 'true');
+      selectedMethod = c.dataset.method;
+      if (step === 2) renderMethodPreview(selectedMethod);
+    });
+  });
+
+  // ── Prompt chips ─────────────────────────────────────────────────
+  document.querySelectorAll('.ai-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var ta = document.getElementById('ai-textarea');
+      if (ta.value && !ta.value.trim().endsWith('.')) ta.value = ta.value.trimEnd() + '. ';
+      ta.value += chip.dataset.add + '. ';
+      ta.focus();
+    });
+  });
+
+  // ── Boot ─────────────────────────────────────────────────────────
+  renderHierarchy('scrum');
+  updateUI();
+
+})();
+</script>
+</body>
+</html>

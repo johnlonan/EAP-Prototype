@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>N7 EAP — Demo Guide</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Tokens ── */
+  :root {
+    --bg-page:        oklch(88% 0.012 78);
+    --bg-card:        oklch(99.5% 0.003 80);
+    --bg-row:         oklch(97.5% 0.006 78);
+    --ink:            oklch(18% 0.006 80);
+    --ink-2:          oklch(40% 0.008 78);
+    --ink-3:          oklch(54% 0.008 78);
+    --border-subtle:  oklch(83% 0.008 78);
+    --border-default: oklch(65% 0.008 78);
+    --charcoal:       oklch(27% 0.010 78);
+    --charcoal-deep:  oklch(19% 0.010 78);
+    --green:          oklch(52% 0.165 145);
+    --green-bg:       oklch(96.5% 0.028 145);
+    --green-border:   oklch(84% 0.065 145);
+    --green-text:     oklch(38% 0.13 145);
+    --amber:          oklch(60% 0.17 68);
+    --amber-bg:       oklch(96% 0.028 78);
+    --amber-border:   oklch(80% 0.075 72);
+    --amber-text:     oklch(42% 0.14 65);
+    --blue-bg:        oklch(97% 0.018 248);
+    --blue-border:    oklch(85% 0.045 248);
+    --blue-text:      oklch(40% 0.14 248);
+    --radius-card:    14px;
+    --shadow-card:    0 1px 2px oklch(0% 0 0 / 0.05), 0 3px 10px oklch(0% 0 0 / 0.04);
+    --shadow-hover:   0 2px 8px oklch(0% 0 0 / 0.08), 0 8px 24px oklch(0% 0 0 / 0.07);
+    --ease-out:       cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ── Base ── */
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg-page);
+    padding-bottom: 80px;
+  }
+
+  /* ── Filter warning strip — sticky, always visible ── */
+  .filter-strip {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--amber-bg);
+    border-bottom: 1px solid var(--amber-border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .filter-strip-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    color: var(--amber);
+  }
+
+  .filter-strip-text {
+    font-size: 13px;
+    color: var(--amber-text);
+    line-height: 1.5;
+  }
+
+  .filter-strip-text strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ── Page container ── */
+  .page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* ── Entry animation ── */
+  @media (prefers-reduced-motion: no-preference) {
+    .card {
+      animation: card-in 420ms var(--ease-out) both;
+    }
+    .card:nth-child(1) { animation-delay:  40ms; }
+    .card:nth-child(2) { animation-delay:  90ms; }
+    .card:nth-child(3) { animation-delay: 140ms; }
+    .card:nth-child(4) { animation-delay: 190ms; }
+    .card:nth-child(5) { animation-delay: 240ms; }
+    .card:nth-child(6) { animation-delay: 290ms; }
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @supports (animation-range: entry 0% entry 100%) {
+      .card { animation: none; }
+      .card { view-timeline: --vt; animation: card-in 420ms var(--ease-out) both; animation-timeline: --vt; animation-range: entry 0% entry 40%; }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation: none; }
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 28px 32px 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .header-copy h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .header-copy p {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .start-btn {
+    flex-shrink: 0;
+    display: inline-block;
+    background: var(--charcoal);
+    color: oklch(99% 0.003 80);
+    text-decoration: none;
+    padding: 9px 20px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: background 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+    position: relative;
+  }
+
+  .start-btn:hover {
+    background: var(--charcoal-deep);
+    box-shadow: 0 0 0 4px oklch(27% 0.01 78 / 0.12);
+  }
+
+  @media (max-width: 520px) {
+    .header { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ── Section label ── */
+  .sec-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ink-3);
+    margin-bottom: 16px;
+  }
+
+  /* ── Persona table ── */
+  .card-pad { padding: 24px 32px; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    text-align: left;
+    padding: 0 12px 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  td {
+    padding: 9px 12px 9px 0;
+    border-bottom: 1px solid var(--bg-row);
+    vertical-align: top;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background: oklch(96.5% 0.028 145);
+    color: var(--green-text);
+    border: 1px solid var(--green-border);
+  }
+
+  /* ── Scope chain ── */
+  .scope-chain {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  .scope-node {
+    background: var(--bg-row);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .scope-node-sub {
+    font-size: 10px;
+    color: var(--ink-3);
+    margin-top: 3px;
+    text-align: center;
+    padding: 0 4px;
+  }
+
+  .scope-arr {
+    color: var(--border-default);
+    font-size: 14px;
+    padding-top: 5px;
+    font-weight: 300;
+  }
+
+  /* ── Tab grid ── */
+  .tab-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .tab-wide { grid-column: 1 / -1; }
+
+  @media (max-width: 580px) {
+    .tab-grid { grid-template-columns: 1fr; }
+    .tab-wide { grid-column: auto; }
+  }
+
+  .tab-block {
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: background 140ms var(--ease-out), border-color 140ms var(--ease-out);
+  }
+
+  .tab-block:hover {
+    background: var(--bg-row);
+    border-color: var(--border-default);
+  }
+
+  .tab-block-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .tab-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 9999px;
+    background: var(--charcoal);
+    color: oklch(99% 0.003 80);
+    letter-spacing: 0.02em;
+  }
+
+  .tab-pill.dim {
+    background: var(--ink-3);
+  }
+
+  .tab-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Wide tab block: show rows as a 2-col grid */
+  .tab-wide .tab-rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 24px;
+  }
+
+  @media (max-width: 580px) {
+    .tab-wide .tab-rows { grid-template-columns: 1fr; }
+  }
+
+  .tab-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tab-row-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--border-default);
+  }
+
+  .tab-row-val {
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  /* ── Highlight cards ── */
+  .highlight-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .highlight {
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), background 140ms var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .highlight:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--bg-card);
+    }
+  }
+
+  /* Background tints per feature type */
+  .hl-ai    { background: var(--green-bg); border-color: var(--green-border); }
+  .hl-dev   { background: var(--blue-bg);  border-color: var(--blue-border); }
+  .hl-exec  { background: oklch(97% 0.018 65); border-color: oklch(82% 0.05 68); }
+  .hl-team  { background: var(--bg-row);   border-color: var(--border-subtle); }
+
+  .hl-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: oklch(93% 0.008 78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-style: normal;
+  }
+
+  .hl-ai   .hl-icon { background: oklch(89% 0.06 145); }
+  .hl-dev  .hl-icon { background: oklch(90% 0.05 248); }
+  .hl-exec .hl-icon { background: oklch(90% 0.055 65); }
+
+  .hl-body h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .hl-body p {
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
+
+  .hl-body .eg {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--green-text);
+    background: oklch(95% 0.04 145 / 0.7);
+    border: 1px solid var(--green-border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    line-height: 1.5;
+  }
+
+  .hl-dev  .hl-body .eg { color: var(--blue-text);  background: oklch(95% 0.03 248 / 0.7); border-color: var(--blue-border); }
+  .hl-exec .hl-body .eg { color: var(--amber-text); background: oklch(95% 0.03 68 / 0.7);  border-color: oklch(80% 0.07 68); }
+
+  /* ── Callout ── */
+  .callout {
+    background: var(--bg-row);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--ink-2);
+    margin-top: 14px;
+    line-height: 1.55;
+  }
+
+  .callout strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Not-built rows ── */
+  .nb-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--bg-row);
+    font-size: 13px;
+    gap: 16px;
+  }
+
+  .nb-row:last-child { border-bottom: none; }
+
+  .nb-label { color: var(--ink-2); }
+
+  .tag {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 9999px;
+    background: oklch(95% 0.03 68 / 0.6);
+    color: var(--amber-text);
+    border: 1px solid var(--amber-border);
+  }
+
+  .tag.neutral {
+    background: oklch(95% 0.005 78);
+    color: var(--ink-3);
+    border-color: var(--border-subtle);
+  }
+
+  /* ── Divider between major sections ── */
+  .section-gap { height: 8px; }
+</style>
+</head>
+<body>
+
+  <!-- ── Filter warning — sticky strip ── -->
+  <div class="filter-strip">
+    <svg class="filter-strip-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M10 2L2 17h16L10 2z"/>
+      <line x1="10" y1="9" x2="10" y2="12"/>
+      <circle cx="10" cy="14.5" r="0.5" fill="currentColor" stroke="none"/>
+    </svg>
+    <p class="filter-strip-text">
+      <strong>Clear filters before every demo.</strong> Switching personas does not reset filters. If the backlog looks too narrow, or a view seems wrong, open the filter bar and remove all active filters — it takes 3 seconds and solves most unexpected results.
+    </p>
+  </div>
+
+
+  <div class="page">
+
+    <!-- ── Header ── -->
+    <div class="card header">
+      <div class="header-copy">
+        <h1>N7 EAP — Demo Guide</h1>
+        <p>Sand theme · Meridian Bank scenario · 7 personas</p>
+      </div>
+      <a href="start.html" class="start-btn">Start prototype</a>
+    </div>
+
+
+    <!-- ── Personas ── -->
+    <div class="card card-pad">
+      <div class="sec-label">Personas — choose on the start screen, or switch via the avatar top-right</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Lands on</th>
+            <th>Best story</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Ananya</strong>&ensp;<span class="badge">Default</span></td>
+            <td style="color:var(--ink-3);font-size:12px;">ART Product Manager</td>
+            <td style="font-size:12px;">Backlog · Feature level</td>
+            <td style="font-size:12px;">AI signal bundling, WSJF, feature detail panel</td>
+          </tr>
+          <tr>
+            <td><strong>Riya</strong></td>
+            <td style="color:var(--ink-3);font-size:12px;">Release Train Engineer</td>
+            <td style="font-size:12px;">Planning · split view</td>
+            <td style="font-size:12px;">PI Planning board, cross-team dependencies</td>
+          </tr>
+          <tr>
+            <td><strong>Dev</strong></td>
+            <td style="color:var(--ink-3);font-size:12px;">Scrum Master · Payments Team</td>
+            <td style="font-size:12px;">Kanban · sprint view</td>
+            <td style="font-size:12px;">Team sprint board, WIP limits, Spaces</td>
+          </tr>
+          <tr>
+            <td><strong>James</strong></td>
+            <td style="color:var(--ink-3);font-size:12px;">Developer · Auth Team</td>
+            <td style="font-size:12px;">Kanban · my work</td>
+            <td style="font-size:12px;">PR status, CI, DOD — developer daily experience</td>
+          </tr>
+          <tr>
+            <td><strong>Priya</strong></td>
+            <td style="color:var(--ink-3);font-size:12px;">Portfolio Director</td>
+            <td style="font-size:12px;">Backlog · Epic level</td>
+            <td style="font-size:12px;">OKR-to-Epic traceability, portfolio governance</td>
+          </tr>
+          <tr>
+            <td><strong>Marcus</strong></td>
+            <td style="color:var(--ink-3);font-size:12px;">Chief Digital Officer</td>
+            <td style="font-size:12px;">Home · executive view</td>
+            <td style="font-size:12px;">Strategic goal health, composite AI signal</td>
+          </tr>
+          <tr>
+            <td><strong>Kenji</strong></td>
+            <td style="color:var(--ink-3);font-size:12px;">Finance &amp; Capacity Lead</td>
+            <td style="font-size:12px;">Analytics</td>
+            <td style="font-size:12px;">Budget committed gauge, capacity outlook, flow metrics</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ── Scope ── -->
+    <div class="card card-pad">
+      <div class="sec-label">Scope — the top-left dropdown changes everything on screen</div>
+      <div class="scope-chain">
+        <div>
+          <div class="scope-node">Portfolio</div>
+          <div class="scope-node-sub">Epics</div>
+        </div>
+        <span class="scope-arr">›</span>
+        <div>
+          <div class="scope-node">Solution Train</div>
+          <div class="scope-node-sub">Capabilities</div>
+        </div>
+        <span class="scope-arr">›</span>
+        <div>
+          <div class="scope-node">ART</div>
+          <div class="scope-node-sub">Features</div>
+        </div>
+        <span class="scope-arr">›</span>
+        <div>
+          <div class="scope-node">Team</div>
+          <div class="scope-node-sub">Stories</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-2);line-height:1.55;">Every tab adapts to the active scope. The same Backlog shows Epics at Portfolio, Features at ART, and Stories with PR status at Team. Switch scope mid-demo to show how one system spans the whole hierarchy.</p>
+    </div>
+
+
+    <!-- ── Tabs ── -->
+    <div class="card card-pad">
+      <div class="sec-label">What you'll find in each tab</div>
+      <div class="tab-grid">
+
+        <!-- Backlog — full width, most content -->
+        <div class="tab-block tab-wide">
+          <div class="tab-block-name"><span class="tab-pill">Backlog</span></div>
+          <div class="tab-rows">
+            <div class="tab-row">
+              <span class="tab-row-label">ART · Feature</span>
+              <span class="tab-row-val">Features ranked by WSJF. AI signals inline on each row. Filter by owner or PI. Priority Map button (top-right) opens a D3 scatter — value vs effort at a glance.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Portfolio · Epic</span>
+              <span class="tab-row-val">Epics with OKR linkage, state, and WSJF. Unmapped epics in a separate section. Goal coverage visible without drilling in.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Team · Story</span>
+              <span class="tab-row-val">Stories with PR branch, CI badge, story points, and owner. Open any story for the full DOD checklist and PR detail panel.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Insights panel</span>
+              <span class="tab-row-val">Split button (columns icon, filter bar) opens the AI insights panel alongside the list. Each persona sees different signals here.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-block">
+          <div class="tab-block-name"><span class="tab-pill">Planning</span></div>
+          <div class="tab-rows">
+            <div class="tab-row">
+              <span class="tab-row-label">ART · Feature</span>
+              <span class="tab-row-val">PI Planning board. Features slotted across sprints. Dependency lines visible between features. Riya lands here in split view by default.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Team · Story</span>
+              <span class="tab-row-val">Sprint planning for a single team. Stories assigned to sprints, capacity bar at the top. Unplanned backlog on the left.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Split view</span>
+              <span class="tab-row-val">Hit the Split toggle in the filter bar. Insights panel opens alongside the board — the AI reads the planning state in context.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-block">
+          <div class="tab-block-name"><span class="tab-pill">Timeline</span></div>
+          <div class="tab-rows">
+            <div class="tab-row">
+              <span class="tab-row-label">Epic / Capability</span>
+              <span class="tab-row-val">Multi-quarter Gantt grouped by strategic goal. Shows Epics and Capabilities across PIs.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Feature / Story</span>
+              <span class="tab-row-val">PI-scoped timeline with sprint bands. At-risk features flagged. Dependency lines visible.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Group by</span>
+              <span class="tab-row-val">Switch between Goal, ART, PI, or Team groupings — same data reads differently each time.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-block">
+          <div class="tab-block-name"><span class="tab-pill">Kanban</span></div>
+          <div class="tab-rows">
+            <div class="tab-row">
+              <span class="tab-row-label">Current PI</span>
+              <span class="tab-row-val">All Features for the active PI across status columns. Best with Ananya or Riya.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Sprint board</span>
+              <span class="tab-row-val">Switch via the dropdown. Shows Stories in the active sprint. Use Dev or James — PR badges visible on cards. Open a card for DOD + PR detail.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">WIP limits</span>
+              <span class="tab-row-val">In Progress column turns amber over the limit. AI signal fires when cycle time rises.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-block">
+          <div class="tab-block-name"><span class="tab-pill">Hierarchy</span></div>
+          <div class="tab-rows">
+            <div class="tab-row">
+              <span class="tab-row-label">All levels</span>
+              <span class="tab-row-val">Full tree from Portfolio to Story. Expand and collapse any level. Use the Level dropdown to zoom in on the part of the hierarchy that's relevant to your audience.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-block">
+          <div class="tab-block-name"><span class="tab-pill dim">Analytics</span></div>
+          <div class="tab-rows">
+            <div class="tab-row">
+              <span class="tab-row-label">Kenji persona</span>
+              <span class="tab-row-val">Budget committed gauge, capacity outlook by team, AI signals about budget-vs-velocity mismatches. Good for closing the demo on the executive layer.</span>
+            </div>
+            <div class="tab-row">
+              <span class="tab-row-label">Coverage</span>
+              <span class="tab-row-val">Walkable but not deep. Stay in the gauge and capacity sections. Don't explore further than what the Kenji persona surfaces by default.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="section-gap"></div>
+
+
+    <!-- ── Key features ── -->
+    <div class="card card-pad">
+      <div class="sec-label">Call these out — they earn the prototype</div>
+      <div class="highlight-grid">
+
+        <div class="highlight hl-ai">
+          <div class="hl-icon">✦</div>
+          <div class="hl-body">
+            <h3>AI Signals</h3>
+            <p>Every AI insight carries a ✦ sparkle, a confidence level (High or Moderate), and a plain-language rationale. They appear inline in the backlog, as panel cards in the insights view, and on the home feed. The signals are always recommendations — the human approves. This matters: AI in this prototype is a thought partner, not an automator.</p>
+            <span class="eg">"✦ Sprint 2 forecast: 62–80% completion range · Median 71% · High confidence · Monte Carlo over 3-sprint velocity history"</span>
+          </div>
+        </div>
+
+        <div class="highlight hl-ai">
+          <div class="hl-icon">⬡</div>
+          <div class="hl-body">
+            <h3>AI Is a System, Not a Feature</h3>
+            <p>Each persona gets a completely different set of AI signals. James sees whether his acceptance criteria were signed off. Ananya sees which features are off-track. Priya sees which epics are misaligned to OKRs. Marcus sees a composite goal-health read. The ✦ sparkle is consistent everywhere — one voice, every layer of the hierarchy.</p>
+            <span class="eg">Switch from James → Ananya → Priya mid-demo and open the insights panel each time to show this.</span>
+          </div>
+        </div>
+
+        <div class="highlight hl-ai">
+          <div class="hl-icon">📦</div>
+          <div class="hl-body">
+            <h3>Signal Bundling</h3>
+            <p>On Ananya's backlog there is a draft Feature generated from 22 separate signals: emails, Teams threads, and customer tickets that all pointed to the same problem. The system clusters them into one proposal rather than 22 noise items. The source signals are visible in the detail panel.</p>
+            <span class="eg">"✦ AI bundled 22 signals → draft Feature ready · Adaptive Biometric Re-enrolment · WSJF 12.4 — your decision to accept"</span>
+          </div>
+        </div>
+
+        <div class="highlight hl-team">
+          <div class="hl-icon">◑</div>
+          <div class="hl-body">
+            <h3>The Confidence Gauge</h3>
+            <p>The semicircle gauge at the top of the insights panel is the AI's context-aware health read. It changes completely per persona and per tab — it is not a vanity metric. Opening the panel is the first thing a PM or RTE should do; the gauge tells them whether the situation needs attention before they read a single signal card.</p>
+            <span class="eg">Ananya / Planning: "PI 26 confidence · 74% · trending down" &nbsp;|&nbsp; Dev / Kanban: "Sprint forecast · 64% · trending down" &nbsp;|&nbsp; Kenji: "Q3 budget committed · 82% · up"</span>
+          </div>
+        </div>
+
+        <div class="highlight hl-dev">
+          <div class="hl-icon">⑂</div>
+          <div class="hl-body">
+            <h3>Pull Request &amp; CI Status on Stories</h3>
+            <p>Open any story at Team level with James or Dev. The detail panel shows branch name, PR number and status (open, merged), CI result, test count, reviewer status, and deployment environment. This is the developer experience story: a dev sees everything they need without leaving the tool.</p>
+            <span class="eg">"feature/pin-fallback-handler · PR #1247 · Open · CI passing · 12/12 tests · 1 reviewer, awaiting approval · Deployed to staging"</span>
+          </div>
+        </div>
+
+        <div class="highlight hl-dev">
+          <div class="hl-icon">☑</div>
+          <div class="hl-body">
+            <h3>Definition of Done</h3>
+            <p>The story detail panel shows a DOD checklist: Tests written, Code reviewed, Design reviewed, Docs updated, Demo recorded, No open bugs. The scrum master's insights panel also surfaces a readiness count ("2 of 8 items at DOD") — they see the team's readiness without opening every card.</p>
+            <span class="eg">Open "Handle fallback to PIN on failed biometric scan" (James persona, sprint board). It has a mixed DOD state and an open PR — both features visible at once.</span>
+          </div>
+        </div>
+
+        <div class="highlight hl-exec">
+          <div class="hl-icon">◐</div>
+          <div class="hl-body">
+            <h3>Analytics &amp; the Financial Layer</h3>
+            <p>Switch to Kenji to close the demo on the exec and finance view. The Analytics tab shows: a budget committed semicircle gauge (82%, trending up), capacity outlook per team, and AI signals about where velocity and budget are drifting apart. It shows the prototype reaches all the way from a developer's story to a CFO's budget read.</p>
+            <span class="eg">The AI signal here: "Teams 4 and 6 are at 60% capacity but consuming 78% of Q3 budget — sprint throughput suggests a reforecast is needed."</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout">
+        <strong>Suggested sequence:</strong> Start screen → Ananya home → Backlog (signal bundle + AI feature) → Planning split view (confidence gauge) → James → Kanban sprint board → open a story (PR + DOD) → Riya → Planning (dependencies) → Kenji → Analytics (gauge + financial signals) → Marcus home (executive read).
+      </div>
+    </div>
+
+
+    <!-- ── Not built ── -->
+    <div class="card card-pad">
+      <div class="sec-label">Know before you click</div>
+      <div class="nb-row">
+        <span class="nb-label">Portfolio SAFe, Kanban, and Custom setup paths in the wizard</span>
+        <span class="tag">Preview only</span>
+      </div>
+      <div class="nb-row">
+        <span class="nb-label">Jira and external tool integrations</span>
+        <span class="tag neutral">Out of scope</span>
+      </div>
+      <div class="nb-row">
+        <span class="nb-label">Analytics tab beyond Kenji's default view</span>
+        <span class="tag neutral">Shallow</span>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+
+</body>
+</html>

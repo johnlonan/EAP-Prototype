@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Agile Planning | Digital Banking ART</title>
+  <script>
+    // Always route through the persona slide unless the URL carries one.
+    // Internal nav appends ?p=<persona> so in-app navigation never bounces back.
+    (function() {
+      try {
+        var qs = new URLSearchParams(window.location.search);
+        if (qs.get('p')) return;
+        window.location.replace('start.html');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="../shared/shell.css">
+  <link rel="stylesheet" href="../../assets/css/tokens.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="../../assets/js/d3.v7.min.js"></script>
+  <script src="../../assets/js/chart.min.js"></script>
+  <script src="../../assets/js/interactions.js" defer></script>
+  <link rel="stylesheet" href="css/app.css?v=20">
+  <link rel="stylesheet" href="css/modernity.css?v=11">
+  <link rel="stylesheet" href="css/interactions.css?v=8">
+</head>
+<body>
+<div class="liquid-bg" aria-hidden="true"></div>
+<div class="page-shell">
+  <nav id="left-nav" aria-label="Primary navigation"></nav>
+  <main class="content-viewport" style="display:flex; flex-direction:column;">
+    <div id="page-header" class="page-header"></div>
+    <div id="chrome-bar" class="chrome"></div>
+    <div id="filter-bar" class="fbar"></div>
+    <div id="content-area" class="content-area"></div>
+  </main>
+</div>
+
+<script src="js/nav.js"></script>
+<script src="js/data.js?v=20"></script>
+<script src="js/state.js?v=6"></script>
+<script src="js/data-personas.js?v=10"></script>
+<script src="js/components/icons.js"></script>
+<script src="js/components/helpers.js?v=5"></script>
+<script src="js/components/detail-panel.js?v=2"></script>
+<script src="js/components/charts.js"></script>
+<script src="js/components/persona-switcher.js"></script>
+<script src="js/tabs/backlog.js"></script>
+<script src="js/tabs/list.js?v=2"></script>
+<script src="js/tabs/timeline.js?v=6"></script>
+<script src="js/tabs/board.js?v=6"></script>
+<script src="js/components/board-dnd.js?v=1"></script>
+<script src="js/components/board-filters.js?v=1"></script>
+<script src="js/components/board-panel.js?v=1"></script>
+<script src="js/tabs/track.js?v=20"></script>
+<script src="js/tabs/hierarchy.js?v=5"></script>
+<script src="js/tabs/analytics.js?v=1"></script>
+<script src="js/tabs/space-board.js"></script>
+<script src="js/tabs/space-list.js"></script>
+<script src="js/tabs/space-docs.js"></script>
+<script src="js/components/insights.js?v=8"></script>
+<script src="js/components/priority-map.js"></script>
+<script src="js/render.js?v=20"></script>
+<script src="js/interactions.js"></script>
+<script src="js/components/interactions-pass.js?v=10"></script>
+<script src="js/components/command-palette.js?v=4"></script>
+<script>
+  // Apply selected persona (URL ?p=, then localStorage, fallback ananya)
+  if (EAP.bootPersona) EAP.bootPersona();
+  // Persona-scoped data injections — only Ananya gets Otto's draft Feature
+  // (the bundle proposal materialised as a Funnel item).
+  if (EAP.state.persona === 'ananya' && EAP.injectAnanyaDraftFeature) {
+    EAP.injectAnanyaDraftFeature();
+  }
+  // Carry visit forward so existing screens know which demo session is active.
+  // Honour ?tab= from the IH tile click and snap to that tab on first render.
+  (function(){
+    try {
+      var qs = new URLSearchParams(window.location.search);
+      var v = qs.get('visit') || localStorage.getItem('eap.visit') || 'return';
+      EAP.state.visit = v;
+      // ?highlight= deep-link from the IH (e.g. customer-signals callout).
+      // Stored on state; consumed by EAP.handleHighlight after first render.
+      var hl = qs.get('highlight');
+      if (hl) EAP.state.highlight = hl;
+      var t = qs.get('tab');
+      if (t) {
+        var validTabs = (EAP.tabConfig || []).map(function(c){ return c.id; });
+        if (validTabs.indexOf(t) !== -1) {
+          // Match setTab's contract without triggering its render — the boot
+          // path calls EAP.render() once below.
+          EAP.state.tab = t;
+          EAP.state.wsjfSort = null;
+          EAP.state.pagination = {};
+          EAP.state.mineOverrides = EAP.state.mineOverrides || {};
+          if (EAP.state.mineOverrides[t] !== undefined) {
+            EAP.state.mineOnly = EAP.state.mineOverrides[t];
+          } else if (typeof EAP.personaWantsMineOn === 'function') {
+            EAP.state.mineOnly = EAP.personaWantsMineOn(EAP.personas[EAP.state.persona], t);
+          }
+          // Task Board needs ART/Team context + WorkItem level
+          if (t === 'taskboard') {
+            if (EAP.state.context !== 'art' && EAP.state.context !== 'team') {
+              EAP.state.context = 'art';
+              EAP.state.contextName = 'Digital Banking ART';
+              EAP.state.contextId = 'art1';
+            }
+            EAP.state.level = 'WorkItem';
+          }
+        }
+      }
+    } catch(e) {}
+  })();
+  // Render nav with the active persona's avatar + name
+  var __p = (EAP.personas && EAP.personas[EAP.state.persona]) || (EAP.personas && EAP.personas.ananya) || {};
+  // Preserve persona + visit on home-nav clicks so internal navigation doesn't bounce back to start
+  var __carry = '?p=' + (EAP.state.persona || 'ananya') + (EAP.state.visit ? '&visit=' + EAP.state.visit : '');
+  var __homeUrl = 'home.html' + __carry;
+  renderNav('board', {
+    avatar: __p.avatar || '../../assets/images/avatar-miley-simmons.png',
+    name:   __p.name   || 'Ananya Krishnan',
+    links:  { 0: __homeUrl, 2: 'setup.html', 3: 'index.html' + __carry + '&tab=board' },
+    theme:  'sand'
+  });
+  if (EAP.initPersonaSwitcher) EAP.initPersonaSwitcher();
+  EAP.state.openAccordions['pi26'] = true;
+  EAP.initInteractions();
+  EAP.render();
+
+  // ── Otto context banner (deep-link from IH Otto interactions) ──
+  // When landing from the home page via an Otto item, ?otto= carries the
+  // context message explaining why the user is here and what to look at.
+  (function() {
+    try {
+      var qs = new URLSearchParams(window.location.search);
+      var ottoMsg = qs.get('otto');
+      if (!ottoMsg) return;
+      var banner = document.createElement('div');
+      banner.id = 'otto-banner';
+      banner.innerHTML =
+        '<span class="otto-banner-sparkle">' + EAP.icon('otto', 14) + '</span>' +
+        '<span class="otto-banner-label">Otto</span>' +
+        '<span class="otto-banner-sep">·</span>' +
+        '<span class="otto-banner-msg">' + ottoMsg + '</span>' +
+        '<button class="otto-banner-close" aria-label="Dismiss">&#x2715;</button>';
+      var filterBar = document.getElementById('filter-bar');
+      var vp = document.querySelector('.content-viewport');
+      if (!vp) return;
+      if (filterBar) {
+        vp.insertBefore(banner, filterBar);
+      } else {
+        var gpanel = document.getElementById('gpanel');
+        if (gpanel) vp.insertBefore(banner, gpanel); else vp.appendChild(banner);
+      }
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() { banner.classList.add('show'); });
+      });
+      var timer = setTimeout(dismiss, 9000);
+      function dismiss() {
+        banner.classList.remove('show');
+        setTimeout(function() { if (banner.parentNode) banner.parentNode.removeChild(banner); }, 400);
+      }
+      banner.querySelector('.otto-banner-close').addEventListener('click', function() {
+        clearTimeout(timer); dismiss();
+      });
+    } catch(e) {}
+  })();
+
+  // ── Deep-link highlight ──────────────────────────────
+  // The IH (customer-signals callout) deep-links into Backlog with the
+  // bundled draft Feature targeted via ?highlight=fb1. After first render:
+  //  1. scroll the row into view
+  //  2. apply .is-highlighted (sticks until first interaction)
+  //  3. open the detail panel after a short pause so the row pulse reads
+  if (EAP.state.highlight) {
+    var __hlId = EAP.state.highlight;
+    requestAnimationFrame(function() {
+      var row = document.querySelector('tr[data-item-id="' + __hlId + '"]');
+      if (!row) return;
+      row.classList.add('is-highlighted');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Auto-open detail after the pulse establishes itself
+      setTimeout(function() {
+        if (EAP.openDetail) EAP.openDetail(__hlId);
+      }, 700);
+      // Stick until first interaction — clear on scroll, click, or keypress
+      var clear = function() {
+        row.classList.remove('is-highlighted');
+        document.removeEventListener('click',  clear, true);
+        document.removeEventListener('keydown',clear, true);
+        var sc = document.querySelector('.gpanel-scroll'); if (sc) sc.removeEventListener('scroll', clear, true);
+      };
+      document.addEventListener('click',  clear, true);
+      document.addEventListener('keydown',clear, true);
+      var sc = document.querySelector('.gpanel-scroll'); if (sc) sc.addEventListener('scroll', clear, true);
+    });
+  }
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     AI INTAKE ASSISTANT — N7 Setup UX prototype
+     Wires the "New" button in Backlog/List tabs to an AI-assisted
+     feature/story creation panel. Otto suggests team, PI, effort,
+     and similar existing items before the user even saves.
+     ══════════════════════════════════════════════════════════════ -->
+<div id="ai-intake-overlay" style="display:none;" aria-modal="true" role="dialog" aria-label="Create new item">
+  <div id="ai-intake-modal">
+
+    <!-- Header -->
+    <div class="aim-header">
+      <div class="aim-header-left">
+        <div class="aim-type-pill" id="aim-type-pill">Feature</div>
+        <div class="aim-title-text">Create new</div>
+      </div>
+      <button class="aim-close" id="aim-close" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="aim-body">
+
+      <!-- Title input -->
+      <div class="aim-field">
+        <input class="aim-title-input" id="aim-title-input" type="text"
+          placeholder="Feature title…"
+          autocomplete="off" spellcheck="false">
+      </div>
+
+      <!-- Description -->
+      <div class="aim-field">
+        <textarea class="aim-desc-input" id="aim-desc-input" rows="3"
+          placeholder="Optional description — Otto uses this to improve suggestions"></textarea>
+      </div>
+
+      <!-- AI suggestions panel -->
+      <div class="aim-ai-panel" id="aim-ai-panel">
+        <div class="aim-ai-header">
+          <div class="aim-ai-spinner" id="aim-ai-spinner"></div>
+          <span class="aim-ai-label" id="aim-ai-label">Otto is generating suggestions…</span>
+          <button class="aim-ai-dismiss" id="aim-ai-dismiss" style="display:none">Dismiss</button>
+        </div>
+        <div class="aim-suggestions" id="aim-suggestions" style="display:none">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="aim-footer">
+      <button class="aim-btn-cancel" id="aim-btn-cancel">Cancel</button>
+      <button class="aim-btn-create" id="aim-btn-create" disabled>Create Feature</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── AI Intake Overlay ──────────────────────────────── */
+#ai-intake-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,0.32);
+  display: flex; align-items: center; justify-content: center;
+  animation: aim-overlay-in 180ms ease both;
+}
+@keyframes aim-overlay-in { from { opacity:0; } to { opacity:1; } }
+
+#ai-intake-modal {
+  width: 560px; max-width: calc(100vw - 40px);
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);
+  display: flex; flex-direction: column;
+  animation: aim-modal-in 220ms cubic-bezier(0.22,1,0.36,1) both;
+  overflow: hidden;
+}
+@keyframes aim-modal-in {
+  from { opacity:0; transform: scale(0.96) translateY(8px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
+.aim-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid #F1F0ED;
+}
+.aim-header-left { display: flex; align-items: center; gap: 8px; flex: 1; }
+.aim-type-pill {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: #383733;
+  background: rgba(56,55,51,0.08);
+  padding: 3px 8px; border-radius: 999px;
+}
+.aim-title-text { font-size: 13px; font-weight: 600; color: #111111; }
+.aim-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #797874;
+  transition: background 140ms, color 140ms;
+}
+.aim-close:hover { background: #F1F0ED; color: #111111; }
+
+.aim-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+.aim-field { display: flex; flex-direction: column; gap: 4px; }
+.aim-title-input {
+  width: 100%; font-family: inherit;
+  font-size: 17px; font-weight: 500; color: #111111;
+  border: none; outline: none; background: transparent;
+  padding: 4px 0;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.aim-title-input::placeholder { color: #CCCBC8; }
+.aim-desc-input {
+  width: 100%; font-family: inherit; font-size: 13px; color: #585753;
+  border: 1px solid #E1E0DD; border-radius: 10px; outline: none;
+  background: #F8F7F4; resize: none; padding: 10px 12px;
+  line-height: 1.5; transition: border-color 160ms;
+}
+.aim-desc-input:focus { border-color: #BBBBB7; background: #FFFFFF; }
+.aim-desc-input::placeholder { color: #BBBBB7; }
+
+/* AI suggestions panel */
+.aim-ai-panel {
+  background: rgba(22,163,74,0.05);
+  border: 1px solid rgba(22,163,74,0.20);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.aim-ai-header {
+  display: flex; align-items: center; gap: 8px;
+}
+.aim-ai-spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(22,163,74,0.20);
+  border-top-color: #16A34A;
+  flex-shrink: 0;
+  animation: aim-spin 0.7s linear infinite;
+}
+.aim-ai-spinner.is-done {
+  animation: none;
+  border-color: transparent;
+  background: rgba(22,163,74,0.15);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8l2.5 2.5L12 5' stroke='%2316A34A' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: 12px; background-repeat: no-repeat; background-position: center;
+}
+@keyframes aim-spin { to { transform: rotate(360deg); } }
+.aim-ai-label { font-size: 11.5px; font-weight: 500; color: #15803D; flex: 1; }
+.aim-ai-dismiss {
+  font-family: inherit; font-size: 11px; font-weight: 500; color: #797874;
+  background: none; border: none; cursor: pointer; padding: 0;
+}
+.aim-ai-dismiss:hover { color: #383733; }
+
+/* Individual suggestions */
+.aim-suggestions { display: flex; flex-direction: column; gap: 6px; }
+.aim-sug {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  background: #FFFFFF; border: 1px solid rgba(22,163,74,0.12);
+  animation: aim-sug-in 200ms ease both;
+  cursor: default;
+}
+@keyframes aim-sug-in {
+  from { opacity:0; transform: translateX(-4px); }
+  to   { opacity:1; transform: translateX(0); }
+}
+.aim-sug-icon {
+  font-size: 13px; flex-shrink: 0; margin-top: 1px;
+  color: #16A34A;
+}
+.aim-sug-body { flex: 1; }
+.aim-sug-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.07em; color: #797874; margin-bottom: 2px;
+}
+.aim-sug-value { font-size: 12.5px; font-weight: 500; color: #111111; line-height: 1.3; }
+.aim-sug-note  { font-size: 11px; color: #797874; margin-top: 1px; line-height: 1.35; }
+.aim-sug-confidence {
+  font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: 999px;
+  background: rgba(22,163,74,0.10); color: #15803D;
+  white-space: nowrap; flex-shrink: 0;
+  margin-top: 1px;
+}
+.aim-sug-accept {
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  color: #383733; background: #F1F0ED; border: none;
+  border-radius: 6px; padding: 3px 9px; cursor: pointer;
+  flex-shrink: 0; margin-top: 1px;
+  transition: background 120ms;
+}
+.aim-sug-accept:hover { background: #E1E0DD; }
+.aim-sug-accept.is-accepted {
+  background: rgba(22,163,74,0.12); color: #15803D;
+}
+
+/* Similar items list */
+.aim-similar-list { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+.aim-similar-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: #585753; line-height: 1.35;
+  cursor: pointer;
+}
+.aim-similar-item:hover { color: #111111; }
+.aim-similar-id { font-size: 10px; color: #797874; font-variant-numeric: tabular-nums; }
+
+/* Footer */
+.aim-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid #F1F0ED;
+}
+.aim-btn-cancel {
+  font-family: inherit; font-size: 13px; font-weight: 500; color: #585753;
+  background: none; border: 1px solid #CCCBC8;
+  border-radius: 999px; padding: 7px 18px;
+  cursor: pointer; transition: background 140ms;
+}
+.aim-btn-cancel:hover { background: #F1F0ED; color: #111111; }
+.aim-btn-create {
+  margin-left: auto;
+  font-family: inherit; font-size: 13px; font-weight: 600; color: #FFFFFF;
+  background: #383733; border: none;
+  border-radius: 999px; padding: 8px 20px;
+  cursor: pointer; transition: background 140ms;
+}
+.aim-btn-create:disabled { background: #CCCBC8; cursor: not-allowed; }
+.aim-btn-create:not(:disabled):hover { background: #262521; }
+</style>
+
+<script>
+// ── AI Intake Assistant ────────────────────────────────────────────
+(function() {
+
+  var overlay  = document.getElementById('ai-intake-overlay');
+  var modal    = document.getElementById('ai-intake-modal');
+  var titleIn  = document.getElementById('aim-title-input');
+  var descIn   = document.getElementById('aim-desc-input');
+  var typePill = document.getElementById('aim-type-pill');
+  var aiPanel  = document.getElementById('aim-ai-panel');
+  var spinner  = document.getElementById('aim-ai-spinner');
+  var aiLabel  = document.getElementById('aim-ai-label');
+  var aiDismiss= document.getElementById('aim-ai-dismiss');
+  var suggestions= document.getElementById('aim-suggestions');
+  var btnCreate= document.getElementById('aim-btn-create');
+  var sugTimer, titleTimer;
+
+  // Build suggestions based on current state
+  function getSuggestionsForLevel(level) {
+    if (level === 'WorkItem') {
+      return [
+        {
+          icon: '✦', label: 'Suggested team', value: 'Auth Team',
+          note: 'Based on similar work items in Sprint 2', confidence: '91%'
+        },
+        {
+          icon: '✦', label: 'Suggested sprint', value: 'Sprint 2 (active)',
+          note: 'PI-26 · ends in 7 days', confidence: '88%'
+        },
+        {
+          icon: '✦', label: 'Effort estimate', value: '3 story points',
+          note: 'Median for Auth Team items this PI', confidence: '76%'
+        },
+        {
+          icon: '✦', label: 'Similar work items', value: null,
+          similar: [
+            { id: 'SI-247', title: 'Add MFA token refresh flow' },
+            { id: 'SI-201', title: 'Session timeout handling on mobile' }
+          ]
+        }
+      ];
+    }
+    // Feature / default
+    return [
+      {
+        icon: '✦', label: 'Suggested ART team', value: 'Auth Team',
+        note: 'Matches auth domain — 3 similar features owned by this team', confidence: '87%'
+      },
+      {
+        icon: '✦', label: 'Suggested PI', value: 'PI-26 (current)',
+        note: 'Based on backlog priority and team capacity', confidence: '82%'
+      },
+      {
+        icon: '✦', label: 'Effort estimate', value: '8 story points',
+        note: 'Median for auth-domain features this PI', confidence: '74%'
+      },
+      {
+        icon: '✦', label: 'Similar features', value: null,
+        similar: [
+          { id: 'F-112', title: 'Biometric login for iOS & Android' },
+          { id: 'F-098', title: 'OAuth 2.0 PKCE flow for web' },
+          { id: 'F-071', title: 'Session persistence after app backgrounding' }
+        ]
+      }
+    ];
+  }
+
+  function renderSuggestions(level) {
+    var sugs = getSuggestionsForLevel(level);
+    suggestions.innerHTML = '';
+    sugs.forEach(function(s, i) {
+      var el = document.createElement('div');
+      el.className = 'aim-sug';
+      el.style.animationDelay = (i * 80) + 'ms';
+
+      if (s.similar) {
+        el.innerHTML = '<span class="aim-sug-icon">' + s.icon + '</span>' +
+          '<div class="aim-sug-body">' +
+            '<div class="aim-sug-label">' + s.label + '</div>' +
+            '<div class="aim-similar-list">' +
+              s.similar.map(function(item) {
+                return '<div class="aim-similar-item">' +
+                  '<span class="aim-similar-id">' + item.id + '</span>' +
+                  item.title +
+                '</div>';
+              }).join('') +
+            '</div>' +
+          '</div>';
+      } else {
+        el.innerHTML = '<span class="aim-sug-icon">' + s.icon + '</span>' +
+          '<div class="aim-sug-body">' +
+            '<div class="aim-sug-label">' + s.label + '</div>' +
+            '<div class="aim-sug-value">' + s.value + '</div>' +
+            (s.note ? '<div class="aim-sug-note">' + s.note + '</div>' : '') +
+          '</div>' +
+          (s.confidence ? '<div class="aim-sug-confidence">✦ ' + s.confidence + '</div>' : '') +
+          '<button class="aim-sug-accept" title="Apply suggestion">Apply</button>';
+
+        var acceptBtn = el.querySelector('.aim-sug-accept');
+        if (acceptBtn) {
+          acceptBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            acceptBtn.textContent = '✓ Applied';
+            acceptBtn.classList.add('is-accepted');
+            acceptBtn.disabled = true;
+          });
+        }
+      }
+      suggestions.appendChild(el);
+    });
+  }
+
+  function runAiSuggestions(level) {
+    spinner.classList.remove('is-done');
+    aiLabel.textContent = 'Otto is generating suggestions…';
+    aiDismiss.style.display = 'none';
+    suggestions.style.display = 'none';
+    suggestions.innerHTML = '';
+
+    sugTimer = setTimeout(function() {
+      spinner.classList.add('is-done');
+      aiLabel.textContent = '✦ Suggestions ready — review before saving';
+      aiDismiss.style.display = 'block';
+      renderSuggestions(level);
+      suggestions.style.display = 'flex';
+    }, 1400);
+  }
+
+  function openIntake() {
+    var level = (EAP && EAP.state) ? EAP.state.level : 'Feature';
+    var typeLabel = level === 'WorkItem' ? 'Story' : (level || 'Feature');
+    typePill.textContent = typeLabel;
+    btnCreate.textContent = 'Create ' + typeLabel;
+    btnCreate.disabled = true;
+    titleIn.value = '';
+    descIn.value = '';
+    spinner.classList.remove('is-done');
+    aiLabel.textContent = 'Otto is generating suggestions…';
+    aiDismiss.style.display = 'none';
+    suggestions.style.display = 'none';
+
+    overlay.style.display = 'flex';
+    requestAnimationFrame(function() {
+      titleIn.focus();
+      runAiSuggestions(level);
+    });
+  }
+
+  function closeIntake() {
+    if (sugTimer) clearTimeout(sugTimer);
+    if (titleTimer) clearTimeout(titleTimer);
+    overlay.style.animation = 'none';
+    modal.style.animation = 'none';
+    overlay.style.opacity = '0';
+    setTimeout(function() {
+      overlay.style.display = 'none';
+      overlay.style.opacity = '';
+      overlay.style.animation = '';
+      modal.style.animation = '';
+    }, 160);
+  }
+
+  // Enable create button when title is entered
+  titleIn.addEventListener('input', function() {
+    btnCreate.disabled = !titleIn.value.trim();
+    clearTimeout(titleTimer);
+    if (titleIn.value.trim().length > 5) {
+      titleTimer = setTimeout(function() {
+        var level = (EAP && EAP.state) ? EAP.state.level : 'Feature';
+        runAiSuggestions(level);
+      }, 700);
+    }
+  });
+
+  // Close handlers
+  document.getElementById('aim-close').addEventListener('click', closeIntake);
+  document.getElementById('aim-btn-cancel').addEventListener('click', closeIntake);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeIntake(); });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && overlay.style.display !== 'none') closeIntake();
+  });
+
+  // Dismiss suggestions
+  aiDismiss.addEventListener('click', function() {
+    aiPanel.style.display = 'none';
+  });
+
+  // Create (simulated — logs to console in prototype)
+  btnCreate.addEventListener('click', function() {
+    if (!titleIn.value.trim()) return;
+    var level = (EAP && EAP.state) ? EAP.state.level : 'Feature';
+    console.log('[N7 AI Intake] Creating ' + level + ':', titleIn.value.trim());
+    closeIntake();
+  });
+
+  // Delegate: wire "New" button from backlog/list tab
+  // render.js re-renders the DOM on tab switch, so use document-level delegation
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.add-btn');
+    if (!btn) return;
+    // Only intercept "New" buttons — other add-btns (Expand all, Collapse all, etc.) must pass through
+    var txt = btn.textContent || btn.innerText || '';
+    if (txt.indexOf('New') !== -1) {
+      e.stopPropagation();
+      openIntake();
+    }
+  }, true); // capture phase so it fires before render.js's handler
+
+})();
+</script>
+</body>
+</html>
