@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmployeeWorks: Demand</title>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="css/tokens-karuna.css">
+  <link rel="stylesheet" href="css/components-karuna.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="js/demands-data.js"></script>
+</head>
+<body>
+  <div class="ew-shell">
+
+    <!-- ═══ Left nav ═══ -->
+    <nav class="ew-nav">
+      <div class="ew-nav-top">
+        <button class="icon-btn" data-icon="menu" aria-label="Collapse navigation"></button>
+        <span class="ew-wordmark">servicen<span class="dot">o</span>w</span>
+      </div>
+
+      <div class="ew-nav-group">
+        <a class="ew-nav-item" href="#"><span data-icon="home"></span>Home</a>
+      </div>
+
+      <div class="ew-nav-divider"></div>
+      <div class="ew-nav-label">My Apps</div>
+      <div class="ew-nav-group">
+        <a class="ew-nav-item active" href="canvas.html"><span data-icon="canvas"></span>Canvas</a>
+        <a class="ew-nav-item" href="#"><span data-icon="inbox"></span>Inbox</a>
+        <a class="ew-nav-item" href="#"><span data-icon="org-chart"></span>Org chart</a>
+      </div>
+
+      <div class="ew-nav-spacer"></div>
+
+      <div class="ew-nav-footer">
+        <span class="aiux-avatar">JL</span>
+        <span class="ew-nav-footer-name">Service-now: John Lon…</span>
+      </div>
+    </nav>
+
+    <!-- ═══ Content ═══ -->
+    <main class="ew-content">
+      <div class="ew-content-inner ew-content-inner--wide" id="detail-root">
+
+        <a class="ew-breadcrumb" href="demands-list.html"><span data-icon="chevron-left"></span>My Demands</a>
+
+        <div class="ew-page-header">
+          <div>
+            <h1 class="ew-page-title ew-page-title--compact" id="dm-title"></h1>
+            <p class="ew-page-subtitle" id="dm-subtitle"></p>
+          </div>
+          <div class="dm-header-badges">
+            <span id="dm-priority-badge"></span>
+            <span id="dm-state-badge"></span>
+          </div>
+        </div>
+
+        <section class="ew-card">
+          <div class="ew-card-header">
+            <h2 class="ew-card-title">Track Request</h2>
+          </div>
+          <div id="dm-track-explain"></div>
+          <div class="dm-stepper" id="dm-stepper"></div>
+          <div class="dm-delivery-panel" id="dm-delivery"></div>
+        </section>
+
+        <div class="ew-grid dm-detail-grid">
+
+          <section class="ew-card">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">Request Details</h2>
+            </div>
+            <dl class="dm-fields" id="dm-fields"></dl>
+            <div class="dm-business-case" id="dm-business-case"></div>
+          </section>
+
+          <section class="ew-card">
+            <div class="tab-bar dm-tab-bar" id="dm-tab-bar">
+              <button class="tab-item is-active" data-dm-tab="activity">Activity</button>
+              <button class="tab-item" data-dm-tab="attachments">Attachments</button>
+              <button class="tab-item" data-dm-tab="editdetails">Edit</button>
+            </div>
+
+            <div id="dm-tab-activity">
+              <form class="dm-worknote-form" id="dm-worknote-form">
+                <textarea class="aiux-textarea" id="dm-worknote-input" placeholder="Add a work note" rows="2"></textarea>
+                <button type="submit" class="aiux-btn aiux-btn-primary aiux-btn-sm" id="dm-worknote-post" disabled>Post</button>
+              </form>
+              <div class="dm-activity" id="dm-activity"></div>
+            </div>
+
+            <div id="dm-tab-attachments" hidden>
+              <div class="dm-attach-header">
+                <p class="dm-attach-hint">Upload JPG, JPEG, PNG, GIF, PDF, or XLSX files (max 10 MB)</p>
+                <button class="aiux-btn aiux-btn-outline aiux-btn-sm" id="dm-attach-add"><span data-icon="plus"></span>Add file</button>
+              </div>
+              <div class="dm-attach-dropzone">
+                <span data-icon="upload"></span>
+                <span>Drag a file to upload as attachment</span>
+              </div>
+            </div>
+
+            <div id="dm-tab-editdetails" hidden></div>
+          </section>
+
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="js/demand-detail.js"></script>
+</body>
+</html>
