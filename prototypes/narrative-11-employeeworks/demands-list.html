@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmployeeWorks: My Demands</title>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="css/tokens-karuna.css">
+  <link rel="stylesheet" href="css/components-karuna.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="js/demands-data.js"></script>
+</head>
+<body>
+  <div class="ew-shell">
+
+    <!-- ═══ Left nav ═══ -->
+    <nav class="ew-nav">
+      <div class="ew-nav-top">
+        <button class="icon-btn" data-icon="menu" aria-label="Collapse navigation"></button>
+        <span class="ew-wordmark">servicen<span class="dot">o</span>w</span>
+      </div>
+
+      <div class="ew-nav-group">
+        <a class="ew-nav-item" href="#"><span data-icon="home"></span>Home</a>
+      </div>
+
+      <div class="ew-nav-divider"></div>
+      <div class="ew-nav-label">My Apps</div>
+      <div class="ew-nav-group">
+        <a class="ew-nav-item active" href="canvas.html"><span data-icon="canvas"></span>Canvas</a>
+        <a class="ew-nav-item" href="#"><span data-icon="inbox"></span>Inbox</a>
+        <a class="ew-nav-item" href="#"><span data-icon="org-chart"></span>Org chart</a>
+      </div>
+
+      <div class="ew-nav-spacer"></div>
+
+      <div class="ew-nav-footer">
+        <span class="aiux-avatar">JL</span>
+        <span class="ew-nav-footer-name">Service-now: John Lon…</span>
+      </div>
+    </nav>
+
+    <!-- ═══ Content ═══ -->
+    <main class="ew-content">
+      <div class="ew-content-inner ew-content-inner--wide">
+
+        <a class="ew-breadcrumb" href="canvas.html"><span data-icon="chevron-left"></span>Canvas</a>
+
+        <div class="ew-page-header">
+          <div>
+            <h1 class="ew-page-title ew-page-title--compact">My Demands</h1>
+            <p class="ew-page-subtitle">Demands you've requested.</p>
+          </div>
+        </div>
+
+        <div class="tab-bar" id="tab-bar">
+          <button class="tab-item is-active" data-filter="All">All</button>
+          <button class="tab-item" data-filter="In progress">In progress</button>
+          <button class="tab-item" data-filter="Complete">Complete</button>
+        </div>
+
+        <div class="dm-table-wrap">
+          <table class="dm-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Number</th>
+                <th>Portfolio</th>
+                <th>State</th>
+                <th>Score</th>
+                <th>Start date</th>
+                <th>Due date</th>
+              </tr>
+            </thead>
+            <tbody id="dm-table-body"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="js/demands-list.js"></script>
+</body>
+</html>

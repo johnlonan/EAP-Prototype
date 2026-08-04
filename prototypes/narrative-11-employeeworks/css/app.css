@@ -1,0 +1,364 @@
+/* ===============================================================
+   APP.CSS - narrative-11-employeeworks
+   Page shell + nav + Canvas widget grid. Every colour/radius/space
+   value below resolves through tokens-karuna.css - no hardcoded hex.
+   Avatar, stat and list-row rules extend components-karuna.css with
+   real aiux-avatar / aiux-stat class names confirmed present in the
+   AIUX component library (aiux-library_v2.html) but not yet ported
+   into that shared file - kept local since this is page-specific.
+   =============================================================== */
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background: var(--color-background-secondary);
+}
+
+/* -- Page shell --------------------------------------------------- */
+.ew-shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* -- Left nav ----------------------------------------------------- */
+.ew-nav {
+  width: 248px; flex-shrink: 0;
+  background: transparent;
+  display: flex; flex-direction: column;
+  padding: var(--space-4) var(--space-3);
+}
+.ew-nav-top { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-2) var(--space-5); }
+.ew-nav-top .icon-btn { color: var(--color-text-secondary); }
+.ew-wordmark { font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-text-primary); letter-spacing: -0.01em; }
+.ew-wordmark .dot { color: var(--color-accent-500); }
+
+.ew-nav-item {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: 0.5rem 0.625rem; border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary); text-decoration: none;
+  cursor: pointer; transition: background-color var(--transition-fast);
+}
+.ew-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+.ew-nav-item:hover { background: var(--color-ghost-hover); color: var(--color-text-primary); }
+.ew-nav-item.active { background: var(--color-secondary); color: var(--color-text-primary); }
+
+.ew-nav-divider { height: 1px; background: var(--border-subtle); margin: var(--space-3) var(--space-2); }
+.ew-nav-label {
+  font-size: var(--font-size-2xs); font-weight: var(--font-weight-semibold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--color-text-tertiary); padding: 0 0.625rem var(--space-2);
+}
+.ew-nav-group { display: flex; flex-direction: column; gap: 2px; }
+.ew-nav-spacer { flex: 1; }
+
+.ew-nav-footer {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) 0.625rem; border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-2); padding-top: var(--space-4);
+}
+.ew-nav-footer .aiux-avatar { width: 28px; height: 28px; font-size: var(--font-size-2xs); }
+.ew-nav-footer-name { font-size: var(--font-size-xs); color: var(--color-text-primary); font-weight: var(--font-weight-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* -- Content ------------------------------------------------------ */
+.ew-content { flex: 1; overflow-y: auto; padding: var(--space-10) var(--space-12) var(--space-16); }
+.ew-content-inner { max-width: 1040px; margin: 0 auto; }
+
+.ew-page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-8); }
+.ew-page-title { font-size: var(--font-size-4xl); font-weight: var(--font-weight-normal); color: var(--color-text-primary); margin: 0 0 var(--space-1); }
+.ew-page-title--compact { font-size: var(--font-size-2xl); }
+.ew-page-subtitle { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 0; }
+.ew-page-header .icon-btn { color: var(--color-text-tertiary); }
+.dm-header-badges { display: flex; align-items: center; gap: var(--space-2); }
+
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: var(--radius-lg);
+  background: transparent; border: none; cursor: pointer; color: inherit;
+  transition: background-color var(--transition-fast);
+}
+.icon-btn:hover { background: var(--color-ghost-hover); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+.ew-section-label {
+  font-size: var(--font-size-2xs); font-weight: var(--font-weight-semibold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--color-text-tertiary); margin: 0 0 var(--space-3);
+}
+
+.ew-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); align-items: stretch; }
+.ew-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-5); align-items: start; }
+.ew-grid + .ew-grid-3 { margin-top: var(--space-10); }
+.ew-grid-3 + .ew-section-label { margin-top: var(--space-12); }
+
+/* -- Card (reference / existing widgets) ------------------------- */
+.ew-card {
+  background: var(--surface-primary); border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm); padding: var(--space-6);
+}
+.ew-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+.ew-card-header .icon-btn { color: var(--color-text-tertiary); }
+.ew-card-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-normal); color: var(--color-text-primary); margin: 0; }
+.ew-card-title-group { display: flex; align-items: center; gap: var(--space-2); }
+.ew-card-actions { display: flex; align-items: center; gap: var(--space-1); }
+.ew-card-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.5rem; height: 1.5rem; padding: 0 0.375rem; border-radius: var(--radius-full);
+  background: var(--color-background-secondary); color: var(--color-text-secondary);
+  font-size: var(--font-size-xs); font-variant-numeric: tabular-nums;
+}
+
+.ew-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: var(--space-8) var(--space-4); color: var(--color-text-secondary); }
+.ew-empty svg { width: 28px; height: 28px; color: var(--color-text-tertiary); margin-bottom: var(--space-3); }
+.ew-empty-link { font-size: var(--font-size-xs); color: var(--color-link); text-decoration: underline; margin-top: var(--space-2); }
+
+/* -- Quiet card - lower-priority reference content (Other apps) recedes -- */
+.ew-card-quiet { padding: var(--space-5); box-shadow: var(--shadow-xs); }
+.ew-card-quiet .ew-empty { padding: var(--space-6) var(--space-3); }
+
+/* -- Card variants - inverted (To-dos) / accent (Holiday) --------- */
+.ew-card-inverted { background: var(--color-background-inverted); }
+.ew-card-inverted .ew-card-title { color: var(--color-text-inverted); }
+.ew-card-inverted .aiux-stat-value { color: var(--color-text-inverted); }
+.ew-card-inverted .aiux-stat-value.is-error { color: var(--color-red-300); }
+.ew-card-inverted .aiux-stat-value.is-warning { color: var(--color-yellow-300); }
+.ew-card-inverted .aiux-stat-title { color: rgba(255,255,255,0.68); }
+.ew-card-footnote { font-size: var(--font-size-xs); color: rgba(255,255,255,0.68); margin: var(--space-3) 0 0; line-height: var(--line-height-snug); }
+
+.ew-card-accent { background: var(--color-accent-100); }
+
+.holiday-date { display: flex; align-items: baseline; gap: var(--space-2); }
+.holiday-day { font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); line-height: 1; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+.holiday-month { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-secondary); }
+.holiday-name { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); color: var(--color-text-primary); margin: var(--space-1) 0 0; }
+
+/* -- Suggested actions ---------------------------------------------- */
+.sug-list { display: flex; flex-direction: column; }
+.sug-row {
+  display: flex; align-items: flex-start; gap: var(--space-3);
+  padding: var(--space-3) 0; text-decoration: none;
+  border-top: 1px solid var(--border-subtle);
+}
+.sug-row:first-child { border-top: none; padding-top: 0; }
+.sug-icon {
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 2rem; height: 2rem; border-radius: var(--radius-lg);
+  background: var(--color-background-secondary); color: var(--color-text-secondary);
+}
+.sug-icon svg { width: 16px; height: 16px; }
+.sug-text { font-size: var(--font-size-xs); font-weight: var(--font-weight-normal); color: var(--color-text-secondary); line-height: var(--line-height-snug); }
+
+/* === Demands widgets =========================================== */
+
+/* components-karuna.css's .aiux-btn base never resets native button
+   chrome (appearance stayed "auto"), so Chromium renders its default
+   outset/embossed border on top of the author background - most visible
+   once :disabled, since the button's own colour fades but the native
+   border doesn't. Real gap in the shared file, fixed locally. */
+.aiux-btn { appearance: none; -webkit-appearance: none; }
+.aiux-btn:disabled { border-style: solid; border-width: 1px; }
+
+/* -- Avatar (aiux-avatar - confirmed in aiux-library_v2.html) ---- */
+.aiux-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: var(--radius-full);
+  background: var(--color-primary-100); color: var(--color-primary-800);
+  font-family: var(--font-sans); font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs); flex-shrink: 0; user-select: none;
+}
+
+/* -- Stat (aiux-stat - confirmed in aiux-library_v2.html) --------- */
+.aiux-stats { display: flex; justify-content: space-between; gap: var(--space-6); }
+.aiux-stat { display: flex; flex-direction: column; }
+.aiux-stat-value { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); line-height: var(--line-height-tight); font-variant-numeric: tabular-nums; color: var(--color-text-primary); }
+.aiux-stat-value.is-warning { color: var(--color-warning); }
+.aiux-stat-value.is-error { color: var(--color-error); }
+.aiux-stat-value.is-info { color: var(--color-info); }
+.aiux-stat-title { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: 2px; }
+
+/* -- Demand row - flat, divided by hairlines, no nested card box -- */
+.dmw-list { display: flex; flex-direction: column; max-height: 330px; overflow-y: auto; }
+#queue-list { max-height: 305px; }
+.dmw-card {
+  display: flex; align-items: center; gap: var(--space-3);
+  border-top: 1px solid var(--border-subtle); padding: var(--space-4) 0;
+  text-decoration: none; cursor: pointer;
+}
+.dmw-card:first-child { border-top: none; padding-top: 0; }
+.dmw-card:hover .dmw-title { text-decoration: underline; }
+.dmw-card-body { flex: 1; min-width: 0; }
+.dmw-card-chevron { display: inline-flex; flex-shrink: 0; color: var(--color-text-tertiary); }
+.dmw-card-chevron svg { width: 16px; height: 16px; }
+
+.dmw-title { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); color: var(--color-text-primary); margin: 0 0 var(--space-2); }
+.dmw-next { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: var(--space-1) 0 0; }
+.dmw-next.is-error { color: var(--color-error); font-weight: var(--font-weight-medium); }
+
+.dmw-meta { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-2); }
+.dmw-person { display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+.dmw-person .aiux-avatar { width: 1.375rem; height: 1.375rem; font-size: 0.5625rem; }
+.dmw-details { font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin: var(--space-1) 0 0; }
+.dmw-update-label { color: var(--color-text-secondary); }
+
+/* -- State indicator - soft/light tier, matching the real AIUX badge
+   library grid exactly: background = the color's own -600 shade at 10%
+   alpha (the confirmed formula behind components-karuna.css's own
+   .aiux-badge-soft.aiux-badge-success/error/warning rules - success-bg
+   is literally rgba(0,131,79,0.10), i.e. green-600 at 10%), text = -700.
+   Teal/violet aren't named semantic variants in that file, but the hues
+   exist as raw tokens and appear as real badge colors in the library
+   grid, so the same derivation is applied rather than approximated. -- */
+.dmw-state-badge--red    { background: rgba(226,22,28,0.10);   color: var(--color-red-700); }
+.dmw-state-badge--blue   { background: rgba(42,110,220,0.10);  color: var(--color-blue-700); }
+.dmw-state-badge--violet { background: rgba(135,74,248,0.10);  color: var(--color-violet-700); }
+.dmw-state-badge--teal   { background: rgba(0,128,115,0.10);   color: var(--color-teal-700); }
+.dmw-state-badge--green  { background: rgba(0,131,79,0.10);    color: var(--color-green-700); }
+.dmw-state-badge--amber  { background: rgba(165,98,0,0.10);    color: var(--color-amber-700); }
+.dmw-state-badge--neutral{ background: var(--color-neutral-100);color: var(--color-neutral-800); }
+
+.dmw-stats-row { display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-4); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-subtle); }
+.dmw-stats-row.no-border { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+
+.dmw-proportion-bar { display: flex; height: 6px; border-radius: var(--radius-full); overflow: hidden; background: var(--color-neutral-200); }
+.dmw-proportion-seg { height: 100%; }
+
+/* === List / Detail pages (My Demands drill-down) =============== */
+
+.ew-content-inner--wide { max-width: 1200px; }
+.dm-detail-grid { margin-top: var(--space-5); }
+
+.ew-breadcrumb {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  font-size: var(--font-size-sm); color: var(--color-text-secondary);
+  text-decoration: none; margin-bottom: var(--space-5);
+}
+.ew-breadcrumb:hover { color: var(--color-text-primary); }
+.ew-breadcrumb svg { width: 16px; height: 16px; }
+
+/* -- Tabs - underline style ------------------------------------- */
+.tab-bar { display: flex; gap: var(--space-6); border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-6); }
+.tab-item {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-sans); font-size: var(--font-size-sm); color: var(--color-text-secondary);
+  padding: 0 0 var(--space-3); border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab-item:hover { color: var(--color-text-primary); }
+.tab-item.is-active { color: var(--color-text-primary); font-weight: var(--font-weight-medium); border-bottom-color: var(--color-primary); }
+
+/* -- Demands table ---------------------------------------------- */
+.dm-table-wrap { background: var(--surface-primary); border-radius: var(--radius-2xl); box-shadow: var(--shadow-sm); overflow: hidden; }
+.dm-table { width: 100%; border-collapse: collapse; }
+.dm-table th {
+  text-align: left; font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);
+}
+.dm-table td {
+  font-size: var(--font-size-sm); color: var(--color-text-primary);
+  padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle);
+}
+.dm-table td.is-numeric { font-variant-numeric: tabular-nums; font-weight: var(--font-weight-semibold); }
+.dm-table tr:last-child td { border-bottom: none; }
+.dm-table tr:hover td { background: var(--color-ghost-hover); }
+.dm-table-link { color: var(--color-link); text-decoration: none; }
+.dm-table-link:hover { color: var(--color-link-hover); text-decoration: underline; }
+
+/* -- Track Request stepper -------------------------------------- */
+.dm-stepper { display: flex; align-items: flex-start; }
+.dm-stepper-step { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+.dm-stepper-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 1.75rem; height: 1.75rem; border-radius: var(--radius-full);
+  font-size: var(--font-size-xs); font-weight: var(--font-weight-medium);
+  border: 1px solid var(--border-default); color: var(--color-text-secondary); background: var(--surface-primary);
+}
+.dm-stepper-icon svg { width: 14px; height: 14px; }
+.dm-stepper-icon--done { background: var(--color-success); border-color: var(--color-success); color: var(--color-success-content); }
+.dm-stepper-icon--current { border-color: var(--color-primary); color: var(--color-primary); border-width: 2px; }
+.dm-stepper-label { font-size: var(--font-size-2xs); color: var(--color-text-secondary); white-space: nowrap; }
+.dm-stepper-line { flex: 1; height: 1px; background: var(--border-subtle); margin: 0.875rem var(--space-2) 0; min-width: var(--space-6); }
+.dm-stepper-line.is-done { background: var(--color-success); }
+
+/* -- Track Request: state explanation + resulting-entity section ------- */
+.dm-track-eyebrow { font-size: var(--font-size-2xs); font-weight: var(--font-weight-semibold); letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-tertiary); margin: 0 0 var(--space-2); }
+.dm-track-headline { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary); margin: 0 0 var(--space-1); }
+.dm-track-sub { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0 0 var(--space-5); }
+.dm-delivery-panel { background: var(--color-background-secondary); border-radius: var(--radius-xl); padding: var(--space-5); margin-top: var(--space-6); }
+
+.dm-delivery-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
+.dm-delivery-name { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary); margin: 0 0 var(--space-3); }
+
+.dm-progress-row { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-1); }
+.dm-progress { flex: 1; height: 6px; border-radius: var(--radius-full); background: var(--surface-primary); overflow: hidden; }
+.dm-progress-fill { height: 100%; background: var(--color-success); border-radius: var(--radius-full); }
+.dm-progress-pct { font-size: var(--font-size-xs); color: var(--color-text-secondary); white-space: nowrap; }
+
+.dm-delivery-phase { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0 0 var(--space-5); }
+
+.dm-delivery-meta { display: flex; gap: var(--space-8); margin: 0 0 var(--space-5); }
+.dm-delivery-meta-item dt { font-size: var(--font-size-2xs); text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-tertiary); margin: 0 0 var(--space-1); }
+.dm-delivery-meta-item dd { font-size: var(--font-size-sm); color: var(--color-text-primary); margin: 0; font-weight: var(--font-weight-medium); }
+
+.dm-delivery-notyet { display: flex; align-items: center; gap: var(--space-4); }
+
+/* -- Work notes card: Activity / Attachments / Edit details tabs ------- */
+.dm-tab-bar { margin-bottom: var(--space-5); }
+
+.dm-attach-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+.dm-attach-hint { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0; }
+.dm-attach-dropzone {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2);
+  border: 1px dashed var(--border-default); border-radius: var(--radius-xl);
+  padding: var(--space-10); color: var(--color-text-secondary); font-size: var(--font-size-sm);
+}
+.dm-attach-dropzone svg { width: 18px; height: 18px; color: var(--color-text-tertiary); }
+
+.dm-edit-details-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.dm-edit-details-title { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary); margin: 0; }
+.dm-edit-details-actions { display: flex; align-items: center; gap: var(--space-2); }
+.dm-delivery-notyet-icon {
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 2.5rem; height: 2.5rem; border-radius: var(--radius-full);
+  background: var(--surface-primary); border: 1px solid var(--border-subtle); color: var(--color-text-tertiary);
+}
+.dm-delivery-notyet-icon svg { width: 18px; height: 18px; }
+.dm-delivery-notyet-title { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary); margin: 0 0 0.125rem; }
+.dm-delivery-notyet-text { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0; }
+
+/* -- Request Details fields ------------------------------------- */
+.dm-fields { margin: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.dm-field { display: flex; justify-content: space-between; gap: var(--space-4); }
+.dm-field dt { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0; }
+.dm-field dd { font-size: var(--font-size-xs); color: var(--color-text-primary); margin: 0; text-align: right; }
+.dm-field dd.is-numeric { font-variant-numeric: tabular-nums; font-weight: var(--font-weight-semibold); }
+
+/* -- Business case - read-only, no input chrome (Request Details card) -- */
+.dm-business-case { display: flex; flex-direction: column; gap: var(--space-4); margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--border-subtle); }
+
+/* -- Edit tab (same 4 fields, view ↔ form) - shares the case-block rhythm -- */
+#dm-tab-editdetails { display: flex; flex-direction: column; gap: var(--space-4); }
+#dm-tab-editdetails[hidden] { display: none; }
+.dm-case-label { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0 0 var(--space-1); }
+.dm-case-text { font-size: var(--font-size-sm); color: var(--color-text-primary); margin: 0; line-height: var(--line-height-normal); }
+
+/* -- Activity / worknotes --------------------------------------- */
+/* components-karuna.css defines .aiux-input/.aiux-select but never a
+   textarea variant - added locally, same formula, so it isn't left
+   rendering in the browser's default form-control font. */
+.aiux-textarea {
+  width: 100%; font-family: var(--font-sans); font-size: var(--font-size-sm);
+  color: var(--color-text-primary); background: var(--color-white);
+  border: 1px solid var(--border-default); border-radius: var(--radius-field);
+  padding: 0.5rem 0.75rem;
+}
+.aiux-textarea:focus { outline: 2px solid var(--color-focus-ring); outline-offset: 1px; border-color: var(--color-primary); }
+.aiux-textarea::placeholder { color: var(--color-text-tertiary); }
+
+.dm-worknote-form { display: flex; gap: var(--space-3); align-items: flex-end; margin-bottom: var(--space-5); }
+.dm-worknote-form textarea { flex: 1; resize: none; }
+.dm-activity { display: flex; flex-direction: column; }
+.dm-activity-row { display: flex; gap: var(--space-3); padding: var(--space-3) 0; border-top: 1px solid var(--border-subtle); }
+.dm-activity-row:first-child { border-top: none; padding-top: 0; }
+.dm-activity-body { flex: 1; min-width: 0; }
+.dm-activity-meta { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 0 0 2px; }
+.dm-activity-meta strong { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+.dm-activity-text { font-size: var(--font-size-xs); color: var(--color-text-primary); margin: 0; line-height: var(--line-height-snug); }

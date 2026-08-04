@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmployeeWorks: Canvas</title>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="css/tokens-karuna.css">
+  <link rel="stylesheet" href="css/components-karuna.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="../../assets/js/icons.js"></script>
+  <script src="js/demands-data.js"></script>
+</head>
+<body>
+  <div class="ew-shell">
+
+    <!-- ═══ Left nav ═══ -->
+    <nav class="ew-nav">
+      <div class="ew-nav-top">
+        <button class="icon-btn" data-icon="menu" aria-label="Collapse navigation"></button>
+        <span class="ew-wordmark">servicen<span class="dot">o</span>w</span>
+      </div>
+
+      <div class="ew-nav-group">
+        <a class="ew-nav-item" href="#"><span data-icon="home"></span>Home</a>
+      </div>
+
+      <div class="ew-nav-divider"></div>
+      <div class="ew-nav-label">My Apps</div>
+      <div class="ew-nav-group">
+        <a class="ew-nav-item active" href="#"><span data-icon="canvas"></span>Canvas</a>
+        <a class="ew-nav-item" href="#"><span data-icon="inbox"></span>Inbox</a>
+        <a class="ew-nav-item" href="#"><span data-icon="org-chart"></span>Org chart</a>
+      </div>
+
+      <div class="ew-nav-spacer"></div>
+
+      <div class="ew-nav-footer">
+        <span class="aiux-avatar">JL</span>
+        <span class="ew-nav-footer-name">Service-now: John Lon…</span>
+      </div>
+    </nav>
+
+    <!-- ═══ Content ═══ -->
+    <main class="ew-content">
+      <div class="ew-content-inner">
+
+        <div class="ew-page-header">
+          <div>
+            <h1 class="ew-page-title">Canvas</h1>
+            <p class="ew-page-subtitle">Your space to organize the things that are important to you.</p>
+          </div>
+          <button class="icon-btn" data-icon="pencil" aria-label="Edit canvas"></button>
+        </div>
+
+        <!-- ═══ Demands widgets ═══ -->
+        <div class="ew-grid">
+
+          <!-- My Demands — requestor -->
+          <section class="ew-card">
+            <div class="ew-card-header">
+              <div class="ew-card-title-group">
+                <h2 class="ew-card-title">My Demands</h2>
+                <span class="ew-card-count" id="my-demands-count"></span>
+              </div>
+              <div class="ew-card-actions">
+                <button type="button" class="aiux-btn aiux-btn-secondary aiux-btn-xs">
+                  <span class="btn-icon" data-icon="plus"></span><span>New Demand</span>
+                </button>
+                <a class="icon-btn" href="demands-list.html" aria-label="View all" data-icon="arrow-up-right"></a>
+              </div>
+            </div>
+            <div class="dmw-list" id="submissions-list"></div>
+          </section>
+
+          <!-- Demands Assigned to Me — facilitator -->
+          <section class="ew-card">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">Demands Assigned to Me</h2>
+              <a class="icon-btn" href="#" aria-label="View all" data-icon="arrow-up-right"></a>
+            </div>
+
+            <div class="dmw-stats-row">
+              <div class="aiux-stats">
+                <div class="aiux-stat">
+                  <span class="aiux-stat-value is-info">8</span>
+                  <span class="aiux-stat-title">Owned</span>
+                </div>
+                <div class="aiux-stat">
+                  <span class="aiux-stat-value is-warning">3</span>
+                  <span class="aiux-stat-title">Needs review</span>
+                </div>
+                <div class="aiux-stat">
+                  <span class="aiux-stat-value is-error">1</span>
+                  <span class="aiux-stat-title">Overdue</span>
+                </div>
+              </div>
+              <div class="dmw-proportion-bar" role="img" aria-label="Of 8 owned demands: 4 on track, 3 need review, 1 overdue">
+                <span class="dmw-proportion-seg" style="width: 50%; background: var(--color-info);"></span>
+                <span class="dmw-proportion-seg" style="width: 37.5%; background: var(--color-warning);"></span>
+                <span class="dmw-proportion-seg" style="width: 12.5%; background: var(--color-error);"></span>
+              </div>
+            </div>
+
+            <div class="dmw-list" id="queue-list"></div>
+          </section>
+
+        </div>
+
+        <!-- ═══ Gravitas row — widgets from the '2-home' reference ═══ -->
+        <div class="ew-grid-3">
+
+          <section class="ew-card ew-card-inverted">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">To-dos</h2>
+            </div>
+            <div class="dmw-stats-row aiux-stats no-border">
+              <div class="aiux-stat">
+                <span class="aiux-stat-value">12</span>
+                <span class="aiux-stat-title">Open</span>
+              </div>
+              <div class="aiux-stat">
+                <span class="aiux-stat-value">4</span>
+                <span class="aiux-stat-title">Due soon</span>
+              </div>
+              <div class="aiux-stat">
+                <span class="aiux-stat-value is-error">2</span>
+                <span class="aiux-stat-title">Overdue</span>
+              </div>
+            </div>
+            <p class="ew-card-footnote">Bianca is waiting on a PTO approval, Alfonso is waiting on a MacBook Pro approval.</p>
+          </section>
+
+          <section class="ew-card">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">Suggested actions</h2>
+            </div>
+            <div class="sug-list">
+              <a class="sug-row" href="#">
+                <span class="sug-icon" data-icon="id"></span>
+                <span class="sug-text">Request badge &amp; building access for your new office</span>
+              </a>
+              <a class="sug-row" href="#">
+                <span class="sug-icon" data-icon="receipt-pencil"></span>
+                <span class="sug-text">Review expense submission guidelines before your report is due</span>
+              </a>
+            </div>
+          </section>
+
+          <section class="ew-card ew-card-accent">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">Next Holiday</h2>
+            </div>
+            <div class="holiday-date">
+              <span class="holiday-day">7</span>
+              <span class="holiday-month">Sep</span>
+            </div>
+            <p class="holiday-name">Labor Day</p>
+          </section>
+
+        </div>
+
+        <!-- ═══ Other apps (existing Canvas widgets, unchanged) ═══ -->
+        <div class="ew-section-label">Other apps</div>
+        <div class="ew-grid-3">
+
+          <section class="ew-card ew-card-quiet">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">Requests</h2>
+            </div>
+            <div class="ew-empty">
+              <span data-icon="clipboard-check"></span>
+              <span>You don't have anything pending right now</span>
+              <a class="ew-empty-link" href="#">View completed requests</a>
+            </div>
+          </section>
+
+          <section class="ew-card ew-card-quiet">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">My Projects</h2>
+              <button class="aiux-btn aiux-btn-primary aiux-btn-sm">Create new project</button>
+            </div>
+            <div class="ew-empty">
+              <span>You don't have any projects right now</span>
+            </div>
+          </section>
+
+          <section class="ew-card ew-card-quiet">
+            <div class="ew-card-header">
+              <h2 class="ew-card-title">My Project Tasks</h2>
+            </div>
+            <div class="ew-empty">
+              <span>You don't have any project tasks assigned</span>
+            </div>
+          </section>
+
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

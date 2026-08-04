@@ -1,0 +1,252 @@
+/* ===============================================================
+   TOKENS-KARUNA.CSS - Real ServiceNow/Karuna design tokens.
+   Local to narrative-10-eap ONLY - overrides the shared
+   assets/css/tokens.css values (loaded before this file) without
+   touching that file, so N1–N9 are completely unaffected.
+   Source: Downloads/SPM-horizon-2.0-karuna-main/assets/css/tokens.css
+   (887 lines, digested in full - see project_narrative9_kanban_conform
+   memory for the complete token inventory and migration notes).
+   Deliberately overrides Section 7 (Sand) of the root CLAUDE.md for
+   N10 specifically - this pass's whole point is fidelity to what the
+   dev team will actually ship, which is Karuna's real primary (a dark
+   blue-grey, --color-primary-800 #2a4d61), not Sand's charcoal #383733.
+   =============================================================== */
+:root {
+
+  /* -- Tier 0 ----------------------------------------------- */
+  --color-black: #000000;
+  --color-white: #ffffff;
+
+  /* -- Tier 1 - raw hue scales actually used by badges/alerts/status -- */
+  --color-red-50: #fff7f6;   --color-red-100: #ffd8d0;  --color-red-200: #ffb8ad;
+  --color-red-300: #ff9688;  --color-red-400: #ff6d5f;  --color-red-500: #fb3e37;
+  --color-red-600: #e2161c;  --color-red-700: #be0003;  --color-red-800: #970000;
+  --color-red-900: #750000;  --color-red-950: #530000;
+
+  --color-orange-50: #fff8f3;  --color-orange-100: #ffd9be; --color-orange-200: #ffbb8c;
+  --color-orange-300: #ff9955; --color-orange-400: #fa751a; --color-orange-500: #df6000;
+  --color-orange-600: #c14e00; --color-orange-700: #a13d00; --color-orange-800: #812e00;
+  --color-orange-900: #642100; --color-orange-950: #461500;
+
+  --color-amber-50: #fff7eb;  --color-amber-100: #ffdc9d; --color-amber-200: #ffbe57;
+  --color-amber-300: #f7a013; --color-amber-400: #dc8900; --color-amber-500: #c17500;
+  --color-amber-600: #a56200; --color-amber-700: #884f00; --color-amber-800: #6c3e00;
+  --color-amber-900: #532e00; --color-amber-950: #3a1e00;
+
+  --color-yellow-50: #fffbc9;  --color-yellow-100: #ffe04d; --color-yellow-200: #f3c500;
+  --color-yellow-300: #d9ae00; --color-yellow-400: #be9700; --color-yellow-500: #a58200;
+  --color-yellow-600: #8d6e00; --color-yellow-700: #735a00; --color-yellow-800: #5c4600;
+  --color-yellow-900: #453500; --color-yellow-950: #302300;
+
+  --color-lime-50: #e9ffe5;  --color-lime-100: #8cf97a; --color-lime-200: #68e353;
+  --color-lime-300: #52cb3d; --color-lime-400: #41b22d; --color-lime-500: #349b21;
+  --color-lime-600: #298317; --color-lime-700: #1f6b0f; --color-lime-800: #155408;
+  --color-lime-900: #0e4005; --color-lime-950: #072c02;
+
+  --color-green-50: #f1fcf5;  --color-green-100: #a1f1c5; --color-green-200: #63e0a3;
+  --color-green-300: #2acb88; --color-green-400: #00b271; --color-green-500: #009b60;
+  --color-green-600: #00834f; --color-green-700: #006b3f; --color-green-800: #005430;
+  --color-green-900: #004023; --color-green-950: #002b16;
+
+  --color-teal-50: #f2fbf9;  --color-teal-100: #b0ede3; --color-teal-200: #72dccc;
+  --color-teal-300: #3bc6b5; --color-teal-400: #00af9f; --color-teal-500: #009889;
+  --color-teal-600: #008073; --color-teal-700: #00695e; --color-teal-800: #005349;
+  --color-teal-900: #003e37; --color-teal-950: #002a25;
+
+  --color-blue-50: #f4f9ff;  --color-blue-100: #cbe4ff; --color-blue-200: #a1cdff;
+  --color-blue-300: #7cb6ff; --color-blue-400: #599cff; --color-blue-500: #3d84f8;
+  --color-blue-600: #2a6edc; --color-blue-700: #1b59bb; --color-blue-800: #114598;
+  --color-blue-900: #083376; --color-blue-950: #042255;
+
+  --color-indigo-50: #f7f8ff;  --color-indigo-100: #dddeff; --color-indigo-200: #c5c5ff;
+  --color-indigo-300: #aeaaff; --color-indigo-400: #988eff; --color-indigo-500: #8472ff;
+  --color-indigo-600: #6f57f5; --color-indigo-700: #5b43d3; --color-indigo-800: #4831af;
+  --color-indigo-900: #37228a; --color-indigo-950: #251564;
+
+  --color-violet-50: #f8f7ff;  --color-violet-100: #e4ddff; --color-violet-200: #d0c1ff;
+  --color-violet-300: #bea5ff; --color-violet-400: #ab87ff; --color-violet-500: #9969ff;
+  --color-violet-600: #874af8; --color-violet-700: #732edf; --color-violet-800: #5e16be;
+  --color-violet-900: #490499; --color-violet-950: #33006f;
+
+  --color-purple-50: #fcf6ff;  --color-purple-100: #f4d6ff; --color-purple-200: #ebb8ff;
+  --color-purple-300: #dc98ff; --color-purple-400: #c87afa; --color-purple-500: #b165e2;
+  --color-purple-600: #9952c5; --color-purple-700: #7e41a4; --color-purple-800: #653185;
+  --color-purple-900: #4d2467; --color-purple-950: #361649;
+
+  --color-fuchsia-50: #fff5ff;  --color-fuchsia-100: #ffd3ff; --color-fuchsia-200: #ffafff;
+  --color-fuchsia-300: #fb86ff; --color-fuchsia-400: #eb60ff; --color-fuchsia-500: #d642eb;
+  --color-fuchsia-600: #bb2bcf; --color-fuchsia-700: #9d19af; --color-fuchsia-800: #7e0b8d;
+  --color-fuchsia-900: #62036e; --color-fuchsia-950: #45014f;
+
+  --color-pink-50: #fff7fa;  --color-pink-100: #ffd6e9; --color-pink-200: #ffb3d8;
+  --color-pink-300: #ff8ec6; --color-pink-400: #ff63ac; --color-pink-500: #ea4697;
+  --color-pink-600: #cd3081; --color-pink-700: #ad206a; --color-pink-800: #8b1254;
+  --color-pink-900: #6d0940; --color-pink-950: #4d042c;
+
+  /* -- Tier 2 - configurable primary/accent/neutral scales ------- */
+  --color-primary-50:  #f8f9fa;  --color-primary-100: #dbe1e5; --color-primary-200: #c0cbd2;
+  --color-primary-300: #a6b5c0;  --color-primary-400: #8a9fac; --color-primary-500: #728a9a;
+  --color-primary-600: #5a7587;  --color-primary-700: #426174; --color-primary-800: #2a4d61;
+  --color-primary-900: #143a50;  --color-primary-950: #00283c;
+
+  --color-accent-50: var(--color-lime-50);   --color-accent-100: var(--color-lime-100);
+  --color-accent-200: var(--color-lime-200); --color-accent-300: var(--color-lime-300);
+  --color-accent-400: var(--color-lime-400); --color-accent-500: var(--color-lime-500);
+  --color-accent-600: var(--color-lime-600); --color-accent-700: var(--color-lime-700);
+  --color-accent-800: var(--color-lime-800); --color-accent-900: var(--color-lime-900);
+  --color-accent-950: var(--color-lime-950);
+
+  --color-neutral-50:  #f9f8f6;  --color-neutral-100: #f4f3f0; --color-neutral-200: #edece9;
+  --color-neutral-300: #e3e2df;  --color-neutral-400: #c2c1be; --color-neutral-500: #8a8986;
+  --color-neutral-600: #656462;  --color-neutral-700: #4d4c4a; --color-neutral-800: #343331;
+  --color-neutral-900: #232320;  --color-neutral-950: #171614;
+
+  /* -- Tier 3 - semantic (DaisyUI-style) ----------------------- */
+  --color-primary:           var(--color-primary-800);
+  --color-primary-content:   var(--color-white);
+  --color-primary-hover:     var(--color-primary-900);
+  --color-primary-active:    var(--color-primary-950);
+
+  --color-secondary:         var(--color-neutral-300);
+  --color-secondary-content: var(--color-neutral-800);
+  --color-secondary-hover:   #d4d3d0;
+  --color-secondary-active:  #c5c4c1;
+
+  --color-accent:            var(--color-accent-200);
+  --color-accent-content:    var(--color-black);
+  --color-accent-hover:      var(--color-accent-300);
+  --color-accent-active:     var(--color-accent-400);
+
+  --color-neutral:           var(--color-neutral-950);
+  --color-neutral-content:   var(--color-white);
+  --color-neutral-hover:     #272624;
+  --color-neutral-active:    var(--color-neutral-900);
+
+  --color-base-100: var(--color-white);
+  --color-base-200: var(--color-neutral-100);
+  --color-base-300: var(--color-neutral-200);
+  --color-base-content: var(--color-black);
+
+  --color-info:            var(--color-blue-600);
+  --color-info-content:    var(--color-blue-50);
+  --color-info-bg:         rgba(14, 78, 105, 0.10);
+  --color-info-hover:      var(--color-blue-700);
+  --color-info-active:     var(--color-blue-800);
+
+  --color-success:         var(--color-green-600);
+  --color-success-content: var(--color-green-50);
+  --color-success-bg:      rgba(0, 131, 79, 0.10);
+  --color-success-hover:   var(--color-green-700);
+  --color-success-active:  var(--color-green-800);
+
+  --color-warning:         var(--color-yellow-600);
+  --color-warning-content: var(--color-yellow-50);
+  --color-warning-bg:      rgba(141, 110, 0, 0.10);
+  --color-warning-hover:   var(--color-yellow-700);
+  --color-warning-active:  var(--color-yellow-800);
+
+  --color-error:           var(--color-red-600);
+  --color-error-content:   var(--color-red-50);
+  --color-error-hover:     #c41116;
+  --color-error-active:    #a50e13;
+
+  --color-focus-ring: rgba(14, 78, 105, 0.15);
+  --color-ghost-hover:  rgba(0, 0, 0, 0.06);
+  --color-ghost-active: rgba(0, 0, 0, 0.12);
+  --color-link:         var(--color-primary-700);
+  --color-link-hover:   var(--color-primary-800);
+
+  /* -- Tier 4 - Janus semantic text/background ---------------- */
+  --color-text-primary:         var(--color-black);
+  --color-text-secondary:       var(--color-neutral-700);
+  --color-text-tertiary:        var(--color-neutral-600);
+  --color-text-inverted:        var(--color-white);
+  --text-disabled:              var(--color-neutral-400);
+
+  --color-background-primary:   var(--color-white);
+  --color-background-secondary: var(--color-neutral-100);
+  --color-background-tertiary:  var(--color-neutral-200);
+  --color-background-inverted:  var(--color-neutral-800);
+  --bg-dark: #0d0d0c;
+
+  --surface-primary:   var(--color-white);
+  --surface-secondary: var(--color-neutral-300);
+
+  --border-subtle:  var(--color-neutral-300);
+  --border-default: var(--color-neutral-500);
+  --border-strong:  var(--color-primary-950);
+
+  /* AI accent - already matches this repo's AINPX teal, no reconciliation needed */
+  --ai-accent: #00C7B1;
+  --ai-bg:     #F0FAFA;
+
+  /* -- Typography ----------------------------------------------- */
+  --font-sans: "ServiceNow Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "ServiceNow Sans Mono", "SF Mono", "Fira Code", monospace;
+
+  --font-weight-light:    300;
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --font-size-3xs: 0.6875rem;  /* 11px */
+  --font-size-2xs: 0.625rem;   /* 10px */
+  --font-size-xs:  0.75rem;    /* 12px */
+  --font-size-sm:  0.875rem;   /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg:  1.125rem;   /* 18px */
+  --font-size-xl:  1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;     /* 24px */
+  --font-size-3xl: 1.875rem;   /* 30px */
+  --font-size-4xl: 2.25rem;    /* 36px */
+  --font-size-5xl: 3rem;       /* 48px */
+
+  --line-height-tight:   1.25;
+  --line-height-snug:    1.375;
+  --line-height-normal:  1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-4: 1rem;
+  --line-height-5: 1.25rem;
+
+  --type-button-xl-size: 1.375rem;  /* 22px, bespoke - not on the atomic scale */
+  --type-button-xs-size: 0.6875rem; /* 11px, bespoke - not on the atomic scale */
+
+  /* -- Spacing (4px grid) --------------------------------------- */
+  --space-1:  0.25rem;  --space-2:  0.5rem;   --space-3:  0.75rem;
+  --space-4:  1rem;     --space-5:  1.25rem;  --space-6:  1.5rem;
+  --space-8:  2rem;     --space-10: 2.5rem;   --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* -- Radius --------------------------------------------------- */
+  --radius-sm:    0.25rem;   /* 4px */
+  --radius-md:    0.375rem;  /* 6px */
+  --radius-lg:    0.5rem;    /* 8px */
+  --radius-field: 0.75rem;   /* 12px - inputs/form controls */
+  --radius-xl:    0.75rem;   /* 12px - buttons/tabs/cards */
+  --radius-2xl:   1rem;      /* 16px */
+  --radius-3xl:   1.5rem;    /* 24px */
+  --radius-pill:  9999px;
+  --radius-full:  9999px;
+
+  /* -- Shadows -------------------------------------------------- */
+  --shadow-2xs: 0 1px rgba(0, 0, 0, 0.05);
+  --shadow-xs:  0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm:  0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl:  0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inset-2xs: inset 0 1px rgba(0, 0, 0, 0.05);
+  --shadow-inset-xs:  inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  --shadow-inset-sm:  inset 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  /* -- Motion --------------------------------------------------- */
+  --duration-xs: 150ms;  --duration-sm: 200ms;  --duration-md: 250ms;
+  --duration-lg: 300ms;  --duration-xl: 350ms;  --duration-2xl: 450ms; --duration-3xl: 500ms;
+  --ease-enter: cubic-bezier(0.21, 0.64, 0.52, 1.00);
+  --ease-exit:  cubic-bezier(0.71, 0.01, 1.00, 1.00);
+  --transition-fast: var(--duration-xs) ease;
+  --transition-base: var(--duration-sm) ease;
+  --transition-slow: var(--duration-lg) ease;
+}
