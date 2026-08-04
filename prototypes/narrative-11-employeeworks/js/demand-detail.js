@@ -185,8 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="dm-edit-details-header">
         <p class="dm-edit-details-title">Details</p>
         <div class="dm-edit-details-actions">
-          <button class="icon-btn" id="dm-edit-save" aria-label="Save"><span data-icon="check"></span></button>
-          <button class="icon-btn" id="dm-edit-cancel" aria-label="Cancel"><span data-icon="close"></span></button>
+          <button class="icon-btn dm-edit-btn-save" id="dm-edit-save" aria-label="Save"><span data-icon="check"></span></button>
+          <button class="icon-btn dm-edit-btn-cancel" id="dm-edit-cancel" aria-label="Cancel"><span data-icon="close"></span></button>
         </div>
       </div>
       ${EDIT_DETAIL_FIELDS.map(f => `

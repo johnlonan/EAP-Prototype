@@ -5,6 +5,7 @@ function demandRowTR(d) {
       <td>${d.id}</td>
       <td>${d.portfolio}</td>
       <td>${stateBadgeHTML(d.state)}</td>
+      <td>${priorityBadgeHTML(d.priority)}</td>
       <td class="is-numeric">${d.score != null ? d.score : '–'}</td>
       <td>${formatDate(d.startDate)}</td>
       <td>${formatDate(d.endDate)}</td>

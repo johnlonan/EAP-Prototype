@@ -10,9 +10,11 @@ const STATE_COLOR = {
 const STATE_ORDER = ['Draft', 'Submitted', 'Screening', 'Qualified', 'Approved', 'Complete'];
 
 const PRIORITY_COLOR = {
-  High: 'red',
-  Medium: 'amber',
-  Low: 'neutral',
+  '1 - Critical': 'red',
+  '2 - High': 'amber',
+  '3 - Moderate': 'blue',
+  '4 - Low': 'neutral',
+  '5 - Planning': 'violet',
 };
 
 // Verbal explanation of each lifecycle state — generic, keyed by state only,
@@ -43,7 +45,7 @@ const DELIVERY_STATUS_COLOR = {
 const MY_DEMANDS = [
   {
     id: 'DMND412001', title: 'Customer self-service portal redesign', portfolio: 'Consumer Digital product',
-    state: 'Qualified', priority: 'Medium', score: 74, startDate: '2026-06-01', endDate: '2026-09-30',
+    state: 'Qualified', priority: '3 - Moderate', score: 74, startDate: '2026-06-01', endDate: '2026-09-30',
     targetEntityType: 'Project',
     demandManager: { initials: 'SK', name: 'Sarah Kim' },
     businessJustification: 'Reduces inbound support tickets by letting employees resolve common requests without contacting the service desk.',
@@ -58,7 +60,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND412014', title: 'Vendor onboarding automation', portfolio: 'Business Transformation',
-    state: 'Draft', priority: 'Medium', score: null, startDate: '2026-07-01', endDate: '2026-10-01',
+    state: 'Draft', priority: '3 - Moderate', score: null, startDate: '2026-07-01', endDate: '2026-10-01',
     targetEntityType: 'Project',
     demandManager: { initials: 'RM', name: 'Raj Malhotra' },
     businessJustification: 'Cuts vendor onboarding time from weeks to days by automating document collection and approvals.',
@@ -71,7 +73,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND411988', title: 'Regional office network upgrade', portfolio: 'Enterprise Ventures',
-    state: 'Approved', priority: 'High', score: 81, startDate: '2026-09-01', endDate: '2027-01-15',
+    state: 'Approved', priority: '1 - Critical', score: 81, startDate: '2026-09-01', endDate: '2027-01-15',
     targetEntityType: 'Project',
     convertedEntity: {
       number: 'PRJ0010021', name: 'Regional office network hardware refresh', status: 'In progress',
@@ -90,7 +92,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND411920', title: 'Employee travel policy chatbot', portfolio: 'HR',
-    state: 'Submitted', priority: 'Low', score: null, startDate: '2026-08-01', endDate: '2026-11-30',
+    state: 'Submitted', priority: '4 - Low', score: null, startDate: '2026-08-01', endDate: '2026-11-30',
     targetEntityType: 'Project',
     demandManager: { initials: 'SK', name: 'Sarah Kim' },
     businessJustification: 'Reduces HR inquiries about travel policy by giving employees instant, consistent answers.',
@@ -103,7 +105,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND411875', title: 'Marketing analytics dashboard refresh', portfolio: 'Marketing',
-    state: 'Screening', priority: 'Medium', score: null, startDate: '2026-08-15', endDate: '2026-12-01',
+    state: 'Screening', priority: '3 - Moderate', score: null, startDate: '2026-08-15', endDate: '2026-12-01',
     targetEntityType: 'Project',
     demandManager: { initials: 'RM', name: 'Raj Malhotra' },
     businessJustification: 'Current dashboards use deprecated data sources and no longer reflect accurate campaign performance.',
@@ -117,7 +119,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND410340', title: 'Legacy CRM data migration', portfolio: 'Application Modernization',
-    state: 'Complete', priority: 'High', score: 68, startDate: '2025-11-01', endDate: '2026-03-01',
+    state: 'Complete', priority: '2 - High', score: 68, startDate: '2025-11-01', endDate: '2026-03-01',
     targetEntityType: 'Project',
     convertedEntity: {
       number: 'PRJ0009984', name: 'Legacy CRM data migration', status: 'Complete',
@@ -136,7 +138,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND411450', title: 'Supplier risk scoring model', portfolio: 'Enterprise Ventures',
-    state: 'Draft', priority: 'Medium', score: null, startDate: '2026-09-15', endDate: '2027-02-28',
+    state: 'Draft', priority: '5 - Planning', score: null, startDate: '2026-09-15', endDate: '2027-02-28',
     targetEntityType: 'Project',
     demandManager: { initials: 'SK', name: 'Sarah Kim' },
     businessJustification: 'Gives procurement an early warning system for suppliers at risk of disruption.',
@@ -149,7 +151,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND412030', title: 'Self-service IT ticket deflection bot', portfolio: 'Consumer Digital product',
-    state: 'Screening', priority: 'Low', score: null, startDate: '2026-08-20', endDate: '2026-12-15',
+    state: 'Screening', priority: '4 - Low', score: null, startDate: '2026-08-20', endDate: '2026-12-15',
     targetEntityType: 'Project',
     demandManager: { initials: 'RM', name: 'Raj Malhotra' },
     businessJustification: 'Deflects routine IT tickets away from the service desk queue, freeing agents for complex issues.',
@@ -163,7 +165,7 @@ const MY_DEMANDS = [
   },
   {
     id: 'DMND411510', title: 'Contractor badge access automation', portfolio: 'HR',
-    state: 'Approved', priority: 'High', score: 77, startDate: '2026-10-01', endDate: '2027-01-31',
+    state: 'Approved', priority: '2 - High', score: 77, startDate: '2026-10-01', endDate: '2027-01-31',
     targetEntityType: 'Project',
     convertedEntity: {
       number: 'PRJ0010045', name: 'Contractor badge access automation', status: 'In progress',
