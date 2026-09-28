@@ -1250,7 +1250,7 @@ var injectStyles = function() {
     @keyframes snp-orch-dialog-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .snp-orch-dialog-hd {
       display: flex; align-items: center; gap: 8px; padding: 12px 10px 12px 14px;
-      border-bottom: 1px solid #f1f2f4;
+      border-bottom: 1px solid #f1f2f4; cursor: grab; user-select: none;
     }
     .snp-orch-dialog-hd-title { flex: 1; font-size: 13px; font-weight: 700; color: #151920; }
     .snp-orch-dialog-close {
@@ -2310,6 +2310,20 @@ var TRK_ORCH_TRACKS = {
       { label: 'Converted to project', unlocks: [] },
     ],
   },
+  hr: {
+    stages: ['Demand raised', 'HR policy compliance checked', 'Employee impact assessed', 'Resourcing estimate', 'Steering committee approval', 'Converted to project'],
+    stageOfStep: [0, 0, 1, 1, 2, 3, 4, 5],
+    steps: [
+      { label: 'Logged the demand', unlocks: [] },
+      { label: 'Reviewed submitted details', unlocks: ['exec'] },
+      { label: 'Checked required fields', unlocks: ['validation', 'autofill'] },
+      { label: 'Checked HR policy compliance', unlocks: [] },
+      { label: 'Assessed employee impact', unlocks: ['similarity'] },
+      { label: 'Estimated resourcing', unlocks: ['resource'] },
+      { label: 'Routed to steering committee', unlocks: [] },
+      { label: 'Recorded committee decision', unlocks: [] },
+    ],
+  },
 };
 
 // Which of the 5 Overview sections are actually ready given the specialist's
@@ -2328,7 +2342,8 @@ function trkUnlockedSet(orch) {
 function trkTrackForPortfolio(portfolio) {
   if (portfolio === 'Marketing') return 'marketing';
   if (portfolio === 'Consumer Digital product') return 'fasttrack';
-  return 'it'; // HR, Application Modernization, Enterprise Ventures, Business Transformation, (empty)
+  if (portfolio === 'HR') return 'hr';
+  return 'it'; // Application Modernization, Enterprise Ventures, Business Transformation, (empty)
 }
 
 // Reuses the demand's own lifecycle state so every demand already in the list
@@ -2357,8 +2372,35 @@ function trkOrchDialog(props) {
   var track = orch.track;
   var isDone = orch.status === 'completed';
 
-  return React.createElement('div', { className: 'snp-orch-dialog' },
-    React.createElement('div', { className: 'snp-orch-dialog-hd' },
+  // Freely draggable by its header, like any modeless dialog — starts docked
+  // bottom-right, switches to an explicit position on first drag.
+  var posS = React.useState(null);
+  var pos = posS[0]; var setPos = posS[1];
+  var elRef = React.useRef(null);
+  var dragRef = React.useRef(null);
+
+  function onDragStart(e) {
+    if (e.target.closest('.snp-orch-dialog-close')) return;
+    var rect = elRef.current.getBoundingClientRect();
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: rect.left, origY: rect.top };
+    function onMove(ev) {
+      var d = dragRef.current;
+      if (!d) return;
+      setPos({ x: d.origX + (ev.clientX - d.startX), y: d.origY + (ev.clientY - d.startY) });
+    }
+    function onUp() {
+      dragRef.current = null;
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    }
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }
+
+  var dragStyle = pos ? { left: pos.x + 'px', top: pos.y + 'px', right: 'auto', bottom: 'auto' } : null;
+
+  return React.createElement('div', { className: 'snp-orch-dialog', ref: elRef, style: dragStyle },
+    React.createElement('div', { className: 'snp-orch-dialog-hd', onMouseDown: onDragStart },
       React.createElement('div', { className: 'snp-orch-dialog-hd-title' }, 'Demand AI Specialist'),
       React.createElement('span', { className: 'snp-orch-pill ' + (isDone ? 'is-complete' : 'is-progress') },
         isDone ? React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }) : React.createElement('span', { className: 'snp-orch-ring', style: { width: '10px', height: '10px' } }),
