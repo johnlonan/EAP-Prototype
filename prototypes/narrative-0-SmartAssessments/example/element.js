@@ -1258,10 +1258,15 @@ var injectStyles = function() {
       border-radius: 6px; color: #6b7280; cursor: pointer; border: none; background: transparent;
     }
     .snp-orch-dialog-close:hover { background: #f3f4f6; }
-    .snp-orch-dialog-body { padding: 12px 14px 4px; }
-    .snp-orch-dialog-stage { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #151920; font-weight: 600; }
-    .snp-orch-dialog-stage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; }
-    .snp-orch-dialog-meta { font-size: 12px; color: #6b7280; margin: 5px 0 12px 22px; }
+    .snp-orch-dialog-body { padding: 12px 14px 8px; }
+    .snp-orch-dialog-meta { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+    .snp-orch-dialog-stages { display: flex; flex-direction: column; gap: 9px; }
+    .snp-orch-dstage { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ca3af; }
+    .snp-orch-dstage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; }
+    .snp-orch-dstage .snp-orch-ring { width: 13px; height: 13px; flex-shrink: 0; }
+    .snp-orch-dstage .snp-orch-step-dot { width: 7px; height: 7px; margin: 3px; flex-shrink: 0; }
+    .snp-orch-dstage.is-done .snp-orch-dstage-label { color: #151920; }
+    .snp-orch-dstage.is-active .snp-orch-dstage-label { color: #151920; font-weight: 600; }
     .snp-orch-dialog-ft {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 10px 14px; border-top: 1px solid #f1f2f4;
@@ -2259,34 +2264,66 @@ function trkStripChip(item, onJump) {
 // ── Demand AI Specialist — orchestrator awareness (modeless dialog + side panel) ──
 // The specialist's steps differ by demand type, matching the process spine each
 // portfolio actually follows (steering-committee tracks vs. the AZ fast-track).
+// Each step optionally "unlocks" one or more of the Overview's five sections
+// (exec / validation / autofill / similarity / resource — same keys as the
+// card expand-map) once that step is done. This ties what's visibly populated
+// on the Overview, and the "At a glance" strip, to the specialist's real
+// progress instead of a fake timer.
 var TRK_ORCH_TRACKS = {
   marketing: {
     stages: ['Demand raised', 'Demand manager validates info', 'Resourcing estimate completed', 'Steering committee approves', 'Converted to project'],
     stageOfStep: [0, 1, 1, 2, 3, 3, 4],
     steps: [
-      'Logged the demand', 'Reviewed the marketing brief', 'Checked required fields with demand manager',
-      'Estimated campaign resourcing', 'Routed to steering committee', 'Awaiting committee decision', 'Recorded committee outcome',
+      { label: 'Logged the demand', unlocks: [] },
+      { label: 'Reviewed the marketing brief', unlocks: ['exec'] },
+      { label: 'Checked required fields with demand manager', unlocks: ['validation', 'autofill'] },
+      { label: 'Estimated campaign resourcing', unlocks: ['resource'] },
+      { label: 'Routed to steering committee', unlocks: ['similarity'] },
+      { label: 'Awaiting committee decision', unlocks: [] },
+      { label: 'Recorded committee outcome', unlocks: [] },
     ],
   },
   it: {
     stages: ['Demand raised', 'Information validated', 'Engineering assessment', 'Resourcing estimate', 'Steering committee approval', 'Converted to project'],
     stageOfStep: [0, 1, 1, 2, 2, 3, 3, 4, 5],
     steps: [
-      'Logged the demand', 'Reviewed submitted details', 'Checked required fields',
-      'Assessed technical feasibility', 'Identified integration risks',
-      'Estimated engineering hours', 'Estimated role-level resourcing',
-      'Routed to steering committee', 'Recorded committee decision',
+      { label: 'Logged the demand', unlocks: [] },
+      { label: 'Reviewed submitted details', unlocks: ['exec'] },
+      { label: 'Checked required fields', unlocks: ['validation', 'autofill'] },
+      { label: 'Assessed technical feasibility', unlocks: [] },
+      { label: 'Identified integration risks', unlocks: ['similarity'] },
+      { label: 'Estimated engineering hours', unlocks: [] },
+      { label: 'Estimated role-level resourcing', unlocks: ['resource'] },
+      { label: 'Routed to steering committee', unlocks: [] },
+      { label: 'Recorded committee decision', unlocks: [] },
     ],
   },
   fasttrack: {
     stages: ['Demand raised', 'Minimum data criteria checked', 'Budget threshold checked', 'Converted to project'],
     stageOfStep: [0, 1, 1, 2, 2, 3],
     steps: [
-      'Logged the demand', 'Checked minimum data criteria', 'Validated data classification',
-      'Checked budget against $100k threshold', 'Confirmed no committee review needed', 'Converted to project',
+      { label: 'Logged the demand', unlocks: [] },
+      { label: 'Checked minimum data criteria', unlocks: ['validation', 'autofill'] },
+      { label: 'Validated data classification', unlocks: ['exec'] },
+      { label: 'Checked budget against $100k threshold', unlocks: ['resource'] },
+      { label: 'Confirmed no committee review needed', unlocks: ['similarity'] },
+      { label: 'Converted to project', unlocks: [] },
     ],
   },
 };
+
+// Which of the 5 Overview sections are actually ready given the specialist's
+// real progress: everything from steps already checked off, or everything if
+// the whole run is done. The step currently in progress hasn't produced its
+// output yet.
+function trkUnlockedSet(orch) {
+  var unlocked = {};
+  var cutoff = orch.status === 'completed' ? orch.track.steps.length : orch.stepIdx;
+  for (var i = 0; i < cutoff; i++) {
+    orch.track.steps[i].unlocks.forEach(function(key) { unlocked[key] = true; });
+  }
+  return unlocked;
+}
 
 function trkTrackForPortfolio(portfolio) {
   if (portfolio === 'Marketing') return 'marketing';
@@ -2319,7 +2356,6 @@ function trkOrchDialog(props) {
   var orch = props.orch;
   var track = orch.track;
   var isDone = orch.status === 'completed';
-  var stageLabel = track.stages[orch.stageIdx];
 
   return React.createElement('div', { className: 'snp-orch-dialog' },
     React.createElement('div', { className: 'snp-orch-dialog-hd' },
@@ -2333,14 +2369,21 @@ function trkOrchDialog(props) {
       )
     ),
     React.createElement('div', { className: 'snp-orch-dialog-body' },
-      React.createElement('div', { className: 'snp-orch-dialog-stage' },
-        isDone
-          ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
-          : React.createElement('span', { className: 'snp-orch-ring' }),
-        isDone ? 'All steps complete' : stageLabel
-      ),
       React.createElement('div', { className: 'snp-orch-dialog-meta' },
         orch.meta + (orch.est ? ' (est. ' + orch.est + ')' : '')
+      ),
+      React.createElement('div', { className: 'snp-orch-dialog-stages' },
+        track.stages.map(function(label, i) {
+          var st = isDone || i < orch.stageIdx ? 'is-done' : i === orch.stageIdx ? 'is-active' : '';
+          return React.createElement('div', { key: i, className: 'snp-orch-dstage ' + st },
+            st === 'is-done'
+              ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
+              : st === 'is-active'
+                ? React.createElement('span', { className: 'snp-orch-ring' })
+                : React.createElement('span', { className: 'snp-orch-step-dot' }),
+            React.createElement('span', { className: 'snp-orch-dstage-label' }, label)
+          );
+        })
       )
     ),
     React.createElement('div', { className: 'snp-orch-dialog-ft' },
@@ -2375,7 +2418,7 @@ function trkOrchPanel(props) {
         )
       ),
       React.createElement('div', { className: 'snp-orch-panel-body' },
-        track.steps.map(function(label, i) {
+        track.steps.map(function(step, i) {
           var st = i < orch.stepIdx ? 'is-done' : i === orch.stepIdx ? 'is-active' : '';
           return React.createElement('div', { key: i, className: 'snp-orch-step ' + st },
             React.createElement('div', { className: 'snp-orch-step-icon' },
@@ -2385,7 +2428,7 @@ function trkOrchPanel(props) {
                   ? React.createElement('span', { className: 'snp-orch-ring' })
                   : React.createElement('span', { className: 'snp-orch-step-dot' })
             ),
-            React.createElement('div', { className: 'snp-orch-step-label' }, label)
+            React.createElement('div', { className: 'snp-orch-step-label' }, step.label)
           );
         })
       )
@@ -2397,18 +2440,27 @@ function trkOrchPanel(props) {
 function OverviewTrack(props) {
   var demand = props.demand;
   var variant = props.variant;
+  var orch = props.orch;
 
-  // Option 3: auto-generates (starts 'loading'). Option 4: waits for the user
-  // to click Generate insights (starts 'empty'). Same skeleton/content either way.
-  var phaseS = React.useState(variant === 4 ? 'empty' : 'loading');
+  // Option 4: waits for the user to click Generate insights (starts 'empty'),
+  // then a flat 1s loading beat before everything appears together.
+  // Option 3: no fake timer — each section unlocks as the Demand AI Specialist
+  // (orch) actually reaches the step that produces it, so a demand still early
+  // in its run genuinely shows an incomplete Overview, not a fully-populated one.
+  var phaseS = React.useState(variant === 4 ? 'empty' : 'loaded');
   var phase = phaseS[0]; var setPhase = phaseS[1];
-  var loading = phase === 'loading';
+  var loading = variant === 4 && phase === 'loading';
 
   React.useEffect(function() {
     if (phase !== 'loading') return;
     var t = setTimeout(function() { setPhase('loaded'); }, 1000);
     return function() { clearTimeout(t); };
   }, [phase]);
+
+  var unlocked = variant === 3 ? trkUnlockedSet(orch) : null;
+  function sectionReady(key) {
+    return variant === 3 ? !!unlocked[key] : phase === 'loaded';
+  }
 
   var exS = React.useState({
     exec: true, // foundational reading — expanded by default
@@ -2497,11 +2549,14 @@ function OverviewTrack(props) {
           )
         )
       : [
-      React.createElement('div', { key: 'strip', className: 'snp-trk-strip' },
-        [React.createElement('div', { key: 'lbl', className: 'snp-trk-strip-label' }, 'At a glance')].concat(
-          stripItems.map(function(item) { return trkStripChip(item, jumpTo); })
-        )
-      ),
+      (function() {
+        var readyStripItems = stripItems.filter(function(item) { return sectionReady(item.mapKey); });
+        return readyStripItems.length === 0 ? null : React.createElement('div', { key: 'strip', className: 'snp-trk-strip' },
+          [React.createElement('div', { key: 'lbl', className: 'snp-trk-strip-label' }, 'At a glance')].concat(
+            readyStripItems.map(function(item) { return trkStripChip(item, jumpTo); })
+          )
+        );
+      })(),
       React.createElement('div', { key: 'body', className: 'snp-ov-body' },
         React.createElement('div', { className: 'snp-trk-cols' },
           loading
@@ -2520,71 +2575,87 @@ function OverviewTrack(props) {
               ),
             ]
           : [
-          // Left (60%) — business-judgment content
+          // Left (60%) — business-judgment content. Each section falls back to
+          // a skeleton until the specialist has actually reached the step that
+          // produces it (variant 3 only — variant 4 is all-or-nothing per phase).
           React.createElement('div', { key: 'col-left', className: 'snp-trk-col-left' },
-            trkExecutiveSummaryBlock({
-              expanded: expandedMap.exec, onToggle: function() { toggle('exec'); },
-              showMore: execShowMore, onToggleShowMore: function() { setExecShowMore(function(v) { return !v; }); },
-              onRefresh: function() { handleRefresh('exec'); }, refreshing: !!spinningMap.exec, refreshed: !!refreshedMap.exec,
-            }),
-            React.createElement('div', { style: { height: '16px' } }),
-            variant === 4
-              ? trkResourceBlockV4({
-                  expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
-                  onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
-                  showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
+            sectionReady('exec')
+              ? trkExecutiveSummaryBlock({
+                  expanded: expandedMap.exec, onToggle: function() { toggle('exec'); },
+                  showMore: execShowMore, onToggleShowMore: function() { setExecShowMore(function(v) { return !v; }); },
+                  onRefresh: function() { handleRefresh('exec'); }, refreshing: !!spinningMap.exec, refreshed: !!refreshedMap.exec,
                 })
-              : trkResourceBlock({
-                  expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
-                  onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
-                  showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
-                }),
+              : trkSkeletonCard(['92%', '78%', '55%']),
+            React.createElement('div', { style: { height: '16px' } }),
+            sectionReady('resource')
+              ? (variant === 4
+                  ? trkResourceBlockV4({
+                      expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
+                      onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
+                      showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
+                    })
+                  : trkResourceBlock({
+                      expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
+                      onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
+                      showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
+                    }))
+              : trkSkeletonCard(['85%', '60%']),
             React.createElement('div', { style: { height: '24px' } }),
-            trkSimilarityBlock({
-              expanded: expandedMap.similarity, onToggle: function() { toggle('similarity'); },
-              onRefresh: function() { handleRefresh('similarity'); }, refreshing: !!spinningMap.similarity, refreshed: !!refreshedMap.similarity,
-              showMore: simShowMore, onToggleShowMore: function() { setSimShowMore(function(v) { return !v; }); },
-            })
+            sectionReady('similarity')
+              ? trkSimilarityBlock({
+                  expanded: expandedMap.similarity, onToggle: function() { toggle('similarity'); },
+                  onRefresh: function() { handleRefresh('similarity'); }, refreshing: !!spinningMap.similarity, refreshed: !!refreshedMap.similarity,
+                  showMore: simShowMore, onToggleShowMore: function() { setSimShowMore(function(v) { return !v; }); },
+                })
+              : trkSkeletonCard(['70%', '90%', '50%'])
           ),
           // Right (40%). Option 3 (locked): Auto-fill leads, Conformance Check beneath it (deliberate, unchanged).
           // Option 4: Key Signals leads instead (replaces Conformance Check in this slot), Auto-fill beneath it.
           React.createElement('div', { key: 'col-right', className: 'snp-trk-col-right' },
             variant === 4
               ? [
-                  trkKeySignalsBlock({
-                    expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
-                    onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
-                  }),
+                  sectionReady('validation')
+                    ? trkKeySignalsBlock({
+                        expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
+                        onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
+                      })
+                    : trkSkeletonCard(['80%', '65%', '90%', '40%']),
                   React.createElement('div', { key: 'rsp1', style: { height: '12px' } }),
-                  trkAutoFillBlock({
-                    expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
-                    values: autofillValues, editingKey: autofillEditingKey,
-                    onEdit: function(key) { setAutofillEditingKey(key); },
-                    onSave: function(key, val) {
-                      setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
-                      setAutofillEditingKey(null);
-                    },
-                    onCancelEdit: function() { setAutofillEditingKey(null); },
-                    onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
-                  }),
+                  sectionReady('autofill')
+                    ? trkAutoFillBlock({
+                        expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
+                        values: autofillValues, editingKey: autofillEditingKey,
+                        onEdit: function(key) { setAutofillEditingKey(key); },
+                        onSave: function(key, val) {
+                          setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
+                          setAutofillEditingKey(null);
+                        },
+                        onCancelEdit: function() { setAutofillEditingKey(null); },
+                        onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
+                      })
+                    : trkSkeletonCard(['75%', '55%']),
                 ]
               : [
-                  trkAutoFillBlock({
-                    expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
-                    values: autofillValues, editingKey: autofillEditingKey,
-                    onEdit: function(key) { setAutofillEditingKey(key); },
-                    onSave: function(key, val) {
-                      setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
-                      setAutofillEditingKey(null);
-                    },
-                    onCancelEdit: function() { setAutofillEditingKey(null); },
-                    onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
-                  }),
+                  sectionReady('autofill')
+                    ? trkAutoFillBlock({
+                        expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
+                        values: autofillValues, editingKey: autofillEditingKey,
+                        onEdit: function(key) { setAutofillEditingKey(key); },
+                        onSave: function(key, val) {
+                          setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
+                          setAutofillEditingKey(null);
+                        },
+                        onCancelEdit: function() { setAutofillEditingKey(null); },
+                        onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
+                      })
+                    : trkSkeletonCard(['75%', '55%']),
                   React.createElement('div', { key: 'rsp2', style: { height: '12px' } }),
-                  trkValidationBlock({
-                    demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
-                    onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
-                  }),
+                  sectionReady('validation')
+                    ? trkValidationBlock({
+                        demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
+                        onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
+                      })
+                    : trkSkeletonCard(['80%', '65%', '90%', '40%']),
                 ]
           ),
         ]
@@ -3840,7 +3911,7 @@ function DemandDetailPage(props) {
                 onSelectAssessment: function(a) { setSelectedAssessment(a); },
               })
             : (variant === 3 || variant === 4)
-              ? React.createElement(OverviewTrack, { demand: demand, variant: variant })
+              ? React.createElement(OverviewTrack, { demand: demand, variant: variant, orch: orch })
               : React.createElement(OverviewTab, { demand: demand })
       )
     )
