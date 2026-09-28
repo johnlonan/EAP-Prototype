@@ -1225,6 +1225,80 @@ var injectStyles = function() {
     .snp-trk-tbl th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; font-weight: 600; }
     .snp-trk-tbl td:last-child, .snp-trk-tbl th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
     .snp-trk-tbl-total td { font-weight: 700; font-size: 15px; border-top: 2px solid #d1d5db; border-bottom: none; }
+
+    /* Demand AI Specialist — orchestrator awareness: floating modeless dialog + detail side panel */
+    @keyframes snp-orch-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .snp-orch-ring {
+      display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid #cfe6ee; border-top-color: #0f7aab;
+      animation: snp-orch-spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    .snp-orch-pill {
+      display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600;
+      padding: 3px 9px 3px 7px; border-radius: 10px;
+    }
+    .snp-orch-pill.is-progress { background: #eef7fa; color: #0f7aab; }
+    .snp-orch-pill.is-complete { background: #eaf7ee; color: #1a8a4a; }
+
+    .snp-orch-dialog {
+      position: fixed; right: 24px; bottom: 24px; width: 320px; z-index: 60;
+      background: #fff; border-radius: 12px; border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 24px rgba(3,45,66,0.14), 0 2px 6px rgba(3,45,66,0.08);
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+      animation: snp-orch-dialog-in 0.22s ease-out;
+    }
+    @keyframes snp-orch-dialog-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .snp-orch-dialog-hd {
+      display: flex; align-items: center; gap: 8px; padding: 12px 10px 12px 14px;
+      border-bottom: 1px solid #f1f2f4;
+    }
+    .snp-orch-dialog-hd-title { flex: 1; font-size: 13px; font-weight: 700; color: #151920; }
+    .snp-orch-dialog-close {
+      display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+      border-radius: 6px; color: #6b7280; cursor: pointer; border: none; background: transparent;
+    }
+    .snp-orch-dialog-close:hover { background: #f3f4f6; }
+    .snp-orch-dialog-body { padding: 12px 14px 4px; }
+    .snp-orch-dialog-stage { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #151920; font-weight: 600; }
+    .snp-orch-dialog-stage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; }
+    .snp-orch-dialog-meta { font-size: 12px; color: #6b7280; margin: 5px 0 12px 22px; }
+    .snp-orch-dialog-ft {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px 14px; border-top: 1px solid #f1f2f4;
+    }
+    .snp-orch-dialog-link {
+      font-size: 12px; font-weight: 600; color: #0f7aab; cursor: pointer; background: none; border: none;
+      padding: 0; display: flex; align-items: center; gap: 4px;
+    }
+    .snp-orch-dialog-link:hover { text-decoration: underline; }
+
+    .snp-orch-panel {
+      position: fixed; top: 56px; right: 0; bottom: 0; width: 380px; z-index: 70;
+      background: #fff; box-shadow: -8px 0 24px rgba(3,45,66,0.16);
+      display: flex; flex-direction: column;
+      animation: snp-orch-panel-in 0.22s ease-out;
+      font-family: var(--now-font-family, 'Lato', sans-serif);
+    }
+    @keyframes snp-orch-panel-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+    .snp-orch-panel-hd { padding: 18px 20px 14px; border-bottom: 1px solid #f1f2f4; }
+    .snp-orch-panel-hd-row { display: flex; align-items: center; justify-content: space-between; }
+    .snp-orch-panel-title { font-size: 18px; font-weight: 700; color: #032d42; font-family: 'Cabin', var(--now-font-family, sans-serif); }
+    .snp-orch-panel-meta { font-size: 12px; color: #6b7280; margin-top: 8px; }
+    .snp-orch-panel-owner { font-size: 12px; color: #454D5B; margin-top: 6px; }
+    .snp-orch-panel-body { flex: 1; overflow-y: auto; padding: 18px 20px 24px; }
+    .snp-orch-step {
+      display: flex; gap: 10px; align-items: flex-start; padding-bottom: 20px; position: relative;
+    }
+    .snp-orch-step:not(:last-child)::before {
+      content: ''; position: absolute; left: 7px; top: 20px; bottom: 0; width: 1px; background: #e5e7eb;
+    }
+    .snp-orch-step-icon { flex-shrink: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+    .snp-orch-step-icon .snp-orch-check { color: #1a8a4a; }
+    .snp-orch-step-icon .snp-orch-ring { width: 15px; height: 15px; }
+    .snp-orch-step-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid #d1d5db; margin: 3px; }
+    .snp-orch-step-label { font-size: 14px; color: #9ca3af; line-height: 1.3; padding-top: 0px; }
+    .snp-orch-step.is-done .snp-orch-step-label { color: #151920; }
+    .snp-orch-step.is-active .snp-orch-step-label { color: #151920; font-weight: 600; }
   `;
   document.head.appendChild(el);
 };
@@ -2177,6 +2251,143 @@ function trkStripChip(item, onJump) {
       React.createElement('div', { className: 'snp-trk-chip-text' },
         React.createElement('div', { className: 'snp-trk-chip-label' }, item.label),
         React.createElement('div', { className: 'snp-trk-chip-sub' }, item.sub)
+      )
+    )
+  );
+}
+
+// ── Demand AI Specialist — orchestrator awareness (modeless dialog + side panel) ──
+// The specialist's steps differ by demand type, matching the process spine each
+// portfolio actually follows (steering-committee tracks vs. the AZ fast-track).
+var TRK_ORCH_TRACKS = {
+  marketing: {
+    stages: ['Demand raised', 'Demand manager validates info', 'Resourcing estimate completed', 'Steering committee approves', 'Converted to project'],
+    stageOfStep: [0, 1, 1, 2, 3, 3, 4],
+    steps: [
+      'Logged the demand', 'Reviewed the marketing brief', 'Checked required fields with demand manager',
+      'Estimated campaign resourcing', 'Routed to steering committee', 'Awaiting committee decision', 'Recorded committee outcome',
+    ],
+  },
+  it: {
+    stages: ['Demand raised', 'Information validated', 'Engineering assessment', 'Resourcing estimate', 'Steering committee approval', 'Converted to project'],
+    stageOfStep: [0, 1, 1, 2, 2, 3, 3, 4, 5],
+    steps: [
+      'Logged the demand', 'Reviewed submitted details', 'Checked required fields',
+      'Assessed technical feasibility', 'Identified integration risks',
+      'Estimated engineering hours', 'Estimated role-level resourcing',
+      'Routed to steering committee', 'Recorded committee decision',
+    ],
+  },
+  fasttrack: {
+    stages: ['Demand raised', 'Minimum data criteria checked', 'Budget threshold checked', 'Converted to project'],
+    stageOfStep: [0, 1, 1, 2, 2, 3],
+    steps: [
+      'Logged the demand', 'Checked minimum data criteria', 'Validated data classification',
+      'Checked budget against $100k threshold', 'Confirmed no committee review needed', 'Converted to project',
+    ],
+  },
+};
+
+function trkTrackForPortfolio(portfolio) {
+  if (portfolio === 'Marketing') return 'marketing';
+  if (portfolio === 'Consumer Digital product') return 'fasttrack';
+  return 'it'; // HR, Application Modernization, Enterprise Ventures, Business Transformation, (empty)
+}
+
+// Reuses the demand's own lifecycle state so every demand already in the list
+// gets a coherent specialist status — no separate field to keep in sync.
+function trkOrchStateForDemand(demand) {
+  var track = TRK_ORCH_TRACKS[trkTrackForPortfolio(demand.portfolio)];
+  var lastStep = track.steps.length - 1;
+  var byState = {
+    'Draft':        { status: 'in_progress', stepIdx: 0,                              meta: 'Started just now',      est: '10–25 mins' },
+    'Submitted':    { status: 'in_progress', stepIdx: 1,                              meta: 'Started 6 mins ago',    est: '10–25 mins' },
+    'Screening':    { status: 'in_progress', stepIdx: Math.round(lastStep * 0.45),    meta: 'Started 20 mins ago',   est: '10–25 mins' },
+    'Qualified':    { status: 'in_progress', stepIdx: Math.round(lastStep * 0.75),    meta: 'Started 40 mins ago',   est: '10–25 mins' },
+    'Approved':     { status: 'completed',   stepIdx: lastStep,                        meta: 'Completed 25 mins ago' },
+    'Complete':     { status: 'completed',   stepIdx: lastStep,                        meta: 'Completed 2 hours ago' },
+    'AI Qualified': { status: 'completed',   stepIdx: lastStep,                        meta: 'Completed 1 hour ago' },
+  };
+  var s = byState[demand.state] || byState['Draft'];
+  return {
+    track: track, status: s.status, stepIdx: s.stepIdx, meta: s.meta, est: s.est,
+    stageIdx: track.stageOfStep[s.stepIdx],
+  };
+}
+
+function trkOrchDialog(props) {
+  var orch = props.orch;
+  var track = orch.track;
+  var isDone = orch.status === 'completed';
+  var stageLabel = track.stages[orch.stageIdx];
+
+  return React.createElement('div', { className: 'snp-orch-dialog' },
+    React.createElement('div', { className: 'snp-orch-dialog-hd' },
+      React.createElement('div', { className: 'snp-orch-dialog-hd-title' }, 'Demand AI Specialist'),
+      React.createElement('span', { className: 'snp-orch-pill ' + (isDone ? 'is-complete' : 'is-progress') },
+        isDone ? React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }) : React.createElement('span', { className: 'snp-orch-ring', style: { width: '10px', height: '10px' } }),
+        isDone ? 'Completed' : 'In progress'
+      ),
+      React.createElement('button', { className: 'snp-orch-dialog-close', onClick: props.onClose, 'aria-label': 'Dismiss' },
+        React.createElement('now-icon', { icon: 'close-outline', size: 'sm' })
+      )
+    ),
+    React.createElement('div', { className: 'snp-orch-dialog-body' },
+      React.createElement('div', { className: 'snp-orch-dialog-stage' },
+        isDone
+          ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
+          : React.createElement('span', { className: 'snp-orch-ring' }),
+        isDone ? 'All steps complete' : stageLabel
+      ),
+      React.createElement('div', { className: 'snp-orch-dialog-meta' },
+        orch.meta + (orch.est ? ' (est. ' + orch.est + ')' : '')
+      )
+    ),
+    React.createElement('div', { className: 'snp-orch-dialog-ft' },
+      React.createElement('button', { className: 'snp-orch-dialog-link', onClick: props.onOpenPanel },
+        'View all steps',
+        React.createElement('now-icon', { icon: 'chevron-right-outline', size: 'sm' })
+      )
+    )
+  );
+}
+
+function trkOrchPanel(props) {
+  var orch = props.orch;
+  var track = orch.track;
+  var isDone = orch.status === 'completed';
+
+  return (
+    React.createElement('div', { className: 'snp-orch-panel' },
+      React.createElement('div', { className: 'snp-orch-panel-hd' },
+        React.createElement('div', { className: 'snp-orch-panel-hd-row' },
+          React.createElement('div', { className: 'snp-orch-panel-title' }, 'All steps'),
+          React.createElement('button', { className: 'snp-orch-dialog-close', onClick: props.onClose, 'aria-label': 'Close' },
+            React.createElement('now-icon', { icon: 'close-outline', size: 'sm' })
+          )
+        ),
+        React.createElement('div', { className: 'snp-orch-panel-owner' }, 'Demand AI Specialist (owner)'),
+        React.createElement('div', { className: 'snp-orch-panel-meta' },
+          React.createElement('span', { className: 'snp-orch-pill ' + (isDone ? 'is-complete' : 'is-progress'), style: { marginRight: '6px' } },
+            isDone ? 'Completed' : 'In progress'
+          ),
+          orch.meta + (orch.est ? ' (est. ' + orch.est + ')' : '')
+        )
+      ),
+      React.createElement('div', { className: 'snp-orch-panel-body' },
+        track.steps.map(function(label, i) {
+          var st = i < orch.stepIdx ? 'is-done' : i === orch.stepIdx ? 'is-active' : '';
+          return React.createElement('div', { key: i, className: 'snp-orch-step ' + st },
+            React.createElement('div', { className: 'snp-orch-step-icon' },
+              i < orch.stepIdx || (i === orch.stepIdx && isDone)
+                ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
+                : i === orch.stepIdx
+                  ? React.createElement('span', { className: 'snp-orch-ring' })
+                  : React.createElement('span', { className: 'snp-orch-step-dot' })
+            ),
+            React.createElement('div', { className: 'snp-orch-step-label' }, label)
+          );
+        })
       )
     )
   );
@@ -3545,6 +3756,12 @@ function DemandDetailPage(props) {
   var saS = React.useState(null);
   var selectedAssessment = saS[0]; var setSelectedAssessment = saS[1];
 
+  // Demand AI Specialist awareness — Option 3 only. Floats over every tab in
+  // this demand (not just Overview) so the user can't miss that it ran.
+  var orch = variant === 3 ? trkOrchStateForDemand(demand) : null;
+  var dlgS = React.useState(true); var dialogOpen = dlgS[0]; var setDialogOpen = dlgS[1];
+  var pnlS = React.useState(false); var panelOpen = pnlS[0]; var setPanelOpen = pnlS[1];
+
   if (selectedAssessment && tab === 'smart-assessments') {
     return React.createElement(SmartAssessmentInstanceView, {
       demand: demand,
@@ -3554,7 +3771,8 @@ function DemandDetailPage(props) {
     });
   }
 
-  return React.createElement('div', { className: 'snp-detail-page' },
+  return React.createElement(React.Fragment, null,
+  React.createElement('div', { className: 'snp-detail-page' },
 
     // Full-width breadcrumb
     React.createElement('div', { className: 'snp-bc' },
@@ -3626,6 +3844,17 @@ function DemandDetailPage(props) {
               : React.createElement(OverviewTab, { demand: demand })
       )
     )
+  ),
+  orch && dialogOpen && !panelOpen
+    ? React.createElement(trkOrchDialog, {
+        orch: orch,
+        onClose: function() { setDialogOpen(false); },
+        onOpenPanel: function() { setPanelOpen(true); },
+      })
+    : null,
+  orch && panelOpen
+    ? React.createElement(trkOrchPanel, { orch: orch, onClose: function() { setPanelOpen(false); } })
+    : null
   );
 }
 
@@ -3652,6 +3881,12 @@ var OPTION_CARDS = [
     title: 'Demand Intelligence (On Demand)',
     desc: 'Same as Demand Intelligence, but nothing generates automatically. The Overview tab opens empty until the user chooses to generate insights.',
   },
+  {
+    num: 5,
+    title: 'Demand widget - Employee Slate',
+    desc: 'A standalone My Demands widget for the EmployeeWorks employee experience — submit and track demands, follow lifecycle state through to the resulting delivery project, and manage business case details.',
+    href: '../narrative-11-employeeworks/canvas.html',
+  },
 ];
 
 function StartPage(props) {
@@ -3663,24 +3898,25 @@ function StartPage(props) {
       React.createElement('div', { className: 'hub-eyebrow' }, 'Demand Management'),
       React.createElement('h1', { className: 'hub-title' }, 'Prototype'),
       React.createElement('p', { className: 'hub-subtitle' },
-        'Four explorations in AI-assisted demand management: structured assessments, automated validation, similarity detection, and resource estimation.'
+        'Five explorations in AI-assisted demand management: structured assessments, automated validation, similarity detection, resource estimation, and an employee-facing demand widget.'
       )
     ),
 
     React.createElement('div', { className: 'hub-body' },
       React.createElement('div', { className: 'hub-cards' },
         OPTION_CARDS.map(function(opt) {
+          var go = opt.href ? function() { window.location.href = opt.href; } : function() { onSelect(opt.num); };
           return React.createElement('div', {
             key: opt.num,
             className: 'hub-card',
-            onClick: function() { onSelect(opt.num); },
+            onClick: go,
           },
             React.createElement('div', { className: 'hub-num' }, opt.num),
             React.createElement('div', { className: 'hub-card-title' }, opt.title),
             React.createElement('div', { className: 'hub-card-desc' }, opt.desc),
             React.createElement('button', {
               className: 'hub-card-cta',
-              onClick: function(e) { e.stopPropagation(); onSelect(opt.num); },
+              onClick: function(e) { e.stopPropagation(); go(); },
             }, 'Launch prototype')
           );
         })
@@ -3704,6 +3940,7 @@ function DemandsApp(props) {
 
   if (view === 'detail' && demand) {
     return React.createElement(DemandDetailPage, {
+      key: demand.key,
       demand: demand, tab: tab, setTab: setTab, variant: variant,
       onBack: function() { setView('list'); },
     });
