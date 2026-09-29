@@ -1262,6 +1262,11 @@ var injectStyles = function() {
     .snp-orch-dialog-body { padding: 12px 14px 8px; }
     .snp-orch-dialog-meta { font-size: 12px; color: #6b7280; margin-bottom: 6px; }
     .snp-orch-dialog-dispatch { font-size: 12px; color: #0f7aab; margin-bottom: 10px; line-height: 1.4; }
+    .snp-orch-dialog-headline { font-size: 15px; font-weight: 600; color: #151920; line-height: 1.35; margin-bottom: 10px; }
+    @keyframes snp-orch-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+    .snp-orch-dialog-live { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; animation: snp-orch-pulse 1.8s ease-in-out infinite; }
+    .snp-orch-live-text { font-size: 13px; color: #0f7aab; font-weight: 500; }
+    .snp-orch-dialog-min .snp-orch-dialog-body { padding-bottom: 12px; }
     .snp-orch-dialog-autoconvert { font-size: 11px; color: #6b7280; margin-bottom: 14px; line-height: 1.45; padding: 8px 10px; background: #f9fafb; border-radius: 6px; }
     .snp-orch-dialog-stages { display: flex; flex-direction: column; gap: 12px; }
     .snp-orch-dstage { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #9ca3af; }
@@ -2370,6 +2375,11 @@ function trkTrackKeys(track) {
 // Overview's expand-map). Order here is just display order, not sequence.
 // Not every track produces every one — see trkTrackKeys.
 var TRK_AGENT_KEYS = ['exec', 'validation', 'autofill', 'similarity', 'resource', 'finance'];
+
+// Two demo demands (near the top of the list, one in progress, one
+// completed) show the minimal dialog instead of the full checklist, so
+// both variants can be compared side by side.
+var TRK_MINIMAL_DIALOG_DEMOS = ['DMND410099a', 'DMND410200'];
 var TRK_AGENT_LABELS = {
   exec: 'Executive Summary', validation: 'Conformance Check', autofill: 'Auto-fill',
   similarity: 'Similarity Check', resource: 'Resourcing Estimate', finance: 'Finance Review',
@@ -2465,14 +2475,10 @@ function trkAgentStatuses(orch) {
   return statuses;
 }
 
-function trkOrchDialog(props) {
-  var orch = props.orch;
-  var isDone = orch.status === 'completed';
-  var statuses = trkAgentStatuses(orch);
-  var trackKeys = trkTrackKeys(orch.track);
-
-  // Freely draggable by its header, like any modeless dialog — starts docked
-  // bottom-right, switches to an explicit position on first drag.
+// Shared by both dialog variants — freely draggable by its header, like any
+// modeless dialog. Starts docked bottom-right, switches to an explicit
+// position on first drag.
+function trkUseDialogDrag() {
   var posS = React.useState(null);
   var pos = posS[0]; var setPos = posS[1];
   var elRef = React.useRef(null);
@@ -2496,7 +2502,16 @@ function trkOrchDialog(props) {
     window.addEventListener('mouseup', onUp);
   }
 
-  var dragStyle = pos ? { left: pos.x + 'px', top: pos.y + 'px', right: 'auto', bottom: 'auto' } : null;
+  return { elRef: elRef, onDragStart: onDragStart, style: pos ? { left: pos.x + 'px', top: pos.y + 'px', right: 'auto', bottom: 'auto' } : null };
+}
+
+function trkOrchDialog(props) {
+  var orch = props.orch;
+  var isDone = orch.status === 'completed';
+  var statuses = trkAgentStatuses(orch);
+  var trackKeys = trkTrackKeys(orch.track);
+  var drag = trkUseDialogDrag();
+  var elRef = drag.elRef, onDragStart = drag.onDragStart, dragStyle = drag.style;
 
   return React.createElement('div', { className: 'snp-orch-dialog', ref: elRef, style: dragStyle },
     React.createElement('div', { className: 'snp-orch-dialog-hd', onMouseDown: onDragStart },
@@ -2544,6 +2559,57 @@ function trkOrchDialog(props) {
     React.createElement('div', { className: 'snp-orch-dialog-ft' },
       React.createElement('button', { className: 'snp-orch-dialog-link', onClick: props.onOpenPanel },
         'View all steps',
+        React.createElement('now-icon', { icon: 'chevron-right-outline', size: 'sm' })
+      )
+    )
+  );
+}
+
+// Minimal variant — same underlying data, but deliberately withholds the
+// per-agent checklist. Just the confident headline, what's live right now,
+// and a way in for anyone who wants the detail. Reserved for a couple of
+// demo demands so both this and the full dialog can be seen side by side.
+function trkOrchDialogMinimal(props) {
+  var orch = props.orch;
+  var isDone = orch.status === 'completed';
+  var statuses = trkAgentStatuses(orch);
+  var trackKeys = trkTrackKeys(orch.track);
+  var total = trackKeys.filter(function(k) { return statuses[k] !== 'skipped'; }).length;
+  var runningPurpose = trackKeys
+    .filter(function(k) { return statuses[k] === 'running'; })
+    .map(function(k) { return TRK_AGENT_PURPOSE[k]; })
+    .join(' and ');
+  var drag = trkUseDialogDrag();
+  var elRef = drag.elRef, onDragStart = drag.onDragStart, dragStyle = drag.style;
+
+  return React.createElement('div', { className: 'snp-orch-dialog snp-orch-dialog-min', ref: elRef, style: dragStyle },
+    React.createElement('div', { className: 'snp-orch-dialog-hd', onMouseDown: onDragStart },
+      React.createElement('div', { className: 'snp-orch-dialog-hd-title' }, 'Demand AI Specialist'),
+      React.createElement('span', { className: 'snp-orch-pill ' + (isDone ? 'is-complete' : 'is-progress') },
+        isDone ? React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }) : React.createElement('span', { className: 'snp-orch-ring', style: { width: '10px', height: '10px' } }),
+        isDone ? 'Completed' : 'In progress'
+      ),
+      React.createElement('button', { className: 'snp-orch-dialog-close', onClick: props.onClose, 'aria-label': 'Dismiss' },
+        React.createElement('now-icon', { icon: 'close-outline', size: 'sm' })
+      )
+    ),
+    React.createElement('div', { className: 'snp-orch-dialog-body' },
+      React.createElement('div', { className: 'snp-orch-dialog-headline' },
+        isDone ? 'All ' + total + ' agents completed their review' : 'Working across ' + total + ' agents to assess this demand'
+      ),
+      isDone
+        ? null
+        : React.createElement('div', { className: 'snp-orch-dialog-live' },
+            React.createElement('span', { className: 'snp-orch-ring' }),
+            React.createElement('span', { className: 'snp-orch-live-text' }, runningPurpose || 'Working through the next check')
+          ),
+      React.createElement('div', { className: 'snp-orch-dialog-meta' },
+        orch.meta + (orch.est ? ' (est. ' + orch.est + ')' : '')
+      )
+    ),
+    React.createElement('div', { className: 'snp-orch-dialog-ft' },
+      React.createElement('button', { className: 'snp-orch-dialog-link', onClick: props.onOpenPanel },
+        'View steps',
         React.createElement('now-icon', { icon: 'chevron-right-outline', size: 'sm' })
       )
     )
@@ -4118,7 +4184,7 @@ function DemandDetailPage(props) {
     )
   ),
   orch && dialogOpen && !panelOpen
-    ? React.createElement(trkOrchDialog, {
+    ? React.createElement(TRK_MINIMAL_DIALOG_DEMOS.indexOf(demand.key) !== -1 ? trkOrchDialogMinimal : trkOrchDialog, {
         orch: orch,
         onClose: function() { setDialogOpen(false); },
         onOpenPanel: function() { setPanelOpen(true); },
