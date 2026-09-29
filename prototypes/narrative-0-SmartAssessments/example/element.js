@@ -1059,10 +1059,6 @@ var injectStyles = function() {
     .snp-skel-line { height: 10px; border-radius: 3px; margin-bottom: 8px; }
     .snp-skel-line:last-child { margin-bottom: 0; }
 
-    .snp-trk-notneeded { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; }
-    .snp-trk-notneeded .snp-orch-dash { color: #c2c4c9; font-weight: 700; font-size: 15px; line-height: 1.4; }
-    .snp-trk-notneeded-title { font-size: 13px; color: #9ca3af; font-weight: 600; }
-    .snp-trk-notneeded-sub { font-size: 12px; color: #c2c4c9; margin-top: 2px; }
 
     /* Bolder pass — stronger hierarchy and weight contrast, track-scoped only
        (never touches the shared classes Options 1 & 2 also render through) */
@@ -1271,12 +1267,10 @@ var injectStyles = function() {
     .snp-orch-dstage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; margin-top: 1px; }
     .snp-orch-dstage .snp-orch-ring { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; }
     .snp-orch-dstage .snp-orch-step-dot { width: 7px; height: 7px; margin: 5px 3px 0; flex-shrink: 0; }
-    .snp-orch-dstage .snp-orch-dash { width: 13px; text-align: center; color: #c2c4c9; flex-shrink: 0; font-weight: 700; }
     .snp-orch-dstage-text { min-width: 0; }
     .snp-orch-dstage-detail { font-size: 11px; color: #b0b3ba; margin-top: 2px; line-height: 1.35; }
     .snp-orch-dstage.is-done .snp-orch-dstage-label { color: #151920; }
     .snp-orch-dstage.is-running .snp-orch-dstage-label { color: #151920; font-weight: 600; }
-    .snp-orch-dstage.is-skipped .snp-orch-dstage-label { color: #c2c4c9; text-decoration: line-through; }
     .snp-orch-dialog-ft {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 10px 14px; border-top: 1px solid #f1f2f4;
@@ -1310,13 +1304,10 @@ var injectStyles = function() {
     .snp-orch-step-icon { flex-shrink: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
     .snp-orch-step-icon .snp-orch-check { color: #1a8a4a; }
     .snp-orch-step-icon .snp-orch-ring { width: 15px; height: 15px; }
-    .snp-orch-step-icon .snp-orch-dash { color: #c2c4c9; font-weight: 700; }
     .snp-orch-step-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid #d1d5db; margin: 3px; }
     .snp-orch-step-label { font-size: 14px; color: #9ca3af; line-height: 1.3; padding-top: 0px; }
     .snp-orch-step.is-done .snp-orch-step-label { color: #151920; }
     .snp-orch-step.is-active .snp-orch-step-label { color: #151920; font-weight: 600; }
-    .snp-orch-step.is-skipped .snp-orch-step-label { color: #c2c4c9; text-decoration: line-through; }
-    .snp-orch-step-note { font-size: 11px; color: #c2c4c9; margin-top: 2px; }
   `;
   document.head.appendChild(el);
 };
@@ -1763,25 +1754,6 @@ function trkSkeletonCard(lineWidths) {
           lineWidths.map(function(w, i) {
             return React.createElement('div', { key: i, className: 'snp-skel snp-skel-line', style: { width: w } });
           })
-        )
-      )
-    )
-  );
-}
-
-// A calm, static placeholder for a deliverable the orchestrator decided this
-// demand doesn't need — distinct from a skeleton, which implies "still coming".
-function trkNotNeededCard(label) {
-  return React.createElement('div', { className: 'snp-ai-card snp-trk-card' },
-    React.createElement('div', { className: 'snp-ai-inner' },
-      React.createElement('div', { className: 'snp-ai-bar' }),
-      React.createElement('div', { className: 'snp-ai-content' },
-        React.createElement('div', { className: 'snp-trk-notneeded' },
-          React.createElement('span', { className: 'snp-orch-dash' }, '–'),
-          React.createElement('div', null,
-            React.createElement('div', { className: 'snp-trk-notneeded-title' }, label),
-            React.createElement('div', { className: 'snp-trk-notneeded-sub' }, 'Not needed for this demand')
-          )
         )
       )
     )
@@ -2380,15 +2352,6 @@ var TRK_AGENT_PURPOSE = {
   similarity: 'Scans for overlapping or duplicate demands',
   resource: 'Estimates role-level resourcing from comparables',
 };
-// Plain-language reason when the orchestrator decides an agent isn't needed —
-// explainability applies to "didn't run" the same as it does to a ranking.
-var TRK_AGENT_SKIP_REASON = {
-  validation: 'intake already met policy requirements',
-  autofill: 'all required fields were already complete',
-  similarity: 'no comparable demands expected for this intake type',
-  resource: 'resourcing was already defined upstream',
-};
-
 function trkTrackForPortfolio(portfolio) {
   if (portfolio === 'Marketing') return 'marketing';
   if (portfolio === 'Consumer Digital product') return 'fasttrack';
@@ -2514,20 +2477,19 @@ function trkOrchDialog(props) {
         'Deployed ' + TRK_AGENT_KEYS.filter(function(k) { return statuses[k] !== 'skipped'; }).length + ' of ' + TRK_AGENT_KEYS.length + ' agents, based on demand type and intake completeness'
       ),
       React.createElement('div', { className: 'snp-orch-dialog-stages' },
-        TRK_AGENT_KEYS.map(function(key) {
-          var st = statuses[key]; // done / running / queued / skipped
-          var detail = st === 'done' ? 'Completed'
-            : st === 'running' ? 'Running'
-            : st === 'queued' ? 'Queued to run next'
-            : 'Not needed, ' + TRK_AGENT_SKIP_REASON[key];
+        // The orchestrator decided which agents to deploy before starting —
+        // one it never selected has no business appearing in this list at
+        // all (struck-through would read as "started, then cancelled").
+        // The dispatch line above is the one place that says fewer ran.
+        TRK_AGENT_KEYS.filter(function(key) { return statuses[key] !== 'skipped'; }).map(function(key) {
+          var st = statuses[key]; // done / running / queued
+          var detail = st === 'done' ? 'Completed' : st === 'running' ? 'Running' : 'Queued to run next';
           return React.createElement('div', { key: key, className: 'snp-orch-dstage is-' + st },
             st === 'done'
               ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
               : st === 'running'
                 ? React.createElement('span', { className: 'snp-orch-ring' })
-                : st === 'skipped'
-                  ? React.createElement('span', { className: 'snp-orch-dash' }, '–')
-                  : React.createElement('span', { className: 'snp-orch-step-dot' }),
+                : React.createElement('span', { className: 'snp-orch-step-dot' }),
             React.createElement('div', { className: 'snp-orch-dstage-text' },
               React.createElement('div', { className: 'snp-orch-dstage-label' }, TRK_AGENT_LABELS[key]),
               React.createElement('div', { className: 'snp-orch-dstage-detail' }, TRK_AGENT_PURPOSE[key] + ' · ' + detail)
@@ -2568,21 +2530,21 @@ function trkOrchPanel(props) {
         )
       ),
       React.createElement('div', { className: 'snp-orch-panel-body' },
+        // This is a literal execution log — every one of these steps ran
+        // regardless of which agent's output ended up skipped, so it's
+        // always shown as plain done/active/pending. Which agent didn't run
+        // is a dialog-level (decision) concern, not a log-level one.
         track.steps.map(function(step, i) {
-          var skippedHere = orch.skipped && step.unlocks.indexOf(orch.skipped) !== -1;
-          var st = skippedHere ? 'is-skipped' : i < orch.stepIdx ? 'is-done' : i === orch.stepIdx ? 'is-active' : '';
+          var st = i < orch.stepIdx ? 'is-done' : i === orch.stepIdx ? 'is-active' : '';
           return React.createElement('div', { key: i, className: 'snp-orch-step ' + st },
             React.createElement('div', { className: 'snp-orch-step-icon' },
-              skippedHere
-                ? React.createElement('span', { className: 'snp-orch-dash' }, '–')
-                : i < orch.stepIdx || (i === orch.stepIdx && isDone)
-                  ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
-                  : i === orch.stepIdx
-                    ? React.createElement('span', { className: 'snp-orch-ring' })
-                    : React.createElement('span', { className: 'snp-orch-step-dot' })
+              i < orch.stepIdx || (i === orch.stepIdx && isDone)
+                ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
+                : i === orch.stepIdx
+                  ? React.createElement('span', { className: 'snp-orch-ring' })
+                  : React.createElement('span', { className: 'snp-orch-step-dot' })
             ),
-            React.createElement('div', { className: 'snp-orch-step-label' }, step.label),
-            skippedHere ? React.createElement('div', { className: 'snp-orch-step-note' }, 'Not needed for this demand') : null
+            React.createElement('div', { className: 'snp-orch-step-label' }, step.label)
           );
         })
       )
@@ -2591,6 +2553,20 @@ function trkOrchPanel(props) {
 }
 
 // ── Track Overview root — Options 3 & 4 ─────────────────────────────────────
+// Renders a column's items, dropping any whose node is null (skipped agent)
+// and reflowing the spacers so no gap is left where a card would have been —
+// same reasoning as the dialog: a skipped agent was never dispatched, so its
+// slot shouldn't exist on the page at all.
+function trkBuildColumn(items) {
+  var visible = items.filter(function(it) { return it.node !== null; });
+  var out = [];
+  visible.forEach(function(it, i) {
+    if (i > 0) out.push(React.createElement('div', { key: 'sp' + i, style: { height: it.height } }));
+    out.push(React.cloneElement(it.node, { key: 'card' + i }));
+  });
+  return out;
+}
+
 function OverviewTrack(props) {
   var demand = props.demand;
   var variant = props.variant;
@@ -2736,35 +2712,44 @@ function OverviewTrack(props) {
           // a skeleton until the specialist has actually reached the step that
           // produces it (variant 3 only — variant 4 is all-or-nothing per phase).
           React.createElement('div', { key: 'col-left', className: 'snp-trk-col-left' },
-            sectionReady('exec')
-              ? trkExecutiveSummaryBlock({
-                  expanded: expandedMap.exec, onToggle: function() { toggle('exec'); },
-                  showMore: execShowMore, onToggleShowMore: function() { setExecShowMore(function(v) { return !v; }); },
-                  onRefresh: function() { handleRefresh('exec'); }, refreshing: !!spinningMap.exec, refreshed: !!refreshedMap.exec,
-                })
-              : trkSkeletonCard(['92%', '78%', '55%']),
-            React.createElement('div', { style: { height: '16px' } }),
-            sectionReady('resource')
-              ? (variant === 4
-                  ? trkResourceBlockV4({
-                      expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
-                      onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
-                      showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
+            trkBuildColumn([
+              {
+                height: null,
+                node: sectionReady('exec')
+                  ? trkExecutiveSummaryBlock({
+                      expanded: expandedMap.exec, onToggle: function() { toggle('exec'); },
+                      showMore: execShowMore, onToggleShowMore: function() { setExecShowMore(function(v) { return !v; }); },
+                      onRefresh: function() { handleRefresh('exec'); }, refreshing: !!spinningMap.exec, refreshed: !!refreshedMap.exec,
                     })
-                  : trkResourceBlock({
-                      expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
-                      onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
-                      showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
-                    }))
-              : sectionSkipped('resource') ? trkNotNeededCard('Resourcing Estimate') : trkSkeletonCard(['85%', '60%']),
-            React.createElement('div', { style: { height: '24px' } }),
-            sectionReady('similarity')
-              ? trkSimilarityBlock({
-                  expanded: expandedMap.similarity, onToggle: function() { toggle('similarity'); },
-                  onRefresh: function() { handleRefresh('similarity'); }, refreshing: !!spinningMap.similarity, refreshed: !!refreshedMap.similarity,
-                  showMore: simShowMore, onToggleShowMore: function() { setSimShowMore(function(v) { return !v; }); },
-                })
-              : sectionSkipped('similarity') ? trkNotNeededCard('Similarity Check') : trkSkeletonCard(['70%', '90%', '50%'])
+                  : trkSkeletonCard(['92%', '78%', '55%']),
+              },
+              {
+                height: '16px',
+                node: sectionSkipped('resource') ? null : sectionReady('resource')
+                  ? (variant === 4
+                      ? trkResourceBlockV4({
+                          expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
+                          onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
+                          showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
+                        })
+                      : trkResourceBlock({
+                          expanded: expandedMap.resource, onToggle: function() { toggle('resource'); },
+                          onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
+                          showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
+                        }))
+                  : trkSkeletonCard(['85%', '60%']),
+              },
+              {
+                height: '24px',
+                node: sectionSkipped('similarity') ? null : sectionReady('similarity')
+                  ? trkSimilarityBlock({
+                      expanded: expandedMap.similarity, onToggle: function() { toggle('similarity'); },
+                      onRefresh: function() { handleRefresh('similarity'); }, refreshing: !!spinningMap.similarity, refreshed: !!refreshedMap.similarity,
+                      showMore: simShowMore, onToggleShowMore: function() { setSimShowMore(function(v) { return !v; }); },
+                    })
+                  : trkSkeletonCard(['70%', '90%', '50%']),
+              },
+            ])
           ),
           // Right (40%). Option 3 (locked): Auto-fill leads, Conformance Check beneath it (deliberate, unchanged).
           // Option 4: Key Signals leads instead (replaces Conformance Check in this slot), Auto-fill beneath it.
@@ -2792,28 +2777,33 @@ function OverviewTrack(props) {
                       })
                     : trkSkeletonCard(['75%', '55%']),
                 ]
-              : [
-                  sectionReady('autofill')
-                    ? trkAutoFillBlock({
-                        expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
-                        values: autofillValues, editingKey: autofillEditingKey,
-                        onEdit: function(key) { setAutofillEditingKey(key); },
-                        onSave: function(key, val) {
-                          setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
-                          setAutofillEditingKey(null);
-                        },
-                        onCancelEdit: function() { setAutofillEditingKey(null); },
-                        onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
-                      })
-                    : sectionSkipped('autofill') ? trkNotNeededCard('Auto-fill') : trkSkeletonCard(['75%', '55%']),
-                  React.createElement('div', { key: 'rsp2', style: { height: '12px' } }),
-                  sectionReady('validation')
-                    ? trkValidationBlock({
-                        demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
-                        onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
-                      })
-                    : sectionSkipped('validation') ? trkNotNeededCard('Conformance Check') : trkSkeletonCard(['80%', '65%', '90%', '40%']),
-                ]
+              : trkBuildColumn([
+                  {
+                    height: null,
+                    node: sectionSkipped('autofill') ? null : sectionReady('autofill')
+                      ? trkAutoFillBlock({
+                          expanded: expandedMap.autofill, onToggle: function() { toggle('autofill'); },
+                          values: autofillValues, editingKey: autofillEditingKey,
+                          onEdit: function(key) { setAutofillEditingKey(key); },
+                          onSave: function(key, val) {
+                            setAutofillValues(function(v) { var n = Object.assign({}, v); n[key] = val; return n; });
+                            setAutofillEditingKey(null);
+                          },
+                          onCancelEdit: function() { setAutofillEditingKey(null); },
+                          onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
+                        })
+                      : trkSkeletonCard(['75%', '55%']),
+                  },
+                  {
+                    height: '12px',
+                    node: sectionSkipped('validation') ? null : sectionReady('validation')
+                      ? trkValidationBlock({
+                          demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
+                          onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
+                        })
+                      : trkSkeletonCard(['80%', '65%', '90%', '40%']),
+                  },
+                ])
           ),
         ]
         )
