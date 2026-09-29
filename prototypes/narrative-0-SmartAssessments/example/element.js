@@ -1261,7 +1261,8 @@ var injectStyles = function() {
     .snp-orch-dialog-close:hover { background: #f3f4f6; }
     .snp-orch-dialog-body { padding: 12px 14px 8px; }
     .snp-orch-dialog-meta { font-size: 12px; color: #6b7280; margin-bottom: 6px; }
-    .snp-orch-dialog-dispatch { font-size: 12px; color: #0f7aab; margin-bottom: 14px; line-height: 1.4; }
+    .snp-orch-dialog-dispatch { font-size: 12px; color: #0f7aab; margin-bottom: 10px; line-height: 1.4; }
+    .snp-orch-dialog-autoconvert { font-size: 11px; color: #6b7280; margin-bottom: 14px; line-height: 1.45; padding: 8px 10px; background: #f9fafb; border-radius: 6px; }
     .snp-orch-dialog-stages { display: flex; flex-direction: column; gap: 12px; }
     .snp-orch-dstage { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #9ca3af; }
     .snp-orch-dstage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; margin-top: 1px; }
@@ -1941,6 +1942,26 @@ function trkValidationBlock(props) {
   });
 }
 
+// ── Finance review block (Option 3 only — new agent) ────────────────────────
+function trkFinanceBlock(props) {
+  return trkCard({
+    anchorId: 'trk-finance',
+    title: 'Finance Review',
+    badge: { text: 'Within threshold', tone: 'ready' },
+    expanded: props.expanded,
+    onToggle: props.onToggle,
+    onRefresh: props.onRefresh,
+    refreshing: props.refreshing,
+    children: React.createElement('div', null,
+      trkMetaRow(['Run by finance.specialist', 'Checked against approved budget thresholds', props.refreshed ? 'Evaluated just now' : 'Evaluated 3 hours ago']),
+      React.createElement('div', { className: 'snp-ai-sec' },
+        trkSec('Budget threshold', 'Estimated cost falls within the $250,000 delegated approval threshold for this portfolio. No additional finance sign-off is required beyond this automated review.', 'bt'),
+        trkSec('Cost center', 'Allocated to cost center CC-4021, Enterprise Technology Operating Budget.', 'cc')
+      )
+    ),
+  });
+}
+
 // ── Auto-fill block (shared) ────────────────────────────────────────────────
 // 12 fields — illustrates auto-fill at real scale. Model is awareness, not a
 // per-item gate: values are already applied, user amends inline if wrong.
@@ -2277,21 +2298,18 @@ function trkStripChip(item, onJump) {
 // progress instead of a fake timer.
 var TRK_ORCH_TRACKS = {
   marketing: {
-    stages: ['Demand raised', 'Demand manager validates info', 'Resourcing estimate completed', 'Steering committee approves', 'Converted to project'],
-    stageOfStep: [0, 1, 1, 2, 3, 3, 4],
     steps: [
       { label: 'Logged the demand', unlocks: [] },
       { label: 'Reviewed the marketing brief', unlocks: ['exec'] },
       { label: 'Checked required fields with demand manager', unlocks: ['validation', 'autofill'] },
       { label: 'Estimated campaign resourcing', unlocks: ['resource'] },
+      { label: 'Reviewed budget and cost approval', unlocks: ['finance'] },
       { label: 'Routed to steering committee', unlocks: ['similarity'] },
       { label: 'Awaiting committee decision', unlocks: [] },
       { label: 'Recorded committee outcome', unlocks: [] },
     ],
   },
   it: {
-    stages: ['Demand raised', 'Information validated', 'Engineering assessment', 'Resourcing estimate', 'Steering committee approval', 'Converted to project'],
-    stageOfStep: [0, 1, 1, 2, 2, 3, 3, 4, 5],
     steps: [
       { label: 'Logged the demand', unlocks: [] },
       { label: 'Reviewed submitted details', unlocks: ['exec'] },
@@ -2300,25 +2318,27 @@ var TRK_ORCH_TRACKS = {
       { label: 'Identified integration risks', unlocks: ['similarity'] },
       { label: 'Estimated engineering hours', unlocks: [] },
       { label: 'Estimated role-level resourcing', unlocks: ['resource'] },
+      { label: 'Reviewed budget and cost approval', unlocks: ['finance'] },
       { label: 'Routed to steering committee', unlocks: [] },
       { label: 'Recorded committee decision', unlocks: [] },
     ],
   },
+  // No resourcing and no finance review for this track at all — small,
+  // pre-approved intake (data-classification + budget-threshold gates only).
+  // Since there's nothing left requiring judgment once those pass, the
+  // specialist converts it itself, no steering committee involved.
   fasttrack: {
-    stages: ['Demand raised', 'Minimum data criteria checked', 'Budget threshold checked', 'Converted to project'],
-    stageOfStep: [0, 1, 1, 2, 2, 3],
+    autoConvert: true,
     steps: [
       { label: 'Logged the demand', unlocks: [] },
       { label: 'Checked minimum data criteria', unlocks: ['validation', 'autofill'] },
       { label: 'Validated data classification', unlocks: ['exec'] },
-      { label: 'Checked budget against $100k threshold', unlocks: ['resource'] },
+      { label: 'Checked budget against $100k threshold', unlocks: [] },
       { label: 'Confirmed no committee review needed', unlocks: ['similarity'] },
-      { label: 'Converted to project', unlocks: [] },
+      { label: 'Converted to project automatically', unlocks: [] },
     ],
   },
   hr: {
-    stages: ['Demand raised', 'HR policy compliance checked', 'Employee impact assessed', 'Resourcing estimate', 'Steering committee approval', 'Converted to project'],
-    stageOfStep: [0, 0, 1, 1, 2, 3, 4, 5],
     steps: [
       { label: 'Logged the demand', unlocks: [] },
       { label: 'Reviewed submitted details', unlocks: ['exec'] },
@@ -2326,22 +2346,33 @@ var TRK_ORCH_TRACKS = {
       { label: 'Checked HR policy compliance', unlocks: [] },
       { label: 'Assessed employee impact', unlocks: ['similarity'] },
       { label: 'Estimated resourcing', unlocks: ['resource'] },
+      { label: 'Reviewed budget and cost approval', unlocks: ['finance'] },
       { label: 'Routed to steering committee', unlocks: [] },
       { label: 'Recorded committee decision', unlocks: [] },
     ],
   },
 };
 
+// Which of the 6 possible agents a track can ever produce — not every track
+// needs Finance or Resourcing (the fast-track has neither), and that's what
+// lets the specialist convert it on its own once its own gates are met.
+function trkTrackKeys(track) {
+  var keys = {};
+  track.steps.forEach(function(step) { step.unlocks.forEach(function(k) { keys[k] = true; }); });
+  return TRK_AGENT_KEYS.filter(function(k) { return keys[k]; });
+}
+
 // Which of the 5 Overview sections are actually ready given the specialist's
 // real progress: everything from steps already checked off, or everything if
 // the whole run is done. The step currently in progress hasn't produced its
 // output yet.
-// The 5 deliverables an orchestrator run can produce (same keys as the
+// The 6 deliverables an orchestrator run can produce (same keys as the
 // Overview's expand-map). Order here is just display order, not sequence.
-var TRK_AGENT_KEYS = ['exec', 'validation', 'autofill', 'similarity', 'resource'];
+// Not every track produces every one — see trkTrackKeys.
+var TRK_AGENT_KEYS = ['exec', 'validation', 'autofill', 'similarity', 'resource', 'finance'];
 var TRK_AGENT_LABELS = {
   exec: 'Executive Summary', validation: 'Conformance Check', autofill: 'Auto-fill',
-  similarity: 'Similarity Check', resource: 'Resourcing Estimate',
+  similarity: 'Similarity Check', resource: 'Resourcing Estimate', finance: 'Finance Review',
 };
 // What each agent actually does, independent of its current status —
 // each agent is independent, so its metadata shouldn't only be a timestamp.
@@ -2351,6 +2382,7 @@ var TRK_AGENT_PURPOSE = {
   autofill: 'Fills missing fields from related records',
   similarity: 'Scans for overlapping or duplicate demands',
   resource: 'Estimates role-level resourcing from comparables',
+  finance: 'Reviews budget allocation and approval thresholds',
 };
 function trkTrackForPortfolio(portfolio) {
   if (portfolio === 'Marketing') return 'marketing';
@@ -2368,7 +2400,7 @@ function trkSkippedAgent(demand) {
   for (var i = 0; i < demand.key.length; i++) hash = (hash * 31 + demand.key.charCodeAt(i)) | 0;
   hash = Math.abs(hash);
   if (hash % 3 !== 0) return null;
-  var optional = ['validation', 'autofill', 'similarity', 'resource'];
+  var optional = ['validation', 'autofill', 'similarity', 'resource', 'finance'];
   return optional[hash % optional.length];
 }
 
@@ -2394,7 +2426,7 @@ function trkOrchStateForDemand(demand) {
   var stepIdx = s.status === 'in_progress' ? trkNearestUnlockingStep(track, s.stepIdx) : s.stepIdx;
   return {
     track: track, status: s.status, stepIdx: stepIdx, meta: s.meta, est: s.est,
-    stageIdx: track.stageOfStep[stepIdx], skipped: trkSkippedAgent(demand),
+    skipped: trkSkippedAgent(demand),
   };
 }
 
@@ -2411,8 +2443,15 @@ function trkNearestUnlockingStep(track, idx) {
 // Several can be 'running' at once (a step can unlock more than one agent),
 // which is the point: this is a set of dispatched agents, not a pipeline.
 function trkAgentStatuses(orch) {
+  // A key this track never produces at all (e.g. Resourcing/Finance on the
+  // fast-track) is treated exactly like a per-demand skip — same outcome,
+  // it doesn't run, so it gets the same 'skipped' bucket rather than a
+  // separate "not applicable" concept.
+  var applicable = trkTrackKeys(orch.track);
   var statuses = {};
-  TRK_AGENT_KEYS.forEach(function(key) { statuses[key] = key === orch.skipped ? 'skipped' : 'queued'; });
+  TRK_AGENT_KEYS.forEach(function(key) {
+    statuses[key] = (key === orch.skipped || applicable.indexOf(key) === -1) ? 'skipped' : 'queued';
+  });
   if (orch.status === 'completed') {
     TRK_AGENT_KEYS.forEach(function(key) { if (statuses[key] !== 'skipped') statuses[key] = 'done'; });
     return statuses;
@@ -2430,6 +2469,7 @@ function trkOrchDialog(props) {
   var orch = props.orch;
   var isDone = orch.status === 'completed';
   var statuses = trkAgentStatuses(orch);
+  var trackKeys = trkTrackKeys(orch.track);
 
   // Freely draggable by its header, like any modeless dialog — starts docked
   // bottom-right, switches to an explicit position on first drag.
@@ -2474,14 +2514,17 @@ function trkOrchDialog(props) {
         orch.meta + (orch.est ? ' (est. ' + orch.est + ')' : '')
       ),
       React.createElement('div', { className: 'snp-orch-dialog-dispatch' },
-        'Deployed ' + TRK_AGENT_KEYS.filter(function(k) { return statuses[k] !== 'skipped'; }).length + ' of ' + TRK_AGENT_KEYS.length + ' agents, based on demand type and intake completeness'
+        'Deployed ' + trackKeys.filter(function(k) { return statuses[k] !== 'skipped'; }).length + ' of ' + trackKeys.length + ' agents, based on demand type and intake completeness'
       ),
+      orch.track.autoConvert ? React.createElement('div', { className: 'snp-orch-dialog-autoconvert' },
+        'This demand type has no resourcing or finance review to route for approval, so once its own checks pass, the specialist converts it directly, no steering committee needed.'
+      ) : null,
       React.createElement('div', { className: 'snp-orch-dialog-stages' },
         // The orchestrator decided which agents to deploy before starting —
         // one it never selected has no business appearing in this list at
         // all (struck-through would read as "started, then cancelled").
         // The dispatch line above is the one place that says fewer ran.
-        TRK_AGENT_KEYS.filter(function(key) { return statuses[key] !== 'skipped'; }).map(function(key) {
+        trackKeys.filter(function(key) { return statuses[key] !== 'skipped'; }).map(function(key) {
           var st = statuses[key]; // done / running / queued
           var detail = st === 'done' ? 'Completed' : st === 'running' ? 'Running' : 'Queued to run next';
           return React.createElement('div', { key: key, className: 'snp-orch-dstage is-' + st },
@@ -2601,6 +2644,7 @@ function OverviewTrack(props) {
     autofill: false,
     similarity: true, // has an actionable merge — open by default
     resource: true, // open by default
+    finance: false,
   });
   var expandedMap = exS[0]; var setExpandedMap = exS[1];
 
@@ -2663,6 +2707,7 @@ function OverviewTrack(props) {
         ? TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0].label + ' · ' + TRK_TSHIRT_SIZES.filter(function(s) { return s.key === TRK_TSHIRT_PICK; })[0].range
         : resourceTotal + ' hrs · ' + TRK_RESOURCE_ROLES.length + ' roles',
       tone: variant === 4 ? 'info' : 'ready' },
+    { id: 'trk-finance', mapKey: 'finance', icon: 'currency-outline', label: 'Finance review', sub: 'Within threshold', tone: 'ready' },
   ];
 
   return React.createElement('div', { className: 'snp-ov-layout' },
@@ -2802,6 +2847,15 @@ function OverviewTrack(props) {
                           onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
                         })
                       : trkSkeletonCard(['80%', '65%', '90%', '40%']),
+                  },
+                  {
+                    height: '12px',
+                    node: sectionSkipped('finance') ? null : sectionReady('finance')
+                      ? trkFinanceBlock({
+                          expanded: expandedMap.finance, onToggle: function() { toggle('finance'); },
+                          onRefresh: function() { handleRefresh('finance'); }, refreshing: !!spinningMap.finance, refreshed: !!refreshedMap.finance,
+                        })
+                      : trkSkeletonCard(['70%', '60%']),
                   },
                 ])
           ),
