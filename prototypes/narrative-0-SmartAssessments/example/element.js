@@ -1059,6 +1059,11 @@ var injectStyles = function() {
     .snp-skel-line { height: 10px; border-radius: 3px; margin-bottom: 8px; }
     .snp-skel-line:last-child { margin-bottom: 0; }
 
+    .snp-trk-notneeded { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; }
+    .snp-trk-notneeded .snp-orch-dash { color: #c2c4c9; font-weight: 700; font-size: 15px; line-height: 1.4; }
+    .snp-trk-notneeded-title { font-size: 13px; color: #9ca3af; font-weight: 600; }
+    .snp-trk-notneeded-sub { font-size: 12px; color: #c2c4c9; margin-top: 2px; }
+
     /* Bolder pass — stronger hierarchy and weight contrast, track-scoped only
        (never touches the shared classes Options 1 & 2 also render through) */
     .snp-ov-title.snp-trk-title { font-size: 20px; letter-spacing: -0.2px; }
@@ -1265,8 +1270,12 @@ var injectStyles = function() {
     .snp-orch-dstage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; }
     .snp-orch-dstage .snp-orch-ring { width: 13px; height: 13px; flex-shrink: 0; }
     .snp-orch-dstage .snp-orch-step-dot { width: 7px; height: 7px; margin: 3px; flex-shrink: 0; }
+    .snp-orch-dstage .snp-orch-dash { width: 13px; text-align: center; color: #c2c4c9; flex-shrink: 0; font-weight: 700; }
     .snp-orch-dstage.is-done .snp-orch-dstage-label { color: #151920; }
-    .snp-orch-dstage.is-active .snp-orch-dstage-label { color: #151920; font-weight: 600; }
+    .snp-orch-dstage.is-running .snp-orch-dstage-label { color: #151920; font-weight: 600; }
+    .snp-orch-dstage.is-skipped .snp-orch-dstage-label { color: #c2c4c9; text-decoration: line-through; }
+    .snp-orch-dstage-note { font-size: 11px; color: #c2c4c9; margin-left: auto; }
+    .snp-orch-dialog-otto { display: block; flex-shrink: 0; }
     .snp-orch-dialog-ft {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 10px 14px; border-top: 1px solid #f1f2f4;
@@ -1300,16 +1309,21 @@ var injectStyles = function() {
     .snp-orch-step-icon { flex-shrink: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
     .snp-orch-step-icon .snp-orch-check { color: #1a8a4a; }
     .snp-orch-step-icon .snp-orch-ring { width: 15px; height: 15px; }
+    .snp-orch-step-icon .snp-orch-dash { color: #c2c4c9; font-weight: 700; }
     .snp-orch-step-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid #d1d5db; margin: 3px; }
     .snp-orch-step-label { font-size: 14px; color: #9ca3af; line-height: 1.3; padding-top: 0px; }
     .snp-orch-step.is-done .snp-orch-step-label { color: #151920; }
     .snp-orch-step.is-active .snp-orch-step-label { color: #151920; font-weight: 600; }
+    .snp-orch-step.is-skipped .snp-orch-step-label { color: #c2c4c9; text-decoration: line-through; }
+    .snp-orch-step-note { font-size: 11px; color: #c2c4c9; margin-top: 2px; }
   `;
   document.head.appendChild(el);
 };
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 var DEMANDS = [
+  { key: 'DMND410200',  number: 'DMND410200', name: 'Marketing Campaign Automation Platform',            portfolio: 'Marketing',                  state: 'Approved',     startDate: '2025-01-15', endDate: '2025-06-01' },
+  { key: 'DMND410201',  number: 'DMND410201', name: 'Employee Onboarding Automation',                    portfolio: 'HR',                        state: 'Complete',     startDate: '2025-01-01', endDate: '2025-04-01' },
   { key: 'DMND410099a', number: 'DMND410099', name: 'Automated Data Retention & Deletion System',       portfolio: 'HR',                        state: 'Draft',        startDate: '2025-04-16', endDate: '2025-05-16' },
   { key: 'DMND410081',  number: 'DMND410081', name: 'Landing Page for New Product Launch',               portfolio: 'Marketing',                  state: 'Draft',        startDate: '2025-04-01', endDate: '2025-06-30' },
   { key: 'DMND410076',  number: 'DMND410076', name: 'User Account Provisioning Automation',              portfolio: 'Consumer Digital product',   state: 'Submitted',    startDate: '2025-02-28', endDate: '2025-05-10' },
@@ -1748,6 +1762,25 @@ function trkSkeletonCard(lineWidths) {
           lineWidths.map(function(w, i) {
             return React.createElement('div', { key: i, className: 'snp-skel snp-skel-line', style: { width: w } });
           })
+        )
+      )
+    )
+  );
+}
+
+// A calm, static placeholder for a deliverable the orchestrator decided this
+// demand doesn't need — distinct from a skeleton, which implies "still coming".
+function trkNotNeededCard(label) {
+  return React.createElement('div', { className: 'snp-ai-card snp-trk-card' },
+    React.createElement('div', { className: 'snp-ai-inner' },
+      React.createElement('div', { className: 'snp-ai-bar' }),
+      React.createElement('div', { className: 'snp-ai-content' },
+        React.createElement('div', { className: 'snp-trk-notneeded' },
+          React.createElement('span', { className: 'snp-orch-dash' }, '–'),
+          React.createElement('div', null,
+            React.createElement('div', { className: 'snp-trk-notneeded-title' }, label),
+            React.createElement('div', { className: 'snp-trk-notneeded-sub' }, 'Not needed for this demand')
+          )
         )
       )
     )
@@ -2330,20 +2363,32 @@ var TRK_ORCH_TRACKS = {
 // real progress: everything from steps already checked off, or everything if
 // the whole run is done. The step currently in progress hasn't produced its
 // output yet.
-function trkUnlockedSet(orch) {
-  var unlocked = {};
-  var cutoff = orch.status === 'completed' ? orch.track.steps.length : orch.stepIdx;
-  for (var i = 0; i < cutoff; i++) {
-    orch.track.steps[i].unlocks.forEach(function(key) { unlocked[key] = true; });
-  }
-  return unlocked;
-}
+// The 5 deliverables an orchestrator run can produce (same keys as the
+// Overview's expand-map). Order here is just display order, not sequence.
+var TRK_AGENT_KEYS = ['exec', 'validation', 'autofill', 'similarity', 'resource'];
+var TRK_AGENT_LABELS = {
+  exec: 'Executive Summary', validation: 'Conformance Check', autofill: 'Auto-fill',
+  similarity: 'Similarity Check', resource: 'Resourcing Estimate',
+};
 
 function trkTrackForPortfolio(portfolio) {
   if (portfolio === 'Marketing') return 'marketing';
   if (portfolio === 'Consumer Digital product') return 'fasttrack';
   if (portfolio === 'HR') return 'hr';
   return 'it'; // Application Modernization, Enterprise Ventures, Business Transformation, (empty)
+}
+
+// The orchestrator doesn't run every agent for every demand — some demands
+// simply don't need a similarity check, or arrived with clean data that
+// needs no auto-fill. Deterministic per demand (never touches 'exec',
+// which every run needs to produce a summary at all).
+function trkSkippedAgent(demand) {
+  var hash = 0;
+  for (var i = 0; i < demand.key.length; i++) hash = (hash * 31 + demand.key.charCodeAt(i)) | 0;
+  hash = Math.abs(hash);
+  if (hash % 3 !== 0) return null;
+  var optional = ['validation', 'autofill', 'similarity', 'resource'];
+  return optional[hash % optional.length];
 }
 
 // Reuses the demand's own lifecycle state so every demand already in the list
@@ -2363,14 +2408,33 @@ function trkOrchStateForDemand(demand) {
   var s = byState[demand.state] || byState['Draft'];
   return {
     track: track, status: s.status, stepIdx: s.stepIdx, meta: s.meta, est: s.est,
-    stageIdx: track.stageOfStep[s.stepIdx],
+    stageIdx: track.stageOfStep[s.stepIdx], skipped: trkSkippedAgent(demand),
   };
+}
+
+// Independent status per agent — 'done' / 'running' / 'queued' / 'skipped'.
+// Several can be 'running' at once (a step can unlock more than one agent),
+// which is the point: this is a set of dispatched agents, not a pipeline.
+function trkAgentStatuses(orch) {
+  var statuses = {};
+  TRK_AGENT_KEYS.forEach(function(key) { statuses[key] = key === orch.skipped ? 'skipped' : 'queued'; });
+  if (orch.status === 'completed') {
+    TRK_AGENT_KEYS.forEach(function(key) { if (statuses[key] !== 'skipped') statuses[key] = 'done'; });
+    return statuses;
+  }
+  orch.track.steps.forEach(function(step, i) {
+    step.unlocks.forEach(function(key) {
+      if (statuses[key] === 'skipped') return;
+      statuses[key] = i < orch.stepIdx ? 'done' : i === orch.stepIdx ? 'running' : 'queued';
+    });
+  });
+  return statuses;
 }
 
 function trkOrchDialog(props) {
   var orch = props.orch;
-  var track = orch.track;
   var isDone = orch.status === 'completed';
+  var statuses = trkAgentStatuses(orch);
 
   // Freely draggable by its header, like any modeless dialog — starts docked
   // bottom-right, switches to an explicit position on first drag.
@@ -2401,6 +2465,7 @@ function trkOrchDialog(props) {
 
   return React.createElement('div', { className: 'snp-orch-dialog', ref: elRef, style: dragStyle },
     React.createElement('div', { className: 'snp-orch-dialog-hd', onMouseDown: onDragStart },
+      React.createElement('img', { src: OTTO_MARK_URI, width: 18, height: 18, alt: '', className: 'snp-orch-dialog-otto' }),
       React.createElement('div', { className: 'snp-orch-dialog-hd-title' }, 'Demand AI Specialist'),
       React.createElement('span', { className: 'snp-orch-pill ' + (isDone ? 'is-complete' : 'is-progress') },
         isDone ? React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }) : React.createElement('span', { className: 'snp-orch-ring', style: { width: '10px', height: '10px' } }),
@@ -2415,15 +2480,18 @@ function trkOrchDialog(props) {
         orch.meta + (orch.est ? ' (est. ' + orch.est + ')' : '')
       ),
       React.createElement('div', { className: 'snp-orch-dialog-stages' },
-        track.stages.map(function(label, i) {
-          var st = isDone || i < orch.stageIdx ? 'is-done' : i === orch.stageIdx ? 'is-active' : '';
-          return React.createElement('div', { key: i, className: 'snp-orch-dstage ' + st },
-            st === 'is-done'
+        TRK_AGENT_KEYS.map(function(key) {
+          var st = statuses[key]; // done / running / queued / skipped
+          return React.createElement('div', { key: key, className: 'snp-orch-dstage is-' + st },
+            st === 'done'
               ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
-              : st === 'is-active'
+              : st === 'running'
                 ? React.createElement('span', { className: 'snp-orch-ring' })
-                : React.createElement('span', { className: 'snp-orch-step-dot' }),
-            React.createElement('span', { className: 'snp-orch-dstage-label' }, label)
+                : st === 'skipped'
+                  ? React.createElement('span', { className: 'snp-orch-dash' }, '–')
+                  : React.createElement('span', { className: 'snp-orch-step-dot' }),
+            React.createElement('span', { className: 'snp-orch-dstage-label' }, TRK_AGENT_LABELS[key]),
+            st === 'skipped' ? React.createElement('span', { className: 'snp-orch-dstage-note' }, 'Not needed') : null
           );
         })
       )
@@ -2461,16 +2529,20 @@ function trkOrchPanel(props) {
       ),
       React.createElement('div', { className: 'snp-orch-panel-body' },
         track.steps.map(function(step, i) {
-          var st = i < orch.stepIdx ? 'is-done' : i === orch.stepIdx ? 'is-active' : '';
+          var skippedHere = orch.skipped && step.unlocks.indexOf(orch.skipped) !== -1;
+          var st = skippedHere ? 'is-skipped' : i < orch.stepIdx ? 'is-done' : i === orch.stepIdx ? 'is-active' : '';
           return React.createElement('div', { key: i, className: 'snp-orch-step ' + st },
             React.createElement('div', { className: 'snp-orch-step-icon' },
-              i < orch.stepIdx || (i === orch.stepIdx && isDone)
-                ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
-                : i === orch.stepIdx
-                  ? React.createElement('span', { className: 'snp-orch-ring' })
-                  : React.createElement('span', { className: 'snp-orch-step-dot' })
+              skippedHere
+                ? React.createElement('span', { className: 'snp-orch-dash' }, '–')
+                : i < orch.stepIdx || (i === orch.stepIdx && isDone)
+                  ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
+                  : i === orch.stepIdx
+                    ? React.createElement('span', { className: 'snp-orch-ring' })
+                    : React.createElement('span', { className: 'snp-orch-step-dot' })
             ),
-            React.createElement('div', { className: 'snp-orch-step-label' }, step.label)
+            React.createElement('div', { className: 'snp-orch-step-label' }, step.label),
+            skippedHere ? React.createElement('div', { className: 'snp-orch-step-note' }, 'Not needed for this demand') : null
           );
         })
       )
@@ -2499,9 +2571,12 @@ function OverviewTrack(props) {
     return function() { clearTimeout(t); };
   }, [phase]);
 
-  var unlocked = variant === 3 ? trkUnlockedSet(orch) : null;
+  var agentStatuses = variant === 3 ? trkAgentStatuses(orch) : null;
   function sectionReady(key) {
-    return variant === 3 ? !!unlocked[key] : phase === 'loaded';
+    return variant === 3 ? agentStatuses[key] === 'done' : phase === 'loaded';
+  }
+  function sectionSkipped(key) {
+    return variant === 3 && agentStatuses[key] === 'skipped';
   }
 
   var exS = React.useState({
@@ -2641,7 +2716,7 @@ function OverviewTrack(props) {
                       onRefresh: function() { handleRefresh('resource'); }, refreshing: !!spinningMap.resource, refreshed: !!refreshedMap.resource,
                       showMore: resShowMore, onToggleShowMore: function() { setResShowMore(function(v) { return !v; }); },
                     }))
-              : trkSkeletonCard(['85%', '60%']),
+              : sectionSkipped('resource') ? trkNotNeededCard('Resourcing Estimate') : trkSkeletonCard(['85%', '60%']),
             React.createElement('div', { style: { height: '24px' } }),
             sectionReady('similarity')
               ? trkSimilarityBlock({
@@ -2649,7 +2724,7 @@ function OverviewTrack(props) {
                   onRefresh: function() { handleRefresh('similarity'); }, refreshing: !!spinningMap.similarity, refreshed: !!refreshedMap.similarity,
                   showMore: simShowMore, onToggleShowMore: function() { setSimShowMore(function(v) { return !v; }); },
                 })
-              : trkSkeletonCard(['70%', '90%', '50%'])
+              : sectionSkipped('similarity') ? trkNotNeededCard('Similarity Check') : trkSkeletonCard(['70%', '90%', '50%'])
           ),
           // Right (40%). Option 3 (locked): Auto-fill leads, Conformance Check beneath it (deliberate, unchanged).
           // Option 4: Key Signals leads instead (replaces Conformance Check in this slot), Auto-fill beneath it.
@@ -2690,14 +2765,14 @@ function OverviewTrack(props) {
                         onCancelEdit: function() { setAutofillEditingKey(null); },
                         onRefresh: function() { handleRefresh('autofill'); }, refreshing: !!spinningMap.autofill, refreshed: !!refreshedMap.autofill,
                       })
-                    : trkSkeletonCard(['75%', '55%']),
+                    : sectionSkipped('autofill') ? trkNotNeededCard('Auto-fill') : trkSkeletonCard(['75%', '55%']),
                   React.createElement('div', { key: 'rsp2', style: { height: '12px' } }),
                   sectionReady('validation')
                     ? trkValidationBlock({
                         demand: demand, expanded: expandedMap.validation, onToggle: function() { toggle('validation'); },
                         onRefresh: function() { handleRefresh('validation'); }, refreshing: !!spinningMap.validation, refreshed: !!refreshedMap.validation,
                       })
-                    : trkSkeletonCard(['80%', '65%', '90%', '40%']),
+                    : sectionSkipped('validation') ? trkNotNeededCard('Conformance Check') : trkSkeletonCard(['80%', '65%', '90%', '40%']),
                 ]
           ),
         ]
