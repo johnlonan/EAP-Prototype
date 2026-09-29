@@ -1264,18 +1264,19 @@ var injectStyles = function() {
     }
     .snp-orch-dialog-close:hover { background: #f3f4f6; }
     .snp-orch-dialog-body { padding: 12px 14px 8px; }
-    .snp-orch-dialog-meta { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
-    .snp-orch-dialog-stages { display: flex; flex-direction: column; gap: 9px; }
-    .snp-orch-dstage { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ca3af; }
-    .snp-orch-dstage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; }
-    .snp-orch-dstage .snp-orch-ring { width: 13px; height: 13px; flex-shrink: 0; }
-    .snp-orch-dstage .snp-orch-step-dot { width: 7px; height: 7px; margin: 3px; flex-shrink: 0; }
+    .snp-orch-dialog-meta { font-size: 12px; color: #6b7280; margin-bottom: 6px; }
+    .snp-orch-dialog-dispatch { font-size: 12px; color: #0f7aab; margin-bottom: 14px; line-height: 1.4; }
+    .snp-orch-dialog-stages { display: flex; flex-direction: column; gap: 12px; }
+    .snp-orch-dstage { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #9ca3af; }
+    .snp-orch-dstage .snp-orch-check { color: #1a8a4a; display: inline-flex; flex-shrink: 0; margin-top: 1px; }
+    .snp-orch-dstage .snp-orch-ring { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; }
+    .snp-orch-dstage .snp-orch-step-dot { width: 7px; height: 7px; margin: 5px 3px 0; flex-shrink: 0; }
     .snp-orch-dstage .snp-orch-dash { width: 13px; text-align: center; color: #c2c4c9; flex-shrink: 0; font-weight: 700; }
+    .snp-orch-dstage-text { min-width: 0; }
+    .snp-orch-dstage-detail { font-size: 11px; color: #b0b3ba; margin-top: 2px; line-height: 1.35; }
     .snp-orch-dstage.is-done .snp-orch-dstage-label { color: #151920; }
     .snp-orch-dstage.is-running .snp-orch-dstage-label { color: #151920; font-weight: 600; }
     .snp-orch-dstage.is-skipped .snp-orch-dstage-label { color: #c2c4c9; text-decoration: line-through; }
-    .snp-orch-dstage-note { font-size: 11px; color: #c2c4c9; margin-left: auto; }
-    .snp-orch-dialog-otto { display: block; flex-shrink: 0; }
     .snp-orch-dialog-ft {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 10px 14px; border-top: 1px solid #f1f2f4;
@@ -2370,6 +2371,23 @@ var TRK_AGENT_LABELS = {
   exec: 'Executive Summary', validation: 'Conformance Check', autofill: 'Auto-fill',
   similarity: 'Similarity Check', resource: 'Resourcing Estimate',
 };
+// What each agent actually does, independent of its current status —
+// each agent is independent, so its metadata shouldn't only be a timestamp.
+var TRK_AGENT_PURPOSE = {
+  exec: 'Summarizes business case, risk, cost and ROI',
+  validation: 'Checks required fields against policy',
+  autofill: 'Fills missing fields from related records',
+  similarity: 'Scans for overlapping or duplicate demands',
+  resource: 'Estimates role-level resourcing from comparables',
+};
+// Plain-language reason when the orchestrator decides an agent isn't needed —
+// explainability applies to "didn't run" the same as it does to a ranking.
+var TRK_AGENT_SKIP_REASON = {
+  validation: 'intake already met policy requirements',
+  autofill: 'all required fields were already complete',
+  similarity: 'no comparable demands expected for this intake type',
+  resource: 'resourcing was already defined upstream',
+};
 
 function trkTrackForPortfolio(portfolio) {
   if (portfolio === 'Marketing') return 'marketing';
@@ -2465,7 +2483,6 @@ function trkOrchDialog(props) {
 
   return React.createElement('div', { className: 'snp-orch-dialog', ref: elRef, style: dragStyle },
     React.createElement('div', { className: 'snp-orch-dialog-hd', onMouseDown: onDragStart },
-      React.createElement('img', { src: OTTO_MARK_URI, width: 18, height: 18, alt: '', className: 'snp-orch-dialog-otto' }),
       React.createElement('div', { className: 'snp-orch-dialog-hd-title' }, 'Demand AI Specialist'),
       React.createElement('span', { className: 'snp-orch-pill ' + (isDone ? 'is-complete' : 'is-progress') },
         isDone ? React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }) : React.createElement('span', { className: 'snp-orch-ring', style: { width: '10px', height: '10px' } }),
@@ -2479,9 +2496,16 @@ function trkOrchDialog(props) {
       React.createElement('div', { className: 'snp-orch-dialog-meta' },
         orch.meta + (orch.est ? ' (est. ' + orch.est + ')' : '')
       ),
+      React.createElement('div', { className: 'snp-orch-dialog-dispatch' },
+        'Deployed ' + TRK_AGENT_KEYS.filter(function(k) { return statuses[k] !== 'skipped'; }).length + ' of ' + TRK_AGENT_KEYS.length + ' agents, based on demand type and intake completeness'
+      ),
       React.createElement('div', { className: 'snp-orch-dialog-stages' },
         TRK_AGENT_KEYS.map(function(key) {
           var st = statuses[key]; // done / running / queued / skipped
+          var detail = st === 'done' ? 'Completed'
+            : st === 'running' ? 'Running'
+            : st === 'queued' ? 'Queued to run next'
+            : 'Not needed, ' + TRK_AGENT_SKIP_REASON[key];
           return React.createElement('div', { key: key, className: 'snp-orch-dstage is-' + st },
             st === 'done'
               ? React.createElement('span', { className: 'snp-orch-check' }, React.createElement('now-icon', { icon: 'circle-check-fill', size: 'sm' }))
@@ -2490,8 +2514,10 @@ function trkOrchDialog(props) {
                 : st === 'skipped'
                   ? React.createElement('span', { className: 'snp-orch-dash' }, '–')
                   : React.createElement('span', { className: 'snp-orch-step-dot' }),
-            React.createElement('span', { className: 'snp-orch-dstage-label' }, TRK_AGENT_LABELS[key]),
-            st === 'skipped' ? React.createElement('span', { className: 'snp-orch-dstage-note' }, 'Not needed') : null
+            React.createElement('div', { className: 'snp-orch-dstage-text' },
+              React.createElement('div', { className: 'snp-orch-dstage-label' }, TRK_AGENT_LABELS[key]),
+              React.createElement('div', { className: 'snp-orch-dstage-detail' }, TRK_AGENT_PURPOSE[key] + ' · ' + detail)
+            )
           );
         })
       )
@@ -4069,12 +4095,6 @@ var OPTION_CARDS = [
     title: 'Demand Intelligence (On Demand)',
     desc: 'Same as Demand Intelligence, but nothing generates automatically. The Overview tab opens empty until the user chooses to generate insights.',
   },
-  {
-    num: 5,
-    title: 'Demand widget - Employee Slate',
-    desc: 'A standalone My Demands widget for the EmployeeWorks employee experience — submit and track demands, follow lifecycle state through to the resulting delivery project, and manage business case details.',
-    href: '../narrative-11-employeeworks/canvas.html',
-  },
 ];
 
 function StartPage(props) {
@@ -4086,7 +4106,7 @@ function StartPage(props) {
       React.createElement('div', { className: 'hub-eyebrow' }, 'Demand Management'),
       React.createElement('h1', { className: 'hub-title' }, 'Prototype'),
       React.createElement('p', { className: 'hub-subtitle' },
-        'Five explorations in AI-assisted demand management: structured assessments, automated validation, similarity detection, resource estimation, and an employee-facing demand widget.'
+        'Four explorations in AI-assisted demand management: structured assessments, automated validation, similarity detection, and resource estimation.'
       )
     ),
 
