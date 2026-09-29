@@ -2424,10 +2424,24 @@ function trkOrchStateForDemand(demand) {
     'AI Qualified': { status: 'completed',   stepIdx: lastStep,                        meta: 'Completed 1 hour ago' },
   };
   var s = byState[demand.state] || byState['Draft'];
+  // Some steps are purely administrative (routing, awaiting a decision) and
+  // unlock no agent. Landing on one of those while "in progress" left every
+  // agent looking idle with nothing actually shown as running — snap to the
+  // nearest step (either direction) that does unlock something.
+  var stepIdx = s.status === 'in_progress' ? trkNearestUnlockingStep(track, s.stepIdx) : s.stepIdx;
   return {
-    track: track, status: s.status, stepIdx: s.stepIdx, meta: s.meta, est: s.est,
-    stageIdx: track.stageOfStep[s.stepIdx], skipped: trkSkippedAgent(demand),
+    track: track, status: s.status, stepIdx: stepIdx, meta: s.meta, est: s.est,
+    stageIdx: track.stageOfStep[stepIdx], skipped: trkSkippedAgent(demand),
   };
+}
+
+function trkNearestUnlockingStep(track, idx) {
+  if (track.steps[idx].unlocks.length) return idx;
+  for (var d = 1; d < track.steps.length; d++) {
+    if (idx + d < track.steps.length && track.steps[idx + d].unlocks.length) return idx + d;
+    if (idx - d >= 0 && track.steps[idx - d].unlocks.length) return idx - d;
+  }
+  return idx;
 }
 
 // Independent status per agent — 'done' / 'running' / 'queued' / 'skipped'.
