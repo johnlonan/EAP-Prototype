@@ -107,3 +107,7 @@ body { background:
 .mn-chan.is-green { background: color-mix(in oklch, var(--ow-green) 22%, #fff); color: #0d5a3a; }
 .mn-chan.is-purple { background: #e8ebfa; color: #3f43a3; }
 .mn-chan.is-amber { background: #fdecd6; color: #8a4600; }
+
+/* Hint: a quiet callout, set a little lower so it reads as an instruction rather than a footnote */
+.mn-hint { display: block; width: fit-content; max-width: calc(100% - 32px); margin: 48px auto 0; padding: 10px 20px; border-radius: 999px; border: 1px solid var(--color-border-default); background: var(--color-base-100); color: var(--color-text-primary); font-size: 14px; line-height: 20px; text-align: center; }
+@media (max-width: 700px) { .mn-hint { border-radius: 16px; margin-top: 32px; font-size: 13px; } }

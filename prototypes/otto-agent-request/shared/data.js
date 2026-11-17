@@ -131,7 +131,7 @@ window.PROTO_DATA = {
     cta: 'Start flow',
     back: 'All flows',
     menuPage: 'index.html',
-    hint: 'Inside any flow, All flows in the bottom left brings you back here.',
+    hint: 'To return to this menu from any flow, select “All flows” at the bottom left of the screen.',
     cards: [
       { id: 'ew', n: '1', channel: 'EmployeeWorks', hue: 'green', title: 'Josh raises the demand', blurb: 'Josh asks EmployeeWorks for an AI resume screening app. The Demand AI Specialist picks it up, checks policy and moves it to Submitted.', who: 'Josh Sutton · Requester', href: 'home.html?reset' },
       { id: 'teams', n: '2', channel: 'Teams · Moveworks', hue: 'purple', title: 'The same demand, started in Teams', blurb: 'Josh starts in Teams with Moveworks and picks Submit an IT Demand. The whole demand, from intake to policy review, happens in the Teams chat.', who: 'Josh Sutton · Requester', href: 'teams.html' },
