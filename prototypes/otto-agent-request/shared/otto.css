@@ -1,0 +1,287 @@
+/* Layout and motion for the Otto prototype. Colors are theme tokens only. */
+#proto-main { padding: 0 !important; background: var(--color-base-200); }
+.ow-page { min-height: 100%; display: flex; flex-direction: column; }
+.ow-home { max-width: 1320px; width: 100%; margin: 0 auto; padding: 56px 24px 48px; }
+.ow-greet { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 28px; }
+.ow-greet h1 { margin: 0; }
+.ow-learn { position: absolute; top: 16px; right: 16px; }
+
+/* Otto bar */
+.ow-bar-wrap { max-width: 770px; margin: 0 auto; padding: 8px; border-radius: 28px; background: var(--color-base-100); box-shadow: 0 0 0 1px var(--color-border-subtle); }
+.ow-bar { position: relative; min-height: 96px; border-radius: 22px; padding: 14px 20px 12px; cursor: text; display: flex; flex-direction: column; justify-content: space-between; background: var(--color-base-100); border: 2px solid transparent; transition: border-color .2s; }
+.ow-bar.is-active { border-color: var(--color-text-primary); }
+.ow-bar-text { min-height: 24px; }
+.ow-bar-text .ph { color: var(--color-text-secondary); }
+.ow-caret { display: inline-block; width: 1px; height: 1.1em; margin-left: 1px; vertical-align: text-bottom; background: var(--color-text-primary); animation: ow-blink 1s steps(1) infinite; }
+.ow-bar-foot { display: flex; align-items: center; justify-content: space-between; }
+.ow-model { display: inline-flex; align-items: center; gap: 4px; }
+.ow-send { width: 32px; height: 32px; border-radius: 50%; border: 0; display: inline-flex; align-items: center; justify-content: center; cursor: default; background: var(--color-base-300); color: var(--color-text-tertiary); transition: background .2s, color .2s, transform .15s; }
+.ow-send.is-ready { background: var(--color-success); color: var(--color-success-content); cursor: pointer; }
+.ow-send.is-ready:hover { transform: scale(1.06); }
+.ow-chips { display: flex; justify-content: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+
+/* Cards */
+.ow-grid { display: grid; grid-template-columns: minmax(0, 428px) minmax(0, 1fr); gap: 16px 18px; margin-top: 24px; align-items: start; }
+.ow-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ow-card { background: var(--color-base-100); border-radius: var(--radius-box); border: 1px solid var(--color-border-subtle); padding: 20px 24px; min-width: 0; }
+.ow-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.ow-row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.ow-task { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: var(--radius-field); background: var(--color-base-200); margin-bottom: 8px; }
+.ow-task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ow-banner-img { height: 236px; border-radius: var(--radius-box); background: var(--color-primary); display: flex; align-items: center; justify-content: center; color: var(--color-primary-content); }
+.ow-dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+.ow-news { display: flex; gap: 12px; padding: 10px 12px; border-radius: var(--radius-field); background: var(--color-base-200); margin-bottom: 8px; }
+.ow-thumb { width: 64px; height: 64px; flex: none; border-radius: var(--radius-field); background: var(--color-neutral); color: var(--color-neutral-content); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.ow-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
+.ow-app { display: flex; align-items: center; gap: 14px; padding: 8px; border-radius: var(--radius-field); }
+.ow-app-ico { width: 56px; height: 56px; flex: none; border-radius: var(--radius-field); background: var(--color-base-200); display: flex; align-items: center; justify-content: center; }
+.ow-event { display: flex; gap: 12px; border-radius: var(--radius-field); background: var(--color-base-200); overflow: hidden; margin-bottom: 10px; }
+.ow-event .ow-thumb { width: 112px; height: auto; min-height: 116px; border-radius: 0; }
+.ow-day { display: flex; align-items: center; gap: 12px; margin: 6px 0 10px; }
+.ow-day::before, .ow-day::after { content: ""; flex: 1; height: 1px; background: var(--color-border-subtle); }
+.ow-hol { display: flex; align-items: center; gap: 12px; padding: 8px 4px; }
+.ow-hol .ow-thumb { border-radius: 50%; width: 40px; height: 40px; }
+.ow-hol-main { flex: 1; min-width: 0; }
+
+/* Chat */
+.ow-chat-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px 12px 24px; border-bottom: 1px solid var(--color-border-subtle); }
+.ow-chat-head .grow { flex: 1; display: flex; align-items: center; gap: 10px; }
+.ow-thread { flex: 1; overflow-y: auto; padding: 24px 24px 16px; scroll-behavior: smooth; }
+.ow-thread-in { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; padding-bottom: 8px; }
+.ow-msg { display: flex; gap: 16px; align-items: flex-start; animation: ow-rise .35s ease both; }
+.ow-av { width: 32px; height: 32px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 500; background: var(--color-base-300); color: var(--color-text-primary); }
+.ow-msg-body { min-width: 0; flex: 1; }
+.ow-msg-meta { display: flex; gap: 12px; align-items: baseline; margin-bottom: 4px; }
+.ow-acts { display: flex; gap: 14px; margin-top: 10px; color: var(--color-text-secondary); }
+.ow-acts button { background: none; border: 0; padding: 4px; cursor: pointer; color: inherit; border-radius: var(--radius-field); }
+.ow-acts button:hover { background: var(--color-base-300); }
+.ow-think { display: flex; align-items: center; gap: 10px; color: var(--color-text-secondary); }
+.ow-think .dots { display: inline-flex; gap: 4px; }
+.ow-think .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary); animation: ow-bounce 1.1s infinite ease-in-out; }
+.ow-think .dots i:nth-child(2) { animation-delay: .15s; }
+.ow-think .dots i:nth-child(3) { animation-delay: .3s; }
+.ow-shimmer { background: linear-gradient(90deg, var(--color-text-secondary) 20%, var(--color-text-primary) 50%, var(--color-text-secondary) 80%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: ow-shim 1.6s linear infinite; }
+.ow-composer-wrap { padding: 8px 24px 12px; }
+.ow-composer { max-width: 770px; margin: 0 auto; display: flex; align-items: flex-end; gap: 12px; padding: 8px 10px 8px 24px; border-radius: 28px; background: var(--color-base-100); box-shadow: 0 1px 6px 0 var(--color-border-subtle); border: 2px solid transparent; cursor: text; min-height: 56px; transition: border-color .2s; }
+.ow-composer.is-active { border-color: transparent; }
+.ow-composer .txt { flex: 1; min-width: 0; padding: 8px 4px 8px 0; line-height: 1.5; }
+.ow-composer .ph { color: var(--color-text-secondary); }
+.ow-foot { text-align: center; padding-bottom: 6px; }
+
+/* Draft card */
+.ow-draft { max-width: 512px; margin: 8px 0 0 0; padding: 24px; border-radius: var(--radius-box); background: var(--color-base-100); border: 1px solid var(--color-border-subtle); animation: ow-rise .5s ease both; }
+.ow-draft-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.ow-field { margin-bottom: 14px; }
+.ow-field .val { font-weight: 500; }
+.ow-draft-foot { display: flex; gap: 8px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle); margin-top: 6px; }
+.ow-reveal { opacity: 0; transform: translateY(6px); animation: ow-rise .45s ease forwards; }
+.ow-stream-caret { display: inline-block; width: 7px; height: 14px; margin-left: 2px; vertical-align: -2px; background: var(--color-primary); animation: ow-blink 1s steps(1) infinite; }
+
+@keyframes ow-blink { 50% { opacity: 0; } }
+@keyframes ow-bounce { 0%, 80%, 100% { transform: translateY(0); opacity: .45; } 40% { transform: translateY(-5px); opacity: 1; } }
+@keyframes ow-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes ow-shim { to { background-position: -200% 0; } }
+.ow-leave { animation: ow-fade .28s ease forwards; }
+@keyframes ow-fade { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ow-msg, .ow-draft, .ow-reveal, .ow-think .dots i, .ow-shimmer, .ow-caret, .ow-stream-caret { animation: none; opacity: 1; transform: none; } }
+@media (max-width: 900px) { .ow-grid, .ow-row2 { grid-template-columns: minmax(0, 1fr); } .ow-home { padding: 40px 16px 32px; } .ow-apps { grid-template-columns: 1fr; } }
+
+@media (max-width: 600px) {
+  .ow-chat-head { padding: 8px 8px 8px 12px; gap: 2px; }
+  .ow-chat-head .grow { min-width: 0; }
+  .ow-chat-head .text-lg { font-size: 16px; }
+  .ow-thread { padding: 16px 12px 8px; }
+  .ow-msg { gap: 10px; }
+  .ow-learn { position: static; margin: 8px 8px 0 auto; display: flex; }
+  .ow-home { padding-top: 16px; }
+}
+
+#proto-main { position: relative; }
+.ow-pop { position: absolute; min-width: 200px; background: var(--color-base-100); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-box); box-shadow: 0 4px 16px 0 var(--color-border-subtle); padding: 6px; }
+.ow-wide .ow-thread-in, .ow-wide .ow-composer { max-width: 1040px; }
+@media (max-width: 600px) { #menu-btn { display: none; } .ow-foot { font-size: 11px; line-height: 14px; padding: 0 8px 4px; } }
+
+/* ---- images ---- */
+img.ow-banner-img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--color-base-200); }
+img.ow-thumb { object-fit: cover; background: var(--color-base-200); }
+img.ow-app-ico { width: 56px; height: 56px; object-fit: cover; padding: 0; background: none; }
+.ow-event img.ow-thumb { width: 112px; height: auto; align-self: stretch; }
+
+/* ---- status pills ---- */
+.ow-pill { border-radius: 999px; padding-inline: 10px; gap: 4px; white-space: nowrap; }
+
+/* ---- navigation surface (theme base-300, as in the product) ---- */
+#proto-nav { background: var(--color-base-300); border-right: 1px solid var(--color-border-subtle); }
+
+/* ---- bright green of the Otto mark and send button (the theme success token, as the product draws it) ---- */
+:root { --ow-green: oklch(76% .177 163.223); }
+.ow-green { color: var(--ow-green); }
+.ow-send.is-ready { background: var(--ow-green); color: var(--color-text-primary); }
+.ow-send.is-ready:active { transform: scale(.96); }
+
+/* ---- polished load: hide until components are ready, then stagger in ---- */
+html.ow-pre body { opacity: 0; }
+body { transition: opacity .35s ease; }
+html:not(.ow-pre) #proto-nav { animation: ow-slide-in .5s cubic-bezier(.2, .7, .2, 1) both; }
+.ow-in { opacity: 0; animation: ow-rise .6s cubic-bezier(.2, .7, .2, 1) var(--d, 0ms) forwards; }
+html.ow-pre .ow-in, html.ow-pre #proto-nav { animation-play-state: paused; }
+@keyframes ow-slide-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@keyframes ow-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.ow-card, .ow-task, .ow-news, .ow-app, .ow-event, .ow-hol, .ow-bar-wrap { transition: box-shadow .25s ease, transform .25s ease, background-color .2s ease, border-color .2s ease; }
+.ow-card:hover { box-shadow: 0 6px 20px -8px var(--color-border-subtle); }
+.ow-task:hover, .ow-news:hover, .ow-event:hover { transform: translateY(-1px); }
+.ow-app:hover { background: var(--color-base-200); }
+.ow-bar-wrap:focus-within, .ow-bar-wrap:hover { box-shadow: 0 0 0 1px var(--color-border-subtle), 0 8px 28px -12px var(--color-border-subtle); }
+.ow-chips button { transition: transform .2s ease, background-color .2s ease; }
+.ow-chips button:hover { transform: translateY(-1px); }
+.ow-msg-body { animation: ow-rise .4s ease both; }
+@media (prefers-reduced-motion: reduce) { body { transition: none; } .ow-in, #proto-nav { animation: none !important; opacity: 1; } .ow-card, .ow-task, .ow-news, .ow-app, .ow-event, .ow-hol, .ow-bar-wrap, .ow-chips button { transition: none; } }
+
+/* ---- weights: the product font ships 300/400/500/700 only, so 600 renders as 700 (too bold). Use 500. ---- */
+strong, b, .font-semibold, .font-bold { font-weight: 500; }
+
+/* ---- send button: grey disc with a white plane; turns green when ready ---- */
+.ow-send { background: color-mix(in oklab, var(--color-text-primary) 22%, var(--color-base-100)); color: var(--color-base-100); }
+.ow-send.is-ready { background: var(--ow-green); color: var(--color-base-100); }
+
+/* ---- request card: SPM Type C status card (aiux-card, shadow-sm, no border, no footer divider) ---- */
+.ow-draft { max-width: 480px; border: 0; padding: 0; margin: 8px 0 0; animation: ow-rise .5s ease both; }
+.ow-card-body { display: flex; flex-direction: column; gap: 16px; padding: 20px 24px; }
+.ow-badges { display: flex; align-items: center; gap: 8px; }
+.ow-draft .aiux-card-header-title { margin: 0; font-size: var(--font-size-lg, 18px); line-height: 1.3; font-weight: 400; color: var(--color-text-primary); }
+.ow-draft .aiux-card-header-subtitle { margin: 2px 0 0; }
+.ow-badges .aiux-card-header-subtitle { margin: 0; }
+.ow-meta-list, .ow-fields { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.ow-kv { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.ow-kv dd { margin: 0; }
+.ow-kv-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 16px; }
+.ow-kv-row .ow-kv { grid-template-columns: 1fr; gap: 2px; }
+.ow-kv-edit { grid-template-columns: 1fr; gap: 4px; }
+.ow-who { display: inline-flex; align-items: center; gap: 8px; }
+.ow-av-sm { width: 20px; height: 20px; font-size: 10px; background: var(--color-base-300); }
+.ow-insight { margin: 0; }
+.ow-spark { display: inline-block; vertical-align: text-bottom; margin-inline-end: 2px; }
+.ow-draft-foot { display: flex; gap: 8px; padding: 0; border: 0; margin: 0; }
+.ow-linknote { margin-top: -8px; }
+@media (max-width: 600px) { .ow-kv { grid-template-columns: 1fr; gap: 2px; } .ow-kv-row { grid-template-columns: 1fr; } }
+
+/* ---- page-to-page: no white gap between Home and chat ---- */
+html { background: var(--color-base-200); }
+@view-transition { navigation: auto; }
+::view-transition-group(root) { animation-duration: .25s; }
+
+/* ---- Demand AI Specialist: shows its checks ticking off ---- */
+.ow-msg-meta .aiux-badge { margin-inline-start: 6px; vertical-align: 1px; }
+.ow-steps { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ow-step { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--color-text-secondary); animation: ow-rise .35s ease both; }
+.ow-step.is-done { color: var(--color-text-primary); }
+.ow-step-i { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.ow-step.is-done .ow-step-i { color: var(--ow-green); }
+.ow-ans { animation: ow-rise .35s ease both; }
+
+/* ---- user message = right-aligned dark bubble (as in the chat component); specialist uses its own avatar ---- */
+.ow-msg-user { justify-content: flex-end; }
+.ow-bubble { max-width: 80%; padding: 12px 18px; border-radius: 16px; background: var(--color-primary); color: var(--color-primary-content, #fff); line-height: 1.5; }
+.ow-agent-av { width: 32px; height: 32px; flex: none; display: inline-flex; }
+.ow-agent-av img { width: 32px; height: 32px; display: block; }
+
+
+.ow-ans ul { margin: 8px 0 0; padding-inline-start: 20px; display: flex; flex-direction: column; gap: 4px; list-style: disc; }
+
+/* ---- request card, second pass: owner chip, requester line, specialist panel, requirement checklist ---- */
+.ow-card-body { gap: 18px; }
+.ow-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ow-owner { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border-radius: 999px; background: var(--color-base-200); color: var(--color-text-primary); animation: ow-rise .4s ease both; }
+.ow-spimg { display: block; flex: none; border-radius: 50%; }
+.ow-head { display: flex; flex-direction: column; gap: 6px; }
+.ow-head .aiux-card-header-title { font-size: 18px; line-height: 1.3; margin: 0; }
+.ow-sub { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.ow-sub .ow-av-sm { margin-inline-end: -2px; }
+.ow-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--color-text-tertiary); }
+.ow-details { gap: 0; }
+.ow-details .ow-kv { padding: 10px 0; border-top: 1px solid var(--color-border-subtle); }
+.ow-details .ow-kv:last-child { padding-bottom: 0; }
+.ow-panel { display: flex; flex-direction: column; gap: 14px; padding: 16px; border-radius: 12px; background: var(--color-base-200); animation: ow-rise .45s cubic-bezier(.2,.7,.2,1) both; }
+.ow-panel-h { display: flex; align-items: center; gap: 10px; }
+.ow-panel-t { display: flex; flex-direction: column; line-height: 1.3; }
+.ow-trio { display: flex; flex-direction: column; gap: 10px; }
+.ow-trio > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 12px; min-height: 24px; }
+.ow-trio > div > div:first-child { margin: 0; }
+.ow-reqs-h { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--color-border-subtle); }
+.ow-reqs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.ow-req { display: flex; gap: 10px; align-items: flex-start; }
+.ow-req-i { width: 20px; height: 20px; flex: none; display: inline-flex; align-items: center; justify-content: center; color: var(--ow-green); animation: ow-pop .4s cubic-bezier(.3,1.4,.5,1) both; }
+.ow-ring { width: 16px; height: 16px; border-radius: 50%; border: 1.5px dashed var(--color-text-tertiary); }
+@keyframes ow-pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.ow-insight { display: flex; align-items: center; gap: 8px; margin: 0; }
+.ow-insight > span:last-child { min-width: 0; }
+
+
+/* ---- assignment breather: the specialist picks the demand up ---- */
+.ow-assign { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--color-text-secondary); animation: ow-rise .4s ease both; }
+.ow-assign .ow-ringwrap { position: relative; width: 28px; height: 28px; flex: none; display: inline-flex; align-items: center; justify-content: center; }
+.ow-assign .ow-ringwrap::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid var(--ow-green); opacity: 0; animation: ow-pulse 1.4s ease-out infinite; }
+.ow-assign.is-done .ow-ringwrap::after { animation: none; }
+.ow-assign.is-done { color: var(--color-text-primary); }
+@keyframes ow-pulse { 0% { transform: scale(.85); opacity: .7; } 100% { transform: scale(1.35); opacity: 0; } }
+.ow-owner { padding: 4px 12px; gap: 6px; }
+.ow-panel-f { padding-top: 12px; border-top: 1px solid var(--color-border-subtle); }
+.ow-panel-f .ow-insight { align-items: flex-start; }
+.ow-assign { padding-inline-start: 4px; }
+
+/* ---- specialist card: highlighted summary with an expandable "what was filled in and why" ---- */
+.ow-callout { border-radius: 12px; border: 1px solid; overflow: hidden; }
+.ow-callout.is-needs { background: color-mix(in oklch, var(--color-warning) 12%, var(--color-base-100)); border-color: color-mix(in oklch, var(--color-warning) 40%, transparent); }
+.ow-callout.is-done { background: color-mix(in oklch, var(--color-success) 12%, var(--color-base-100)); border-color: color-mix(in oklch, var(--color-success) 40%, transparent); }
+.ow-callout > summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+.ow-callout > summary::-webkit-details-marker { display: none; }
+.ow-callout-t { flex: 1; min-width: 0; color: var(--color-text-primary); }
+.ow-callout-i { display: inline-flex; flex: none; }
+.ow-callout.is-needs .ow-callout-i { color: var(--color-warning); }
+.ow-callout.is-done .ow-callout-i { color: var(--ow-green); }
+.ow-callout-c { display: inline-flex; flex: none; color: var(--color-text-secondary); transition: transform .25s ease; }
+.ow-callout[open] .ow-callout-c { transform: rotate(180deg); }
+.ow-callout > summary:hover { background: color-mix(in oklch, var(--color-text-primary) 4%, transparent); }
+.ow-callout-b { display: flex; flex-direction: column; gap: 12px; padding: 4px 14px 14px; animation: ow-rise .3s ease both; }
+.ow-callout-b p { margin: 0; }
+.ow-why { display: flex; flex-direction: column; gap: 2px; padding-top: 10px; border-top: 1px solid var(--color-border-subtle); }
+.ow-why-h { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: center; }
+.ow-why > p { padding-inline-start: 108px; }
+
+.ow-tail { margin-top: 14px; }
+.ow-callout-t { display: flex; flex-direction: column; gap: 2px; }
+
+
+/* Demand validation card: present, not present, filled in */
+.ow-sec { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; border-top: 1px solid var(--color-border-subtle); }
+.ow-sec-warn { padding: 14px; border: 1px solid color-mix(in oklch, var(--color-warning) 35%, transparent); border-radius: 12px; background: color-mix(in oklch, var(--color-warning) 9%, var(--color-base-100)); }
+.ow-sec-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.ow-sec-t { margin: 0; font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.ow-count { font-size: 12px; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+.ow-count.is-missing { color: color-mix(in oklch, var(--color-warning) 70%, var(--color-text-primary)); }
+.ow-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.ow-li { display: flex; gap: 10px; align-items: flex-start; animation: ow-rise .3s ease both; }
+.ow-li-i { width: 20px; height: 20px; flex: none; display: inline-flex; align-items: center; justify-content: center; }
+.ow-li.is-ok .ow-li-i { color: var(--ow-green); }
+.ow-li.is-warn .ow-li-i { color: var(--color-warning); }
+.ow-li > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ow-fill { margin: 0; display: flex; flex-direction: column; }
+.ow-fill-r { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--color-border-subtle); }
+.ow-fill-r:first-child { border-top: 0; padding-top: 0; }
+.ow-fill-r:last-child { padding-bottom: 0; }
+.ow-fill-r dt { padding-top: 2px; }
+.ow-fill-r dd { margin: 0; display: flex; flex-direction: column; gap: 3px; }
+
+/* Routing notice on the draft card */
+.ow-notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in oklch, var(--color-info) 30%, transparent); background: color-mix(in oklch, var(--color-info) 9%, var(--color-base-100)); animation: ow-rise .3s ease both; }
+.ow-notice-i { width: 20px; height: 20px; flex: none; display: inline-flex; align-items: center; justify-content: center; color: var(--color-info); }
+.ow-notice > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ow-notice.is-submitted { border-color: color-mix(in oklch, var(--color-success) 35%, transparent); background: color-mix(in oklch, var(--color-success) 9%, var(--color-base-100)); }
+.ow-notice.is-submitted .ow-notice-i { color: var(--ow-green); }
+
+/* ---- Otto bar, one line: text on the left, send on the right (same shape as the chat composer) ---- */
+.ow-bar-wrap { padding: 6px; border-radius: 999px; box-shadow: 0 0 0 1px var(--color-border-subtle), 0 6px 18px -8px var(--color-border-default); }
+.ow-bar { min-height: 52px; padding: 6px 8px 6px 22px; border-radius: 999px; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+.ow-bar .ow-bar-text { flex: 1; min-width: 0; min-height: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ow-bar .ow-bar-foot { flex: none; }
+.ow-bar .ow-send { width: 36px; height: 36px; }

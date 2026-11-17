@@ -1,0 +1,30 @@
+/* Flow 4: Moveworks reaches out first, in Teams. Builds on teams.css. */
+.tm-r.has-dot::after { content: ''; position: absolute; top: 7px; right: 7px; width: 9px; height: 9px; border-radius: 50%; background: #c4314b; border: 2px solid #ebebeb; }
+.tm-notif { position: fixed; top: 56px; right: 20px; width: 340px; display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); z-index: 20; transform: translateX(24px); opacity: 0; transition: transform .35s cubic-bezier(.2,.7,.2,1), opacity .35s ease; }
+.tm-notif.on { transform: none; opacity: 1; }
+.tm-notif .tm-bot { width: 32px; height: 32px; margin: 0; align-self: flex-start; }
+.tm-notif-t { display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.tm-notif-t b { font-weight: 600; }
+.tm-notif-t span { color: #424242; }
+.tm-hello { margin: 0 0 12px !important; }
+.tm-next { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.tm-next-h { margin: 16px 0 6px !important; font-weight: 600; }
+.tm-next li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; color: #242424; }
+.tm-next li > span:first-child { color: #616161; font-variant-numeric: tabular-nums; }
+.tm-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.tm-acts .tm-btn { margin-top: 0; }
+.tm-acts .tm-btn.is-primary { background: var(--tm-accent); border-color: var(--tm-accent); color: #fff; }
+.tm-acts .tm-btn.is-primary:hover { background: #4f52b2; }
+.tm-box.is-idle { cursor: default; }
+
+/* Flow 4, second pass: a colleague chat first, then the Moveworks conversation */
+.tm-pp { width: 36px; height: 36px; border-radius: 50%; background: #c7d2e6; color: #2b3a55; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex: none; align-self: center; margin-bottom: 8px; }
+.tm-pp-s { width: 32px; height: 32px; font-size: 12px; margin: 18px 0 0; align-self: flex-start; }
+.tm-them { background: #f3f3f3; }
+.tm-notif.is-live { cursor: pointer; }
+.tm-notif.is-live:hover { background: #fafafa; }
+.tm-notif.is-live::after { content: ''; position: absolute; inset: -4px; border-radius: 12px; border: 2px solid var(--tm-accent); opacity: 0; animation: tm-ping 1.8s ease-out 2; pointer-events: none; }
+.tm-notif { position: fixed; }
+@keyframes tm-ping { 0% { opacity: .7; transform: scale(.98); } 100% { opacity: 0; transform: scale(1.03); } }
+
+.tm-acts + .tm-foot { margin-top: 20px; }

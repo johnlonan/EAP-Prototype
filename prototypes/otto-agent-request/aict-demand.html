@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="bundle-version" content="2026.11.13-5">
+<title>Demand overview</title>
+<link rel="stylesheet" href="bundle/theme.css">
+<link rel="stylesheet" href="bundle/karuna.css">
+<script type="module" src="bundle/karuna.js"></script>
+<script>document.documentElement.classList.add("ow-pre");</script>
+<style>*, *::before, *::after { box-sizing: border-box; } body { margin: 0; }</style>
+<link rel="stylesheet" href="shared/otto.css">
+<link rel="stylesheet" href="shared/aict.css">
+</head>
+<body>
+<!--proto:shell-->
+<!-- ServiceNow app shell: the product's left navigation (Home, Ask Otto, notifications, Browse, pinned,
+     active apps) around your page. Edit ONLY the SHELL data block below and the <main> content.
+     The setup script gives the navigation the platform data it normally gets from a live instance
+     (from the product's own Storybook fixtures); it must stay above the sidebar. -->
+<script>
+/* ===== SHELL: edit these values =============================================================== */
+const SHELL = {
+  "user": {
+    "firstName": "Josh",
+    "lastName": "Sutton",
+    "initials": "JS"
+  },
+  "notifications": 3,
+  "discussions": 0,
+  "pinned": [],
+  "browse": {
+    "all": [
+      [
+        "Artifact library",
+        "/artifacts"
+      ],
+      [
+        "World Knowledge",
+        "/wk"
+      ],
+      [
+        "Browse assistants",
+        "/assistants"
+      ]
+    ],
+    "favorites": [],
+    "history": []
+  },
+  "apps": [
+    {
+      "id": "hrsd",
+      "label": "HR Agent Workspace",
+      "basePath": "now/hr-agent",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        },
+        {
+          "id": "cases",
+          "label": "Cases",
+          "icon": "database-outline"
+        },
+        {
+          "id": "knowledge",
+          "label": "Knowledge",
+          "icon": "lightbulb-outline"
+        }
+      ]
+    },
+    {
+      "id": "ec",
+      "label": "Employee Center",
+      "basePath": "now/employee-center",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        }
+      ]
+    }
+  ],
+  "currentPath": "/workspace/now/aict/activity"
+};
+/* ===== end of SHELL ============================================================================ */
+
+/* ----- platform setup: do not edit. Runs before the component scripts load. ---------------------- */
+const __IDS = { all: 'd6e462a5c3533010cbd77096e940dd8c', favorites: '1b682fe1c3133010cbd77096e940dd18', history: 'c51543a5c3133010cbd77096e940dd43', workspaces: '63242b61c3133010cbd77096e940dd23', notifications: 'experience-notifications' };
+const __FEATURES = { menus: true, unifiedExperience: true, collabChat: true, userAvatar: true, preferences: false, pagePinning: true, tabGroups: true };
+window.__CONTEXT_DATA__ = { ...(window.__CONTEXT_DATA__ || {}), 'nav-layout': { menus: [], menuData: {}, features: __FEATURES, ready: true } };
+window.__REQUIREMENTS_DATA__ = { ...(window.__REQUIREMENTS_DATA__ || {}), sysProperties: { 'com.glide.cs.collab.enabled': 'true' }, plugins: { 'com.glide.cs.collab': true } };
+try {
+  localStorage.setItem('aiux.nav.menuCache.backend', 'localStorage');
+  localStorage.setItem('aiux.nav.activeWorkspaces', JSON.stringify(SHELL.apps.map((a) => a.id + '-ws')));
+  localStorage.setItem('aiux.nav.sectionOrder', JSON.stringify(['tabs', 'workspaces']));
+} catch (e) { /* storage blocked: the navigation still renders, without active apps */ }
+const __leaf = ([label, url], i, p) => ({ id: p + i, label, subItems: [], route: { url } });
+const __MENU = { result: [
+  { id: __IDS.all, label: 'All', icon: 'grid', subItems: SHELL.browse.all.map((x, i) => __leaf(x, i, 'all-')) },
+  { id: __IDS.favorites, label: 'Favorites', icon: 'star', subItems: SHELL.browse.favorites.map((x, i) => __leaf(x, i, 'fav-')) },
+  { id: __IDS.history, label: 'History', icon: 'change', subItems: SHELL.browse.history.map((x, i) => __leaf(x, i, 'his-')) },
+  { id: __IDS.workspaces, label: 'Workspaces', icon: 'window', subItems: SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath, route: { url: '/' + a.basePath + '/home', context: { path: a.basePath } }, subItems: [] })) }
+] };
+const __fetch = window.fetch.bind(window);
+window.fetch = (u, o) => {
+  const s = String(u && u.url ? u.url : u);
+  const json = (b) => Promise.resolve(new Response(JSON.stringify(b), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+  if (s.includes('/api/now/ui/polaris/menu')) return json(__MENU);
+  if (s.includes('/api/now/aiux_nav_service/workspace_experiences')) return json({ result: [] });
+  if (s.includes('/api/now/graphql')) return json({ data: {} });
+  // any other same-origin platform call (preferences, shortcuts, batch, data broker): an empty answer
+  if (/^(?:https?:\/\/[^/]+)?\/api\/now\//.test(s) && (s.startsWith('/') || s.startsWith(location.origin))) return json({ result: {} });
+  if (s.includes('keyboard-shortcut')) return json({ result: {} });
+  return __fetch(u, o);
+};
+</script>
+
+<div style="display:flex;height:100vh;overflow:hidden">
+  <aiux-nav-sidebar id="proto-nav" style="flex:none"></aiux-nav-sidebar>
+  <main id="proto-main" style="flex:1;min-width:0;overflow:auto;padding:16px 24px">
+<!--proto:main-->
+<div class="ow-page ad-shell bg-base-200 text-sm text-text-primary" id="shell" style="position:relative">
+  <aside class="ad-otto" id="otto" aria-label="Otto" hidden>
+    <header class="ad-otto-h"><span class="ow-green"><aiux-icon name="ai-sparkle-outline" size="lg"></aiux-icon></span><span class="text-lg grow" id="otto-name"></span><button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" id="otto-close"><aiux-icon name="close-outline" size="md"></aiux-icon></button></header>
+    <div class="ad-otto-t" id="otto-t"><div class="ad-otto-in" id="otto-m"></div></div>
+    <div class="ad-otto-f"><div class="ad-reply" id="otto-reply" hidden></div><div class="ow-composer"><div class="txt text-base" id="otto-ph"></div><button class="ow-send" aria-label="Send" aria-disabled="true" style="width:40px;height:40px"><aiux-icon name="send" size="sm"></aiux-icon></button></div></div>
+  </aside>
+  <div class="ad-main"><div class="ad-page" id="page"></div></div>
+  <div class="ac-toast text-sm" id="toast" role="status" hidden></div>
+</div>
+<script src="shared/data.js"></script>
+<script src="shared/store.js"></script>
+<script src="shared/otto.js"></script>
+<script>
+(function () {
+  var shown = false;
+  function reveal() { if (shown) return; shown = true; document.documentElement.classList.remove('ow-pre'); }
+  Promise.all([customElements.whenDefined('aiux-nav-sidebar'), customElements.whenDefined('aiux-icon')]).then(function () { setTimeout(reveal, 120); });
+  setTimeout(reveal, 2500);
+  var E = Otto.esc, $ = function (id) { return document.getElementById(id); }, toastTimer = null, D = null;
+  function badge(b) { return '<span class="aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + b.tone + ' ow-pill">' + E(b.label) + '</span>'; }
+  function head(title, meta, by, inline) { return '<div class="ad-head"><div><div class="ad-h2"><h2 class="text-base font-medium">' + E(title) + '</h2>' + (inline || '') + '</div>' + (meta ? '<p class="text-xs text-text-secondary">' + E(meta) + '</p>' : '') + '</div>' + (by || '') + '</div>'; }
+  function byAi(d, k) { return '<span class="ad-by is-ai text-xs" tabindex="0" data-tip="' + E(d.tips[k]) + '"><aiux-icon name="ai-sparkle-outline" size="sm"></aiux-icon>' + E(d.aiLabel) + '</span>'; }
+  function bySp(d, k) { return '<span class="ad-by text-xs" tabindex="0" data-tip="' + E(d.tips[k]) + '"><img class="ow-spimg" width="20" height="20" data-img="1" alt="">' + E(d.specialist.name) + '</span>'; }
+  function card(cls, inner) { return '<section class="ow-card ad-card ' + cls + '">' + inner + '</section>'; }
+  function toast(text) { var t = $('toast'); t.textContent = text; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 3200); }
+
+  function render(d) {
+    var P = d.specialist.review, pol = d.policy, S = d.sections || P.sections;
+    var top = '<a class="ad-back text-sm" href="aict.html"><aiux-icon name="chevron-left-outline" size="sm"></aiux-icon>' + E(d.back.label) + '</a>'
+      + '<div class="ad-title-row"><div class="ad-title-main"><h1 class="ad-title">' + E(d.title) + '</h1>'
+      + '<div class="ad-meta text-sm text-text-secondary">' + d.badges.map(badge).join('') + '<span>' + E(d.ref) + '</span>' + d.meta.map(function (m) { return '<span class="ad-sep"></span><span>' + E(m) + '</span>'; }).join('') + '</div></div>'
+      + '<button class="aiux-btn aiux-btn-sm" data-soon="1">' + E(d.actions) + ' <aiux-icon name="chevron-down-outline" size="sm"></aiux-icon></button></div>'
+      + '<div class="aiux-tabs aiux-tabs-box ad-tabs" role="tablist">' + d.tabs.map(function (t, i) { return '<button role="tab" class="aiux-tab ' + (i === 0 ? 'aiux-tab-active' : '') + '" ' + (i ? 'data-soon="1"' : '') + '>' + E(t) + '</button>'; }).join('') + '</div>';
+
+    var glance = card('ad-glance', d.glance.map(function (g) { return '<div class="ad-g"><span class="text-xs text-text-secondary">' + E(g.label) + '</span><span class="ad-gv' + (g.tone ? ' is-' + g.tone : '') + '">' + E(g.value) + '</span><span class="text-xs text-text-tertiary">' + E(g.note) + '</span></div>'; }).join(''));
+
+    var sm = d.summary;
+    var summary = card('', head(sm.title, sm.meta, byAi(d, 'summary'))
+      + '<div class="ad-prose"><h3 class="text-sm font-medium">' + E(sm.requirement) + '</h3><p>' + E(sm.body) + '</p></div>'
+      + '<div class="ad-rec"><div class="ad-rec-h"><span class="text-xs text-text-secondary">' + E(sm.recLabel) + '</span>' + badge({ label: sm.rec, tone: sm.recTone }) + '</div><p class="text-sm">' + E(sm.recBody) + '</p></div>');
+
+    var rows = P.present.map(function (r) { return { label: r.label, detail: r.by, src: pol.srcPresent }; })
+      .concat(P.missing.map(function (r) { return { label: r.label, detail: r.value, src: pol.srcAdded }; }));
+    var table = '<div class="ad-tbl"><div class="ad-tr ad-th text-xs text-text-secondary"><span></span><span>' + E(pol.cols.req) + '</span><span>' + E(pol.cols.detail) + '</span><span>' + E(pol.cols.src) + '</span></div>'
+      + rows.map(function (r) { return '<div class="ad-tr"><span class="ad-ok"><aiux-icon name="' + E(P.icons.present) + '" size="sm"></aiux-icon></span><span>' + E(r.label) + '</span><span class="text-text-secondary">' + E(r.detail) + '</span><span class="text-text-secondary">' + E(r.src) + '</span></div>'; }).join('') + '</div>';
+    var filled = '<h3 class="ad-sub text-sm font-medium">' + E(pol.filled) + '</h3><div class="ad-fill">' + P.filled.map(function (f) { return '<div class="ad-f"><span class="text-xs text-text-secondary">' + E(f.label) + '</span><span class="ad-fv">' + E(f.value) + '</span><span class="text-xs text-text-tertiary">' + E(f.why) + '</span></div>'; }).join('') + '</div>';
+    var policy = card('', head(pol.title, pol.meta, bySp(d, 'policy')) + table + filled);
+
+    var sim = d.similar;
+    var similar = card('', head(sim.title, sim.meta, bySp(d, 'similar'), badge({ label: sim.count, tone: 'warning' })) + '<div class="ad-list">' + sim.items.map(function (i, k) {
+      return '<div class="ad-li"><div class="ad-li-main"><div class="ad-li-top"><a class="ac-link text-base" href="#" data-soon="1">' + E(i.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(i.ref) + '</span>' + badge({ label: i.match, tone: i.tone }) + '</div>'
+        + '<span class="text-sm text-text-secondary">' + E(i.why) + '</span><span class="text-xs text-text-tertiary">' + E(i.state) + ' · ' + E(i.by) + ' · ' + E(i.dates) + '</span></div>'
+        + '<div class="ad-li-act"><button class="aiux-btn aiux-btn-sm" data-soon="1">' + E(sim.view) + '</button><button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" data-more="' + k + '" aria-label="' + E(sim.more) + '"><aiux-icon name="ellipsis-h-outline" size="sm"></aiux-icon></button></div></div>'; }).join('') + '</div>');
+
+    var details = card('', head(d.details.title, '').replace('<p class="text-xs text-text-secondary"></p>', '') + '<dl class="ad-kv">' + d.details.rows.map(function (r) { return '<div><dt class="text-sm text-text-secondary">' + E(r[0]) + '</dt><dd>' + E(r[1]) + '</dd></div>'; }).join('') + '</dl>');
+
+    var sg = d.signals;
+    var signals = card('', head(sg.title, sg.meta, byAi(d, 'signals'), badge({ label: sg.count, tone: 'warning' })) + '<div class="ad-sig">' + sg.items.map(function (i) { return '<div class="ad-sg"><span class="ad-n">' + E(i.n) + '</span><div><div class="text-sm font-medium">' + E(i.title) + '</div><div class="text-sm text-text-secondary">' + E(i.body) + '</div></div></div>'; }).join('') + '</div>');
+
+    var as = d.assess;
+    var assess = card('', head(as.title, as.meta, bySp(d, 'assess')) + '<div class="ad-list">' + as.items.map(function (i) { return '<div class="ad-as"><span>' + E(i) + '</span><span class="text-xs text-text-tertiary">' + E(as.status) + '</span></div>'; }).join('') + '</div>');
+
+    var pr = d.priority;
+    var prio = card('ad-prio', head(pr.title, pr.meta, byAi(d, 'priority')) + '<div class="ad-map"><span class="text-xs text-text-secondary">' + E(pr.mapped.label) + '</span><span>' + E(pr.mapped.value) + '</span></div><div class="ad-tiles ad-tiles-3">' + pr.rows.map(function (r) { return '<div class="ad-tile"><span class="ad-tv is-' + r.tone + '">' + E(r.value) + E(pr.unit) + '</span><span class="text-xs text-text-secondary">' + E(r.label) + '</span><div class="ad-track is-' + r.tone + '"><span style="width:' + r.value + '%"></span></div></div>'; }).join('') + '</div><div class="ad-rs"><span class="text-xs text-text-secondary">' + E(pr.whyLabel) + '</span><p>' + E(pr.why) + '</p></div>');
+
+    var es = d.estimate;
+    var estimate = card('', head(es.title, es.meta, byAi(d, 'estimate'))
+      + '<div class="ad-sizes">' + es.sizes.map(function (z, i) { return '<div class="ad-size' + (i === es.selected ? ' is-on' : '') + '">' + (i === es.selected ? '<span class="ad-pick text-xs">' + E(es.pick) + '</span>' : '') + '<span class="ad-sk">' + E(z.key) + '</span><span class="text-xs text-text-secondary">' + E(z.range) + '</span></div>'; }).join('') + '</div>'
+      + '<div class="ad-stats">' + es.stats.map(function (t) { return '<div class="ad-f"><span class="text-xs text-text-secondary">' + E(t.label) + '</span><span class="ad-fv">' + E(t.value) + '</span></div>'; }).join('') + '</div>'
+      + '<h3 class="ad-sub text-sm font-medium">' + E(es.compLabel) + '</h3><div class="ad-list">' + es.comps.map(function (c) { return '<div class="ad-as"><span class="ad-li-top"><a class="ac-link text-base" href="#" data-soon="1">' + E(c.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(c.ref) + '</span></span><span class="text-sm text-text-secondary">' + E(c.size) + ' · ' + E(c.took) + '</span></div>'; }).join('') + '</div>'
+      + '<div class="ad-rs"><span class="text-xs text-text-secondary">' + E(es.reasoningLabel) + '</span><p>' + E(es.reasoning) + '</p></div>');
+
+    var im = d.impact;
+    var impact = card('', head(im.title, im.meta, byAi(d, 'impact')) + '<div class="ad-imp">' + im.items.map(function (i) { return '<div class="ad-i"><span class="ad-iv">' + E(i.value) + '</span><span class="text-sm text-text-secondary">' + E(i.label) + '</span></div>'; }).join('') + '</div>');
+
+    var dc = d.decision;
+    var decision = '<div class="ad-decide"><div class="ad-decide-t"><span class="ad-decide-h">' + E(dc.title) + '</span><span class="text-sm">' + E(dc.sub) + '</span></div><button class="aiux-btn aiux-btn-accent" data-approve="1"><aiux-icon name="ai-sparkle" size="sm"></aiux-icon>' + E(dc.cta) + '</button></div>';
+
+    $('page').innerHTML = '<div class="ad-top ow-in" style="--d:60ms">' + top + '</div>'
+      + '<div class="ow-in" style="--d:140ms">' + decision + glance + '</div>'
+      + '<div class="ad-rows">'
+      + '<div class="ad-r2 ow-in" style="--d:220ms">' + summary + impact + '</div>'
+      + '<div class="ad-r11 ow-in" style="--d:280ms">' + prio + estimate + '</div>'
+      + '<div class="ad-r2 ad-top-al ow-in" style="--d:340ms"><div class="ad-col">' + policy + similar + '</div><div class="ad-col">' + signals + assess + details + '</div></div>'
+      + '</div>';
+    $('page').querySelectorAll('[data-img]').forEach(function (im) { im.src = d.specialist.img; });
+  }
+
+  ProtoStore.mount(protoStore, function (store) {
+    var d = D = store.view('aict-demand');
+    customElements.whenDefined('aiux-nav-sidebar').then(function () { setTimeout(function () {
+      var n = $('proto-nav');
+      n.userMeta = { authenticated: true, firstName: d.steward.first, lastName: '', fullName: d.steward.first, initials: d.steward.initials, avatar: null };
+      n.workspaces = PROTO_DATA.menu.nav.polly.apps.map(function (a) { return { id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath }; });
+      n._workspaceChromeToolbar = Object.fromEntries(PROTO_DATA.menu.nav.polly.apps.map(function (a) { return [a.id + '-ws', { global: a.items.map(function (i) { return { id: i.id, label: { message: i.label }, icon: i.icon, routeInfo: { route: i.id } }; }) }]; }));
+      n.activeWorkspacePath = PROTO_DATA.menu.nav.polly.activityPath;
+    }, 50); });
+    render(d);
+  });
+  var chosen = [], busy = false;
+  function pane() { return $('otto-m'); }
+  function down() { var t = $('otto-t'); t.scrollTo({ top: t.scrollHeight, behavior: Otto.reduce ? 'auto' : 'smooth' }); }
+  function user(text) { var el = document.createElement('div'); el.className = 'ow-msg ow-msg-user'; el.innerHTML = '<div class="ow-bubble text-base">' + E(text) + '</div>'; pane().appendChild(el); down(); }
+  function say(html, extra) {
+    var el = document.createElement('div'); el.className = 'ow-msg';
+    el.innerHTML = '<span class="ow-green" style="width:24px;flex:none"><aiux-icon name="ai-sparkle-outline" size="md"></aiux-icon></span><div class="ow-msg-body"><div class="text-base ad-say">' + html + '</div>' + (extra || '') + '</div>';
+    pane().appendChild(el); down(); return el;
+  }
+  function think(text) {
+    var el = document.createElement('div'); el.className = 'ow-msg';
+    el.innerHTML = '<span class="ow-green" style="width:24px;flex:none"><aiux-icon name="ai-sparkle-outline" size="md"></aiux-icon></span><div class="ow-think"><span class="dots"><i></i><i></i><i></i></span><span class="ow-shimmer">' + E(text) + '</span></div>';
+    pane().appendChild(el); down(); return el;
+  }
+  function replies(html) { var r = $('otto-reply'); r.innerHTML = html; r.hidden = !html; if (html) { r.classList.remove('is-in'); void r.offsetWidth; r.classList.add('is-in'); } down(); }
+  function options(opts, attr) { return opts.map(function (o, i) { return '<button class="ad-opt" ' + attr + '="' + i + '"><span class="ad-opt-n">' + (i + 1) + '</span><span>' + E(o) + '</span></button>'; }).join(''); }
+  async function ask(k) {
+    var c = D.convert, st = c.steps[k];
+    var t = think(c.think[0]); await Otto.wait(700); t.remove();
+    say(E(st.q)); replies(options(st.opts, 'data-pick="' + k + '" data-o'));
+    busy = false;
+  }
+  async function review() {
+    var c = D.convert, t = think(c.think[1]); await Otto.wait(900); t.remove();
+    var vals = [chosen[0], chosen[1], chosen[2], c.golive, c.demand];
+    var rows = c.labels.map(function (l, i) { return '<div><dt class="text-sm text-text-secondary">' + E(l) + '</dt><dd>' + E(vals[i]) + '</dd></div>'; }).join('');
+    say(E(c.review), '<dl class="ad-kv ad-sum">' + rows + '</dl>');
+    replies('<button class="ad-opt is-go" data-create="1"><aiux-icon name="ai-sparkle" size="sm"></aiux-icon><span>' + E(c.create) + '</span></button><button class="ad-opt" data-restart="1"><aiux-icon name="arrow-left-outline" size="sm"></aiux-icon><span>' + E(c.restart) + '</span></button>');
+    busy = false;
+  }
+  function finish() {
+    var c = D.convert, dc = D.decision, owner = chosen[0].split(',')[0];
+    var num = c.num;
+    var bar = document.querySelector('.ad-decide');
+    bar.classList.add('is-done');
+    bar.innerHTML = '<div class="ad-decide-t"><span class="ad-decide-h">' + E(dc.done.title.replace('{num}', num)) + '</span><span class="text-sm">' + E(dc.done.sub.replace('{owner}', owner).replace('{start}', chosen[2])) + '</span></div><button class="aiux-btn aiux-btn-accent" data-open="1">' + E(dc.done.cta) + '</button>';
+    var b = document.querySelector('.ad-meta .aiux-badge'); if (b) { b.className = 'aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-success ow-pill'; b.textContent = dc.done.badge; }
+    say(c.done.replace('{num}', E(num)).replace('{owner}', E(owner)));
+  }
+  async function start() {
+    if (busy) return; busy = true; chosen = [];
+    var c = D.convert; $('otto-name').textContent = c.name; $('otto-ph').innerHTML = '<span class="ph">' + E(c.placeholder) + '</span>'; $('otto-close').setAttribute('aria-label', c.close);
+    pane().innerHTML = ''; $('otto').hidden = false; $('shell').classList.add('ad-open');
+    var t = think(c.think[0]); await Otto.wait(700); t.remove();
+    say(c.intro); await Otto.wait(500); ask(0);
+  }
+  function close() { $('otto').hidden = true; $('shell').classList.remove('ad-open'); busy = false; }
+  document.addEventListener('click', function (e) {
+    if (!D) return;
+    var q = function (s) { return e.target.closest && e.target.closest(s); };
+    if (q('[data-approve]')) { start(); return; }
+    if (q('#otto-close')) { close(); return; }
+    var pick = q('[data-pick]');
+    if (pick && !busy) {
+      busy = true; var k = +pick.dataset.pick, v = D.convert.steps[k].opts[+pick.dataset.o];
+      replies(''); chosen[k] = v; user(v);
+      if (k + 1 < D.convert.steps.length) ask(k + 1); else review();
+      return;
+    }
+    if (q('[data-create]') && !busy) { busy = true; replies(''); user(D.convert.create); (async function () { var t = think(D.convert.think[1]); await Otto.wait(900); t.remove(); finish(); busy = false; })(); return; }
+    if (q('[data-restart]') && !busy) { replies(''); busy = true; chosen = []; ask(0); return; }
+    var mo = q('[data-more]');
+    if (mo) { return; }
+    if (q('[data-open]')) { toast(D.decision.next); return; }
+    var hit = q('[data-soon]');
+    if (!hit) return; e.preventDefault(); toast(D.toast);
+  });
+  document.addEventListener('DOMContentLoaded', function () {});
+  ProtoStore.mount(protoStore, function (store) {
+    document.querySelectorAll('[data-more]').forEach(function (btn) {
+      if (btn.dataset.wired) return; btn.dataset.wired = '1';
+      Otto.menu(btn, D.similar.menu, function () { toast(D.toast); });
+    });
+  });
+})();
+</script>
+<!--/proto:main-->
+  </main>
+</div>
+
+<script>
+customElements.whenDefined('aiux-nav-sidebar').then(() => {
+  const el = document.getElementById('proto-nav');
+  const u = SHELL.user;
+  el.userMeta = { authenticated: true, firstName: u.firstName, lastName: u.lastName, fullName: u.firstName + ' ' + u.lastName, initials: u.initials, avatar: null };
+  el.features = __FEATURES;
+  el.menus = [{ id: __IDS.all, label: 'All', icon: 'grid' }, { id: __IDS.favorites, label: 'Favorites', icon: 'star' }, { id: __IDS.history, label: 'History', icon: 'clock' }];
+  el.menuData = {};
+  el.currentPath = SHELL.currentPath;
+  el.utilityMenuOrder = { [__IDS.notifications]: { order: 0 } };
+  el.unreadNotificationCount = SHELL.notifications;
+  el.unreadDiscussionCount = SHELL.discussions;
+  el.tabs = SHELL.pinned;
+  el.activeTabId = null;
+  el.workspaces = SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath }));
+  const active = SHELL.apps.find((a) => SHELL.currentPath.startsWith('/workspace/' + a.basePath + '/'));
+  if (active) el.activeWorkspacePath = active.basePath + '/' + (active.activeItem || 'home');
+  el._workspaceChromeToolbar = Object.fromEntries(SHELL.apps.map((a) => [a.id + '-ws', { global: a.items.map((i) => ({ id: i.id, label: { message: i.label }, icon: i.icon, routeInfo: { route: i.id } })) }]));
+});
+</script>
+
+<!--/proto:shell-->
+</body>
+</html>

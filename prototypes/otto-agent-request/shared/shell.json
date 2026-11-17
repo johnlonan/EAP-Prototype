@@ -1,0 +1,73 @@
+{
+  "user": {
+    "firstName": "Josh",
+    "lastName": "Sutton",
+    "initials": "JS"
+  },
+  "notifications": 3,
+  "discussions": 0,
+  "pinned": [],
+  "browse": {
+    "all": [
+      [
+        "Artifact library",
+        "/artifacts"
+      ],
+      [
+        "World Knowledge",
+        "/wk"
+      ],
+      [
+        "Browse assistants",
+        "/assistants"
+      ]
+    ],
+    "favorites": [],
+    "history": []
+  },
+  "apps": [
+    {
+      "id": "hrsd",
+      "label": "HR Agent Workspace",
+      "basePath": "now/hr-agent",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        },
+        {
+          "id": "cases",
+          "label": "Cases",
+          "icon": "database-outline"
+        },
+        {
+          "id": "knowledge",
+          "label": "Knowledge",
+          "icon": "lightbulb-outline"
+        }
+      ]
+    },
+    {
+      "id": "ec",
+      "label": "Employee Center",
+      "basePath": "now/employee-center",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        }
+      ]
+    }
+  ],
+  "currentPath": "/home",
+  "currentPaths": {
+    "index.html": "/home",
+    "chat.html": "/home",
+    "aict.html": "/workspace/now/aict/home",
+    "aict-demand.html": "/workspace/now/aict/activity"
+  }
+}

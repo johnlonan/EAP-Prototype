@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="bundle-version" content="2026.11.13-5">
+<title>AI Control Tower</title>
+<link rel="stylesheet" href="bundle/theme.css">
+<link rel="stylesheet" href="bundle/karuna.css">
+<script type="module" src="bundle/karuna.js"></script>
+<script>document.documentElement.classList.add("ow-pre");</script>
+<style>*, *::before, *::after { box-sizing: border-box; } body { margin: 0; }</style>
+<link rel="stylesheet" href="shared/otto.css">
+<link rel="stylesheet" href="shared/aict.css">
+</head>
+<body>
+<!--proto:shell-->
+<!-- ServiceNow app shell: the product's left navigation (Home, Ask Otto, notifications, Browse, pinned,
+     active apps) around your page. Edit ONLY the SHELL data block below and the <main> content.
+     The setup script gives the navigation the platform data it normally gets from a live instance
+     (from the product's own Storybook fixtures); it must stay above the sidebar. -->
+<script>
+/* ===== SHELL: edit these values =============================================================== */
+const SHELL = {
+  "user": {
+    "firstName": "Josh",
+    "lastName": "Sutton",
+    "initials": "JS"
+  },
+  "notifications": 3,
+  "discussions": 0,
+  "pinned": [],
+  "browse": {
+    "all": [
+      [
+        "Artifact library",
+        "/artifacts"
+      ],
+      [
+        "World Knowledge",
+        "/wk"
+      ],
+      [
+        "Browse assistants",
+        "/assistants"
+      ]
+    ],
+    "favorites": [],
+    "history": []
+  },
+  "apps": [
+    {
+      "id": "hrsd",
+      "label": "HR Agent Workspace",
+      "basePath": "now/hr-agent",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        },
+        {
+          "id": "cases",
+          "label": "Cases",
+          "icon": "database-outline"
+        },
+        {
+          "id": "knowledge",
+          "label": "Knowledge",
+          "icon": "lightbulb-outline"
+        }
+      ]
+    },
+    {
+      "id": "ec",
+      "label": "Employee Center",
+      "basePath": "now/employee-center",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        }
+      ]
+    }
+  ],
+  "currentPath": "/workspace/now/aict/home"
+};
+/* ===== end of SHELL ============================================================================ */
+
+/* ----- platform setup: do not edit. Runs before the component scripts load. ---------------------- */
+const __IDS = { all: 'd6e462a5c3533010cbd77096e940dd8c', favorites: '1b682fe1c3133010cbd77096e940dd18', history: 'c51543a5c3133010cbd77096e940dd43', workspaces: '63242b61c3133010cbd77096e940dd23', notifications: 'experience-notifications' };
+const __FEATURES = { menus: true, unifiedExperience: true, collabChat: true, userAvatar: true, preferences: false, pagePinning: true, tabGroups: true };
+window.__CONTEXT_DATA__ = { ...(window.__CONTEXT_DATA__ || {}), 'nav-layout': { menus: [], menuData: {}, features: __FEATURES, ready: true } };
+window.__REQUIREMENTS_DATA__ = { ...(window.__REQUIREMENTS_DATA__ || {}), sysProperties: { 'com.glide.cs.collab.enabled': 'true' }, plugins: { 'com.glide.cs.collab': true } };
+try {
+  localStorage.setItem('aiux.nav.menuCache.backend', 'localStorage');
+  localStorage.setItem('aiux.nav.activeWorkspaces', JSON.stringify(SHELL.apps.map((a) => a.id + '-ws')));
+  localStorage.setItem('aiux.nav.sectionOrder', JSON.stringify(['tabs', 'workspaces']));
+} catch (e) { /* storage blocked: the navigation still renders, without active apps */ }
+const __leaf = ([label, url], i, p) => ({ id: p + i, label, subItems: [], route: { url } });
+const __MENU = { result: [
+  { id: __IDS.all, label: 'All', icon: 'grid', subItems: SHELL.browse.all.map((x, i) => __leaf(x, i, 'all-')) },
+  { id: __IDS.favorites, label: 'Favorites', icon: 'star', subItems: SHELL.browse.favorites.map((x, i) => __leaf(x, i, 'fav-')) },
+  { id: __IDS.history, label: 'History', icon: 'change', subItems: SHELL.browse.history.map((x, i) => __leaf(x, i, 'his-')) },
+  { id: __IDS.workspaces, label: 'Workspaces', icon: 'window', subItems: SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath, route: { url: '/' + a.basePath + '/home', context: { path: a.basePath } }, subItems: [] })) }
+] };
+const __fetch = window.fetch.bind(window);
+window.fetch = (u, o) => {
+  const s = String(u && u.url ? u.url : u);
+  const json = (b) => Promise.resolve(new Response(JSON.stringify(b), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+  if (s.includes('/api/now/ui/polaris/menu')) return json(__MENU);
+  if (s.includes('/api/now/aiux_nav_service/workspace_experiences')) return json({ result: [] });
+  if (s.includes('/api/now/graphql')) return json({ data: {} });
+  // any other same-origin platform call (preferences, shortcuts, batch, data broker): an empty answer
+  if (/^(?:https?:\/\/[^/]+)?\/api\/now\//.test(s) && (s.startsWith('/') || s.startsWith(location.origin))) return json({ result: {} });
+  if (s.includes('keyboard-shortcut')) return json({ result: {} });
+  return __fetch(u, o);
+};
+</script>
+
+<div style="display:flex;height:100vh;overflow:hidden">
+  <aiux-nav-sidebar id="proto-nav" style="flex:none"></aiux-nav-sidebar>
+  <main id="proto-main" style="flex:1;min-width:0;overflow:auto;padding:16px 24px">
+<!--proto:main-->
+<div class="ow-page bg-base-200 text-sm text-text-primary" style="position:relative">
+  <div class="ow-home">
+    <div class="ow-greet ow-in" style="--d:80ms">
+      <span class="ow-green"><aiux-icon name="ai-sparkle-outline" size="lg"></aiux-icon></span>
+      <h1 class="text-3xl font-normal text-text-primary" id="greet"></h1>
+    </div>
+    <div class="ow-bar-wrap ow-in" style="--d:160ms">
+      <div class="ow-bar" id="bar" role="button" tabindex="0" aria-label="Ask Otto">
+        <div class="ow-bar-text text-base" id="bar-text"></div>
+        <div class="ow-bar-foot">
+          <button class="ow-send" id="send" aria-label="Send" aria-disabled="true"><aiux-icon name="send" size="sm"></aiux-icon></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ac-wrap">
+      <section class="ow-card ad-glance ow-in" style="--d:240ms" id="glance" aria-label="Summary"></section>
+
+      <div class="ac-row2">
+        <section class="ow-card ow-in" style="--d:300ms" aria-labelledby="t-intake">
+          <div class="ow-card-head"><h2 class="text-base font-medium" id="t-intake"></h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+          <p class="ac-sub text-xs text-text-secondary" id="intake-sub"></p>
+          <div class="ac-rows" id="intake"></div>
+          <a class="ac-foot text-sm" href="#" id="intake-all"></a>
+        </section>
+        <section class="ow-card ow-in" style="--d:360ms" aria-labelledby="t-val">
+          <div class="ow-card-head"><h2 class="text-base font-medium" id="t-val"></h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+          <p class="ac-sub text-xs text-text-secondary" id="val-sub"></p>
+          <div class="ac-big" id="val-amount"></div>
+          <p class="text-sm" id="val-delta"></p>
+          <div class="ac-chart" id="val-spark"></div>
+        </section>
+      </div>
+
+      <section class="ow-card ow-in" style="--d:420ms" aria-labelledby="t-posture">
+        <div class="ow-card-head"><h2 class="text-base font-medium" id="t-posture"></h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+        <p class="ac-sub text-xs text-text-secondary" id="posture-sub"></p>
+        <div class="ad-tiles" id="posture"></div>
+      </section>
+
+      <div class="ac-row2">
+        <section class="ow-card ow-in" style="--d:480ms" aria-labelledby="t-recs">
+          <div class="ow-card-head"><h2 class="text-base font-medium" id="t-recs"></h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+          <p class="ac-sub text-xs text-text-secondary" id="recs-note"></p>
+          <div class="ac-rows" id="recs"></div>
+          <a class="ac-foot text-sm" href="#" id="recs-all"></a>
+        </section>
+        <div class="ac-stack">
+          <section class="ow-card ow-in" style="--d:540ms" aria-labelledby="t-inv">
+            <div class="ow-card-head"><h2 class="text-base font-medium" id="t-inv"></h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+            <p class="ac-sub text-xs text-text-secondary" id="inv-sub"></p>
+            <div class="ac-inv" id="inv"></div>
+          </section>
+          <section class="ow-card ow-in" style="--d:600ms" aria-labelledby="t-reg">
+            <div class="ow-card-head"><h2 class="text-base font-medium" id="t-reg"></h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+            <p class="ac-sub text-xs text-text-secondary" id="reg-sub"></p>
+            <div class="ac-inv" id="reg"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ac-toast text-sm" id="toast" role="status" hidden></div>
+</div>
+<script src="shared/data.js"></script>
+<script src="shared/store.js"></script>
+<script src="shared/otto.js"></script>
+<script>
+(function () {
+  var shown = false;
+  function reveal() { if (shown) return; shown = true; document.documentElement.classList.remove('ow-pre'); }
+  Promise.all([customElements.whenDefined('aiux-nav-sidebar'), customElements.whenDefined('aiux-icon')]).then(function () { setTimeout(reveal, 120); });
+  setTimeout(reveal, 2500);
+  var E = Otto.esc, $ = function (id) { return document.getElementById(id); }, toastTimer = null, D = null;
+  function donut(host, total, label, parts) {
+    var el = document.createElement('aiux-visualizations-composition');
+    el.setAttribute('type', 'donut');
+    el.legend = { visible: false };
+    el.tooltip = {};
+    el.centerContent = { mode: 'custom', value: total, label: label, size: 'small' };
+    el.data = { metadata: { columns: { dim: { key: 'dim', label: label, order: 0, meaning: 'dimension', type: 'categorical' }, val: { key: 'val', label: label, order: 1, meaning: 'metric', type: 'numerical', groupedBy: ['dim'] } } }, rendering: { columns: {} }, data: parts.map(function (p) { return [p.label, p.value]; }) };
+    var box = document.createElement('div'); box.className = 'ac-donut'; box.appendChild(el);
+    var leg = document.createElement('div'); leg.className = 'ac-legend';
+    leg.innerHTML = parts.map(function (l) { return '<span class="ac-leg text-sm"><span class="ac-dot"></span><span class="text-text-secondary">' + E(l.label) + '</span><span>' + E(l.shown) + '</span></span>'; }).join('');
+    host.replaceChildren(box, leg);
+    // paint each legend dot with the colour the chart itself assigned to that slice
+    setTimeout(function paint() {
+      var cfg = el._chartConfig, pts = cfg && cfg.series && cfg.series[0] && cfg.series[0].data;
+      if (!pts || !pts.length) return setTimeout(paint, 150);
+      var pal = cfg.colors || [];
+      leg.querySelectorAll('.ac-dot').forEach(function (dot, k) { dot.style.background = pts[k].color || pal[k % pal.length]; });
+    }, 150);
+  }
+  function chart(c) {
+    var el = document.createElement('aiux-visualizations-axis');
+    el.setAttribute('type', 'area');
+    el.data = { metadata: { columns: { dim: { key: 'dim', label: c.dimension, order: 0, meaning: 'dimension', type: 'categorical' }, val: { key: 'val', label: c.measure, order: 1, meaning: 'measure', type: 'numerical', groupedBy: ['dim'] } } }, rendering: { columns: {} }, data: c.rows };
+    return el;
+  }
+  function toast(text) {
+    var t = $('toast'); t.textContent = text; t.hidden = false; clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; }, 3200);
+  }
+  ProtoStore.mount(protoStore, function (store) {
+    var d = D = store.view('aict');
+    customElements.whenDefined('aiux-nav-sidebar').then(function () { setTimeout(function () { var n = $('proto-nav'); n.userMeta = { authenticated: true, firstName: d.steward.first, lastName: '', fullName: d.steward.first, initials: d.steward.initials, avatar: null }; n.activeWorkspacePath = PROTO_DATA.menu.nav.polly.homePath; n.workspaces = PROTO_DATA.menu.nav.polly.apps.map(function (a) { return { id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath }; }); n._workspaceChromeToolbar = Object.fromEntries(PROTO_DATA.menu.nav.polly.apps.map(function (a) { return [a.id + '-ws', { global: a.items.map(function (i) { return { id: i.id, label: { message: i.label }, icon: i.icon, routeInfo: { route: i.id } }; }) }]; })); }, 50); });
+    $('greet').textContent = d.greeting.replace('{name}', d.steward.first);
+    $('bar-text').innerHTML = '<span class="ph">' + E(d.otto.placeholder) + '</span>';
+    $('glance').innerHTML = d.glance.map(function (g) { return '<div class="ad-g"><span class="text-xs text-text-secondary">' + E(g.label) + '</span><span class="ad-gv' + (g.tone ? ' is-' + g.tone : '') + '">' + E(g.value) + '</span><span class="text-xs text-text-tertiary">' + E(g.note) + '</span></div>'; }).join('');
+    $('t-inv').textContent = d.inventory.title; $('inv-sub').textContent = d.inventory.sub;
+    donut($('inv'), d.inventory.total, d.inventory.totalLabel, d.inventory.parts);
+    $('t-reg').textContent = d.regulatory.title; $('reg-sub').textContent = d.regulatory.sub;
+    donut($('reg'), d.regulatory.total, d.regulatory.totalLabel, d.regulatory.parts);
+    $('t-intake').textContent = d.intake.title;
+    $('intake-sub').textContent = d.intake.sub;
+    $('intake-all').textContent = d.intake.seeAll;
+    $('intake').innerHTML = d.intake.items.map(function (r, i) {
+      return '<div class="ac-row" data-i="' + i + '"><div class="ac-row-main"><div class="ac-row-top"><a class="ac-link text-base" href="#" data-i="' + i + '">' + E(r.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(r.ref) + '</span></div>'
+        + '<span class="text-sm text-text-secondary">' + E(r.by) + '</span><span class="text-xs text-text-tertiary">' + E(r.note) + ' · ' + E(r.status) + ' · ' + E(r.when) + '</span></div>'
+        + '<div class="ac-row-side"><span class="aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + r.tone + ' ow-pill">' + E(r.risk) + '</span><button class="aiux-btn aiux-btn-sm" data-i="' + i + '">' + E(d.intake.open) + '</button></div></div>';
+    }).join('');
+    $('t-posture').textContent = d.posture.title;
+    $('posture-sub').textContent = d.posture.sub;
+    $('posture').innerHTML = d.posture.tiles.map(function (r) { return '<div class="ad-tile"><span class="ad-tv is-' + r.tone + '">' + E(r.value) + '%</span><span class="text-xs text-text-secondary">' + E(r.label) + '</span><div class="ad-track is-' + r.tone + '"><span style="width:' + r.value + '%"></span></div></div>'; }).join('');
+    $('t-recs').textContent = d.recs.title; $('recs-note').textContent = d.recs.note; $('recs-all').textContent = d.recs.seeAll;
+    $('recs').innerHTML = d.recs.items.map(function (r) {
+      return '<div class="ac-row ac-rec"><div class="ac-row-main"><span class="text-xs"><span class="ac-lvl is-' + r.tone + '">' + E(r.level) + '</span> <span class="text-text-secondary">' + E(r.area) + '</span></span><span class="text-base">' + E(r.title) + '</span></div><div class="ac-row-side"><button class="aiux-btn aiux-btn-sm" data-rec="1">' + E(d.recs.open) + '</button></div></div>';
+    }).join('');
+    $('t-val').textContent = d.value.title; $('val-sub').textContent = d.value.sub;
+    $('val-amount').textContent = d.value.amount;
+    $('val-delta').innerHTML = '<span class="ac-up">' + E(d.value.delta) + '</span> ' + E(d.value.since);
+    $('val-spark').replaceChildren(chart(d.value.chart));
+  });
+  document.addEventListener('click', function (e) {
+    var hit = e.target.closest && e.target.closest('.ac-link, .ac-row .aiux-btn, .ac-foot');
+    if (!hit || !D) return; e.preventDefault();
+    var it = hit.dataset.i !== undefined ? D.intake.items[+hit.dataset.i] : null;
+    if (it && it.live) { location.href = 'aict-demand.html'; return; }
+    toast(D.toast);
+  });
+})();
+</script>
+<!--/proto:main-->
+  </main>
+</div>
+
+<script>
+customElements.whenDefined('aiux-nav-sidebar').then(() => {
+  const el = document.getElementById('proto-nav');
+  const u = SHELL.user;
+  el.userMeta = { authenticated: true, firstName: u.firstName, lastName: u.lastName, fullName: u.firstName + ' ' + u.lastName, initials: u.initials, avatar: null };
+  el.features = __FEATURES;
+  el.menus = [{ id: __IDS.all, label: 'All', icon: 'grid' }, { id: __IDS.favorites, label: 'Favorites', icon: 'star' }, { id: __IDS.history, label: 'History', icon: 'clock' }];
+  el.menuData = {};
+  el.currentPath = SHELL.currentPath;
+  el.utilityMenuOrder = { [__IDS.notifications]: { order: 0 } };
+  el.unreadNotificationCount = SHELL.notifications;
+  el.unreadDiscussionCount = SHELL.discussions;
+  el.tabs = SHELL.pinned;
+  el.activeTabId = null;
+  el.workspaces = SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath }));
+  const active = SHELL.apps.find((a) => SHELL.currentPath.startsWith('/workspace/' + a.basePath + '/'));
+  if (active) el.activeWorkspacePath = active.basePath + '/' + (active.activeItem || 'home');
+  el._workspaceChromeToolbar = Object.fromEntries(SHELL.apps.map((a) => [a.id + '-ws', { global: a.items.map((i) => ({ id: i.id, label: { message: i.label }, icon: i.icon, routeInfo: { route: i.id } })) }]));
+});
+</script>
+
+<!--/proto:shell-->
+</body>
+</html>

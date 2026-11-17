@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="bundle-version" content="2026.11.13-5">
+<title>My ServiceNow</title>
+<link rel="stylesheet" href="bundle/theme.css">
+<link rel="stylesheet" href="bundle/karuna.css">
+<script type="module" src="bundle/karuna.js"></script>
+<script>document.documentElement.classList.add("ow-pre");</script>
+<style>*, *::before, *::after { box-sizing: border-box; } body { margin: 0; }</style>
+<link rel="stylesheet" href="shared/otto.css">
+</head>
+<body>
+<!--proto:shell-->
+<!-- ServiceNow app shell: the product's left navigation (Home, Ask Otto, notifications, Browse, pinned,
+     active apps) around your page. Edit ONLY the SHELL data block below and the <main> content.
+     The setup script gives the navigation the platform data it normally gets from a live instance
+     (from the product's own Storybook fixtures); it must stay above the sidebar. -->
+<script>
+/* ===== SHELL: edit these values =============================================================== */
+const SHELL = {
+  "user": {
+    "firstName": "Josh",
+    "lastName": "Sutton",
+    "initials": "JS"
+  },
+  "notifications": 3,
+  "discussions": 0,
+  "pinned": [],
+  "browse": {
+    "all": [
+      [
+        "Artifact library",
+        "/artifacts"
+      ],
+      [
+        "World Knowledge",
+        "/wk"
+      ],
+      [
+        "Browse assistants",
+        "/assistants"
+      ]
+    ],
+    "favorites": [],
+    "history": []
+  },
+  "apps": [
+    {
+      "id": "hrsd",
+      "label": "HR Agent Workspace",
+      "basePath": "now/hr-agent",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        },
+        {
+          "id": "cases",
+          "label": "Cases",
+          "icon": "database-outline"
+        },
+        {
+          "id": "knowledge",
+          "label": "Knowledge",
+          "icon": "lightbulb-outline"
+        }
+      ]
+    },
+    {
+      "id": "ec",
+      "label": "Employee Center",
+      "basePath": "now/employee-center",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        }
+      ]
+    }
+  ],
+  "currentPath": "/home"
+};
+/* ===== end of SHELL ============================================================================ */
+
+/* ----- platform setup: do not edit. Runs before the component scripts load. ---------------------- */
+const __IDS = { all: 'd6e462a5c3533010cbd77096e940dd8c', favorites: '1b682fe1c3133010cbd77096e940dd18', history: 'c51543a5c3133010cbd77096e940dd43', workspaces: '63242b61c3133010cbd77096e940dd23', notifications: 'experience-notifications' };
+const __FEATURES = { menus: true, unifiedExperience: true, collabChat: true, userAvatar: true, preferences: false, pagePinning: true, tabGroups: true };
+window.__CONTEXT_DATA__ = { ...(window.__CONTEXT_DATA__ || {}), 'nav-layout': { menus: [], menuData: {}, features: __FEATURES, ready: true } };
+window.__REQUIREMENTS_DATA__ = { ...(window.__REQUIREMENTS_DATA__ || {}), sysProperties: { 'com.glide.cs.collab.enabled': 'true' }, plugins: { 'com.glide.cs.collab': true } };
+try {
+  localStorage.setItem('aiux.nav.menuCache.backend', 'localStorage');
+  localStorage.setItem('aiux.nav.activeWorkspaces', JSON.stringify(SHELL.apps.map((a) => a.id + '-ws')));
+  localStorage.setItem('aiux.nav.sectionOrder', JSON.stringify(['tabs', 'workspaces']));
+} catch (e) { /* storage blocked: the navigation still renders, without active apps */ }
+const __leaf = ([label, url], i, p) => ({ id: p + i, label, subItems: [], route: { url } });
+const __MENU = { result: [
+  { id: __IDS.all, label: 'All', icon: 'grid', subItems: SHELL.browse.all.map((x, i) => __leaf(x, i, 'all-')) },
+  { id: __IDS.favorites, label: 'Favorites', icon: 'star', subItems: SHELL.browse.favorites.map((x, i) => __leaf(x, i, 'fav-')) },
+  { id: __IDS.history, label: 'History', icon: 'change', subItems: SHELL.browse.history.map((x, i) => __leaf(x, i, 'his-')) },
+  { id: __IDS.workspaces, label: 'Workspaces', icon: 'window', subItems: SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath, route: { url: '/' + a.basePath + '/home', context: { path: a.basePath } }, subItems: [] })) }
+] };
+const __fetch = window.fetch.bind(window);
+window.fetch = (u, o) => {
+  const s = String(u && u.url ? u.url : u);
+  const json = (b) => Promise.resolve(new Response(JSON.stringify(b), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+  if (s.includes('/api/now/ui/polaris/menu')) return json(__MENU);
+  if (s.includes('/api/now/aiux_nav_service/workspace_experiences')) return json({ result: [] });
+  if (s.includes('/api/now/graphql')) return json({ data: {} });
+  // any other same-origin platform call (preferences, shortcuts, batch, data broker): an empty answer
+  if (/^(?:https?:\/\/[^/]+)?\/api\/now\//.test(s) && (s.startsWith('/') || s.startsWith(location.origin))) return json({ result: {} });
+  if (s.includes('keyboard-shortcut')) return json({ result: {} });
+  return __fetch(u, o);
+};
+</script>
+
+<div style="display:flex;height:100vh;overflow:hidden">
+  <aiux-nav-sidebar id="proto-nav" style="flex:none"></aiux-nav-sidebar>
+  <main id="proto-main" style="flex:1;min-width:0;overflow:auto;padding:16px 24px">
+<!--proto:main-->
+<div class="ow-page bg-base-200 text-sm text-text-primary" style="position:relative">
+  <button class="aiux-btn aiux-btn-sm ow-learn" id="learn"><aiux-icon name="lightbulb-outline" size="sm"></aiux-icon> Learn more</button>
+  <div class="ow-home">
+    <div class="ow-greet ow-in" style="--d:80ms">
+      <span class="ow-green"><aiux-icon name="ai-sparkle-outline" size="lg"></aiux-icon></span>
+      <h1 class="text-3xl font-normal text-text-primary" id="greet"></h1>
+    </div>
+
+    <div class="ow-bar-wrap ow-in" style="--d:160ms">
+      <div class="ow-bar" id="bar" role="button" tabindex="0" aria-label="Ask EmployeeWorks">
+        <div class="ow-bar-text text-base" id="bar-text"></div>
+        <div class="ow-bar-foot">
+          <button class="ow-send" id="send" aria-label="Send" aria-disabled="true"><aiux-icon name="send" size="sm"></aiux-icon></button>
+        </div>
+      </div>
+    </div>
+    <div class="ow-chips ow-in" style="--d:240ms" id="chips"></div>
+
+    <div class="ow-grid">
+      <div class="ow-col">
+        <section class="ow-card ow-in" style="--d:410ms" aria-labelledby="t-tasks">
+          <div class="ow-card-head"><h2 class="text-base font-medium" id="t-tasks">Tasks</h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+          <div id="tasks"></div>
+        </section>
+        <section class="ow-card ow-in" style="--d:500ms" aria-label="Apps"><div class="ow-apps" id="apps"></div></section>
+      </div>
+      <div class="ow-col">
+        <section class="ow-card ow-in" style="--d:590ms;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px" aria-label="Highlights and news">
+          <div>
+            <img class="ow-banner-img" src="shared/img/slide-hero-DiA_TG9Q.png" alt="">
+            <h2 class="text-lg font-medium mt-4" id="banner-t"></h2>
+            <p class="text-sm text-text-secondary mt-1" id="banner-b"></p>
+            <div class="ow-dots" id="dots"></div>
+          </div>
+          <div>
+            <div class="ow-card-head"><h2 class="text-base font-medium">News feed</h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+            <div class="aiux-tabs aiux-tabs-border mb-3" role="tablist" id="news-tabs"></div>
+            <div id="news"></div>
+          </div>
+        </section>
+        <div class="ow-row2">
+          <section class="ow-card ow-in" style="--d:680ms" aria-labelledby="t-events">
+            <div class="ow-card-head"><h2 class="text-base font-medium" id="t-events">Events</h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+            <div id="events"></div>
+          </section>
+          <section class="ow-card ow-in" style="--d:770ms" aria-labelledby="t-hol">
+            <div class="ow-card-head"><h2 class="text-base font-medium" id="t-hol">Holiday calendar</h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
+            <select class="aiux-select w-full mb-3" aria-label="Region" id="region"></select>
+            <div id="hols"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="shared/data.js"></script>
+<script src="shared/store.js"></script>
+<script src="shared/otto.js"></script>
+<script>
+(function () {
+  var shown = false;
+  function reveal() { if (shown) return; shown = true; document.documentElement.classList.remove('ow-pre'); }
+  Promise.all([customElements.whenDefined('aiux-nav-sidebar'), customElements.whenDefined('aiux-icon')]).then(function () { setTimeout(reveal, 120); });
+  setTimeout(reveal, 2500);
+  var S = function (u) { return ' ' + ['src', JSON.stringify(u)].join('='); };
+  var E = Otto.esc, tab = 0, slide = 0, typed = null;
+  ProtoStore.mount(protoStore, function (store) {
+    var d = store.view('index');
+    document.getElementById('greet').textContent = 'Good evening, ' + d.me.first + '!';
+    document.getElementById('chips').innerHTML = d.chips.map(function (c) { return '<button class="aiux-btn aiux-btn-sm bg-base-100">' + E(c) + '</button>'; }).join('');
+    document.getElementById('tasks').innerHTML = d.tasks.map(function (t) {
+      return '<div class="ow-task"><div class="ow-task-top"><span class="font-medium">' + E(t.title) + '</span><span class="aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + t.tone + ' ow-pill shrink-0"><aiux-icon name="' + t.icon + '" size="sm"></aiux-icon> ' + E(t.status) + '</span></div><span class="text-xs text-text-secondary">' + E(t.meta) + '</span></div>';
+    }).join('');
+    document.getElementById('apps').innerHTML = d.apps.map(function (a) {
+      return '<div class="ow-app"><img class="ow-app-ico" ' + S(a.img) + ' alt=""><span class="text-sm">' + E(a.label) + '</span></div>';
+    }).join('');
+    var sl = d.banner.slides[slide];
+    document.getElementById('banner-t').textContent = sl.title;
+    document.getElementById('banner-b').textContent = sl.body;
+    var dots = ''; for (var i = 1; i <= d.banner.pages; i++) dots += '<button class="aiux-btn aiux-btn-xs aiux-btn-square ' + (i === slide + 1 ? 'aiux-btn-neutral' : 'aiux-btn-ghost') + '" data-s="' + (i - 1) + '" aria-label="Slide ' + i + '">' + i + '</button>';
+    document.getElementById('dots').innerHTML = dots;
+    document.getElementById('news-tabs').innerHTML = d.news.tabs.map(function (t, i) { return '<button role="tab" class="aiux-tab ' + (i === tab ? 'aiux-tab-active' : '') + '" data-i="' + i + '">' + E(t) + '</button>'; }).join('');
+    document.getElementById('news').innerHTML = d.news.items.map(function (n, i) {
+      var items = tab === 0 ? n : d.news.items[(i + 1) % d.news.items.length];
+      return '<div class="ow-news"><img class="ow-thumb" ' + S(items.img) + ' alt=""><div><div class="font-medium">' + E(items.title) + '</div><div class="text-sm text-text-secondary">' + E(items.body) + '</div><div class="text-xs text-text-tertiary mt-1">' + E(items.meta) + '</div></div></div>';
+    }).join('');
+    document.getElementById('events').innerHTML = d.events.map(function (e) {
+      return '<div class="ow-day text-xs text-text-secondary">' + E(e.day) + '</div><div class="ow-event"><img class="ow-thumb" ' + S(e.img) + ' alt=""><div class="py-3 pr-3"><div class="font-medium">' + E(e.title) + '</div><div class="text-xs text-text-secondary mt-1">' + E(e.when) + '</div><div class="text-xs text-text-tertiary">' + E(e.where) + '</div></div></div>';
+    }).join('');
+    document.getElementById('region').innerHTML = '<option>' + E(d.holidays.region) + '</option>';
+    document.getElementById('hols').innerHTML = d.holidays.items.map(function (h) {
+      return '<div class="ow-hol"><img class="ow-thumb" ' + S(h.img) + ' alt=""><div class="ow-hol-main"><div class="font-medium">' + E(h.title) + '</div><div class="text-sm text-text-secondary">' + E(h.date) + '</div></div>' + (h.next ? '<span class="text-xs text-info">Next</span>' : '') + '</div>';
+    }).join('');
+    Otto.menu(document.getElementById('learn'), ['What is EmployeeWorks?', 'Tips for asking Otto', 'Give feedback']);
+    // Otto bar: click to type, click send to open the chat
+    if (typed) return;
+    var out = document.getElementById('bar-text'), ph = d.otto.placeholder;
+    out.innerHTML = '<span class="ph">' + E(ph) + '</span>';
+    typed = Otto.typer({
+      box: document.getElementById('bar'), out: out, send: document.getElementById('send'), text: d.typed.first,
+      onSend: function (text) {
+        protoStore.set('session', { first: text, step: 'fresh' });
+        document.querySelector('.ow-page').classList.add('ow-leave');
+        setTimeout(function () { location.href = 'chat.html'; }, Otto.reduce ? 0 : 280);
+      }
+    });
+  });
+  document.addEventListener('click', function (e) {
+    var chip = e.target.closest && e.target.closest('#chips button');
+    if (chip && typed) typed.start();
+    var t = e.target.closest && e.target.closest('#news-tabs [data-i]');
+    if (t) { tab = +t.dataset.i; protoStore.set('ui.newsTab', tab); }
+    var b = e.target.closest && e.target.closest('#dots [data-s]');
+    if (b) { slide = +b.dataset.s; protoStore.set('ui.slide', slide); }
+  });
+})();
+</script>
+<!--/proto:main-->
+  </main>
+</div>
+
+<script>
+customElements.whenDefined('aiux-nav-sidebar').then(() => {
+  const el = document.getElementById('proto-nav');
+  const u = SHELL.user;
+  el.userMeta = { authenticated: true, firstName: u.firstName, lastName: u.lastName, fullName: u.firstName + ' ' + u.lastName, initials: u.initials, avatar: null };
+  el.features = __FEATURES;
+  el.menus = [{ id: __IDS.all, label: 'All', icon: 'grid' }, { id: __IDS.favorites, label: 'Favorites', icon: 'star' }, { id: __IDS.history, label: 'History', icon: 'clock' }];
+  el.menuData = {};
+  el.currentPath = SHELL.currentPath;
+  el.utilityMenuOrder = { [__IDS.notifications]: { order: 0 } };
+  el.unreadNotificationCount = SHELL.notifications;
+  el.unreadDiscussionCount = SHELL.discussions;
+  el.tabs = SHELL.pinned;
+  el.activeTabId = null;
+  el.workspaces = SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath }));
+  const active = SHELL.apps.find((a) => SHELL.currentPath.startsWith('/workspace/' + a.basePath + '/'));
+  if (active) el.activeWorkspacePath = active.basePath + '/' + (active.activeItem || 'home');
+  el._workspaceChromeToolbar = Object.fromEntries(SHELL.apps.map((a) => [a.id + '-ws', { global: a.items.map((i) => ({ id: i.id, label: { message: i.label }, icon: i.icon, routeInfo: { route: i.id } })) }]));
+});
+</script>
+
+<!--/proto:shell-->
+</body>
+</html>

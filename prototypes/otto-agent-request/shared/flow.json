@@ -1,0 +1,126 @@
+{
+  "entry": "menu",
+  "screens": [
+    {
+      "id": "menu",
+      "file": "index.html",
+      "title": "Demand AI Specialist demos"
+    },
+    {
+      "id": "teams",
+      "file": "teams.html",
+      "title": "Moveworks chat"
+    },
+    {
+      "id": "home",
+      "file": "home.html",
+      "title": "My ServiceNow"
+    },
+    {
+      "id": "chat",
+      "file": "chat.html",
+      "title": "EmployeeWorks chat"
+    },
+    {
+      "id": "aict",
+      "file": "aict.html",
+      "title": "AI Control Tower home"
+    },
+    {
+      "id": "aict-demand",
+      "file": "aict-demand.html",
+      "title": "AI resume screening demand"
+    },
+    {
+      "id": "status",
+      "file": "status.html",
+      "title": "Moveworks update"
+    }
+  ],
+  "edges": [
+    {
+      "from": "home",
+      "to": "chat",
+      "trigger": "Click Otto bar (types), then click send",
+      "condition": null
+    },
+    {
+      "from": "chat",
+      "to": "home",
+      "trigger": "New chat icon",
+      "condition": null
+    },
+    {
+      "from": "menu",
+      "to": "home",
+      "trigger": "Card 1: Josh raises the demand",
+      "condition": null
+    },
+    {
+      "from": "home",
+      "to": "menu",
+      "trigger": "All flows button",
+      "condition": null
+    },
+    {
+      "from": "chat",
+      "to": "menu",
+      "trigger": "All flows button",
+      "condition": null
+    },
+    {
+      "from": "menu",
+      "to": "teams",
+      "trigger": "Card 2",
+      "condition": null
+    },
+    {
+      "from": "teams",
+      "to": "menu",
+      "trigger": "All flows",
+      "condition": null
+    },
+    {
+      "from": "menu",
+      "to": "aict",
+      "trigger": "Card 3",
+      "condition": null
+    },
+    {
+      "from": "aict",
+      "to": "menu",
+      "trigger": "All flows",
+      "condition": null
+    },
+    {
+      "from": "aict",
+      "to": "aict-demand",
+      "trigger": "Click the demand in Intake requests",
+      "condition": null
+    },
+    {
+      "from": "aict-demand",
+      "to": "aict",
+      "trigger": "Back to Intake requests",
+      "condition": null
+    },
+    {
+      "from": "aict-demand",
+      "to": "menu",
+      "trigger": "All flows",
+      "condition": null
+    },
+    {
+      "from": "menu",
+      "to": "status",
+      "trigger": "Card 4",
+      "condition": null
+    },
+    {
+      "from": "status",
+      "to": "menu",
+      "trigger": "All flows",
+      "condition": null
+    }
+  ]
+}

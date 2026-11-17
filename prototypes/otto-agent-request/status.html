@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="bundle-version" content="2026.11.13-5">
+<title>Moveworks update</title>
+<link rel="stylesheet" href="bundle/theme.css">
+<link rel="stylesheet" href="bundle/karuna.css">
+<script type="module" src="bundle/karuna.js"></script>
+<style>*, *::before, *::after { box-sizing: border-box; } body { margin: 0; }</style>
+<link rel="stylesheet" href="shared/otto.css">
+<link rel="stylesheet" href="shared/teams.css">
+<link rel="stylesheet" href="shared/status.css">
+</head>
+<body>
+<div class="tm-app">
+  <div class="tm-top" id="top"></div>
+  <nav class="tm-rail" id="rail" aria-label="Apps"></nav>
+  <div class="tm-main">
+    <header class="tm-head" id="head"></header>
+    <section class="tm-feed" id="feed" aria-live="polite"></section>
+    <div class="tm-composer">
+      <div class="tm-box is-idle" id="tm-box">
+        <div class="txt" id="tm-text"></div>
+        <button class="tm-send" id="tm-send" type="button" aria-label="Send"><aiux-icon name="send-outline" size="md"></aiux-icon></button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tm-notif" id="tm-notif" role="status"></div>
+<div class="tm-toast" id="tm-toast" role="status"></div>
+<script src="shared/data.js"></script>
+<script src="shared/store.js"></script>
+<script src="shared/otto.js"></script>
+<script src="shared/status.js"></script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="bundle-version" content="2026.11.13-5">
+<title>EmployeeWorks chat</title>
+<link rel="stylesheet" href="bundle/theme.css">
+<link rel="stylesheet" href="bundle/karuna.css">
+<script type="module" src="bundle/karuna.js"></script>
+<script>document.documentElement.classList.add("ow-pre");</script>
+<style>*, *::before, *::after { box-sizing: border-box; } body { margin: 0; }</style>
+<link rel="stylesheet" href="shared/otto.css">
+</head>
+<body>
+<!--proto:shell-->
+<!-- ServiceNow app shell: the product's left navigation (Home, Ask Otto, notifications, Browse, pinned,
+     active apps) around your page. Edit ONLY the SHELL data block below and the <main> content.
+     The setup script gives the navigation the platform data it normally gets from a live instance
+     (from the product's own Storybook fixtures); it must stay above the sidebar. -->
+<script>
+/* ===== SHELL: edit these values =============================================================== */
+const SHELL = {
+  "user": {
+    "firstName": "Josh",
+    "lastName": "Sutton",
+    "initials": "JS"
+  },
+  "notifications": 3,
+  "discussions": 0,
+  "pinned": [],
+  "browse": {
+    "all": [
+      [
+        "Artifact library",
+        "/artifacts"
+      ],
+      [
+        "World Knowledge",
+        "/wk"
+      ],
+      [
+        "Browse assistants",
+        "/assistants"
+      ]
+    ],
+    "favorites": [],
+    "history": []
+  },
+  "apps": [
+    {
+      "id": "hrsd",
+      "label": "HR Agent Workspace",
+      "basePath": "now/hr-agent",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        },
+        {
+          "id": "cases",
+          "label": "Cases",
+          "icon": "database-outline"
+        },
+        {
+          "id": "knowledge",
+          "label": "Knowledge",
+          "icon": "lightbulb-outline"
+        }
+      ]
+    },
+    {
+      "id": "ec",
+      "label": "Employee Center",
+      "basePath": "now/employee-center",
+      "activeItem": "home",
+      "items": [
+        {
+          "id": "home",
+          "label": "Home",
+          "icon": "home-outline"
+        }
+      ]
+    }
+  ],
+  "currentPath": "/home"
+};
+/* ===== end of SHELL ============================================================================ */
+
+/* ----- platform setup: do not edit. Runs before the component scripts load. ---------------------- */
+const __IDS = { all: 'd6e462a5c3533010cbd77096e940dd8c', favorites: '1b682fe1c3133010cbd77096e940dd18', history: 'c51543a5c3133010cbd77096e940dd43', workspaces: '63242b61c3133010cbd77096e940dd23', notifications: 'experience-notifications' };
+const __FEATURES = { menus: true, unifiedExperience: true, collabChat: true, userAvatar: true, preferences: false, pagePinning: true, tabGroups: true };
+window.__CONTEXT_DATA__ = { ...(window.__CONTEXT_DATA__ || {}), 'nav-layout': { menus: [], menuData: {}, features: __FEATURES, ready: true } };
+window.__REQUIREMENTS_DATA__ = { ...(window.__REQUIREMENTS_DATA__ || {}), sysProperties: { 'com.glide.cs.collab.enabled': 'true' }, plugins: { 'com.glide.cs.collab': true } };
+try {
+  localStorage.setItem('aiux.nav.menuCache.backend', 'localStorage');
+  localStorage.setItem('aiux.nav.activeWorkspaces', JSON.stringify(SHELL.apps.map((a) => a.id + '-ws')));
+  localStorage.setItem('aiux.nav.sectionOrder', JSON.stringify(['tabs', 'workspaces']));
+} catch (e) { /* storage blocked: the navigation still renders, without active apps */ }
+const __leaf = ([label, url], i, p) => ({ id: p + i, label, subItems: [], route: { url } });
+const __MENU = { result: [
+  { id: __IDS.all, label: 'All', icon: 'grid', subItems: SHELL.browse.all.map((x, i) => __leaf(x, i, 'all-')) },
+  { id: __IDS.favorites, label: 'Favorites', icon: 'star', subItems: SHELL.browse.favorites.map((x, i) => __leaf(x, i, 'fav-')) },
+  { id: __IDS.history, label: 'History', icon: 'change', subItems: SHELL.browse.history.map((x, i) => __leaf(x, i, 'his-')) },
+  { id: __IDS.workspaces, label: 'Workspaces', icon: 'window', subItems: SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath, route: { url: '/' + a.basePath + '/home', context: { path: a.basePath } }, subItems: [] })) }
+] };
+const __fetch = window.fetch.bind(window);
+window.fetch = (u, o) => {
+  const s = String(u && u.url ? u.url : u);
+  const json = (b) => Promise.resolve(new Response(JSON.stringify(b), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+  if (s.includes('/api/now/ui/polaris/menu')) return json(__MENU);
+  if (s.includes('/api/now/aiux_nav_service/workspace_experiences')) return json({ result: [] });
+  if (s.includes('/api/now/graphql')) return json({ data: {} });
+  // any other same-origin platform call (preferences, shortcuts, batch, data broker): an empty answer
+  if (/^(?:https?:\/\/[^/]+)?\/api\/now\//.test(s) && (s.startsWith('/') || s.startsWith(location.origin))) return json({ result: {} });
+  if (s.includes('keyboard-shortcut')) return json({ result: {} });
+  return __fetch(u, o);
+};
+</script>
+
+<div style="display:flex;height:100vh;overflow:hidden">
+  <aiux-nav-sidebar id="proto-nav" style="flex:none"></aiux-nav-sidebar>
+  <main id="proto-main" style="flex:1;min-width:0;overflow:auto;padding:16px 24px">
+<!--proto:main-->
+<div class="ow-page bg-base-200 text-sm text-text-primary" style="height:100%">
+  <header class="ow-chat-head">
+    <button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" aria-label="Menu" id="menu-btn"><aiux-icon name="list-outline" size="md"></aiux-icon></button>
+    <div class="grow"><span class="ow-green"><aiux-icon name="ai-sparkle-outline" size="lg"></aiux-icon></span><span class="text-lg font-medium" id="who"></span></div>
+    <button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" aria-label="New chat" id="newchat"><aiux-icon name="pencil-outline" size="md"></aiux-icon></button>
+    <button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" aria-label="More" id="more-btn"><aiux-icon name="ellipsis-v-outline" size="md"></aiux-icon></button>
+    <button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" aria-label="Expand" id="expand-btn"><aiux-icon name="expand-outline" size="md"></aiux-icon></button>
+    <button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" aria-label="Collapse" id="collapse-btn"><aiux-icon name="chevron-down-outline" size="md"></aiux-icon></button>
+  </header>
+  <div class="ow-thread" id="thread" aria-live="polite"><div class="ow-thread-in" id="msgs"></div></div>
+  <div class="ow-composer-wrap">
+    <div class="ow-composer" id="composer" role="button" tabindex="0" aria-label="Message EmployeeWorks">
+      <div class="txt text-base" id="comp-text"></div>
+      <button class="ow-send" id="send" aria-label="Send" aria-disabled="true" style="width:40px;height:40px"><aiux-icon name="send" size="sm"></aiux-icon></button>
+    </div>
+    <p class="ow-foot text-xs text-text-tertiary mt-2" id="disc"></p>
+  </div>
+</div>
+<script src="shared/data.js"></script>
+<script src="shared/store.js"></script>
+<script src="shared/otto.js"></script>
+<script>
+(function () {
+  var done = false;
+  function reveal() { if (done) return; done = true; document.documentElement.classList.remove('ow-pre'); }
+  Promise.all([customElements.whenDefined('aiux-nav-sidebar'), customElements.whenDefined('aiux-icon')]).then(function () { setTimeout(reveal, 120); });
+  setTimeout(reveal, 2500);
+})();
+</script>
+<script>
+(function () {
+  var E = Otto.esc, wait = Otto.wait, D = protoStore.view('chat'), msgs = document.getElementById('msgs'), thread = document.getElementById('thread');
+  var first = protoStore.get('session.first') || D.typed.first;
+  var running = false;
+
+  document.getElementById('who').textContent = D.otto.name;
+  document.getElementById('disc').textContent = D.otto.disclaimer;
+  var out = document.getElementById('comp-text');
+  function ph() { out.innerHTML = '<span class="ph">' + E(D.otto.chatPlaceholder) + '</span>'; }
+  ph();
+
+  // Keep the right part in view: short messages stay at the bottom; a message taller than the pane is pinned by its top so its start can be read
+  var follow = true;
+  ['wheel', 'touchmove', 'keydown'].forEach(function (ev) { thread.addEventListener(ev, function () { follow = false; }, { passive: true }); });
+  function scroll(smooth) {
+    if (smooth) follow = true; else if (!follow) return;
+    var last = msgs.lastElementChild, max = thread.scrollHeight - thread.clientHeight, top = max;
+    if (last && last.offsetHeight > thread.clientHeight - 160) top = Math.min(max, last.offsetTop - 24);
+    if (smooth && !Otto.reduce) thread.scrollTo({ top: top, behavior: 'smooth' }); else thread.scrollTop = top;
+  }
+  function userMsg(text) {
+    var el = document.createElement('div'); el.className = 'ow-msg ow-msg-user';
+    el.innerHTML = '<div class="ow-bubble text-base">' + E(text) + '</div>';
+    msgs.appendChild(el); scroll(true);
+  }
+  function ottoShell(agent) {
+    var el = document.createElement('div'); el.className = 'ow-msg';
+    var lead = agent ? '<span class="ow-agent-av" aria-hidden="true"></span>' : '<span class="ow-green" style="width:32px;flex:none"><aiux-icon name="ai-sparkle-outline" size="lg"></aiux-icon></span>';
+    var who = agent ? E(agent.name) + ' <span class="aiux-badge aiux-badge-soft aiux-badge-info aiux-badge-sm">' + E(agent.tag) + '</span>' : E(D.otto.name);
+    el.innerHTML = lead + '<div class="ow-msg-body"><div class="ow-msg-meta"><span class="text-base">' + who + '</span><span class="text-sm text-text-secondary">' + E(D.chat.stamp1) + '</span></div><div class="ow-content text-base"></div><div class="ow-extra"></div></div>';
+    if (agent) { var im = new Image(); im.alt = ''; im.src = agent.img; el.querySelector('.ow-agent-av').appendChild(im); }
+    msgs.appendChild(el); scroll(true); return el;
+  }
+  function acts() {
+    return '<div class="ow-acts ow-reveal"><button aria-label="Good response"><aiux-icon name="thumbs-up-outline" size="sm"></aiux-icon></button><button aria-label="Bad response"><aiux-icon name="thumbs-down-outline" size="sm"></aiux-icon></button><button aria-label="Copy"><aiux-icon name="clone-outline" size="sm"></aiux-icon></button><button aria-label="Download"><aiux-icon name="download-outline" size="sm"></aiux-icon></button></div>';
+  }
+  // Otto "thinks": cycling status lines with bouncing dots, then streams the answer
+  async function ottoSay(lines, html, extra, agent, tail) {
+    var el = ottoShell(agent), c = el.querySelector('.ow-content');
+    if (agent) {
+      // The specialist shows its work: each check ticks off before it answers
+      c.innerHTML = '<ul class="ow-steps"></ul>'; var ul = c.firstChild;
+      for (var k = 0; k < lines.length; k++) {
+        var li = document.createElement('li'); li.className = 'ow-step is-run';
+        li.innerHTML = '<span class="ow-step-i"><span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span></span><span class="ow-shimmer">' + E(lines[k]) + '</span>';
+        ul.appendChild(li); scroll(); await wait(650);
+        li.className = 'ow-step is-done'; li.querySelector('.ow-step-i').innerHTML = '<aiux-icon name="check-outline" size="sm"></aiux-icon>'; li.lastChild.className = '';
+      }
+      await wait(250);
+      ul.insertAdjacentHTML('afterend', '<div class="ow-ans"></div>'); await Otto.stream(c.querySelector('.ow-ans'), html); scroll();
+      if (extra) { await wait(250); extra(el.querySelector('.ow-extra')); }
+      if (tail) { await wait(900); var tl = document.createElement('div'); tl.className = 'ow-ans ow-tail'; el.querySelector('.ow-extra').appendChild(tl); scroll(true); await Otto.stream(tl, tail); scroll(); }
+      el.querySelector('.ow-extra').insertAdjacentHTML('beforeend', acts()); scroll();
+      return el;
+    }
+    for (var i = 0; i < lines.length; i++) {
+      c.innerHTML = '<div class="ow-think"><span class="dots"><i></i><i></i><i></i></span><span class="ow-shimmer">' + E(lines[i]) + '</span></div>';
+      scroll(); await wait(800);
+    }
+    await Otto.stream(c, html); scroll();
+    if (extra) { await wait(250); extra(el.querySelector('.ow-extra')); }
+    el.querySelector('.ow-extra').insertAdjacentHTML('beforeend', acts()); scroll();
+    return el;
+  }
+
+  function renderDraft(host, mode) {
+    var d = D.draft, req = protoStore.view('chat').request;
+    var wrap = document.createElement('div'); wrap.className = 'aiux-card bg-base-100 shadow-sm ow-draft'; wrap.id = 'draft';
+    host.appendChild(wrap);
+    function paint(editing) {
+      var st = protoStore.view('chat').request.state, vals = (protoStore.view('chat').request.values) || {};
+      var sub = st === 'submitted', stage = d.status[st] ? st : 'draft';
+      var badge = '<span class="aiux-badge aiux-badge-soft aiux-badge-' + (sub ? 'success' : stage === 'assigned' ? 'info' : 'neutral') + ' aiux-badge-sm">' + E(d.status[stage]) + '</span>';
+      var val = function (f) { return vals[f.key] != null ? vals[f.key] : f.value; };
+      var field = function (f) {
+        var v = val(f);
+        if (editing) return '<div class="ow-kv ow-kv-edit"><label class="text-xs text-text-secondary" for="f-' + f.key + '">' + E(f.label) + '</label>' + (f.long ? '<textarea class="aiux-textarea w-full" id="f-' + f.key + '" rows="3" data-k="' + f.key + '">' + E(v) + '</textarea>' : '<input class="aiux-input aiux-input-sm w-full" id="f-' + f.key + '" data-k="' + f.key + '" value="' + E(v) + '">') + '</div>';
+        return '<div class="ow-kv"><dt class="text-xs text-text-secondary">' + E(f.label) + '</dt><dd class="text-sm text-text-primary' + '' + '">' + E(v) + '</dd></div>';
+      };
+      var tf = d.fields[0], need = d.fields[1];
+      var title = editing ? '<input class="aiux-input w-full" data-k="title" value="' + E(val(tf)) + '" aria-label="Title">' : '<h3 class="aiux-card-header-title">' + E(val(tf)) + '</h3>';
+      var rest = d.fields.slice(1).map(field).join('');
+      var sp = D.specialist;
+      var rq = d.meta[0], owner = d.meta[2].value;
+      var chip = stage === 'draft' ? '' : '<span class="ow-owner"><span class="text-xs text-text-secondary">' + E(d.meta[2].label) + '</span><span class="text-xs text-text-primary font-medium">' + E(owner) + '</span></span>';
+      var sub1 = '<p class="ow-sub text-sm text-text-secondary"><span class="ow-av ow-av-sm">' + E(rq.av) + '</span><span class="text-text-primary">' + E(rq.value) + '</span><span>' + E(rq.sub) + '</span><span class="ow-dot"></span><span>' + E(d.meta[1].value) + '</span></p>';
+      var ins = d.insight[stage];
+      var insight = '<div class="ow-notice is-' + stage + '"><div><div class="text-sm text-text-primary">' + E(ins.title) + '</div><div class="text-xs text-text-secondary">' + E(ins.sub) + '</div></div></div>';
+      var foot = editing ? '<button class="aiux-btn aiux-btn-primary aiux-btn-sm" id="save">Save changes</button><button class="aiux-btn aiux-btn-secondary aiux-btn-sm" id="cancel">Cancel</button>'
+        : '';
+      wrap.innerHTML = '<div class="aiux-card-body ow-card-body">'
+        + '<div class="ow-top"><div class="ow-badges">' + badge + '<a class="aiux-card-header-subtitle aiux-link aiux-link-hover" href="#" id="dnum">' + E(d.number) + '</a></div>' + chip + '</div>'
+        + '<div class="ow-head">' + title + (editing ? '' : sub1) + '</div>'
+        + '<dl class="ow-fields ow-details">' + rest + '</dl>'
+        + (editing ? '' : insight)
+        + (foot ? '<div class="ow-draft-foot">' + foot + '</div>' : '') + '</div>';
+      var note = function () { var n = wrap.querySelector('.ow-linknote'); if (!n) { n = document.createElement('div'); n.className = 'ow-linknote text-xs text-text-secondary'; n.textContent = 'The record page is not part of this prototype.'; wrap.querySelector('.ow-badges').after(n); setTimeout(function () { n.remove(); }, 2200); } };
+      wrap.querySelector('#dnum').onclick = function (e) { e.preventDefault(); note(); };
+      var $ = function (id) { return wrap.querySelector('#' + id); };
+      if ($('edit')) $('edit').onclick = function () { paint(true); };
+      if ($('cancel')) $('cancel').onclick = function () { paint(false); };
+      if ($('save')) $('save').onclick = function () {
+        var v = {}; wrap.querySelectorAll('[data-k]').forEach(function (i) { v[i.dataset.k] = i.value; });
+        protoStore.set('request.values', v); paint(false); ottoSay(['Updating your request…'], D.chat.reply4);
+      };
+    }
+    wrap.__paint = paint; paint(false); scroll();
+  }
+
+  async function turn1() {
+    running = true; userMsg(first);
+    await wait(500);
+    await ottoSay(D.chat.loading1, D.chat.reply1);
+    running = false; protoStore.set('session.step', 'q'); armComposer();
+  }
+  function armComposer() {
+    var t = Otto.typer({ box: document.getElementById('composer'), out: out, send: document.getElementById('send'), text: D.typed.second,
+      onSend: async function (text) {
+        running = true; out.innerHTML = ''; ph(); document.getElementById('composer').classList.remove('is-active');
+        userMsg(text); await wait(500);
+        await ottoSay(D.chat.loading2, D.chat.reply2, function (host) { renderDraft(host); });
+        protoStore.set('session.step', 'draft');
+        await wait(100); await specialist1();
+      } });
+  }
+  // The specialist's own card: what it classified and what the policy still needs. Updates in place when Josh answers.
+  var review = null, reviewOpen = false;
+  function renderReview(host, done) {
+    var r = D.specialist.review, d = D.draft;
+    if (!review) { review = document.createElement('div'); review.className = 'aiux-card bg-base-100 shadow-sm ow-draft ow-review'; host.appendChild(review); }
+    var ic = function (n) { return '<aiux-icon name="' + n + '" size="sm"></aiux-icon>'; };
+    var cnt = function (k, n, m) { return E(r.counts[k].replace('{n}', n).replace('{m}', m)); };
+    var head = function (k, t, n, m) { return '<div class="ow-sec-h"><h4 class="ow-sec-t">' + E(t) + '</h4><span class="ow-count is-' + k + '">' + cnt(k, n, m) + '</span></div>'; };
+    var total = r.present.length + r.missing.length;
+    var pres = r.present.map(function (q) { return { label: q.label, text: q.by, tag: '' }; });
+    if (done) pres = pres.concat(r.missing.map(function (q) { return { label: q.label, text: q.value, tag: r.sections.added }; }));
+    var row = function (cls, icon, q, tag) { return '<li class="ow-li ' + cls + '"><span class="ow-li-i">' + ic(icon) + '</span><div><div class="text-sm text-text-primary">' + E(q.label) + (tag ? ' <span class="aiux-badge aiux-badge-soft aiux-badge-success aiux-badge-sm">' + E(tag) + '</span>' : '') + '</div><div class="text-xs text-text-secondary">' + E(q.text) + '</div></div></li>'; };
+    var presS = '<section class="ow-sec">' + head('present', r.sections.present, pres.length, total) + '<ul class="ow-list">' + pres.map(function (q) { return row('is-ok', r.icons.present, q, q.tag); }).join('') + '</ul></section>';
+    var missS = done ? '' : '<section class="ow-sec ow-sec-warn">' + head('missing', r.sections.missing, r.missing.length, total) + '<ul class="ow-list">' + r.missing.map(function (q) { return row('is-warn', r.icons.missing, { label: q.label, text: q.why }); }).join('') + '</ul></section>';
+    var fillS = '<section class="ow-sec">' + head('filled', r.sections.filled, r.filled.length, r.filled.length) + '<dl class="ow-fill">' + r.filled.map(function (f) { return '<div class="ow-fill-r"><dt class="text-xs text-text-secondary">' + E(f.label) + '</dt><dd><div class="text-sm text-text-primary">' + (f.tone ? '<span class="aiux-badge aiux-badge-soft aiux-badge-' + f.tone + ' aiux-badge-sm">' + E(f.value) + '</span>' : E(f.value)) + '</div><div class="text-xs text-text-secondary">' + E(f.why) + '</div></dd></div>'; }).join('') + '</dl></section>';
+    review.innerHTML = '<div class="aiux-card-body ow-card-body">'
+      + '<div class="ow-top"><div class="ow-badges"><span class="aiux-badge aiux-badge-soft aiux-badge-' + (done ? 'success' : 'warning') + ' aiux-badge-sm">' + E(done ? r.status.done : r.status.needs) + '</span><span class="aiux-card-header-subtitle">' + E(d.number) + '</span></div></div>'
+      + '<div class="ow-head"><h3 class="aiux-card-header-title">' + E(r.title) + '</h3><p class="aiux-card-header-subtitle">' + E(r.sub) + '</p></div>'
+      + presS + missS + fillS + '</div>';
+    scroll();
+  }
+  function repaint() { var c = document.getElementById('draft'); if (c && c.__paint) c.__paint(false); }
+  async function specialist1() {
+    var sp = D.specialist;
+    // Breather: let the room read the draft, then show the hand-off before the specialist starts working
+    var host = document.querySelector('#draft').closest('.ow-extra');
+    var line = document.createElement('div'); line.className = 'ow-assign';
+    line.innerHTML = '<div class="ow-think"><span class="dots"><i></i><i></i><i></i></span></div>';
+    var tx = document.createElement('span'); tx.className = 'text-sm ow-shimmer'; tx.textContent = sp.phases[0];
+    line.firstChild.appendChild(tx);
+    document.getElementById('draft').after(line); scroll(true);
+    for (var k = 1; k < sp.phases.length; k++) {
+      await wait(2000);
+      if (k === 2) { protoStore.set('request.state', 'assigned'); repaint(); }
+      tx.textContent = sp.phases[k]; tx.style.animation = 'none'; void tx.offsetWidth; tx.style.animation = ''; scroll();
+    }
+    await wait(2000); line.remove();
+    await ottoSay(sp.steps1, sp.ask, function (host) { renderReview(host, false); }, sp, sp.question);
+    protoStore.set('session.step', 'ask2'); running = false; armSpecialist();
+  }
+  function armSpecialist() {
+    Otto.typer({ box: document.getElementById('composer'), out: out, send: document.getElementById('send'), text: D.typed.third,
+      onSend: async function (text) {
+        running = true; out.innerHTML = ''; ph(); document.getElementById('composer').classList.remove('is-active');
+        userMsg(text); await wait(500);
+        var sp = D.specialist;
+        await ottoSay(sp.steps2, sp.done, function () { renderReview(null, true); }, sp);
+        protoStore.set('request.state', 'submitted'); repaint(); running = false;
+      } });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.ow-acts button'); if (!b) return;
+    var l = b.getAttribute('aria-label');
+    if (l === 'Good response' || l === 'Bad response') { var on = b.getAttribute('aria-pressed') !== 'true'; b.parentNode.querySelectorAll('button[aria-label$="response"]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); x.style.background = ''; }); if (on) { b.setAttribute('aria-pressed', 'true'); b.style.background = 'var(--color-base-300)'; } }
+    else { var old = b.innerHTML; b.innerHTML = '<aiux-icon name="check-outline" size="sm"></aiux-icon>'; setTimeout(function () { b.innerHTML = old; }, 1200); }
+  });
+  Otto.menu(document.getElementById('more-btn'), ['Export chat', 'Clear conversation', 'Give feedback']);
+  Otto.menu(document.getElementById('menu-btn'), [D.draft.fields[0].value, 'Q4 pipeline forecast', 'Contoso renewal talking points']);
+  document.getElementById('expand-btn').addEventListener('click', function () { document.querySelector('.ow-page').classList.toggle('ow-wide'); });
+  document.getElementById('collapse-btn').addEventListener('click', function () { location.href = window.PROTO_DATA.menu.cards[0].href.split('?')[0]; });
+  document.getElementById('newchat').addEventListener('click', function () { location.href = window.PROTO_DATA.menu.cards[0].href; });
+  // Back or reload while the story is partly played: replay from the start of the chat for a consistent story
+  turn1();
+})();
+</script>
+<!--/proto:main-->
+  </main>
+</div>
+
+<script>
+customElements.whenDefined('aiux-nav-sidebar').then(() => {
+  const el = document.getElementById('proto-nav');
+  const u = SHELL.user;
+  el.userMeta = { authenticated: true, firstName: u.firstName, lastName: u.lastName, fullName: u.firstName + ' ' + u.lastName, initials: u.initials, avatar: null };
+  el.features = __FEATURES;
+  el.menus = [{ id: __IDS.all, label: 'All', icon: 'grid' }, { id: __IDS.favorites, label: 'Favorites', icon: 'star' }, { id: __IDS.history, label: 'History', icon: 'clock' }];
+  el.menuData = {};
+  el.currentPath = SHELL.currentPath;
+  el.utilityMenuOrder = { [__IDS.notifications]: { order: 0 } };
+  el.unreadNotificationCount = SHELL.notifications;
+  el.unreadDiscussionCount = SHELL.discussions;
+  el.tabs = SHELL.pinned;
+  el.activeTabId = null;
+  el.workspaces = SHELL.apps.map((a) => ({ id: a.id + '-ws', label: a.label, pageRegistryId: a.id + '-reg', basePath: a.basePath }));
+  const active = SHELL.apps.find((a) => SHELL.currentPath.startsWith('/workspace/' + a.basePath + '/'));
+  if (active) el.activeWorkspacePath = active.basePath + '/' + (active.activeItem || 'home');
+  el._workspaceChromeToolbar = Object.fromEntries(SHELL.apps.map((a) => [a.id + '-ws', { global: a.items.map((i) => ({ id: i.id, label: { message: i.label }, icon: i.icon, routeInfo: { route: i.id } })) }]));
+});
+</script>
+
+<!--/proto:shell-->
+</body>
+</html>
