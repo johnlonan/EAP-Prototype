@@ -398,13 +398,13 @@ window.PROTO_DATA = {
       similar: {
         title: 'Similar demands',
         meta: 'Checked against 18 open demands',
-        count: '3 found · 1 possible merge',
+        count: '1 possible merge',
         view: 'View demand',
         more: 'More actions',
         menu: ['Merge with this demand', 'Mark as duplicate', 'Not related'],
         items: [
-          { title: 'Campus hiring candidate screening', ref: 'DMND0010391', match: '91% match', tone: 'neutral', state: 'In progress', by: 'Anita Rao, Talent Acquisition', dates: 'Nov 2026 to Mar 2027', why: 'Same affected system, Workday, and the same goal of cutting hiring turnaround time.' },
-          { title: 'Interview scheduling automation', ref: 'DMND0010402', match: '74% match', tone: 'neutral', state: 'Approved', by: 'Tom Becker, Human Resources', dates: 'Jan 2027 to Apr 2027', why: 'Same affected system, Workday, but a different step of the hiring process.' },
+          { title: 'Campus hiring candidate screening', ref: 'DMND0010391', match: '91% match', tone: 'warning', state: 'In progress', by: 'Anita Rao, Talent Acquisition', dates: 'Nov 2026 to Mar 2027', why: 'Same affected system, Workday, and the same goal of cutting hiring turnaround time.' },
+          { title: 'Interview scheduling automation', ref: 'DMND0010402', match: '74% match', tone: 'info', state: 'Approved', by: 'Tom Becker, Human Resources', dates: 'Jan 2027 to Apr 2027', why: 'Same affected system, Workday, but a different step of the hiring process.' },
           { title: 'Job description drafting assistant', ref: 'DMND0010377', match: '58% match', tone: 'neutral', state: 'Draft', by: 'Mei Lin, Talent Acquisition', dates: 'Not scheduled', why: 'Touches the same recruiter workflow. No shared data or systems.' }
         ]
       },
