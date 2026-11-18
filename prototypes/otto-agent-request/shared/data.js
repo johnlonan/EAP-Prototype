@@ -498,60 +498,53 @@ window.PROTO_DATA = {
         orchestrator: {
           name: 'Demand AI Specialist', working: 'Working', waiting: 'Waiting for {x}', waitAll: 'Waiting for the other agents',
           agents: '{n} agents', doneCount: '{d} of {n} agents done', done: 'Finished in {t}', view: 'View activity',
-          pin: 'Pin to the side', unpin: 'Unpin', collapse: 'Collapse', first: 'Reading the demand and the policy', firstDur: 1400, spawned: 'Started {n} agents',
+          pin: 'Pin to the side', unpin: 'Unpin', collapse: 'Collapse', first: 'Reading the demand and the policy', firstDur: 1800, spawned: 'Started {n} agents',
           steps: [
-            { t: 'Reading the demand DMND0010482', r: 'Read the demand DMND0010482' },
-            { t: 'Loading the AI Use Case Intake Policy', r: 'Loaded the AI Use Case Intake Policy' },
+            { t: 'Reading the demand and the AI Use Case Intake Policy', r: 'Read the demand DMND0010482 and the intake policy' },
             { t: 'Planning the checks', r: 'Planned {n} checks' },
             { t: 'Starting agents in parallel', r: 'Started {n} agents' }
           ]
         },
         agents: [
-          { id: 'policy', name: 'Policy review', after: [], dur: 4400, result: '6 of 6 requirements met · High risk tier', slots: ['policy', 'details'], steps: [
+          { id: 'policy', name: 'Policy review', after: [], dur: 4800, result: '6 of 6 requirements met · High risk tier', slots: ['policy', 'details'], steps: [
             { t: 'Listing the policy requirements', r: 'Listed the 6 policy requirements' },
-            { t: 'Matching Josh’s request to each one', r: 'Matched the request to every requirement' },
-            { t: 'Using Josh’s follow-up for missing details', r: 'Used Josh’s follow-up for the missing details' },
+            { t: 'Matching Josh’s request to each one', r: 'Matched Josh’s request and follow-up to every requirement' },
             { t: 'Classifying the risk tier', r: 'Classified as high risk: it influences hiring decisions' },
             { t: 'Filling in system, goal and investment type', r: 'Filled in the affected system, goal and investment type' }
           ] },
-          { id: 'similar', name: 'Similar demands', after: [], dur: 3600, result: '3 related demands · 1 possible merge', slots: ['similar'], steps: [
+          { id: 'similar', name: 'Similar demands', after: [], dur: 3300, result: '3 related demands · 1 possible merge', slots: ['similar'], steps: [
             { t: 'Searching 18 open demands', r: 'Searched 18 open demands' },
-            { t: 'Comparing affected systems', r: 'Compared affected systems' },
-            { t: 'Comparing goals and scope', r: 'Compared goals and scope' },
-            { t: 'Scoring each match', r: 'Scored 3 matches: 91%, 74% and 58%' },
-            { t: 'Flagging possible merges', r: 'Flagged 1 possible merge' }
+            { t: 'Comparing systems, goals and scope', r: 'Compared affected systems, goals and scope' },
+            { t: 'Scoring each match', r: 'Scored 3 matches (91%, 74%, 58%) and flagged 1 possible merge' }
           ] },
-          { id: 'estimate', name: 'Resource estimate', after: [], dur: 5800, result: 'Size S · 40 person-days · 4 weeks', slots: ['estimate'], steps: [
+          { id: 'estimate', name: 'Resource estimate', after: [], dur: 5200, result: 'Size S · 40 person-days · 4 weeks', slots: ['estimate'], steps: [
             { t: 'Reading the scope and systems involved', r: 'Read the scope: one step of one hiring process' },
-            { t: 'Finding comparable delivered demands', r: 'Compared against 3 related demands' },
-            { t: 'Comparing delivery times', r: 'Compared delivery times: 2 to 3 weeks' },
+            { t: 'Comparing against related demands', r: 'Compared against 3 related demands: 2 to 3 weeks' },
             { t: 'Sizing the effort', r: 'Sized as S: 40 person-days' },
             { t: 'Choosing a team and duration', r: 'Chose a team of 3 over 4 weeks' }
           ] },
-          { id: 'impact', name: 'Business impact', after: [], dur: 4800, result: '1,800 hrs freed a year · $140K value', slots: ['impact'], steps: [
+          { id: 'impact', name: 'Business impact', after: [], dur: 4400, result: '1,800 hrs freed a year · $140K value', slots: ['impact'], steps: [
             { t: 'Reading recruiter volumes', r: 'Read recruiter volumes from the demand' },
             { t: 'Estimating first-pass time per role', r: 'Estimated first-pass screening time per role' },
             { t: 'Applying the 50% success measure', r: 'Applied the 50% reduction target' },
             { t: 'Converting hours into annual value', r: 'Converted 1,800 hours into $140K a year' }
           ] },
-          { id: 'fit', name: 'Strategic fit analysis', after: ['policy', 'similar'], dur: 3600, result: 'Strategic fit 90% · 4 points flagged', slots: ['signals'], steps: [
+          { id: 'fit', name: 'Strategic fit analysis', after: ['policy', 'similar'], dur: 4400, result: 'Strategic fit 90% · 4 points flagged', slots: ['signals'], steps: [
             { t: 'Mapping the demand to HR priorities', r: 'Mapped to reducing hiring turnaround time' },
             { t: 'Checking outside rules and data use', r: 'Checked NYC Local Law 144 and the EU AI Act' },
             { t: 'Scoring strategic fit', r: 'Scored strategic fit at 90%' },
             { t: 'Writing points for the steering committee', r: 'Wrote 4 points for the steering committee' }
           ] },
-          { id: 'priority', name: 'Prioritization', after: ['impact', 'estimate', 'fit'], dur: 4400, result: 'Overall priority 80%', slots: ['prio'], stageDone: 3, steps: [
-            { t: 'Scoring business value', r: 'Business value 90%' },
-            { t: 'Scoring feasibility', r: 'Feasibility 82%' },
+          { id: 'priority', name: 'Prioritization', after: ['impact', 'estimate', 'fit'], dur: 4800, result: 'Overall priority 80%', slots: ['prio'], stageDone: 3, steps: [
+            { t: 'Scoring business value and feasibility', r: 'Business value 90%, feasibility 82%' },
             { t: 'Scoring risk posture', r: 'Risk posture 68%' },
             { t: 'Scoring resource readiness', r: 'Resource readiness 74%' },
             { t: 'Rolling up the overall priority', r: 'Overall priority 80%' }
           ] },
-          { id: 'convert', name: 'Conversion decision', after: ['policy', 'similar', 'impact', 'estimate', 'fit', 'priority'], dur: 4000, result: 'Approved and converted to PRJ0010231', slots: ['assess', 'glance', 'rec'], stageStep: { 2: 4 }, stageDone: 5, steps: [
+          { id: 'convert', name: 'Conversion decision', after: ['policy', 'similar', 'impact', 'estimate', 'fit', 'priority'], dur: 4800, result: 'Approved and converted to PRJ0010231', slots: ['assess', 'glance', 'rec'], stageStep: { 2: 4 }, stageDone: 5, steps: [
             { t: 'Weighing every finding', r: 'Weighed all the findings' },
             { t: 'Checking the conversion criteria', r: 'Met the criteria: policy 6 of 6, strategic fit 90%' },
-            { t: 'Assigning the required assessments', r: 'Assigned the 4 required assessments' },
-            { t: 'Creating the project', r: 'Created project PRJ0010231' },
+            { t: 'Assigning assessments and creating the project', r: 'Assigned the 4 required assessments and created project PRJ0010231' },
             { t: 'Notifying Josh through Moveworks', r: 'Queued a Moveworks update for Josh' }
           ] }
         ]

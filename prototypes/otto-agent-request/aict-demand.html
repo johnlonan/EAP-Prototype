@@ -340,8 +340,9 @@ window.fetch = (u, o) => {
   }
   function paint(done, took, t) {
     var s = D.run.summary || summaryLine(done, took, t), n = D.run.agents.length;
-    $('ag-sub').textContent = s;
-    $('ag-pill-s').textContent = done === n ? s + ' · ' + D.run.orchestrator.view : s;
+    var pt = done === n ? s + ' · ' + D.run.orchestrator.view : s;
+    if ($('ag-sub').textContent !== s) $('ag-sub').textContent = s;
+    if ($('ag-pill-s').textContent !== pt) $('ag-pill-s').textContent = pt;
   }
   function setStep(li, state, text) {
     var k = state + '|' + text; if (li.dataset.k === k) return; li.dataset.k = k;
@@ -375,7 +376,7 @@ window.fetch = (u, o) => {
   function start() {
     var r = D.run, o = r.orchestrator, ag = r.agents.map(function (a) { return { d: a, s: null, e: null, closed: false }; });
     var byId = {}; ag.forEach(function (a) { byId[a.d.id] = a; });
-    var n = ag.length, orchDone = false, finished = false, focusLi = null;
+    var n = ag.length, orchDone = false, finished = false, focusLi = null, focusAt = 0, DWELL = 2600;
     buildPanel(); openPanel(); setStage(2);
     ag.forEach(function (a) {
       setAgent(a.d.id, 'queued', a.d.after.length > 3 ? o.waitAll : a.d.after.length ? o.waiting.replace('{x}', a.d.after.map(function (x) { return byId[x].d.name.toLowerCase(); }).join(', ')) : '', '');
@@ -412,10 +413,10 @@ window.fetch = (u, o) => {
       if (orchDone) {
         var fa = null; for (var q = 0; q < ag.length; q++) { if (ag[q].s !== null && ag[q].e === null) { fa = ag[q]; break; } }
         var fl = fa ? document.querySelector('.ad-ag-r[data-id="' + fa.d.id + '"]') : null;
-        if (fl !== focusLi && (fl || focusLi)) {
+        if (fl !== focusLi && (fl || focusLi) && (!focusLi || t - focusAt >= DWELL)) {
           if (focusLi && !focusLi.dataset.user) focusLi.classList.remove('is-open');
           if (fl) { fl.classList.add('is-open'); keepVisible(fl); }
-          focusLi = fl;
+          focusLi = fl; focusAt = t;
         }
       }
       paint(done, 0, t);
