@@ -250,7 +250,7 @@ window.PROTO_DATA = {
           { label: 'Project owner', value: 'Marcus Webb, Program manager' },
           { label: 'Start date', value: 'Dec 1, 2026' },
           { label: 'Target go-live', value: 'End of Q1 2027' },
-          { label: 'Approved by', value: 'Polly, AI steward' }
+          { label: 'Converted by', value: 'Polly, AI steward' }
         ]
       },
       next: {
@@ -381,11 +381,11 @@ window.PROTO_DATA = {
         meta: 'Summarized from the demand and the AI Use Case Intake Policy · 2 hours ago',
         requirement: 'Business requirement',
         body: 'Josh Sutton in Human Resources is requesting an app that screens incoming resumes and ranks candidates for recruiters. Recruiters spend hours on first-pass screening, so the app would cut time to hire and give every applicant the same consistent first review. Priya Nair, VP of Talent Acquisition, sponsors the demand and wants it live by the end of Q1 2027. Success means halving first-pass screening time per role.',
-        recLabel: 'AI recommendation',
-        rec: 'Approve with conditions',
+        recLabel: 'AI decision',
+        rec: 'Approved by AI',
         recTone: 'success',
         confidence: { label: 'Confidence', level: 'High', filled: 3, of: 3, tip: 'High: the demand, the policy and similar demands all point to the same decision.' },
-        recBody: 'The business case is clear and every policy detail is in place. The app ranks candidates, which the policy treats as high risk, so approval should depend on the assessments listed under Required before approval.'
+        recBody: 'Reviewed against the AI Use Case Intake Policy and approved by the Demand AI Specialist. The business case is clear and every policy detail is in place. Because the app ranks candidates, which the policy treats as high risk, the assessments listed under Required before conversion should be completed first. Your next step is to convert it to a project.'
       },
       policy: {
         title: 'Policy review',
@@ -430,7 +430,7 @@ window.PROTO_DATA = {
         ]
       },
       assess: {
-        title: 'Required before approval', meta: 'Assign these from the intake request',
+        title: 'Required before conversion', meta: 'Assign these from the intake request',
         status: 'Not assigned',
         items: ['Bias and fairness assessment', 'Privacy impact assessment', 'Security review', 'Human oversight plan']
       },
@@ -472,9 +472,9 @@ window.PROTO_DATA = {
         ]
       },
       decision: {
-        title: 'Approve this demand and convert it to a project',
-        sub: 'AI recommends approving with conditions. A project is created so the work can start.',
-        cta: 'Approve and convert to project',
+        title: 'Convert this demand to a project',
+        sub: 'Approved by AI under the intake policy. Converting creates a project so the work can start.',
+        cta: 'Convert to project',
         done: { title: 'Converted to project {num}', sub: 'Owned by {owner}, starting {start}.', cta: 'Open project', badge: 'Converted' },
         next: 'Opening the project is not part of this demo.'
       },
