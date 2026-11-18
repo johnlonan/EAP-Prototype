@@ -80,8 +80,7 @@ window.Otto = (function () {
     customElements.whenDefined('aiux-nav-sidebar').then(function () {
       var nav = document.getElementById('proto-nav'); if (!nav) return;
       var logo = new URL('shared/img/servicenow.svg', document.baseURI).href;
-      nav.companyLogo = logo; nav.companyLogoSm = logo; nav.productName = 'ServiceNow'; nav.style.width = '240px';
-      var svgText = null;
+      nav.companyLogo = logo; nav.companyLogoSm = logo; nav.productName = 'ServiceNow';      var svgText = null;
       fetch(logo).then(function (r) { return r.text(); }).then(function (t) { svgText = t; lines(nav.shadowRoot); }).catch(function () {});
       function inlineLogo(root) {
         var img = root.querySelector('img.logo-full-img'); if (!img || !svgText) return;
@@ -122,7 +121,7 @@ window.Otto = (function () {
       var tries = 0, t = setInterval(function () {
         var r = nav.shadowRoot; if (!r) { if (++tries > 40) clearInterval(t); return; }
         clearInterval(t); lines(r);
-        var st = document.createElement('style'); st.textContent = '.sidebar-search-toggle, .logo-toggle-stack { padding: 8px !important; } '+ '.sidebar-search-toggle { margin-inline-end: -10px; position: relative; z-index: 1; } .sidebar-logo { gap: 0 !important; } .sidebar-nav { width: 240px !important; } .ow-logo { display: inline-flex; align-items: center; padding: 0 6px; } .ow-logo svg { height: 18px; width: auto; display: block; } .sidebar-logo-images { padding-inline: 8px 0 !important; } .ow-logo { padding: 0 !important; } .ow-nav-flows { display: flex; align-items: center; gap: 8px; margin: 0 0 6px -4px; padding: 10px 10px; border-radius: 8px; font-size: 14px; text-decoration: none; color: var(--color-text-secondary); transition: background-color .2s, color .2s; } .ow-nav-flows:hover { background: color-mix(in oklch, var(--color-text-primary) 8%, transparent); color: var(--color-text-primary); } .user-avatar { background: var(--color-primary) !important; color: var(--color-primary-content, #fff) !important; } .user-avatar * { color: var(--color-primary-content, #fff) !important; } .user-avatar span.items-center { background: var(--color-primary) !important; }'; r.appendChild(st);
+        var st = document.createElement('style'); st.textContent = '.sidebar-search-toggle, .logo-toggle-stack { padding: 8px !important; } '+ '.sidebar-search-toggle { margin-inline-end: -10px; position: relative; z-index: 1; } .sidebar-logo { gap: 0 !important; } .sidebar-nav:not(.sidebar-collapsed) { width: 240px !important; } .ow-logo { display: inline-flex; align-items: center; padding: 0 6px; } .ow-logo svg { height: 18px; width: auto; display: block; } .sidebar-logo-images { padding-inline: 8px 0 !important; } .ow-logo { padding: 0 !important; } .ow-nav-flows { display: flex; align-items: center; gap: 8px; margin: 0 0 6px -4px; padding: 10px 10px; border-radius: 8px; font-size: 14px; text-decoration: none; color: var(--color-text-secondary); transition: background-color .2s, color .2s; } .ow-nav-flows:hover { background: color-mix(in oklch, var(--color-text-primary) 8%, transparent); color: var(--color-text-primary); } .user-avatar { background: var(--color-primary) !important; color: var(--color-primary-content, #fff) !important; } .user-avatar * { color: var(--color-primary-content, #fff) !important; } .user-avatar span.items-center { background: var(--color-primary) !important; }'; r.appendChild(st);
         new MutationObserver(function () { lines(r); }).observe(r, { childList: true, subtree: true, attributes: true, attributeFilter: ['href'] });
         setInterval(function () { lines(r); }, 500);
       }, 100);
