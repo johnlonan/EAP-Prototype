@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="bundle-version" content="2026.11.13-5">
+<meta name="bundle-version" content="2026.11.18-5">
 <title>SI Control Tower</title>
 <link rel="stylesheet" href="bundle/theme.css">
 <link rel="stylesheet" href="bundle/karuna.css">
@@ -143,7 +143,7 @@ window.fetch = (u, o) => {
     <div class="ac-wrap">
       <section class="ow-card ad-glance ow-in" style="--d:240ms" id="glance" aria-label="Summary"></section>
 
-      <div class="ac-row2">
+      <div class="ac-row2 ac-row2-wide">
         <section class="ow-card ow-in" style="--d:300ms" aria-labelledby="t-intake">
           <div class="ow-card-head"><h2 class="text-base font-medium" id="t-intake"></h2><aiux-icon name="arrow-up-right-outline" size="sm"></aiux-icon></div>
           <p class="ac-sub text-xs text-text-secondary" id="intake-sub"></p>
@@ -244,10 +244,21 @@ window.fetch = (u, o) => {
     $('t-intake').textContent = d.intake.title;
     $('intake-sub').textContent = d.intake.sub;
     $('intake-all').textContent = d.intake.seeAll;
+    /* A fresh visit to this home screen starts the story again (Josh's demand is Submitted and its run will play).
+       Coming back from the demand keeps the finished state. */
+    try {
+      var navT = (performance.getEntriesByType('navigation')[0] || {}).type;
+      if (navT !== 'back_forward' && !/aict-demand\.html/.test(document.referrer)) { sessionStorage.removeItem('proto.ad.state'); sessionStorage.removeItem('proto.ad.took'); sessionStorage.removeItem('proto.ad.pin'); }
+    } catch (e) {}
+    var ran = false; try { ran = sessionStorage.getItem('proto.ad.state') === 'converted'; } catch (e) {}
+    var SEP = '<span class="ac-sep" aria-hidden="true">·</span>';
     $('intake').innerHTML = d.intake.items.map(function (r, i) {
-      return '<div class="ac-row" data-i="' + i + '"><div class="ac-row-main"><div class="ac-row-top"><a class="ac-link text-base" href="#" data-i="' + i + '">' + E(r.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(r.ref) + '</span></div>'
-        + '<span class="text-sm text-text-secondary">' + E(r.by) + '</span><span class="text-xs text-text-tertiary">' + E(r.note) + ' · ' + E(r.status) + ' · ' + E(r.when) + '</span></div>'
-        + '<div class="ac-row-side"><span class="aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + r.tone + ' ow-pill">' + E(r.risk) + '</span><button class="aiux-btn aiux-btn-sm" data-i="' + i + '">' + E(d.intake.open) + '</button></div></div>';
+      if (ran && r.done) r = Object.assign({}, r, r.done);
+      var meta = [E(r.by), E(r.when)].concat(r.facts.map(function (f) { return E(f.label); })), c = r.conf;
+      return '<div class="ac-row" data-i="' + i + '"><div class="ac-row-main"><div class="ac-row-top"><a class="ac-link text-base" href="#" data-i="' + i + '">' + E(r.title) + '</a><span class="text-xs text-text-tertiary">' + E(r.ref) + '</span></div>'
+        + '<div class="ac-line"><span class="aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + r.stage.tone + ' ow-pill">' + E(r.stage.label) + '</span><span class="text-sm text-text-secondary">' + E(r.outcome.text) + '</span></div>'
+        + '<div class="ac-meta text-xs text-text-tertiary">' + meta.join(SEP) + '</div></div>'
+        + '<div class="ac-conf is-' + c.tone + '"><span class="text-xs text-text-tertiary">' + E(d.intake.confLabel) + '</span><span class="ac-conf-row"><span class="ad-meter" aria-hidden="true">' + [0, 1, 2].map(function (k) { return '<i' + (k < c.filled ? ' class="on"' : '') + '></i>'; }).join('') + '</span><span class="ac-conf-v text-xs">' + E(c.level) + '</span></span></div></div>';
     }).join('');
     $('t-posture').textContent = d.posture.title;
     $('posture-sub').textContent = d.posture.sub;
@@ -262,10 +273,11 @@ window.fetch = (u, o) => {
     $('val-spark').replaceChildren(chart(d.value.chart));
   });
   document.addEventListener('click', function (e) {
-    var hit = e.target.closest && e.target.closest('.ac-link, .ac-row .aiux-btn, .ac-foot');
+    var hit = e.target.closest && e.target.closest('#intake .ac-row, .ac-link, .ac-foot');
     if (!hit || !D) return; e.preventDefault();
     var it = hit.dataset.i !== undefined ? D.intake.items[+hit.dataset.i] : null;
     if (it && it.live) { location.href = 'aict-demand.html'; return; }
+    if (it && it.key) { location.href = 'aict-demand.html?d=' + it.key; return; }
     toast(D.toast);
   });
 })();

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="fill-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M5.471 10.686a.5.5 0 0 1-.464.314H3.393a.5.5 0 0 1-.465-.686l3.6-9A.5.5 0 0 1 6.993 1h1.614a.5.5 0 0 1 .464.686l-3.6 9Z"/></symbol>
+  <symbol id="fill-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M7.155 13.68a.5.5 0 0 1-.467.32H5.08a.5.5 0 0 1-.467-.68l4.232-11A.5.5 0 0 1 9.312 2h1.607a.5.5 0 0 1 .467.68l-4.231 11Z"/></symbol>
+  <symbol id="fill-md" viewBox="0 0 20 20"><path fill="currentColor" d="M8.693 17.68a.5.5 0 0 1-.466.32H6.619a.5.5 0 0 1-.466-.68l5.769-15a.5.5 0 0 1 .466-.32h1.607a.5.5 0 0 1 .467.68l-5.769 15Z"/></symbol>
+  <symbol id="fill-lg" viewBox="0 0 24 24"><path fill="currentColor" d="m17.13 3.635-6.504 16.727a1 1 0 0 1-.932.638h-2.39a.466.466 0 0 1-.435-.635l6.505-16.727A1 1 0 0 1 14.306 3h2.39c.328 0 .554.33.435.635Z"/></symbol>
+  <symbol id="fill-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M13.506 27.359a1 1 0 0 1-.933.641h-1.607a1 1 0 0 1-.934-1.359l8.462-22A1 1 0 0 1 19.427 4h1.607a1 1 0 0 1 .934 1.359l-8.462 22Z"/></symbol>
+  <symbol id="outline-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M5.202 10.686a.5.5 0 0 1-.464.314H3.661a.5.5 0 0 1-.464-.686l3.6-9A.5.5 0 0 1 7.26 1h1.077a.5.5 0 0 1 .464.686l-3.6 9Z"/></symbol>
+  <symbol id="outline-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M6.887 13.68a.5.5 0 0 1-.467.32H5.348a.5.5 0 0 1-.466-.68l4.231-11A.5.5 0 0 1 9.58 2h1.072a.5.5 0 0 1 .467.68l-4.232 11Z"/></symbol>
+  <symbol id="outline-md" viewBox="0 0 20 20"><path fill="currentColor" d="M8.308 17.984a.024.024 0 0 1-.022.016h-1.4a.5.5 0 0 1-.466-.68l5.769-15a.5.5 0 0 1 .467-.32h1.072a.5.5 0 0 1 .466.68L8.308 17.983Z"/></symbol>
+  <symbol id="outline-lg" viewBox="0 0 24 24"><path fill="currentColor" d="m16.898 3.544-6.54 16.818a1 1 0 0 1-.932.638H7.474a.4.4 0 0 1-.373-.544l6.54-16.818A1 1 0 0 1 14.575 3h1.952a.4.4 0 0 1 .372.544Z"/></symbol>
+  <symbol id="outline-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M13.239 27.359a1 1 0 0 1-.934.641h-1.072a1 1 0 0 1-.933-1.359l8.461-22A1 1 0 0 1 19.695 4h1.072a1 1 0 0 1 .933 1.359l-8.461 22Z"/></symbol>
+</svg>

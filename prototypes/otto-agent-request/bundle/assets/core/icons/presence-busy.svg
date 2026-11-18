@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="fill-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M6.5 3a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Zm-2 3a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4Z"/></symbol>
+  <symbol id="fill-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M8.5 4a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm-3 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1h-6Z"/></symbol>
+  <symbol id="fill-md" viewBox="0 0 20 20"><path fill="currentColor" d="M10.5 5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm-4 5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1h-8Z"/></symbol>
+  <symbol id="fill-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M12.5 6a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm-5 6a.5.5 0 0 0 0 1h10a.5.5 0 0 0 0-1h-10Z"/></symbol>
+  <symbol id="fill-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M16.5 9a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15Zm-6 7a.5.5 0 0 0 0 1h12a.5.5 0 0 0 0-1h-12Z"/></symbol>
+  <symbol id="outline-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M6.5 3a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7ZM4.05 7a2.501 2.501 0 0 0 4.9 0h-4.9ZM6.5 4a2.5 2.5 0 0 0-2.45 2h4.9A2.501 2.501 0 0 0 6.5 4Z"/></symbol>
+  <symbol id="outline-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M8.5 4a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9ZM5.036 9a3.5 3.5 0 0 0 6.928 0H5.036ZM8.5 5a3.5 3.5 0 0 0-3.464 3h6.928A3.5 3.5 0 0 0 8.5 5Z"/></symbol>
+  <symbol id="outline-md" viewBox="0 0 20 20"><path fill="currentColor" d="M10.5 5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm-4.472 6a4.5 4.5 0 0 0 8.944 0H6.028ZM10.5 6a4.5 4.5 0 0 0-4.472 4h8.944A4.5 4.5 0 0 0 10.5 6Z"/></symbol>
+  <symbol id="outline-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M12.5 6a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Zm-5.477 7a5.5 5.5 0 0 0 10.954 0H7.023ZM12.5 7a5.5 5.5 0 0 0-5.477 5h10.954A5.5 5.5 0 0 0 12.5 7Z"/></symbol>
+  <symbol id="outline-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M16.5 9a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15Zm-6.479 8a6.498 6.498 0 0 0 12.957 0H10.021Zm6.479-7a6.5 6.5 0 0 0-6.48 6h12.96a6.5 6.5 0 0 0-6.48-6Z"/></symbol>
+</svg>

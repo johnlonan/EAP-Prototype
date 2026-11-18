@@ -250,7 +250,7 @@ window.PROTO_DATA = {
           { label: 'Project owner', value: 'Marcus Webb, Program manager' },
           { label: 'Start date', value: 'Dec 1, 2026' },
           { label: 'Target go-live', value: 'End of Q1 2027' },
-          { label: 'Converted by', value: 'Polly, AI steward' }
+          { label: 'Converted by', value: 'Demand AI Specialist' }
         ]
       },
       next: {
@@ -300,19 +300,23 @@ window.PROTO_DATA = {
       toast: 'Only the AI resume screening demand is part of this demo.',
       glance: [
         { label: 'Pending work items', value: '24', note: 'Across SI Control Tower' },
-        { label: 'Intake requests', value: '3', note: '1 new in the last 2 hours' },
+        { label: 'Intake requests', value: '3', note: '1 new a few minutes ago' },
         { label: 'Critical recommendations', value: '3', note: 'Need action this week', tone: 'error' },
         { label: 'Managed AI assets', value: '1,383', note: '90% of 1,539 assets' }
       ],
       intake: {
         title: 'Intake requests',
         sub: 'AI use cases submitted for steward review',
-        open: 'Open',
         seeAll: 'See all intake requests (3)',
+        confLabel: 'Confidence',
         items: [
-          { title: 'AI resume screening app', ref: 'DMND0010482', by: 'Josh Sutton · Human Resources', note: 'Validated by Demand AI Specialist', risk: 'High', tone: 'warning', status: 'AI-approved', when: '2 hours ago', live: true },
-          { title: 'Customer support reply assistant', ref: 'DMND0010467', by: 'Dana Whitfield · Customer Service', note: 'Validated by Demand AI Specialist', risk: 'Medium', tone: 'info', status: 'In review', when: '1 day ago' },
-          { title: 'Invoice data extraction', ref: 'DMND0010451', by: 'Luis Ortega · Finance', note: 'Validated by Demand AI Specialist', risk: 'Low', tone: 'success', status: 'In review', when: '3 days ago' }
+          { title: 'AI resume screening app', ref: 'DMND0010482', by: 'Josh Sutton · Human Resources', when: 'A few minutes ago', live: true,
+            stage: { label: 'Submitted', tone: 'neutral' }, facts: [], outcome: { text: 'Waiting for the Demand AI Specialist', tone: 'neutral' }, conf: { level: 'Pending', filled: 0, tone: 'neutral' },
+            done: { stage: { label: 'Complete', tone: 'success' }, facts: [{ label: 'High risk', tone: 'warning' }, { label: '90% fit', tone: 'success' }], outcome: { text: 'Converted to PRJ0010231', tone: 'success' }, conf: { level: 'High', filled: 3, tone: 'success' } } },
+          { title: 'Customer support reply assistant', ref: 'DMND0010467', by: 'Dana Whitfield · Customer Service', when: '1 day ago',
+            stage: { label: 'Screening', tone: 'warning' }, facts: [{ label: 'Medium risk', tone: 'info' }, { label: '20% fit', tone: 'error' }], outcome: { text: 'Needs human review', tone: 'warning' }, conf: { level: 'Medium', filled: 2, tone: 'warning' } },
+          { title: 'Invoice data extraction', ref: 'DMND0010451', by: 'Luis Ortega · Finance', when: '3 days ago',
+            stage: { label: 'Complete', tone: 'success' }, facts: [{ label: 'Low risk', tone: 'success' }, { label: '88% fit', tone: 'success' }], outcome: { text: 'Converted to PRJ0010198', tone: 'success' }, conf: { level: 'High', filled: 3, tone: 'success' } }
         ]
       },
       inventory: {
@@ -366,8 +370,9 @@ window.PROTO_DATA = {
       back: { label: 'Intake requests' },
       title: 'AI resume screening app',
       ref: 'DMND0010482',
-      badges: [{ label: 'AI-approved', tone: 'success' }, { label: 'High risk', tone: 'warning' }],
-      meta: ['Josh Sutton, Human Resources', 'Submitted 2 hours ago'],
+      states: { submitted: { label: 'Submitted', tone: 'neutral' }, screening: { label: 'Screening', tone: 'info' }, qualified: { label: 'Qualified', tone: 'info' }, approved: { label: 'Approved', tone: 'info' }, complete: { label: 'Complete', tone: 'success' } },
+      badges: [{ label: 'High risk', tone: 'warning' }],
+      meta: ['Josh Sutton, Human Resources', 'Submitted a few minutes ago'],
       actions: 'Actions',
       tabs: ['Overview', 'Details', 'Risk and compliance', 'Lifecycle', 'Activity'],
       glance: [
@@ -378,18 +383,18 @@ window.PROTO_DATA = {
       ],
       summary: {
         title: 'Executive summary',
-        meta: 'Summarized from the demand and the AI Use Case Intake Policy · 2 hours ago',
+        meta: 'Summarized from the demand and the AI Use Case Intake Policy · a few minutes ago',
         requirement: 'Business requirement',
         body: 'Josh Sutton in Human Resources is requesting an app that screens incoming resumes and ranks candidates for recruiters. Recruiters spend hours on first-pass screening, so the app would cut time to hire and give every applicant the same consistent first review. Priya Nair, VP of Talent Acquisition, sponsors the demand and wants it live by the end of Q1 2027. Success means halving first-pass screening time per role.',
         recLabel: 'AI decision',
         rec: 'Approved by AI',
         recTone: 'success',
         confidence: { label: 'Confidence', level: 'High', filled: 3, of: 3, tip: 'High: the demand, the policy and similar demands all point to the same decision.' },
-        recBody: 'Reviewed against the AI Use Case Intake Policy and approved by the Demand AI Specialist. The business case is clear and every policy detail is in place. Because the app ranks candidates, which the policy treats as high risk, the assessments listed under Required before conversion should be completed first. Your next step is to convert it to a project.'
+        recBody: 'Reviewed against the AI Use Case Intake Policy, then approved and converted to a project by the Demand AI Specialist. The business case is clear and every policy detail is in place. Because the app ranks candidates, which the policy treats as high risk, the required assessments were assigned as part of the conversion.'
       },
       policy: {
         title: 'Policy review',
-        meta: 'Evaluated against the AI Use Case Intake Policy · 2 hours ago',
+        meta: 'Evaluated against the AI Use Case Intake Policy · a few minutes ago',
         cols: { req: 'Requirement', detail: 'Detail', src: 'Source' },
         srcPresent: 'Josh’s request',
         srcAdded: 'Josh’s follow-up',
@@ -430,15 +435,15 @@ window.PROTO_DATA = {
         ]
       },
       assess: {
-        title: 'Required before conversion', meta: 'Assign these from the intake request',
-        status: 'Not assigned',
+        title: 'Completed by AI', meta: 'Required assessments assigned from the intake request',
+        status: 'Assigned',
         items: ['Bias and fairness assessment', 'Privacy impact assessment', 'Security review', 'Human oversight plan']
       },
       priority: {
         mapped: { label: 'Mapped priority', value: 'Reduce hiring turnaround time' },
         whyLabel: 'Why it fits',
         why: 'Hiring turnaround time is the top priority for Human Resources this year. First-pass screening is the slowest step, and the app targets it directly. Risk posture is the score held back, because the app influences hiring decisions.',
-        title: 'Prioritization', meta: 'Each score is out of 100% · 2 hours ago',
+        title: 'Prioritization', meta: 'Each score is out of 100% · a few minutes ago',
         unit: '%',
         rows: [
           { label: 'Strategic fit', value: 90, tone: 'success' },
@@ -450,7 +455,7 @@ window.PROTO_DATA = {
         ]
       },
       estimate: {
-        title: 'Resource estimate', meta: 'Compared against 3 related demands · 2 hours ago',
+        title: 'Resource estimate', meta: 'Compared against 3 related demands · a few minutes ago',
         badge: 'S · 2 to 4 weeks', pick: 'AI pick',
         sizes: [{ key: 'XS', range: '1 to 2 weeks' }, { key: 'S', range: '2 to 4 weeks' }, { key: 'M', range: '1 to 3 months' }, { key: 'L', range: '3 to 6 months' }, { key: 'XL', range: '6+ months' }],
         selected: 1,
@@ -472,11 +477,84 @@ window.PROTO_DATA = {
         ]
       },
       decision: {
-        title: 'Convert this demand to a project',
-        sub: 'Approved by AI under the intake policy. Converting creates a project so the work can start.',
-        cta: 'Convert to project',
         done: { title: 'Converted to project {num}', sub: 'Owned by {owner}, starting {start}.', cta: 'Open project', badge: 'Converted' },
         next: 'Opening the project is not part of this demo.'
+      },
+      track: {
+        title: 'Track demand',
+        steps: ['Draft', 'Submitted', 'Screening', 'Qualified', 'Approved', 'Complete'],
+        phases: [
+          null,
+          'This demand is submitted and waiting for the Demand AI Specialist.',
+          'The Demand AI Specialist is screening this demand.',
+          'Qualified: strategic fit of 90% and an overall priority of 80% meet the bar.',
+          'Approved by AI under the AI Use Case Intake Policy.',
+          'Converted to a project automatically by the Demand AI Specialist.'
+        ],
+        box: { waiting: { title: 'Not yet converted', sub: 'It becomes a project once the Demand AI Specialist approves it.' } }
+      },
+      run: {
+        startAfter: 800,
+        orchestrator: {
+          name: 'Demand AI Specialist', working: 'Working', waiting: 'Waiting for {x}', waitAll: 'Waiting for the other agents',
+          agents: '{n} agents', doneCount: '{d} of {n} agents done', done: 'Finished in {t}', view: 'View activity',
+          pin: 'Pin to the side', unpin: 'Unpin', collapse: 'Collapse', first: 'Reading the demand and the policy', firstDur: 1400, spawned: 'Started {n} agents',
+          steps: [
+            { t: 'Reading the demand DMND0010482', r: 'Read the demand DMND0010482' },
+            { t: 'Loading the AI Use Case Intake Policy', r: 'Loaded the AI Use Case Intake Policy' },
+            { t: 'Planning the checks', r: 'Planned {n} checks' },
+            { t: 'Starting agents in parallel', r: 'Started {n} agents' }
+          ]
+        },
+        agents: [
+          { id: 'policy', name: 'Policy review', after: [], dur: 4400, result: '6 of 6 requirements met · High risk tier', slots: ['policy', 'details'], steps: [
+            { t: 'Listing the policy requirements', r: 'Listed the 6 policy requirements' },
+            { t: 'Matching Josh’s request to each one', r: 'Matched the request to every requirement' },
+            { t: 'Using Josh’s follow-up for missing details', r: 'Used Josh’s follow-up for the missing details' },
+            { t: 'Classifying the risk tier', r: 'Classified as high risk: it influences hiring decisions' },
+            { t: 'Filling in system, goal and investment type', r: 'Filled in the affected system, goal and investment type' }
+          ] },
+          { id: 'similar', name: 'Similar demands', after: [], dur: 3600, result: '3 related demands · 1 possible merge', slots: ['similar'], steps: [
+            { t: 'Searching 18 open demands', r: 'Searched 18 open demands' },
+            { t: 'Comparing affected systems', r: 'Compared affected systems' },
+            { t: 'Comparing goals and scope', r: 'Compared goals and scope' },
+            { t: 'Scoring each match', r: 'Scored 3 matches: 91%, 74% and 58%' },
+            { t: 'Flagging possible merges', r: 'Flagged 1 possible merge' }
+          ] },
+          { id: 'estimate', name: 'Resource estimate', after: [], dur: 5800, result: 'Size S · 40 person-days · 4 weeks', slots: ['estimate'], steps: [
+            { t: 'Reading the scope and systems involved', r: 'Read the scope: one step of one hiring process' },
+            { t: 'Finding comparable delivered demands', r: 'Compared against 3 related demands' },
+            { t: 'Comparing delivery times', r: 'Compared delivery times: 2 to 3 weeks' },
+            { t: 'Sizing the effort', r: 'Sized as S: 40 person-days' },
+            { t: 'Choosing a team and duration', r: 'Chose a team of 3 over 4 weeks' }
+          ] },
+          { id: 'impact', name: 'Business impact', after: [], dur: 4800, result: '1,800 hrs freed a year · $140K value', slots: ['impact'], steps: [
+            { t: 'Reading recruiter volumes', r: 'Read recruiter volumes from the demand' },
+            { t: 'Estimating first-pass time per role', r: 'Estimated first-pass screening time per role' },
+            { t: 'Applying the 50% success measure', r: 'Applied the 50% reduction target' },
+            { t: 'Converting hours into annual value', r: 'Converted 1,800 hours into $140K a year' }
+          ] },
+          { id: 'fit', name: 'Strategic fit analysis', after: ['policy', 'similar'], dur: 3600, result: 'Strategic fit 90% · 4 points flagged', slots: ['signals'], steps: [
+            { t: 'Mapping the demand to HR priorities', r: 'Mapped to reducing hiring turnaround time' },
+            { t: 'Checking outside rules and data use', r: 'Checked NYC Local Law 144 and the EU AI Act' },
+            { t: 'Scoring strategic fit', r: 'Scored strategic fit at 90%' },
+            { t: 'Writing points for the steering committee', r: 'Wrote 4 points for the steering committee' }
+          ] },
+          { id: 'priority', name: 'Prioritization', after: ['impact', 'estimate', 'fit'], dur: 4400, result: 'Overall priority 80%', slots: ['prio'], stageDone: 3, steps: [
+            { t: 'Scoring business value', r: 'Business value 90%' },
+            { t: 'Scoring feasibility', r: 'Feasibility 82%' },
+            { t: 'Scoring risk posture', r: 'Risk posture 68%' },
+            { t: 'Scoring resource readiness', r: 'Resource readiness 74%' },
+            { t: 'Rolling up the overall priority', r: 'Overall priority 80%' }
+          ] },
+          { id: 'convert', name: 'Conversion decision', after: ['policy', 'similar', 'impact', 'estimate', 'fit', 'priority'], dur: 4000, result: 'Approved and converted to PRJ0010231', slots: ['assess', 'glance', 'rec'], stageStep: { 2: 4 }, stageDone: 5, steps: [
+            { t: 'Weighing every finding', r: 'Weighed all the findings' },
+            { t: 'Checking the conversion criteria', r: 'Met the criteria: policy 6 of 6, strategic fit 90%' },
+            { t: 'Assigning the required assessments', r: 'Assigned the 4 required assessments' },
+            { t: 'Creating the project', r: 'Created project PRJ0010231' },
+            { t: 'Notifying Josh through Moveworks', r: 'Queued a Moveworks update for Josh' }
+          ] }
+        ]
       },
       convert: {
         name: 'Otto', close: 'Close', placeholder: 'Reply to Otto', num: 'PRJ0010231',
@@ -501,9 +579,222 @@ window.PROTO_DATA = {
         signals: 'AI flagged these points by reading the demand against the intake policy and outside data rules.',
         policy: 'Demand AI Specialist checked every policy requirement, asked Josh for the missing details and filled in the affected AI system, primary goal, investment type and risk tier.',
         similar: 'Demand AI Specialist compared this demand with 18 open demands by system, goal and scope.',
+        track: 'Demand AI Specialist moves this demand through each stage as its agents finish their checks.',
         assess: 'Demand AI Specialist worked out which assessments the high risk tier requires and left them ready to assign.'
       },
       aiLabel: 'AI'
     }
   }
 };
+
+/* The two older demands on the SI Control Tower home list. They reuse the shape of the AI resume screening demand,
+   with their own content, and open as finished pages (the Demand AI Specialist already did its work on them). */
+(function () {
+  var S = window.PROTO_DATA.story;
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+  function merge(a, b) {
+    Object.keys(b).forEach(function (k) {
+      var v = b[k];
+      a[k] = (v && typeof v === 'object' && !Array.isArray(v) && a[k] && typeof a[k] === 'object' && !Array.isArray(a[k])) ? merge(a[k], v) : clone(v);
+    });
+    return a;
+  }
+  function agentsFrom(base, results, hold) {
+    return base.map(function (a) { var o = { id: a.id, name: a.name, result: results[a.id] }; if (hold && a.id === 'convert') o.hold = true; return o; });
+  }
+  var base = S['aict-demand'];
+
+  /* Customer support reply assistant: screened, strategic fit is low, so it waits for a person. */
+  S['aict-demand-cs'] = merge(clone(base), {
+    title: 'Customer support reply assistant', ref: 'DMND0010467',
+    badges: [{ label: 'Medium risk', tone: 'info' }],
+    meta: ['Dana Whitfield, Customer Service', 'Submitted 1 day ago'],
+    states: { review: { label: 'Screening', tone: 'warning' } },
+    glance: [
+      { label: 'Risk tier', value: 'Medium', note: 'Drafts replies that reach customers', tone: 'info' },
+      { label: 'Policy checks', value: '6 of 6', note: 'All required details present', tone: 'success' },
+      { label: 'Strategic fit', value: '20%', note: 'No funded priority matched', tone: 'error' },
+      { label: 'Target go-live', value: 'Q3 2027', note: 'End of the quarter' }
+    ],
+    summary: {
+      meta: 'Summarized from the demand and the AI Use Case Intake Policy · 1 day ago',
+      body: 'Dana Whitfield in Customer Service is requesting an assistant that drafts replies to customer cases for support agents. Agents write many similar answers each day, so drafts built from the knowledge base would shorten response times and keep the tone consistent. Elena Fischer, Director of Customer Support, sponsors the demand and wants it live in Q3 2027. Success means cutting average reply time by 20%.',
+      recLabel: 'AI decision', rec: 'Needs human review', recTone: 'warning',
+      confidence: { label: 'Confidence', level: 'Medium', filled: 2, of: 3, tip: 'Medium: the demand and the policy are in order, but strategic fit is below the bar, so a person should decide.' },
+      recBody: 'Every policy detail is in place and the risk is medium. Strategic fit is 20%, because customer support response time is not a funded priority this year and approved work already covers part of it. That is below the 60% bar for automatic approval, so the Demand AI Specialist has left the decision with you.'
+    },
+    specialist: { review: {
+      present: [
+        { label: 'Description', by: 'Satisfied by what the app is for: drafting replies to customer cases for support agents.' },
+        { label: 'Business case', by: 'Satisfied by the time agents spend writing similar replies and the cut to response time.' },
+        { label: 'Reason it should be done', by: 'Satisfied by the aim of keeping replies fast, accurate and consistent in tone.' }
+      ],
+      missing: [
+        { label: 'Business sponsor', why: 'The policy needs a named person who is accountable for the demand.', value: 'Elena Fischer, Director of Customer Support' },
+        { label: 'Target go-live', why: 'No date is given, so the demand cannot be scheduled for review.', value: 'Q3 2027' },
+        { label: 'Success measure', why: 'The business case describes a benefit but gives nothing measurable to check it against.', value: 'Cut average reply time by 20%' }
+      ],
+      filled: [
+        { label: 'Affected AI system', value: 'ServiceNow CSM', why: 'Customer cases and the knowledge base live in CSM, so the assistant would build on it.' },
+        { label: 'Primary goal', value: 'Improve customer support response time', why: 'Dana’s case centres on the time agents spend writing replies.' },
+        { label: 'Investment type', value: 'Artificial intelligence', why: 'The assistant drafts text with a model, so the policy files it as an AI investment.' },
+        { label: 'Risk tier', value: 'Medium', tone: 'info', why: 'Drafts reach customers, but an agent reviews each one before it is sent, so a person stays in the loop.' }
+      ]
+    } },
+    policy: { meta: 'Evaluated against the AI Use Case Intake Policy · 1 day ago', srcPresent: 'Dana’s request', srcAdded: 'Dana’s follow-up' },
+    similar: {
+      meta: 'Checked against 18 open demands', count: '1 possible merge',
+      items: [
+        { title: 'Case summarization for support agents', ref: 'DMND0010433', match: '87% match', tone: 'warning', state: 'In progress', by: 'Priti Shah, Customer Service', dates: 'Oct 2026 to Feb 2027', why: 'Same affected system, ServiceNow CSM, and the same goal of speeding up agent work on cases.' },
+        { title: 'Knowledge article suggestions', ref: 'DMND0010412', match: '66% match', tone: 'info', state: 'Approved', by: 'Marco Ruiz, Customer Service', dates: 'Dec 2026 to Mar 2027', why: 'Uses the same knowledge base, but only suggests articles and does not draft replies.' },
+        { title: 'Customer survey sentiment analysis', ref: 'DMND0010388', match: '41% match', tone: 'neutral', state: 'Draft', by: 'Alicia Gomez, Customer Experience', dates: 'Not scheduled', why: 'Reads the same case data. No shared goal or workflow.' }
+      ]
+    },
+    details: { rows: [
+      ['Demand number', 'DMND0010467'], ['Requested by', 'Dana Whitfield, Customer Service'], ['Business sponsor', 'Elena Fischer, Director of Customer Support'],
+      ['Affected AI system', 'ServiceNow CSM'], ['Submitted', 'Nov 14, 2026 8:30 PM'], ['Assigned to', 'Polly']
+    ] },
+    signals: { count: '3 flagged', meta: 'Points for your decision', items: [
+      { n: '01', title: 'Strategic fit is below the bar', body: 'At 20% it falls under the 60% threshold, so a person has to decide whether to qualify it.' },
+      { n: '02', title: 'Overlaps with approved work', body: 'Case summarization for support agents already covers part of the same agent workflow.' },
+      { n: '03', title: 'Sends text to customers', body: 'Replies reach customers, so tone, accuracy and an agent review step need to be defined.' }
+    ] },
+    assess: { title: 'Required before conversion', meta: 'Ready to assign once the demand is qualified', status: 'Not assigned', done: false,
+      items: ['Privacy impact assessment', 'Human oversight plan', 'Accuracy and tone review'] },
+    priority: {
+      mapped: { label: 'Mapped priority', value: 'No funded priority matched' },
+      why: 'Customer support response time is not a funded priority for this year. The assistant is feasible and carries medium risk, but it overlaps with case summarization work that is already approved, which holds the strategic fit score back.',
+      meta: 'Each score is out of 100% · 1 day ago',
+      rows: [
+        { label: 'Strategic fit', value: 20, tone: 'error' },
+        { label: 'Business value', value: 58, tone: 'error' },
+        { label: 'Feasibility', value: 84, tone: 'success' },
+        { label: 'Risk posture', value: 72, tone: 'warning' },
+        { label: 'Resource readiness', value: 66, tone: 'warning' },
+        { label: 'Overall priority', value: 52, tone: 'error' }
+      ]
+    },
+    estimate: {
+      meta: 'Compared against 3 related demands · 1 day ago', badge: 'M · 1 to 3 months', selected: 2,
+      reasoning: 'The assistant drafts replies from the knowledge base inside CSM, which needs retrieval, tone controls and an agent review step. That is more than a configuration job, so it sizes at M: about ten weeks for a team of five.',
+      stats: [{ label: 'Effort', value: '90 person-days' }, { label: 'Team', value: '5 people' }, { label: 'Duration', value: '10 weeks' }],
+      comps: [
+        { title: 'Case summarization for support agents', ref: 'DMND0010433', size: 'M', took: '9 weeks' },
+        { title: 'Knowledge article suggestions', ref: 'DMND0010412', size: 'S', took: '4 weeks' }
+      ]
+    },
+    impact: { meta: 'Estimated from case volumes and the success measure', items: [
+      { value: '20%', label: 'Less time to write a reply' },
+      { value: '3,200 hrs', label: 'Agent time freed each year' },
+      { value: '$95K', label: 'Estimated annual value' }
+    ] },
+    track: {
+      stage: 2, hold: true,
+      phases: [null, 'This demand is submitted and waiting for the Demand AI Specialist.', 'Waiting for a human review.', 'This demand is qualified.', 'This demand is approved.', 'This demand is now a project.'],
+      box: { waiting: { title: 'Requires human review', sub: 'Strategic fit is 20%, below the 60% bar for automatic approval. Polly decides whether to qualify it.' } }
+    },
+    run: {
+      mode: 'static', summary: 'Waiting on a human review · 6 of 7 agents done',
+      agents: agentsFrom(base.run.agents, {
+        policy: '6 of 6 requirements met · Medium risk tier', similar: '3 related demands · 1 possible merge', estimate: 'Size M · 90 person-days · 10 weeks',
+        impact: '3,200 hrs freed a year · $95K value', fit: 'Strategic fit 20% · 3 points flagged', priority: 'Overall priority 52%', convert: 'Held for human review: strategic fit is below the bar'
+      }, true)
+    }
+  });
+
+  /* Invoice data extraction: screened, qualified, approved and converted, all by the Demand AI Specialist. */
+  S['aict-demand-inv'] = merge(clone(base), {
+    title: 'Invoice data extraction', ref: 'DMND0010451',
+    badges: [{ label: 'Low risk', tone: 'success' }],
+    meta: ['Luis Ortega, Finance', 'Submitted 3 days ago'],
+    glance: [
+      { label: 'Risk tier', value: 'Low', note: 'Reads documents, no decisions about people', tone: 'success' },
+      { label: 'Policy checks', value: '6 of 6', note: 'All required details present', tone: 'success' },
+      { label: 'Strategic fit', value: '88%', note: 'Reduce manual processing cost', tone: 'success' },
+      { label: 'Target go-live', value: 'Q2 2027', note: 'End of the quarter' }
+    ],
+    summary: {
+      meta: 'Summarized from the demand and the AI Use Case Intake Policy · 3 days ago',
+      body: 'Luis Ortega in Finance is requesting an app that reads incoming supplier invoices and fills in the supplier, amount and due date in the payables record. Clerks key in thousands of invoices by hand each month, which is slow and leads to payment errors. Carla Brandt, VP of Finance Operations, sponsors the demand and wants it live by the end of Q2 2027. Success means cutting manual invoice entry by 70%.',
+      recLabel: 'AI decision', rec: 'Approved by AI', recTone: 'success',
+      confidence: { label: 'Confidence', level: 'High', filled: 3, of: 3, tip: 'High: the demand, the policy and similar demands all point to the same decision.' },
+      recBody: 'Reviewed against the AI Use Case Intake Policy, then approved and converted to a project by the Demand AI Specialist. The business case is clear, every policy detail is in place and the risk is low. Strategic fit is 88%, so it met the bar without needing a person.'
+    },
+    specialist: { review: {
+      present: [
+        { label: 'Description', by: 'Satisfied by what the app is for: reading invoices and filling in the payables record.' },
+        { label: 'Business case', by: 'Satisfied by the time clerks spend keying in invoices and the payment errors that follow.' },
+        { label: 'Reason it should be done', by: 'Satisfied by the aim of fewer errors and faster invoice processing.' }
+      ],
+      missing: [
+        { label: 'Business sponsor', why: 'The policy needs a named person who is accountable for the demand.', value: 'Carla Brandt, VP of Finance Operations' },
+        { label: 'Target go-live', why: 'No date is given, so the demand cannot be scheduled for review.', value: 'End of Q2 2027' },
+        { label: 'Success measure', why: 'The business case describes a benefit but gives nothing measurable to check it against.', value: 'Cut manual invoice entry by 70%' }
+      ],
+      filled: [
+        { label: 'Affected AI system', value: 'SAP', why: 'Invoices and payables records live in SAP, so the app would build on it.' },
+        { label: 'Primary goal', value: 'Reduce manual data entry and errors in accounts payable', why: 'Luis’s case centres on the time clerks spend keying in invoices.' },
+        { label: 'Investment type', value: 'Artificial intelligence', why: 'The app reads documents with a model, so the policy files it as an AI investment.' },
+        { label: 'Risk tier', value: 'Low', tone: 'success', why: 'The app fills in a form for a clerk to confirm and makes no decisions about people.' }
+      ]
+    } },
+    policy: { meta: 'Evaluated against the AI Use Case Intake Policy · 3 days ago', srcPresent: 'Luis’s request', srcAdded: 'Luis’s follow-up' },
+    similar: {
+      meta: 'Checked against 18 open demands', count: 'No duplicates', countTone: 'success',
+      items: [
+        { title: 'Purchase order matching', ref: 'DMND0010419', match: '79% match', tone: 'info', state: 'In progress', by: 'Greg Lowe, Finance', dates: 'Oct 2026 to Jan 2027', why: 'Same affected system, SAP, and the same accounts payable process.' },
+        { title: 'Expense receipt scanning', ref: 'DMND0010398', match: '64% match', tone: 'info', state: 'Approved', by: 'Rina Das, Finance', dates: 'Jan 2027 to Mar 2027', why: 'Reads documents in a similar way, but for expenses rather than invoices.' },
+        { title: 'Contract clause extraction', ref: 'DMND0010371', match: '47% match', tone: 'neutral', state: 'Draft', by: 'Owen Park, Legal', dates: 'Not scheduled', why: 'Extracts text from documents, but for a different system and team.' }
+      ]
+    },
+    details: { rows: [
+      ['Demand number', 'DMND0010451'], ['Requested by', 'Luis Ortega, Finance'], ['Business sponsor', 'Carla Brandt, VP of Finance Operations'],
+      ['Affected AI system', 'SAP'], ['Submitted', 'Nov 12, 2026 2:15 PM'], ['Assigned to', 'Polly']
+    ] },
+    signals: { count: '2 flagged', meta: 'Points to take to the steering committee', items: [
+      { n: '01', title: 'Reads supplier and bank details', body: 'Invoices carry bank details, so access and logging need to follow the finance data policy.' },
+      { n: '02', title: 'Feeds payment records', body: 'An extraction error could reach a payment, so a clerk confirms each record before it is saved.' }
+    ] },
+    assess: { items: ['Privacy impact assessment', 'Security review', 'Accuracy check'] },
+    priority: {
+      mapped: { label: 'Mapped priority', value: 'Reduce the cost of manual processing' },
+      why: 'Cutting manual data entry is a funded Finance priority this year, and the app builds on tools Finance already uses. Resource readiness is the score held back, because the team is also supporting the SAP upgrade.',
+      meta: 'Each score is out of 100% · 3 days ago',
+      rows: [
+        { label: 'Strategic fit', value: 88, tone: 'success' },
+        { label: 'Business value', value: 84, tone: 'success' },
+        { label: 'Feasibility', value: 91, tone: 'success' },
+        { label: 'Risk posture', value: 90, tone: 'success' },
+        { label: 'Resource readiness', value: 78, tone: 'warning' },
+        { label: 'Overall priority', value: 86, tone: 'success' }
+      ]
+    },
+    estimate: {
+      meta: 'Compared against 3 related demands · 3 days ago', badge: 'S · 2 to 4 weeks', selected: 1,
+      reasoning: 'Invoices arrive in a few standard formats and the extraction is a single step in the payables flow, with SAP already connected. A small team can configure and test it in about four weeks.',
+      stats: [{ label: 'Effort', value: '35 person-days' }, { label: 'Team', value: '3 people' }, { label: 'Duration', value: '4 weeks' }],
+      comps: [
+        { title: 'Expense receipt scanning', ref: 'DMND0010398', size: 'S', took: '4 weeks' },
+        { title: 'Purchase order matching', ref: 'DMND0010419', size: 'M', took: '7 weeks' }
+      ]
+    },
+    impact: { meta: 'Estimated from invoice volumes and the success measure', items: [
+      { value: '70%', label: 'Less manual invoice entry' },
+      { value: '2,600 hrs', label: 'Clerk time freed each year' },
+      { value: '$120K', label: 'Estimated annual value' }
+    ] },
+    convert: { num: 'PRJ0010198', steps: [{ opts: ['Hannah Cole, Program manager'] }, { opts: ['Invoice data extraction'] }, { opts: ['Dec 7, 2026'] }] },
+    track: { stage: 5 },
+    run: {
+      mode: 'static', summary: 'Finished in 0:17 · 7 agents',
+      agents: agentsFrom(base.run.agents, {
+        policy: '6 of 6 requirements met · Low risk tier', similar: '3 related demands · No duplicates', estimate: 'Size S · 35 person-days · 4 weeks',
+        impact: '2,600 hrs freed a year · $120K value', fit: 'Strategic fit 88% · 2 points flagged', priority: 'Overall priority 86%', convert: 'Approved and converted to PRJ0010198'
+      }, false)
+    }
+  });
+
+  /* Home list: the two older demands open their own overview. */
+  var items = S.aict.intake.items;
+  items[1].key = 'cs'; items[2].key = 'inv';
+})();

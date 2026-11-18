@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="fill-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M6.5 3a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm1.146 1.647a.5.5 0 1 1 .707.707l-3 3a.5.5 0 0 1-.707-.707l3-3Z"/></symbol>
+  <symbol id="fill-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M8.5 4a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm1.646 2.146a.5.5 0 1 1 .707.708l-4 4a.5.5 0 1 1-.707-.707l4-4Z"/></symbol>
+  <symbol id="fill-md" viewBox="0 0 20 20"><path fill="currentColor" d="M10.5 5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm3.354 2.146a.5.5 0 0 0-.707 0l-6 6a.5.5 0 1 0 .707.707l6-6a.5.5 0 0 0 0-.707Z"/></symbol>
+  <symbol id="fill-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M12.5 6a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm2.646 3.146a.5.5 0 1 1 .707.708l-6 6a.5.5 0 1 1-.707-.707l6-6Z"/></symbol>
+  <symbol id="fill-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M16.5 9a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm3.646 3.146a.5.5 0 1 1 .707.707l-8 8a.5.5 0 1 1-.707-.707l8-8Z"/></symbol>
+  <symbol id="outline-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M6.5 3a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm2.086 2.121a2.5 2.5 0 0 1-3.464 3.464l3.464-3.464ZM6.5 4c.51 0 .984.152 1.379.414L4.415 7.878A2.5 2.5 0 0 1 6.5 4Z"/></symbol>
+  <symbol id="outline-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M8.5 4a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm2.804 2.403a3.5 3.5 0 0 1-4.9 4.9l4.9-4.9ZM8.5 5c.786 0 1.512.259 2.097.696l-4.9 4.9A3.5 3.5 0 0 1 8.5 5Z"/></symbol>
+  <symbol id="outline-md" viewBox="0 0 20 20"><path fill="currentColor" d="M10.5 5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm-2.809 9.015a4.5 4.5 0 0 0 6.323-6.323l-6.323 6.323ZM10.5 6a4.5 4.5 0 0 0-3.516 7.308l6.324-6.324A4.48 4.48 0 0 0 10.5 6Z"/></symbol>
+  <symbol id="outline-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M12.5 6a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm4.227 2.98a5.5 5.5 0 0 1-7.745 7.745l7.745-7.745ZM12.5 7c1.339 0 2.566.478 3.52 1.273L8.274 16.02A5.5 5.5 0 0 1 12.5 7Z"/></symbol>
+  <symbol id="outline-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M16.5 9a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm4.936 3.273A6.5 6.5 0 0 1 16.5 23a6.47 6.47 0 0 1-4.227-1.565l9.163-9.162ZM16.5 10c1.615 0 3.09.59 4.227 1.565l-9.162 9.162A6.472 6.472 0 0 1 10 16.5a6.5 6.5 0 0 1 6.5-6.5Z"/></symbol>
+</svg>

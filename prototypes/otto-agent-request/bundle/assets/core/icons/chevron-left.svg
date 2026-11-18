@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="fill-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M6.97 2.22a.75.75 0 1 1 1.06 1.06L5.31 6l2.72 2.72a.75.75 0 1 1-1.06 1.06L3.72 6.53a.75.75 0 0 1 0-1.06l3.25-3.25Z"/></symbol>
+  <symbol id="fill-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M8.97 12.78a.75.75 0 1 0 1.06-1.06L6.31 8l3.72-3.72a.75.75 0 1 0-1.06-1.06L4.72 7.47a.75.75 0 0 0 0 1.06l4.25 4.25Z"/></symbol>
+  <symbol id="fill-md" viewBox="0 0 20 20"><path fill="currentColor" d="M11.97 16.78a.75.75 0 1 0 1.06-1.06L7.31 10l5.72-5.72a.75.75 0 1 0-1.06-1.06L5.72 9.47a.75.75 0 0 0 0 1.06l6.25 6.25Z"/></symbol>
+  <symbol id="fill-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.222 20.634a1.25 1.25 0 1 0 1.768-1.768L10.124 12l6.866-6.866a1.25 1.25 0 1 0-1.768-1.768l-7.75 7.75a1.25 1.25 0 0 0 0 1.768l7.75 7.75Z"/></symbol>
+  <symbol id="fill-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M19.13 26.648a1.25 1.25 0 0 0 1.768-1.768L12.018 16l8.866-8.866a1.25 1.25 0 0 0-1.768-1.767l-9.75 9.749a1.251 1.251 0 0 0 0 1.768l9.764 9.764Z"/></symbol>
+  <symbol id="outline-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M7.854 9.146a.5.5 0 1 1-.708.707l-3.5-3.5a.5.5 0 0 1 0-.707l3.5-3.5a.5.5 0 1 1 .708.707L4.707 6l3.147 3.146Z"/></symbol>
+  <symbol id="outline-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M9.146 12.854a.5.5 0 0 0 .708-.708L5.707 8l4.147-4.147a.5.5 0 1 0-.708-.707l-4.5 4.5a.5.5 0 0 0 0 .707l4.5 4.5Z"/></symbol>
+  <symbol id="outline-md" viewBox="0 0 20 20"><path fill="currentColor" d="M12.146 16.854a.5.5 0 0 0 .707-.708L6.708 10l6.147-6.147a.5.5 0 1 0-.707-.707l-6.5 6.5a.5.5 0 0 0 0 .707l6.5 6.5Z"/></symbol>
+  <symbol id="outline-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.293 20.707a1 1 0 1 0 1.414-1.414L9.414 12l7.293-7.293a1 1 0 1 0-1.414-1.414l-8 8a1 1 0 0 0 0 1.414l8 8Z"/></symbol>
+  <symbol id="outline-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M19.293 26.707a1 1 0 1 0 1.414-1.414L11.414 16l9.293-9.293a1 1 0 1 0-1.414-1.414l-10 10a1 1 0 0 0 0 1.414l10 10Z"/></symbol>
+</svg>

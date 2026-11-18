@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <style>
+    /* Shared window chrome classes */
+    .ww-brand    { fill: var(--accent-200, #68E353) }
+    .ww-body     { fill: var(--neutral-300, #E3E2DF) }
+    .ww-top      { fill: var(--primary-950, #00273C) }
+    .ww-mod-sh   { fill: var(--neutral-600, #656462) }
+    .ww-mod-hl   { fill: var(--neutral-50,  #F9F8F6) }
+    .ww-mod-circ { fill: var(--neutral-200, #EDECE9) }
+    .ww-mark     { fill: var(--primary-950, #00273C) }
+    .ww-mark-ds  { fill: var(--neutral-500, #8A8986) }
+
+    /* feFlood colors for themed inner shadows */
+    #we-body-sh1 { flood-color: var(--neutral-100,         #F4F3F0) }
+    #we-body-sh2 { flood-color: var(--neutral-500,         #8A8986) }
+    #we-top-sh   { flood-color: var(--primary-600,   #49788F) }
+    #we-circ-sh  { flood-color: var(--neutral-400,         #C2C1BE) }
+    #we-mark-is  { flood-color: var(--primary-500,   #648CA1) }
+
+    /* Dark mode: [data-theme=dark] ancestor — for inline SVG in HTML */
+    [data-theme=dark] .ww-brand    { fill: var(--accent-700,   #3DAB29) }
+    [data-theme=dark] .ww-body     { fill: var(--neutral-700,        #3E3E3B) }
+    [data-theme=dark] .ww-top      { fill: var(--primary-600,  #49788F) }
+    [data-theme=dark] .ww-mod-sh   { fill: var(--neutral-950,        #171614) }
+    [data-theme=dark] .ww-mod-hl   { fill: var(--neutral-600,        #696866) }
+    [data-theme=dark] .ww-mod-circ { fill: var(--neutral-900,        #1A1917) }
+    [data-theme=dark] .ww-mark     { fill: var(--primary-300,  #789BAD) }
+    [data-theme=dark] .ww-mark-ds  { fill: var(--neutral-900,        #1A1917) }
+    [data-theme=dark] #we-body-sh1 { flood-color: var(--neutral-800,        #1F1F1D) }
+    [data-theme=dark] #we-body-sh2 { flood-color: var(--neutral-700,        #3E3E3B) }
+    [data-theme=dark] #we-top-sh   { flood-color: var(--primary-400,  #7FA1B2) }
+    [data-theme=dark] #we-circ-sh  { flood-color: var(--neutral-700,        #3E3E3B) }
+    [data-theme=dark] #we-mark-is  { flood-color: var(--primary-400,  #7FA1B2) }
+
+    /* Dark mode: system preference — for standalone img use */
+    @media(prefers-color-scheme:dark) {
+      .ww-brand    { fill: var(--accent-700,   #3DAB29) }
+      .ww-body     { fill: var(--neutral-700,        #3E3E3B) }
+      .ww-top      { fill: var(--primary-600,  #49788F) }
+      .ww-mod-sh   { fill: var(--neutral-950,        #171614) }
+      .ww-mod-hl   { fill: var(--neutral-600,        #696866) }
+      .ww-mod-circ { fill: var(--neutral-900,        #1A1917) }
+      .ww-mark     { fill: var(--primary-300,  #789BAD) }
+      .ww-mark-ds  { fill: var(--neutral-900,        #1A1917) }
+      #we-body-sh1 { flood-color: var(--neutral-800,        #1F1F1D) }
+      #we-body-sh2 { flood-color: var(--neutral-700,        #3E3E3B) }
+      #we-top-sh   { flood-color: var(--primary-400,  #7FA1B2) }
+      #we-circ-sh  { flood-color: var(--neutral-700,        #3E3E3B) }
+      #we-mark-is  { flood-color: var(--primary-400,  #7FA1B2) }
+    }
+  </style>
+
+  <!-- Brand highlight (left accent edge) -->
+  <path class="ww-brand" d="M0.995117 17.5V13.5693C0.995117 11.5929 0.987904 10.4791 1.36816 9.45117C1.74841 8.4233 2.47855 7.58248 3.76465 6.08203L4.11621 5.6709C4.29773 5.45921 4.61737 5.43473 4.8291 5.61621C5.04079 5.79773 5.06527 6.11737 4.88379 6.3291L4.53125 6.73926C3.19774 8.29502 2.61842 8.9827 2.31543 9.80176C2.01246 10.6208 2.00488 11.5201 2.00488 13.5693V17.5C2.00488 20.107 2.00636 22.0115 2.20215 23.4678C2.39599 24.9094 2.7718 25.8363 3.46777 26.5322C4.16374 27.2282 5.09056 27.604 6.53223 27.7979C7.98848 27.9936 9.893 27.9951 12.5 27.9951H18.5C18.7789 27.9951 19.0049 28.2211 19.0049 28.5C19.0049 28.7789 18.7789 29.0049 18.5 29.0049H12.5C9.92155 29.0049 7.93666 29.0058 6.39746 28.7988C4.84388 28.5899 3.66877 28.161 2.75391 27.2461C1.83904 26.3312 1.41008 25.1561 1.20117 23.6025C0.994232 22.0633 0.995117 20.0784 0.995117 17.5Z"/>
+
+  <!-- Window body: 2 inner shadows via feFlood; clip restores clean edge -->
+  <path class="ww-body" filter="url(#we-f-body)" clip-path="url(#we-body-clip)" d="M29.9648 10C29.9999 10.8712 30 11.868 30 13V19C30 20.8573 30.0022 22.3511 29.8447 23.5225C29.6834 24.7226 29.3377 25.7326 28.5352 26.5352C27.7326 27.3377 26.7226 27.6834 25.5225 27.8447C24.3511 28.0022 22.8573 28 21 28H11C9.14265 28 7.64892 28.0022 6.47754 27.8447C5.27745 27.6834 4.26737 27.3377 3.46484 26.5352C2.66232 25.7326 2.31663 24.7226 2.15527 23.5225C1.99779 22.3511 2 20.8573 2 19V13C2 11.868 2.00015 10.8712 2.03516 10H29.9648Z"/>
+
+  <!-- Window top bar: inner shadow via feFlood; clip restores clean edge -->
+  <path class="ww-top" filter="url(#we-f-top)" clip-path="url(#we-top-clip)" d="M21 4C22.8573 4 24.3511 3.99778 25.5225 4.15527C26.7226 4.31663 27.7326 4.66231 28.5352 5.46484C29.3377 6.26737 29.6834 7.27744 29.8447 8.47753C29.9411 9.19444 29.9744 10.0321 29.9883 11H2.01172C2.02558 10.0321 2.05889 9.19444 2.15527 8.47753C2.31663 7.27744 2.66231 6.26737 3.46484 5.46484C4.26737 4.66231 5.27744 4.31663 6.47754 4.15527C7.64891 3.99778 9.14265 4 11 4H21Z"/>
+
+  <!-- Modifier shadow arc (blurred crescent) -->
+  <g filter="url(#we-f-mod-sh)">
+    <path class="ww-mod-sh" d="M12.833 22C12.833 16.9374 16.9374 12.833 22 12.833V13.167C17.1215 13.167 13.167 17.1215 13.167 22C13.167 24.0331 13.8537 25.9057 15.0078 27.3984L14.7441 27.6016C13.5465 26.0525 12.833 24.1094 12.833 22Z"/>
+  </g>
+
+  <!-- Modifier highlight arc (blurred crescent) -->
+  <g filter="url(#we-f-mod-hl)">
+    <path class="ww-mod-hl" d="M11.75 22C11.75 16.3391 16.3391 11.75 22 11.75V12.25C16.6152 12.25 12.25 16.6152 12.25 22C12.25 23.0194 12.4064 24.0018 12.6963 24.9248L12.2197 25.0752C11.9148 24.1042 11.75 23.0709 11.75 22Z"/>
+  </g>
+
+  <!-- Modifier circle: inner shadow via feFlood; clip restores clean edge -->
+  <path class="ww-mod-circ" filter="url(#we-f-circ)" clip-path="url(#we-circ-clip)" d="M22 31C26.9706 31 31 26.9706 31 22C31 17.0294 26.9706 13 22 13C17.0294 13 13 17.0294 13 22C13 26.9706 17.0294 31 22 31Z"/>
+
+  <!-- Exclamation mark — 3-layer rendering for crisp edges + shadows -->
+
+  <!-- Layer 1: Drop shadow — filled with shadow class, blurred offset -->
+  <g filter="url(#we-f-mark-ds)">
+    <path class="ww-mark-ds" d="M22 25.5C22.4142 25.5 22.75 25.8358 22.75 26.25C22.75 26.6642 22.4142 27 22 27C21.5858 27 21.25 26.6642 21.25 26.25C21.25 25.8358 21.5858 25.5 22 25.5Z"/>
+    <path class="ww-mark-ds" d="M22 17C22.4142 17 22.75 17.3358 22.75 17.75V23.25C22.75 23.6642 22.4142 24 22 24C21.5858 24 21.25 23.6642 21.25 23.25V17.75C21.25 17.3358 21.5858 17 22 17Z"/>
+  </g>
+
+  <!-- Layer 2: Clean vector fill — no filter, crisp edges -->
+  <path class="ww-mark" d="M22 25.5C22.4142 25.5 22.75 25.8358 22.75 26.25C22.75 26.6642 22.4142 27 22 27C21.5858 27 21.25 26.6642 21.25 26.25C21.25 25.8358 21.5858 25.5 22 25.5Z"/>
+  <path class="ww-mark" d="M22 17C22.4142 17 22.75 17.3358 22.75 17.75V23.25C22.75 23.6642 22.4142 24 22 24C21.5858 24 21.25 23.6642 21.25 23.25V17.75C21.25 17.3358 21.5858 17 22 17Z"/>
+
+  <!-- Layer 3: Inner shadow only — filter outputs shadow pixels only (no fill);
+       clip-path re-applies clean vector boundary after rasterization -->
+  <g filter="url(#we-f-mark-is)" clip-path="url(#we-mark-clip)">
+    <path class="ww-mark" d="M22 25.5C22.4142 25.5 22.75 25.8358 22.75 26.25C22.75 26.6642 22.4142 27 22 27C21.5858 27 21.25 26.6642 21.25 26.25C21.25 25.8358 21.5858 25.5 22 25.5Z"/>
+    <path class="ww-mark" d="M22 17C22.4142 17 22.75 17.3358 22.75 17.75V23.25C22.75 23.6642 22.4142 24 22 24C21.5858 24 21.25 23.6642 21.25 23.25V17.75C21.25 17.3358 21.5858 17 22 17Z"/>
+  </g>
+
+  <defs>
+    <!-- Clip paths — applied after filters to restore clean vector edges -->
+    <clipPath id="we-body-clip">
+      <path d="M29.9648 10C29.9999 10.8712 30 11.868 30 13V19C30 20.8573 30.0022 22.3511 29.8447 23.5225C29.6834 24.7226 29.3377 25.7326 28.5352 26.5352C27.7326 27.3377 26.7226 27.6834 25.5225 27.8447C24.3511 28.0022 22.8573 28 21 28H11C9.14265 28 7.64892 28.0022 6.47754 27.8447C5.27745 27.6834 4.26737 27.3377 3.46484 26.5352C2.66232 25.7326 2.31663 24.7226 2.15527 23.5225C1.99779 22.3511 2 20.8573 2 19V13C2 11.868 2.00015 10.8712 2.03516 10H29.9648Z"/>
+    </clipPath>
+    <clipPath id="we-top-clip">
+      <path d="M21 4C22.8573 4 24.3511 3.99778 25.5225 4.15527C26.7226 4.31663 27.7326 4.66231 28.5352 5.46484C29.3377 6.26737 29.6834 7.27744 29.8447 8.47753C29.9411 9.19444 29.9744 10.0321 29.9883 11H2.01172C2.02558 10.0321 2.05889 9.19444 2.15527 8.47753C2.31663 7.27744 2.66231 6.26737 3.46484 5.46484C4.26737 4.66231 5.27744 4.31663 6.47754 4.15527C7.64891 3.99778 9.14265 4 11 4H21Z"/>
+    </clipPath>
+    <clipPath id="we-circ-clip">
+      <path d="M22 31C26.9706 31 31 26.9706 31 22C31 17.0294 26.9706 13 22 13C17.0294 13 13 17.0294 13 22C13 26.9706 17.0294 31 22 31Z"/>
+    </clipPath>
+    <clipPath id="we-mark-clip">
+      <path d="M22 25.5C22.4142 25.5 22.75 25.8358 22.75 26.25C22.75 26.6642 22.4142 27 22 27C21.5858 27 21.25 26.6642 21.25 26.25C21.25 25.8358 21.5858 25.5 22 25.5Z"/>
+      <path d="M22 17C22.4142 17 22.75 17.3358 22.75 17.75V23.25C22.75 23.6642 22.4142 24 22 24C21.5858 24 21.25 23.6642 21.25 23.25V17.75C21.25 17.3358 21.5858 17 22 17Z"/>
+    </clipPath>
+
+    <!-- Window body: 2 inner shadows (dx=1 neutral-100; dx=-0.5 dy=-0.5 neutral-500) -->
+    <filter id="we-f-body" x="1.5" y="9.5" width="29.5" height="18.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="bg"/>
+      <feBlend in="SourceGraphic" in2="bg" result="shape"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="alpha"/>
+      <feOffset in="alpha" dx="1" result="off1"/>
+      <feGaussianBlur in="off1" stdDeviation="1" result="blur1"/>
+      <feComposite in="blur1" in2="alpha" operator="arithmetic" k2="-1" k3="1" result="edge1"/>
+      <feFlood id="we-body-sh1" result="c1"/>
+      <feComposite in="c1" in2="edge1" operator="in" result="inner1"/>
+      <feBlend in="inner1" in2="shape" result="s1"/>
+      <feOffset in="alpha" dx="-0.5" dy="-0.5" result="off2"/>
+      <feGaussianBlur in="off2" stdDeviation="1" result="blur2"/>
+      <feComposite in="blur2" in2="alpha" operator="arithmetic" k2="-1" k3="1" result="edge2"/>
+      <feFlood id="we-body-sh2" result="c2"/>
+      <feComposite in="c2" in2="edge2" operator="in" result="inner2"/>
+      <feBlend in="inner2" in2="s1"/>
+    </filter>
+
+    <!-- Window top bar: inner shadow (dy=1 primary-600) -->
+    <filter id="we-f-top" x="2.01172" y="3.99999" width="27.9766" height="8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="bg"/>
+      <feBlend in="SourceGraphic" in2="bg" result="shape"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="alpha"/>
+      <feOffset in="alpha" dy="1" result="off"/>
+      <feGaussianBlur in="off" stdDeviation="1" result="blur"/>
+      <feComposite in="blur" in2="alpha" operator="arithmetic" k2="-1" k3="1" result="edge"/>
+      <feFlood id="we-top-sh" result="c"/>
+      <feComposite in="c" in2="edge" operator="in" result="inner"/>
+      <feBlend in="inner" in2="shape"/>
+    </filter>
+
+    <!-- Modifier shadow arc: Gaussian blur only -->
+    <filter id="we-f-mod-sh" x="10.833" y="10.833" width="13.167" height="18.7686" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="1"/>
+    </filter>
+
+    <!-- Modifier highlight arc: Gaussian blur only -->
+    <filter id="we-f-mod-hl" x="10.25" y="10.25" width="13.25" height="16.3252" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="0.75"/>
+    </filter>
+
+    <!-- Modifier circle: inner shadow (dx=-0.5 dy=-0.5 neutral-400) -->
+    <filter id="we-f-circ" x="12.5" y="12.5" width="18.5" height="18.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="bg"/>
+      <feBlend in="SourceGraphic" in2="bg" result="shape"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="alpha"/>
+      <feOffset in="alpha" dx="-0.5" dy="-0.5" result="off"/>
+      <feGaussianBlur in="off" stdDeviation="0.75" result="blur"/>
+      <feComposite in="blur" in2="alpha" operator="arithmetic" k2="-1" k3="1" result="edge"/>
+      <feFlood id="we-circ-sh" result="c"/>
+      <feComposite in="c" in2="edge" operator="in" result="inner"/>
+      <feBlend in="inner" in2="shape"/>
+    </filter>
+
+    <!-- Mark drop shadow: offset + blur only (path already filled with shadow class) -->
+    <filter id="we-f-mark-ds" x="20.25" y="16.5" width="3.5" height="12" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feOffset dy="0.5"/>
+      <feGaussianBlur stdDeviation="0.5"/>
+    </filter>
+
+    <!-- Mark inner shadow: outputs ONLY shadow pixels — no final feBlend back onto shape -->
+    <filter id="we-f-mark-is" x="20.25" y="16.5" width="3.5" height="12" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="alpha"/>
+      <feOffset in="alpha" dy="0.5" result="off"/>
+      <feGaussianBlur in="off" stdDeviation="0.5" result="blur"/>
+      <feComposite in="blur" in2="alpha" operator="arithmetic" k2="-1" k3="1" result="edge"/>
+      <feFlood id="we-mark-is" result="c"/>
+      <feComposite in="c" in2="edge" operator="in"/>
+    </filter>
+  </defs>
+</svg>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="bundle-version" content="2026.11.13-5">
+<meta name="bundle-version" content="2026.11.18-5">
 <title>Demand overview</title>
 <link rel="stylesheet" href="bundle/theme.css">
 <link rel="stylesheet" href="bundle/karuna.css">
@@ -128,6 +128,8 @@ window.fetch = (u, o) => {
 <div class="ow-page ad-shell bg-base-200 text-sm text-text-primary" id="shell" style="position:relative">
   <div class="ad-main"><div class="ad-page" id="page"></div></div>
   <div class="ac-toast text-sm" id="toast" role="status" hidden></div>
+  <aside class="ad-agents" id="agents" aria-label="Agent activity" hidden></aside>
+  <button class="ad-ag-pill text-sm" id="ag-pill" hidden></button>
 </div>
 <script src="shared/data.js"></script>
 <script src="shared/store.js"></script>
@@ -139,77 +141,312 @@ window.fetch = (u, o) => {
   Promise.all([customElements.whenDefined('aiux-nav-sidebar'), customElements.whenDefined('aiux-icon')]).then(function () { setTimeout(reveal, 120); });
   setTimeout(reveal, 2500);
   var E = Otto.esc, $ = function (id) { return document.getElementById(id); }, toastTimer = null, D = null;
+  var KEY = 'proto.ad.state', KEYT = 'proto.ad.took';
+  function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { return null; } }
   function badge(b) { return '<span class="aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + b.tone + ' ow-pill">' + E(b.label) + '</span>'; }
   function head(title, meta, by, inline) { return '<div class="ad-head"><div><div class="ad-h2"><h2 class="text-base font-medium">' + E(title) + '</h2>' + (inline || '') + '</div>' + (meta ? '<p class="text-xs text-text-secondary">' + E(meta) + '</p>' : '') + '</div>' + (by || '') + '</div>'; }
   function byAi(d, k) { return '<span class="ad-by is-ai text-xs" tabindex="0" data-tip="' + E(d.tips[k]) + '"><aiux-icon name="ai-sparkle-outline" size="sm"></aiux-icon>' + E(d.aiLabel) + '</span>'; }
   function bySp(d, k) { return '<span class="ad-by text-xs" tabindex="0" data-tip="' + E(d.tips[k]) + '"><img class="ow-spimg" width="20" height="20" data-img="1" alt="">' + E(d.specialist.name) + '</span>'; }
   function card(cls, inner) { return '<section class="ow-card ad-card ' + cls + '">' + inner + '</section>'; }
   function toast(text) { var t = $('toast'); t.textContent = text; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 3200); }
+  function fmt(ms) { var s = Math.round(ms / 1000); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+
+  /* ---------- card builders: each returns the real card for one slot ---------- */
+  var B = {
+    glance: function (d) { return card('ad-glance', d.glance.map(function (g) { return '<div class="ad-g"><span class="text-xs text-text-secondary">' + E(g.label) + '</span><span class="ad-gv' + (g.tone ? ' is-' + g.tone : '') + '">' + E(g.value) + '</span><span class="text-xs text-text-tertiary">' + E(g.note) + '</span></div>'; }).join('')); },
+    rec: function (d) {
+      var sm = d.summary;
+      return '<div class="ad-rec is-' + E(sm.recTone) + '"><div class="ad-rec-top"><span class="text-sm text-text-secondary">' + E(sm.recLabel) + '</span><span class="ad-conf" data-tip="' + E(sm.confidence.tip) + '"><span class="text-sm text-text-secondary">' + E(sm.confidence.label) + '</span><span class="ad-meter" aria-hidden="true">' + Array.apply(null, Array(sm.confidence.of)).map(function (_, i) { return '<i' + (i < sm.confidence.filled ? ' class="on"' : '') + '></i>'; }).join('') + '</span><strong class="text-sm font-medium">' + E(sm.confidence.level) + '</strong></span></div><div class="ad-rec-v">' + E(sm.rec) + '</div><p class="text-sm">' + E(sm.recBody) + '</p></div>';
+    },
+    policy: function (d) {
+      var P = d.specialist.review, pol = d.policy;
+      var rows = P.present.map(function (r) { return { label: r.label, detail: r.by, src: pol.srcPresent }; }).concat(P.missing.map(function (r) { return { label: r.label, detail: r.value, src: pol.srcAdded }; }));
+      var table = '<div class="ad-tbl"><div class="ad-tr ad-th text-xs text-text-secondary"><span></span><span>' + E(pol.cols.req) + '</span><span>' + E(pol.cols.detail) + '</span><span>' + E(pol.cols.src) + '</span></div>'
+        + rows.map(function (r) { return '<div class="ad-tr"><span class="ad-ok"><aiux-icon name="' + E(P.icons.present) + '" size="sm"></aiux-icon></span><span>' + E(r.label) + '</span><span class="text-text-secondary">' + E(r.detail) + '</span><span class="text-text-secondary">' + E(r.src) + '</span></div>'; }).join('') + '</div>';
+      var filled = '<h3 class="ad-sub text-sm font-medium">' + E(pol.filled) + '</h3><div class="ad-fill">' + P.filled.map(function (f) { return '<div class="ad-f"><span class="text-xs text-text-secondary">' + E(f.label) + '</span><span class="ad-fv">' + E(f.value) + '</span><span class="text-xs text-text-tertiary">' + E(f.why) + '</span></div>'; }).join('') + '</div>';
+      return card('', head(pol.title, pol.meta, bySp(d, 'policy')) + table + filled);
+    },
+    similar: function (d) {
+      var sim = d.similar;
+      return card('', head(sim.title, sim.meta, bySp(d, 'similar'), badge({ label: sim.count, tone: sim.countTone || 'warning' })) + '<div class="ad-sdl">' + sim.items.map(function (i) {
+        return '<div class="ad-sd"><div class="ad-sd-top"><a class="ac-link text-base" href="#" data-soon="1">' + E(i.title) + '</a>' + badge({ label: i.match, tone: i.tone }) + '</div>'
+          + '<span class="ad-sd-ref text-xs text-text-tertiary">' + E(i.ref) + ' · ' + E(i.state) + '</span>'
+          + '<p class="ad-sd-why text-sm text-text-secondary">' + E(i.why) + '</p>'
+          + '<span class="ad-sd-foot text-xs text-text-tertiary">' + E(i.by) + ' · ' + E(i.dates) + '</span></div>'; }).join('') + '</div>');
+    },
+    details: function (d) { return card('', head(d.details.title, '').replace('<p class="text-xs text-text-secondary"></p>', '') + '<dl class="ad-kv">' + d.details.rows.map(function (r) { return '<div><dt class="text-sm text-text-secondary">' + E(r[0]) + '</dt><dd>' + E(r[1]) + '</dd></div>'; }).join('') + '</dl>'); },
+    signals: function (d) {
+      var sg = d.signals;
+      return card('', head(sg.title, sg.meta, byAi(d, 'signals'), badge({ label: sg.count, tone: 'warning' })) + '<div class="ad-sig">' + sg.items.map(function (i) { return '<div class="ad-sg"><span class="ad-n">' + E(i.n) + '</span><div><div class="text-sm font-medium">' + E(i.title) + '</div><div class="text-sm text-text-secondary">' + E(i.body) + '</div></div></div>'; }).join('') + '</div>');
+    },
+    assess: function (d) {
+      var as = d.assess, P = d.specialist.review;
+      return card('', head(as.title, as.meta, bySp(d, 'assess')) + '<div class="ad-list">' + as.items.map(function (i) { return '<div class="ad-as"><span class="ad-as-l">' + (as.done === false ? '' : '<span class="ad-ok"><aiux-icon name="' + E(P.icons.present) + '" size="sm"></aiux-icon></span>') + E(i) + '</span><span class="text-xs text-text-tertiary">' + E(as.status) + '</span></div>'; }).join('') + '</div>');
+    },
+    prio: function (d) {
+      var pr = d.priority;
+      return card('ad-prio', head(pr.title, pr.meta, byAi(d, 'priority')) + '<div class="ad-map"><span class="text-xs text-text-secondary">' + E(pr.mapped.label) + '</span><span>' + E(pr.mapped.value) + '</span></div><div class="ad-tiles ad-tiles-3">' + pr.rows.map(function (r) { return '<div class="ad-tile"><span class="ad-tv is-' + r.tone + '">' + E(r.value) + E(pr.unit) + '</span><span class="text-xs text-text-secondary">' + E(r.label) + '</span><div class="ad-track is-' + r.tone + '"><span style="width:' + r.value + '%"></span></div></div>'; }).join('') + '</div><div class="ad-rs"><span class="text-xs text-text-secondary">' + E(pr.whyLabel) + '</span><p>' + E(pr.why) + '</p></div>');
+    },
+    estimate: function (d) {
+      var es = d.estimate;
+      return card('', head(es.title, es.meta, byAi(d, 'estimate'))
+        + '<div class="ad-sizes">' + es.sizes.map(function (z, i) { return '<div class="ad-size' + (i === es.selected ? ' is-on' : '') + '">' + (i === es.selected ? '<span class="ad-pick text-xs">' + E(es.pick) + '</span>' : '') + '<span class="ad-sk">' + E(z.key) + '</span><span class="text-xs text-text-secondary">' + E(z.range) + '</span></div>'; }).join('') + '</div>'
+        + '<div class="ad-stats">' + es.stats.map(function (t) { return '<div class="ad-f"><span class="text-xs text-text-secondary">' + E(t.label) + '</span><span class="ad-fv">' + E(t.value) + '</span></div>'; }).join('') + '</div>'
+        + '<h3 class="ad-sub text-sm font-medium">' + E(es.compLabel) + '</h3><div class="ad-list">' + es.comps.map(function (c) { return '<div class="ad-as"><span class="ad-li-top"><a class="ac-link text-base" href="#" data-soon="1">' + E(c.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(c.ref) + '</span></span><span class="text-sm text-text-secondary">' + E(c.size) + ' · ' + E(c.took) + '</span></div>'; }).join('') + '</div>'
+        + '<div class="ad-rs"><span class="text-xs text-text-secondary">' + E(es.reasoningLabel) + '</span><p>' + E(es.reasoning) + '</p></div>');
+    },
+    impact: function (d) { var im = d.impact; return card('', head(im.title, im.meta, byAi(d, 'impact')) + '<div class="ad-imp">' + im.items.map(function (i) { return '<div class="ad-i"><span class="ad-iv">' + E(i.value) + '</span><span class="text-sm text-text-secondary">' + E(i.label) + '</span></div>'; }).join('') + '</div>'); }
+  };
+
+  /* ---------- layout: nothing is drawn until its agent has finished; cards then grow into place ---------- */
+  function slot(k, cls) { return '<div class="ad-slot ' + (cls || '') + '" data-slot="' + k + '"></div>'; }
+  function rv(k, inner) { return '<div class="ad-rv" data-rv="' + k + '"><div class="ad-rv-i">' + inner + '</div></div>'; }
+  function cell(w, inner, open) { return '<div class="ad-cell' + (open ? ' is-open is-settled' : '') + '" style="--w:' + w + '"><div class="ad-cell-i">' + inner + '</div></div>'; }
+  function statusBadge(key) { var s = D.states[key]; return '<span id="st" class="aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + s.tone + ' ow-pill">' + E(s.label) + '</span>'; }
+  function setStatus(key) { var el = $('st'); if (!el) return; var s = D.states[key]; el.className = 'aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-' + s.tone + ' ow-pill'; el.textContent = s.label; }
+
+  /* ---------- Track demand: the stage of the demand, moved by the agents ---------- */
+  function trackHtml() {
+    var t = D.track, parts = [];
+    t.steps.forEach(function (n, i) {
+      parts.push('<li class="ad-trk-s" data-s="' + i + '"><span class="ad-trk-c"></span><span class="ad-trk-l text-xs">' + E(n) + '</span></li>');
+      if (i < t.steps.length - 1) parts.push('<li class="ad-trk-ln" data-ln="' + i + '" aria-hidden="true"></li>');
+    });
+    return card('ad-trk', '<div class="ad-head"><div><div class="ad-h2"><h2 class="text-base font-medium">' + E(t.title) + '</h2></div><p class="text-xs text-text-secondary" id="trk-h"></p></div>' + bySp(D, 'track') + '</div><ol class="ad-trk-steps">' + parts.join('') + '</ol>'
+      + '<div class="ad-trk-box" id="trk-box"><div class="ad-trk-bb" id="trk-bb"></div></div>');
+  }
+  function boxHtml(done) {
+    var t = D.track, c = D.convert, dc = D.decision;
+    if (!done) return '<div class="ad-trk-bt"><span class="text-sm font-medium' + (t.hold ? ' ad-trk-hold' : '') + '">' + (t.hold ? '<aiux-icon name="triangle-exclamation-outline" size="sm"></aiux-icon>' : '') + E(t.box.waiting.title) + '</span><span class="text-sm text-text-secondary">' + E(t.box.waiting.sub) + '</span></div>';
+    var owner = c.steps[0].opts[0].split(',')[0], start = c.steps[2].opts[0];
+    return '<div class="ad-trk-bt"><span class="text-sm font-medium ad-trk-done"><aiux-icon name="circle-check" size="sm"></aiux-icon>' + E(dc.done.title.replace('{num}', c.num)) + '</span><span class="text-sm text-text-secondary">' + E(dc.done.sub.replace('{owner}', owner).replace('{start}', start)) + '</span></div><button class="aiux-btn aiux-btn-sm" data-open="1">' + E(dc.done.cta) + '</button>';
+  }
+  var stage = 0;
+  function swap(el, html, asHtml) {
+    var cur = asHtml ? el.innerHTML : el.textContent; if (cur === html) return;
+    if (!cur || $('page').classList.contains('is-instant')) { if (asHtml) el.innerHTML = html; else el.textContent = html; return; }
+    el.classList.add('is-swap');
+    setTimeout(function () { if (asHtml) el.innerHTML = html; else el.textContent = html; el.classList.remove('is-swap'); }, 140);
+  }
+  function setStage(n) {
+    stage = n; var t = D.track, all = n >= 5;
+    swap($('trk-h'), t.phases[Math.min(n, 5)]);
+    document.querySelectorAll('.ad-trk-s').forEach(function (li) {
+      var i = parseInt(li.dataset.s, 10), st = all || i < n ? 'done' : (i === n ? 'cur' : 'todo');
+      if (li.dataset.st === st) return;
+      li.dataset.st = st; li.className = 'ad-trk-s is-' + st;
+      li.querySelector('.ad-trk-c').innerHTML = st === 'done' ? '<aiux-icon name="check-outline" size="sm"></aiux-icon>' : String(i + 1);
+    });
+    document.querySelectorAll('.ad-trk-ln').forEach(function (l) { l.className = 'ad-trk-ln' + (all || parseInt(l.dataset.ln, 10) < n ? ' is-done' : ''); });
+    swap($('trk-bb'), boxHtml(all), true); $('trk-box').classList.toggle('is-done', all);
+    var hold = !!(t.hold && n === t.stage); document.querySelector('.ad-trk').classList.toggle('is-hold', hold);
+    setStatus(hold ? 'review' : ['submitted', 'submitted', 'screening', 'qualified', 'approved', 'complete'][Math.min(n, 5)]);
+  }
 
   function render(d) {
-    var P = d.specialist.review, pol = d.policy, S = d.sections || P.sections;
     var top = '<a class="ad-back text-sm" href="aict.html"><aiux-icon name="chevron-left-outline" size="sm"></aiux-icon>' + E(d.back.label) + '</a>'
       + '<div class="ad-title-row"><div class="ad-title-main"><h1 class="ad-title">' + E(d.title) + '</h1>'
-      + '<div class="ad-meta text-sm text-text-secondary">' + d.badges.map(badge).join('') + '<span>' + E(d.ref) + '</span>' + d.meta.map(function (m) { return '<span class="ad-sep"></span><span>' + E(m) + '</span>'; }).join('') + '</div></div>'
+      + '<div class="ad-meta text-sm text-text-secondary">' + statusBadge('submitted') + '<span id="risk"></span><span>' + E(d.ref) + '</span>' + d.meta.map(function (m) { return '<span class="ad-sep"></span><span>' + E(m) + '</span>'; }).join('') + '</div></div>'
       + '<button class="aiux-btn aiux-btn-sm" data-soon="1">' + E(d.actions) + ' <aiux-icon name="chevron-down-outline" size="sm"></aiux-icon></button></div>'
       + '<div class="aiux-tabs aiux-tabs-box ad-tabs" role="tablist">' + d.tabs.map(function (t, i) { return '<button role="tab" class="aiux-tab ' + (i === 0 ? 'aiux-tab-active' : '') + '" ' + (i ? 'data-soon="1"' : '') + '>' + E(t) + '</button>'; }).join('') + '</div>';
-
-    var glance = card('ad-glance', d.glance.map(function (g) { return '<div class="ad-g"><span class="text-xs text-text-secondary">' + E(g.label) + '</span><span class="ad-gv' + (g.tone ? ' is-' + g.tone : '') + '">' + E(g.value) + '</span><span class="text-xs text-text-tertiary">' + E(g.note) + '</span></div>'; }).join(''));
 
     var sm = d.summary;
     var summary = card('', head(sm.title, sm.meta, byAi(d, 'summary'))
       + '<div class="ad-prose"><h3 class="text-sm font-medium">' + E(sm.requirement) + '</h3><p>' + E(sm.body) + '</p></div>'
-      + '<div class="ad-rec is-' + E(sm.recTone) + '"><div class="ad-rec-top"><span class="text-sm text-text-secondary">' + E(sm.recLabel) + '</span><span class="ad-conf" data-tip="' + E(sm.confidence.tip) + '"><span class="text-sm text-text-secondary">' + E(sm.confidence.label) + '</span><span class="ad-meter" aria-hidden="true">' + Array.apply(null, Array(sm.confidence.of)).map(function (_, i) { return '<i' + (i < sm.confidence.filled ? ' class="on"' : '') + '></i>'; }).join('') + '</span><strong class="text-sm font-medium">' + E(sm.confidence.level) + '</strong></span></div><div class="ad-rec-v">' + E(sm.rec) + '</div><p class="text-sm">' + E(sm.recBody) + '</p></div>');
-
-    var rows = P.present.map(function (r) { return { label: r.label, detail: r.by, src: pol.srcPresent }; })
-      .concat(P.missing.map(function (r) { return { label: r.label, detail: r.value, src: pol.srcAdded }; }));
-    var table = '<div class="ad-tbl"><div class="ad-tr ad-th text-xs text-text-secondary"><span></span><span>' + E(pol.cols.req) + '</span><span>' + E(pol.cols.detail) + '</span><span>' + E(pol.cols.src) + '</span></div>'
-      + rows.map(function (r) { return '<div class="ad-tr"><span class="ad-ok"><aiux-icon name="' + E(P.icons.present) + '" size="sm"></aiux-icon></span><span>' + E(r.label) + '</span><span class="text-text-secondary">' + E(r.detail) + '</span><span class="text-text-secondary">' + E(r.src) + '</span></div>'; }).join('') + '</div>';
-    var filled = '<h3 class="ad-sub text-sm font-medium">' + E(pol.filled) + '</h3><div class="ad-fill">' + P.filled.map(function (f) { return '<div class="ad-f"><span class="text-xs text-text-secondary">' + E(f.label) + '</span><span class="ad-fv">' + E(f.value) + '</span><span class="text-xs text-text-tertiary">' + E(f.why) + '</span></div>'; }).join('') + '</div>';
-    var policy = card('', head(pol.title, pol.meta, bySp(d, 'policy')) + table + filled);
-
-    var sim = d.similar;
-    var similar = card('', head(sim.title, sim.meta, bySp(d, 'similar'), badge({ label: sim.count, tone: 'warning' })) + '<div class="ad-list">' + sim.items.map(function (i, k) {
-      return '<div class="ad-li"><div class="ad-li-main"><div class="ad-li-top"><a class="ac-link text-base" href="#" data-soon="1">' + E(i.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(i.ref) + '</span>' + badge({ label: i.match, tone: i.tone }) + '</div>'
-        + '<span class="text-sm text-text-secondary">' + E(i.why) + '</span><span class="text-xs text-text-tertiary">' + E(i.state) + ' · ' + E(i.by) + ' · ' + E(i.dates) + '</span></div>'
-        + '<div class="ad-li-act"><button class="aiux-btn aiux-btn-sm" data-soon="1">' + E(sim.view) + '</button><button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" data-more="' + k + '" aria-label="' + E(sim.more) + '"><aiux-icon name="ellipsis-h-outline" size="sm"></aiux-icon></button></div></div>'; }).join('') + '</div>');
-
-    var details = card('', head(d.details.title, '').replace('<p class="text-xs text-text-secondary"></p>', '') + '<dl class="ad-kv">' + d.details.rows.map(function (r) { return '<div><dt class="text-sm text-text-secondary">' + E(r[0]) + '</dt><dd>' + E(r[1]) + '</dd></div>'; }).join('') + '</dl>');
-
-    var sg = d.signals;
-    var signals = card('', head(sg.title, sg.meta, byAi(d, 'signals'), badge({ label: sg.count, tone: 'warning' })) + '<div class="ad-sig">' + sg.items.map(function (i) { return '<div class="ad-sg"><span class="ad-n">' + E(i.n) + '</span><div><div class="text-sm font-medium">' + E(i.title) + '</div><div class="text-sm text-text-secondary">' + E(i.body) + '</div></div></div>'; }).join('') + '</div>');
-
-    var as = d.assess;
-    var assess = card('', head(as.title, as.meta, bySp(d, 'assess')) + '<div class="ad-list">' + as.items.map(function (i) { return '<div class="ad-as"><span>' + E(i) + '</span><span class="text-xs text-text-tertiary">' + E(as.status) + '</span></div>'; }).join('') + '</div>');
-
-    var pr = d.priority;
-    var prio = card('ad-prio', head(pr.title, pr.meta, byAi(d, 'priority')) + '<div class="ad-map"><span class="text-xs text-text-secondary">' + E(pr.mapped.label) + '</span><span>' + E(pr.mapped.value) + '</span></div><div class="ad-tiles ad-tiles-3">' + pr.rows.map(function (r) { return '<div class="ad-tile"><span class="ad-tv is-' + r.tone + '">' + E(r.value) + E(pr.unit) + '</span><span class="text-xs text-text-secondary">' + E(r.label) + '</span><div class="ad-track is-' + r.tone + '"><span style="width:' + r.value + '%"></span></div></div>'; }).join('') + '</div><div class="ad-rs"><span class="text-xs text-text-secondary">' + E(pr.whyLabel) + '</span><p>' + E(pr.why) + '</p></div>');
-
-    var es = d.estimate;
-    var estimate = card('', head(es.title, es.meta, byAi(d, 'estimate'))
-      + '<div class="ad-sizes">' + es.sizes.map(function (z, i) { return '<div class="ad-size' + (i === es.selected ? ' is-on' : '') + '">' + (i === es.selected ? '<span class="ad-pick text-xs">' + E(es.pick) + '</span>' : '') + '<span class="ad-sk">' + E(z.key) + '</span><span class="text-xs text-text-secondary">' + E(z.range) + '</span></div>'; }).join('') + '</div>'
-      + '<div class="ad-stats">' + es.stats.map(function (t) { return '<div class="ad-f"><span class="text-xs text-text-secondary">' + E(t.label) + '</span><span class="ad-fv">' + E(t.value) + '</span></div>'; }).join('') + '</div>'
-      + '<h3 class="ad-sub text-sm font-medium">' + E(es.compLabel) + '</h3><div class="ad-list">' + es.comps.map(function (c) { return '<div class="ad-as"><span class="ad-li-top"><a class="ac-link text-base" href="#" data-soon="1">' + E(c.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(c.ref) + '</span></span><span class="text-sm text-text-secondary">' + E(c.size) + ' · ' + E(c.took) + '</span></div>'; }).join('') + '</div>'
-      + '<div class="ad-rs"><span class="text-xs text-text-secondary">' + E(es.reasoningLabel) + '</span><p>' + E(es.reasoning) + '</p></div>');
-
-    var im = d.impact;
-    var impact = card('', head(im.title, im.meta, byAi(d, 'impact')) + '<div class="ad-imp">' + im.items.map(function (i) { return '<div class="ad-i"><span class="ad-iv">' + E(i.value) + '</span><span class="text-sm text-text-secondary">' + E(i.label) + '</span></div>'; }).join('') + '</div>');
-
-    var dc = d.decision;
-    var decision = '<div class="ad-decide"><div class="ad-decide-t"><span class="ad-decide-h">' + E(dc.title) + '</span><span class="text-sm">' + E(dc.sub) + '</span></div><button class="aiux-btn aiux-btn-accent" data-approve="1"><aiux-icon name="ai-sparkle" size="sm"></aiux-icon>' + E(dc.cta) + '</button></div>';
+      + rv('rec', slot('rec', 'ad-slot-rec')));
 
     $('page').innerHTML = '<div class="ad-top ow-in" style="--d:60ms">' + top + '</div>'
-      + '<div class="ow-in" style="--d:140ms">' + decision + glance + '</div>'
-      + '<div class="ad-rows">'
-      + '<div class="ad-r2 ow-in" style="--d:220ms">' + summary + impact + '</div>'
-      + '<div class="ad-r11 ow-in" style="--d:280ms">' + prio + estimate + '</div>'
-      + '<div class="ad-r2 ad-top-al ow-in" style="--d:340ms"><div class="ad-col">' + policy + similar + '</div><div class="ad-col">' + signals + assess + details + '</div></div>'
+      + '<div class="ad-stack ow-in" style="--d:140ms">'
+      + '<div class="ad-trk-wrap">' + trackHtml() + '</div>'
+      + rv('top', slot('glance'))
+      + '<div class="ad-fx ad-fx-a">' + cell(5, summary, true) + cell(4, slot('similar')) + '</div>'
+      + rv('b', '<div class="ad-fx ad-fx-b">' + cell(1, slot('estimate')) + cell(1, slot('prio')) + '</div>')
+      + rv('c', '<div class="ad-fx ad-fx-c">'
+        + cell(2, rv('policy', slot('policy')) + rv('details', slot('details')))
+        + cell(1, rv('assess', slot('assess')) + rv('signals', slot('signals')) + rv('impact', slot('impact')))
+        + '</div>')
       + '</div>';
-    $('page').querySelectorAll('[data-img]').forEach(function (im) { im.src = d.specialist.img; });
   }
 
+  /* ---------- reveal one card: fill it, then open its row/column so everything below moves down ---------- */
+  function openUp(el) {
+    var n = el;
+    while (n && n.id !== 'page') {
+      if (n.classList && (n.classList.contains('ad-rv') || n.classList.contains('ad-cell')) && !n.classList.contains('is-open')) {
+        n.classList.add('is-open'); (function (x) { setTimeout(function () { x.classList.add('is-settled'); }, 900); })(n);
+      }
+      n = n.parentNode;
+    }
+  }
+  function fill(k, animate) {
+    var el = document.querySelector('[data-slot="' + k + '"]'); if (!el || el.dataset.done) return;
+    el.dataset.done = '1';
+    el.innerHTML = B[k](D);
+    el.querySelectorAll('[data-img]').forEach(function (im) { im.src = D.specialist.img; });
+    el.querySelectorAll('[data-more]').forEach(function (btn) { if (btn.dataset.wired) return; btn.dataset.wired = '1'; Otto.menu(btn, D.similar.menu, function () { toast(D.toast); }); });
+    if (animate) { el.classList.add('is-new'); setTimeout(function () { el.classList.remove('is-new'); }, 2000); }
+    openUp(el);
+  }
+  function showRisk() { var r = $('risk'); if (r && !r.innerHTML) r.innerHTML = badge(D.badges[0]); }
+
+  /* ---------- agent activity panel: floating by default, can be pinned to the side ---------- */
+  var panelOpen = true, pinned = ss('proto.ad.pin') === '1', R = null;
+  function icon(name) { return '<aiux-icon name="' + name + '" size="sm"></aiux-icon>'; }
+  function stepRows(steps) { return steps.map(function () { return '<li class="ad-st is-queued"><div class="ad-st-w"><div class="ad-st-r"><span class="ad-st-i"></span><span class="ad-st-t text-xs"></span></div></div></li>'; }).join(''); }
+  function agentRow(id, name, steps) {
+    return '<li class="ad-ag-r is-queued" data-id="' + id + '"><button class="ad-ag-top" type="button"><span class="ad-ag-i"></span><span class="ad-ag-b"><span class="ad-ag-n text-sm font-medium">' + E(name) + '</span><span class="ad-ag-l text-xs text-text-secondary"></span></span><span class="ad-ag-c">' + icon('chevron-down-outline') + '</span></button><div class="ad-ag-sw"><div class="ad-ag-swi"><ol class="ad-ag-steps">' + stepRows(steps) + '</ol></div></div></li>';
+  }
+  function buildPanel() {
+    var r = D.run, o = r.orchestrator, n = r.agents.length;
+    $('agents').innerHTML = '<div class="ad-ag-h"><img class="ad-ag-av" width="32" height="32" alt="" src="' + E(D.specialist.img) + '"><div class="ad-ag-ht"><span class="ad-ag-t text-sm font-medium">' + E(o.name) + '</span><span class="ad-ag-s text-xs text-text-secondary" id="ag-sub"></span></div>'
+      + '<button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" id="ag-pin" aria-pressed="false">' + icon('thumbtack-outline') + '</button>'
+      + '<button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" id="ag-close" aria-label="' + E(o.collapse) + '">' + icon('chevron-down-outline') + '</button></div>'
+      + '<ul class="ad-ag-list" id="ag-list">' + agentRow('orch', o.name, o.steps) + r.agents.map(function (a) { return agentRow(a.id, a.name, a.steps || []); }).join('') + '</ul>';
+    $('ag-close').addEventListener('click', closePanel);
+    $('ag-pin').addEventListener('click', function () { pinned = !pinned; ss('proto.ad.pin', pinned ? '1' : '0'); applyDock(); });
+    $('ag-list').addEventListener('click', function (e) {
+      var b = e.target.closest('.ad-ag-top'); if (!b) return;
+      var li = b.parentNode; li.dataset.user = '1'; li.classList.toggle('is-open');
+    });
+    $('ag-pill').innerHTML = '<img class="ad-ag-av" width="28" height="28" alt="" src="' + E(D.specialist.img) + '"><span class="ad-pill-t"><span class="text-sm font-medium">' + E(o.name) + '</span><span class="text-xs text-text-secondary" id="ag-pill-s"></span></span>';
+    $('ag-pill').addEventListener('click', openPanel);
+    applyDock();
+  }
+  function applyDock(keepPanel) {
+    var on = pinned && panelOpen;
+    if (!keepPanel) $('agents').classList.toggle('is-docked', on);
+    $('shell').classList.toggle('is-docked', on);
+    var p = $('ag-pin'); if (p) { p.classList.toggle('is-on', pinned); p.setAttribute('aria-pressed', pinned ? 'true' : 'false'); p.setAttribute('aria-label', pinned ? D.run.orchestrator.unpin : D.run.orchestrator.pin); p.title = pinned ? D.run.orchestrator.unpin : D.run.orchestrator.pin; }
+  }
+  function openPanel() {
+    panelOpen = true; var a = $('agents'), p = $('ag-pill'); clearTimeout(swapT);
+    a.classList.remove('is-out'); a.hidden = false; p.hidden = true; p.classList.remove('is-out'); applyDock();
+  }
+  var swapT = null;
+  /* Closing: a docked panel slides out to the right while the page widens, then the pill settles in; a floating one just fades. */
+  function closePanel() {
+    panelOpen = false; var a = $('agents'), p = $('ag-pill'), docked = a.classList.contains('is-docked');
+    applyDock(true); a.classList.add('is-out'); clearTimeout(swapT);
+    swapT = setTimeout(function () {
+      a.hidden = true; a.classList.remove('is-out', 'is-docked'); p.hidden = false;
+      if (docked) { p.style.animationDelay = '.05s'; setTimeout(function () { p.style.animationDelay = ''; }, 400); }
+    }, docked ? 300 : 160);
+  }
+
+  function summaryLine(done, took, t) {
+    var o = D.run.orchestrator, n = D.run.agents.length;
+    if (done === n) return o.done.replace('{t}', fmt(took)) + ' · ' + o.agents.replace('{n}', n);
+    return o.working + ' · ' + o.doneCount.replace('{d}', done).replace('{n}', n) + ' · ' + fmt(t);
+  }
+  function paint(done, took, t) {
+    var s = D.run.summary || summaryLine(done, took, t), n = D.run.agents.length;
+    $('ag-sub').textContent = s;
+    $('ag-pill-s').textContent = done === n ? s + ' · ' + D.run.orchestrator.view : s;
+  }
+  function setStep(li, state, text) {
+    var k = state + '|' + text; if (li.dataset.k === k) return; li.dataset.k = k;
+    if (li.dataset.state !== state) { li.dataset.state = state; li.className = 'ad-st is-' + state; li.querySelector('.ad-st-i').innerHTML = state === 'done' ? icon('check-outline') : ''; }
+    li.querySelector('.ad-st-t').textContent = text;
+  }
+  function setAgent(id, state, line, time) {
+    var li = document.querySelector('.ad-ag-r[data-id="' + id + '"]'); if (!li) return li;
+    if (li.dataset.state !== state) {
+      li.dataset.state = state;
+      li.classList.remove('is-queued', 'is-run', 'is-done', 'is-hold'); li.classList.add('is-' + state);
+      li.querySelector('.ad-ag-i').innerHTML = state === 'done' ? icon('check-outline') : (state === 'hold' ? icon('triangle-exclamation-outline') : '');
+    }
+    var l = li.querySelector('.ad-ag-l'), txt = line || ''; if (l.textContent !== txt) l.textContent = txt;
+    return li;
+  }
+  function stepsAt(li, steps, n, el, dur, doneAll, nReplace) {
+    var rows = li.querySelectorAll('.ad-st'), per = dur / steps.length, cur = -1;
+    steps.forEach(function (st, i) {
+      var txtDone = st.r.replace('{n}', nReplace || ''), state = doneAll || el >= (i + 1) * per ? 'done' : (el >= i * per ? 'run' : 'queued');
+      if (state === 'run') cur = i;
+      setStep(rows[i], state, state === 'done' ? txtDone : st.t);
+    });
+    return cur;
+  }
+  function keepVisible(li) {
+    var list = $('ag-list'), top = li.offsetTop, bot = top + li.offsetHeight;
+    if (top < list.scrollTop) list.scrollTo({ top: top - 8, behavior: 'smooth' }); else if (bot > list.scrollTop + list.clientHeight) list.scrollTo({ top: bot - list.clientHeight + 8, behavior: 'smooth' });
+  }
+
+  function start() {
+    var r = D.run, o = r.orchestrator, ag = r.agents.map(function (a) { return { d: a, s: null, e: null, closed: false }; });
+    var byId = {}; ag.forEach(function (a) { byId[a.d.id] = a; });
+    var n = ag.length, orchDone = false, finished = false, focusLi = null;
+    buildPanel(); openPanel(); setStage(2);
+    ag.forEach(function (a) {
+      setAgent(a.d.id, 'queued', a.d.after.length > 3 ? o.waitAll : a.d.after.length ? o.waiting.replace('{x}', a.d.after.map(function (x) { return byId[x].d.name.toLowerCase(); }).join(', ')) : '', '');
+      stepsAt(document.querySelector('.ad-ag-r[data-id="' + a.d.id + '"]'), a.d.steps, n, -1, a.d.dur, false);
+    });
+    var orchLi = setAgent('orch', 'run', o.first, ''); orchLi.classList.add('is-open');
+    var t0 = Date.now();
+    var iv = setInterval(function () {
+      var t = Date.now() - t0, done = 0;
+      if (t < o.firstDur) { setAgent('orch', 'run', o.steps[Math.min(o.steps.length - 1, Math.floor(t / (o.firstDur / o.steps.length)))].t, (t / 1000).toFixed(1) + 's'); stepsAt(orchLi, o.steps, n, t, o.firstDur, false, n); }
+      else if (!orchDone) { orchDone = true; setAgent('orch', 'done', o.spawned.replace('{n}', n), (o.firstDur / 1000).toFixed(1) + 's'); stepsAt(orchLi, o.steps, n, o.firstDur, o.firstDur, true, n); setTimeout(function () { if (!orchLi.dataset.user) orchLi.classList.remove('is-open'); }, 1000); }
+      ag.forEach(function (a) {
+        var li = document.querySelector('.ad-ag-r[data-id="' + a.d.id + '"]');
+        if (a.e !== null) { done++; return; }
+        if (a.s === null) {
+          if (t < o.firstDur) return;
+          if (!a.d.after.every(function (x) { return byId[x].e !== null; })) return;
+          a.s = t;
+        }
+        var el = t - a.s;
+        if (el >= a.d.dur) {
+          a.e = t; done++;
+          setAgent(a.d.id, 'done', a.d.result, (a.d.dur / 1000).toFixed(1) + 's'); stepsAt(li, a.d.steps, n, a.d.dur, a.d.dur, true);
+          a.d.slots.forEach(function (k) { fill(k, true); });
+          if (a.d.id === 'policy') showRisk();
+          if (a.d.stageDone) setStage(a.d.stageDone);
+        } else {
+          var cur = stepsAt(li, a.d.steps, n, el, a.d.dur, false);
+          setAgent(a.d.id, 'run', a.d.steps[Math.max(cur, 0)].t, (el / 1000).toFixed(1) + 's');
+          if (cur >= 0 && String(cur) !== li.dataset.cur) { li.dataset.cur = String(cur); keepVisible(li); if (a.d.stageStep && a.d.stageStep[cur]) setStage(a.d.stageStep[cur]); }
+        }
+      });
+      /* One agent is expanded at a time: the earliest one still running. The previous one folds as the next opens. */
+      if (orchDone) {
+        var fa = null; for (var q = 0; q < ag.length; q++) { if (ag[q].s !== null && ag[q].e === null) { fa = ag[q]; break; } }
+        var fl = fa ? document.querySelector('.ad-ag-r[data-id="' + fa.d.id + '"]') : null;
+        if (fl !== focusLi && (fl || focusLi)) {
+          if (focusLi && !focusLi.dataset.user) focusLi.classList.remove('is-open');
+          if (fl) { fl.classList.add('is-open'); keepVisible(fl); }
+          focusLi = fl;
+        }
+      }
+      paint(done, 0, t);
+      if (done === n && !finished) {
+        finished = true; clearInterval(iv);
+        var took = Date.now() - t0; ss(KEY, 'converted'); ss(KEYT, String(took));
+        paint(n, took, took);
+        setTimeout(function () { if (panelOpen) closePanel(); }, 3200);
+      }
+    }, 120);
+  }
+
+  function finishedState() {
+    var r = D.run, took = parseInt(ss(KEYT) || '0', 10) || 22000, n = r.agents.length, still = r.mode === 'static', stage = (D.track && D.track.stage) || 5;
+    $('page').classList.add('is-instant');
+    ['glance', 'rec', 'policy', 'details', 'similar', 'impact', 'estimate', 'prio', 'signals', 'assess'].forEach(function (k) { fill(k, false); });
+    document.querySelectorAll('.ad-rv, .ad-cell').forEach(function (x) { x.classList.add('is-open', 'is-settled'); });
+    showRisk(); buildPanel(); setStage(stage);
+    if (still) $('ag-list').classList.add('no-steps');
+    r.agents.forEach(function (a) {
+      var li = setAgent(a.id, a.hold ? 'hold' : 'done', a.result, '');
+      if (a.steps && !still) stepsAt(li, a.steps, n, a.dur, a.dur, true);
+    });
+    var ol = setAgent('orch', 'done', r.orchestrator.spawned.replace('{n}', n), '');
+    if (!still) stepsAt(ol, r.orchestrator.steps, n, 0, 1, true, n);
+    paint(n, took, took); panelOpen = false; $('agents').hidden = true; $('ag-pill').hidden = false; applyDock();
+    setTimeout(function () { $('page').classList.remove('is-instant'); }, 60);
+  }
   ProtoStore.mount(protoStore, function (store) {
-    var d = D = store.view('aict-demand');
+    var DK = { cs: 'aict-demand-cs', inv: 'aict-demand-inv' }[new URLSearchParams(location.search).get('d')] || 'aict-demand';
+    var d = D = store.view(DK);
     customElements.whenDefined('aiux-nav-sidebar').then(function () { setTimeout(function () {
       var n = $('proto-nav');
       n.userMeta = { authenticated: true, firstName: d.steward.first, lastName: '', fullName: d.steward.first, initials: d.steward.initials, avatar: null };
@@ -217,34 +454,18 @@ window.fetch = (u, o) => {
       n._workspaceChromeToolbar = Object.fromEntries(PROTO_DATA.menu.nav.polly.apps.map(function (a) { return [a.id + '-ws', { global: a.items.map(function (i) { return { id: i.id, label: { message: i.label }, icon: i.icon, routeInfo: { route: i.id } }; }) }]; }));
       n.activeWorkspacePath = PROTO_DATA.menu.nav.polly.activityPath;
     }, 50); });
-    render(d);
+    render(d); $('page').querySelectorAll('[data-img]').forEach(function (im) { im.src = d.specialist.img; }); setStage(1);
+    /* The older demands open finished. Josh's demand always plays its run, every time the page loads. */
+    if (d.run.mode === 'static') finishedState();
+    else { ss(KEY, null); setTimeout(start, d.run.startAfter); }
   });
-  var chosen = [];
-  function finish() {
-    var c = D.convert, dc = D.decision; chosen = c.steps.map(function (s) { return s.opts[0]; });
-    var owner = chosen[0].split(',')[0];
-    var num = c.num;
-    var bar = document.querySelector('.ad-decide');
-    bar.classList.add('is-done');
-    bar.innerHTML = '<div class="ad-decide-t"><span class="ad-decide-h">' + E(dc.done.title.replace('{num}', num)) + '</span><span class="text-sm">' + E(dc.done.sub.replace('{owner}', owner).replace('{start}', chosen[2])) + '</span></div><button class="aiux-btn aiux-btn-accent" data-open="1">' + E(dc.done.cta) + '</button>';
-    var b = document.querySelector('.ad-meta .aiux-badge'); if (b) { b.className = 'aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-success ow-pill'; b.textContent = dc.done.badge; }
-  }
   document.addEventListener('click', function (e) {
     if (!D) return;
     var q = function (s) { return e.target.closest && e.target.closest(s); };
-    if (q('[data-approve]')) { finish(); return; }
-    var mo = q('[data-more]');
-    if (mo) { return; }
     if (q('[data-open]')) { toast(D.decision.next); return; }
+    if (q('[data-more]')) return;
     var hit = q('[data-soon]');
     if (!hit) return; e.preventDefault(); toast(D.toast);
-  });
-  document.addEventListener('DOMContentLoaded', function () {});
-  ProtoStore.mount(protoStore, function (store) {
-    document.querySelectorAll('[data-more]').forEach(function (btn) {
-      if (btn.dataset.wired) return; btn.dataset.wired = '1';
-      Otto.menu(btn, D.similar.menu, function () { toast(D.toast); });
-    });
   });
 })();
 </script>

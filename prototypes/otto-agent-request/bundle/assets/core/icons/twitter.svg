@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="fill-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M6.951 5.234 10.674 1h-.882L6.559 4.677 3.978 1H1l3.904 5.56L1 11h.882l3.414-3.883L8.022 11H11L6.951 5.234ZM2.201 1.65h1.354l6.237 8.73H8.437L2.2 1.65Z"/></symbol>
+  <symbol id="fill-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M9.303 6.928 14.403 1h-1.208L8.767 6.147 5.23 1H1.15L6.5 8.784 1.15 15h1.208l4.676-5.436L10.77 15h4.08L9.303 6.928ZM2.795 1.91H4.65l8.544 12.222H11.34L2.795 1.91Z"/></symbol>
+  <symbol id="fill-md" viewBox="0 0 20 20"><path fill="currentColor" d="M11.712 8.622 18.413 1h-1.588l-5.818 6.618L6.36 1H1l7.027 10.007L1 19h1.588l6.144-6.989L13.64 19H19L11.712 8.622ZM3.16 2.17H5.6l11.226 15.714h-2.439L3.16 2.17Z"/></symbol>
+  <symbol id="fill-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M13.903 10.469 21.348 2h-1.764l-6.465 7.353L7.955 2H2l7.808 11.12L2 22h1.764l6.828-7.765L16.044 22H22l-8.097-11.531ZM4.4 3.299h2.71l12.475 17.46h-2.71L4.4 3.3Z"/></symbol>
+  <symbol id="fill-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M18.607 13.856 28.806 2h-2.417l-8.856 10.294L10.459 2H2.301l10.697 15.567L2.3 30h2.417l9.352-10.871L21.54 30h8.16L18.606 13.856ZM5.588 3.82h3.713L26.39 28.263h-3.712L5.589 3.82Z"/></symbol>
+  <symbol id="outline-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M6.951 5.234 10.674 1h-.882L6.559 4.677 3.978 1H1l3.904 5.56L1 11h.882l3.414-3.883L8.022 11H11L6.951 5.234ZM2.201 1.65h1.354l6.237 8.73H8.437L2.2 1.65Z"/></symbol>
+  <symbol id="outline-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M9.303 6.928 14.403 1h-1.208L8.767 6.147 5.23 1H1.15L6.5 8.784 1.15 15h1.208l4.676-5.436L10.77 15h4.08L9.303 6.928ZM2.795 1.91H4.65l8.544 12.222H11.34L2.795 1.91Z"/></symbol>
+  <symbol id="outline-md" viewBox="0 0 20 20"><path fill="currentColor" d="M11.712 8.622 18.413 1h-1.588l-5.818 6.618L6.36 1H1l7.027 10.007L1 19h1.588l6.144-6.989L13.64 19H19L11.712 8.622ZM3.16 2.17H5.6l11.226 15.714h-2.439L3.16 2.17Z"/></symbol>
+  <symbol id="outline-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M13.903 10.469 21.348 2h-1.764l-6.465 7.353L7.955 2H2l7.808 11.12L2 22h1.764l6.828-7.765L16.044 22H22l-8.097-11.531ZM4.4 3.299h2.71l12.475 17.46h-2.71L4.4 3.3Z"/></symbol>
+  <symbol id="outline-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M18.607 13.856 28.806 2h-2.417l-8.856 10.294L10.459 2H2.301l10.697 15.567L2.3 30h2.417l9.352-10.871L21.54 30h8.16L18.606 13.856ZM5.588 3.82h3.713L26.39 28.263h-3.712L5.589 3.82Z"/></symbol>
+</svg>

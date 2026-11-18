@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="fill-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M8.97 1.97a.75.75 0 1 1 1.06 1.06l-7 7a.75.75 0 1 1-1.06-1.06l7-7Zm0 4a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 1 1-1.06-1.06l3-3Z"/></symbol>
+  <symbol id="fill-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M12.97 5.97a.75.75 0 1 1 1.06 1.06l-7 7a.75.75 0 1 1-1.06-1.06l7-7Zm0 4a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 1 1-1.06-1.06l3-3Z"/></symbol>
+  <symbol id="fill-md" viewBox="0 0 20 20"><path fill="currentColor" d="M16.97 9.97a.75.75 0 1 1 1.06 1.06l-7 7a.75.75 0 1 1-1.06-1.06l7-7Zm0 4a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 1 1-1.06-1.06l3-3Z"/></symbol>
+  <symbol id="fill-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M19.97 12.97a.75.75 0 1 1 1.06 1.06l-7 7a.75.75 0 1 1-1.06-1.06l7-7Zm0 4a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 1 1-1.06-1.06l3-3Z"/></symbol>
+  <symbol id="fill-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M27.97 20.97a.75.75 0 1 1 1.06 1.06l-7 7a.75.75 0 1 1-1.06-1.06l7-7Zm0 4a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 1 1-1.06-1.06l3-3Z"/></symbol>
+  <symbol id="outline-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M9.147 2.147a.5.5 0 1 1 .707.707l-7 7a.5.5 0 1 1-.707-.707l7-7Zm0 4a.5.5 0 1 1 .707.707l-3 3a.5.5 0 1 1-.707-.707l3-3Z"/></symbol>
+  <symbol id="outline-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M13.146 6.147a.5.5 0 1 1 .707.707l-7 7a.5.5 0 1 1-.706-.707l7-7Zm0 3.999a.5.5 0 1 1 .707.707l-3 3a.5.5 0 1 1-.707-.707l3-3Z"/></symbol>
+  <symbol id="outline-md" viewBox="0 0 20 20"><path fill="currentColor" d="M17.146 10.146a.5.5 0 1 1 .707.707l-7 7a.5.5 0 1 1-.707-.707l7-7Zm0 4a.5.5 0 1 1 .707.707l-3 3a.5.5 0 1 1-.707-.707l3-3Z"/></symbol>
+  <symbol id="outline-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M20.146 13.146a.5.5 0 1 1 .707.707l-7 7a.5.5 0 1 1-.707-.707l7-7Zm0 4a.5.5 0 1 1 .707.707l-3 3a.5.5 0 1 1-.707-.707l3-3Z"/></symbol>
+  <symbol id="outline-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M28.146 21.146a.5.5 0 1 1 .707.707l-7 7a.5.5 0 1 1-.707-.707l7-7Zm0 4a.5.5 0 1 1 .707.707l-3 3a.5.5 0 1 1-.707-.707l3-3Z"/></symbol>
+</svg>

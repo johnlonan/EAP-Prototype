@@ -12,6 +12,7 @@
   }
 
   function menu() {
+    try { sessionStorage.removeItem('proto.ad.state'); sessionStorage.removeItem('proto.ad.took'); sessionStorage.removeItem('proto.ad.pin'); } catch (e) {}
     var cards = M.cards.map(function (c, i) {
       return '<a class="mn-card mn-' + esc(c.art) + '" style="--d:' + (160 + i * 90) + 'ms" href="' + esc(c.href) + '">'
         + '<div class="mn-body"><div class="mn-meta"><span class="mn-head"><span class="mn-num">' + esc(c.n) + '</span></span><span class="mn-chan is-' + esc(c.hue) + '">' + esc(c.channel) + '</span></div>'

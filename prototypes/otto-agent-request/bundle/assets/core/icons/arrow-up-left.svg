@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="fill-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M7.25 2a.75.75 0 0 1 0 1.5H4.56l5.22 5.22a.75.75 0 1 1-1.06 1.06L3.5 4.56v2.69a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 2.75 2h4.5Z"/></symbol>
+  <symbol id="fill-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M11.25 3a.75.75 0 0 1 0 1.5H5.56l7.22 7.22a.75.75 0 1 1-1.06 1.06L4.5 5.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 3.75 3h7.5Z"/></symbol>
+  <symbol id="fill-md" viewBox="0 0 20 20"><path fill="currentColor" d="M13.25 3a.75.75 0 0 1 0 1.5H5.56l11.22 11.22a.75.75 0 1 1-1.06 1.06L4.5 5.56v7.69a.75.75 0 0 1-1.5 0v-9.5A.75.75 0 0 1 3.75 3h9.5Z"/></symbol>
+  <symbol id="fill-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M15.75 4a1.25 1.25 0 1 1 0 2.5H8.268l11.366 11.366a1.25 1.25 0 0 1-1.768 1.768L6.5 8.268v7.482a1.25 1.25 0 1 1-2.5 0V5.25C4 4.56 4.56 4 5.25 4h10.5Z"/></symbol>
+  <symbol id="fill-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M20.75 5a1.25 1.25 0 1 1 0 2.5H9.268l17.366 17.366a1.25 1.25 0 0 1-1.768 1.768L7.5 9.268V20.75a1.25 1.25 0 0 1-2.5 0V6.25C5 5.56 5.56 5 6.25 5h14.5Z"/></symbol>
+  <symbol id="outline-xs" viewBox="0 0 12 12"><path fill="currentColor" d="M7.5 2a.5.5 0 0 1 0 1H3.707l6.147 6.146a.5.5 0 1 1-.708.708L3 3.707V7.5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5h5Z"/></symbol>
+  <symbol id="outline-sm" viewBox="0 0 16 16"><path fill="currentColor" d="M11.5 3a.5.5 0 0 1 0 1H4.707l8.146 8.146a.5.5 0 1 1-.707.707L4 4.707V11.5a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5h8Z"/></symbol>
+  <symbol id="outline-md" viewBox="0 0 20 20"><path fill="currentColor" d="M13.5 3a.5.5 0 0 1 0 1H4.707l12.146 12.146a.5.5 0 0 1-.707.707L4 4.707V13.5a.5.5 0 0 1-1 0v-10a.5.5 0 0 1 .5-.5h10Z"/></symbol>
+  <symbol id="outline-lg" viewBox="0 0 24 24"><path fill="currentColor" d="M16 4a1 1 0 1 1 0 2H7.414l12.293 12.293a1 1 0 1 1-1.414 1.414L6 7.414V16a1 1 0 1 1-2 0V5a1 1 0 0 1 1-1h11Z"/></symbol>
+  <symbol id="outline-xl" viewBox="0 0 32 32"><path fill="currentColor" d="M21 5a1 1 0 1 1 0 2H8.414l18.293 18.293a1 1 0 1 1-1.414 1.414L7 8.414V21a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1h15Z"/></symbol>
+</svg>
