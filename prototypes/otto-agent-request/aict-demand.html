@@ -126,11 +126,6 @@ window.fetch = (u, o) => {
   <main id="proto-main" style="flex:1;min-width:0;overflow:auto;padding:16px 24px">
 <!--proto:main-->
 <div class="ow-page ad-shell bg-base-200 text-sm text-text-primary" id="shell" style="position:relative">
-  <aside class="ad-otto" id="otto" aria-label="Otto" hidden>
-    <header class="ad-otto-h"><span class="ow-green"><aiux-icon name="ai-sparkle-outline" size="lg"></aiux-icon></span><span class="text-lg grow" id="otto-name"></span><button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" id="otto-close"><aiux-icon name="close-outline" size="md"></aiux-icon></button></header>
-    <div class="ad-otto-t" id="otto-t"><div class="ad-otto-in" id="otto-m"></div></div>
-    <div class="ad-otto-f"><div class="ad-reply" id="otto-reply" hidden></div><div class="ow-composer"><div class="txt text-base" id="otto-ph"></div><button class="ow-send" aria-label="Send" aria-disabled="true" style="width:40px;height:40px"><aiux-icon name="send" size="sm"></aiux-icon></button></div></div>
-  </aside>
   <div class="ad-main"><div class="ad-page" id="page"></div></div>
   <div class="ac-toast text-sm" id="toast" role="status" hidden></div>
 </div>
@@ -164,7 +159,7 @@ window.fetch = (u, o) => {
     var sm = d.summary;
     var summary = card('', head(sm.title, sm.meta, byAi(d, 'summary'))
       + '<div class="ad-prose"><h3 class="text-sm font-medium">' + E(sm.requirement) + '</h3><p>' + E(sm.body) + '</p></div>'
-      + '<div class="ad-rec"><div class="ad-rec-h"><span class="text-xs text-text-secondary">' + E(sm.recLabel) + '</span>' + badge({ label: sm.rec, tone: sm.recTone }) + '</div><p class="text-sm">' + E(sm.recBody) + '</p></div>');
+      + '<div class="ad-rec is-' + E(sm.recTone) + '"><div class="ad-rec-top"><span class="text-sm text-text-secondary">' + E(sm.recLabel) + '</span><span class="ad-conf" data-tip="' + E(sm.confidence.tip) + '"><span class="text-sm text-text-secondary">' + E(sm.confidence.label) + '</span><span class="ad-meter" aria-hidden="true">' + Array.apply(null, Array(sm.confidence.of)).map(function (_, i) { return '<i' + (i < sm.confidence.filled ? ' class="on"' : '') + '></i>'; }).join('') + '</span><strong class="text-sm font-medium">' + E(sm.confidence.level) + '</strong></span></div><div class="ad-rec-v">' + E(sm.rec) + '</div><p class="text-sm">' + E(sm.recBody) + '</p></div>');
 
     var rows = P.present.map(function (r) { return { label: r.label, detail: r.by, src: pol.srcPresent }; })
       .concat(P.missing.map(function (r) { return { label: r.label, detail: r.value, src: pol.srcAdded }; }));
@@ -224,67 +219,20 @@ window.fetch = (u, o) => {
     }, 50); });
     render(d);
   });
-  var chosen = [], busy = false;
-  function pane() { return $('otto-m'); }
-  function down() { var t = $('otto-t'); t.scrollTo({ top: t.scrollHeight, behavior: Otto.reduce ? 'auto' : 'smooth' }); }
-  function user(text) { var el = document.createElement('div'); el.className = 'ow-msg ow-msg-user'; el.innerHTML = '<div class="ow-bubble text-base">' + E(text) + '</div>'; pane().appendChild(el); down(); }
-  function say(html, extra) {
-    var el = document.createElement('div'); el.className = 'ow-msg';
-    el.innerHTML = '<span class="ow-green" style="width:24px;flex:none"><aiux-icon name="ai-sparkle-outline" size="md"></aiux-icon></span><div class="ow-msg-body"><div class="text-base ad-say">' + html + '</div>' + (extra || '') + '</div>';
-    pane().appendChild(el); down(); return el;
-  }
-  function think(text) {
-    var el = document.createElement('div'); el.className = 'ow-msg';
-    el.innerHTML = '<span class="ow-green" style="width:24px;flex:none"><aiux-icon name="ai-sparkle-outline" size="md"></aiux-icon></span><div class="ow-think"><span class="dots"><i></i><i></i><i></i></span><span class="ow-shimmer">' + E(text) + '</span></div>';
-    pane().appendChild(el); down(); return el;
-  }
-  function replies(html) { var r = $('otto-reply'); r.innerHTML = html; r.hidden = !html; if (html) { r.classList.remove('is-in'); void r.offsetWidth; r.classList.add('is-in'); } down(); }
-  function options(opts, attr) { return opts.map(function (o, i) { return '<button class="ad-opt" ' + attr + '="' + i + '"><span class="ad-opt-n">' + (i + 1) + '</span><span>' + E(o) + '</span></button>'; }).join(''); }
-  async function ask(k) {
-    var c = D.convert, st = c.steps[k];
-    var t = think(c.think[0]); await Otto.wait(700); t.remove();
-    say(E(st.q)); replies(options(st.opts, 'data-pick="' + k + '" data-o'));
-    busy = false;
-  }
-  async function review() {
-    var c = D.convert, t = think(c.think[1]); await Otto.wait(900); t.remove();
-    var vals = [chosen[0], chosen[1], chosen[2], c.golive, c.demand];
-    var rows = c.labels.map(function (l, i) { return '<div><dt class="text-sm text-text-secondary">' + E(l) + '</dt><dd>' + E(vals[i]) + '</dd></div>'; }).join('');
-    say(E(c.review), '<dl class="ad-kv ad-sum">' + rows + '</dl>');
-    replies('<button class="ad-opt is-go" data-create="1"><aiux-icon name="ai-sparkle" size="sm"></aiux-icon><span>' + E(c.create) + '</span></button><button class="ad-opt" data-restart="1"><aiux-icon name="arrow-left-outline" size="sm"></aiux-icon><span>' + E(c.restart) + '</span></button>');
-    busy = false;
-  }
+  var chosen = [];
   function finish() {
-    var c = D.convert, dc = D.decision, owner = chosen[0].split(',')[0];
+    var c = D.convert, dc = D.decision; chosen = c.steps.map(function (s) { return s.opts[0]; });
+    var owner = chosen[0].split(',')[0];
     var num = c.num;
     var bar = document.querySelector('.ad-decide');
     bar.classList.add('is-done');
     bar.innerHTML = '<div class="ad-decide-t"><span class="ad-decide-h">' + E(dc.done.title.replace('{num}', num)) + '</span><span class="text-sm">' + E(dc.done.sub.replace('{owner}', owner).replace('{start}', chosen[2])) + '</span></div><button class="aiux-btn aiux-btn-accent" data-open="1">' + E(dc.done.cta) + '</button>';
     var b = document.querySelector('.ad-meta .aiux-badge'); if (b) { b.className = 'aiux-badge aiux-badge-sm aiux-badge-soft aiux-badge-success ow-pill'; b.textContent = dc.done.badge; }
-    say(c.done.replace('{num}', E(num)).replace('{owner}', E(owner)));
   }
-  async function start() {
-    if (busy) return; busy = true; chosen = [];
-    var c = D.convert; $('otto-name').textContent = c.name; $('otto-ph').innerHTML = '<span class="ph">' + E(c.placeholder) + '</span>'; $('otto-close').setAttribute('aria-label', c.close);
-    pane().innerHTML = ''; $('otto').hidden = false; $('shell').classList.add('ad-open');
-    var t = think(c.think[0]); await Otto.wait(700); t.remove();
-    say(c.intro); await Otto.wait(500); ask(0);
-  }
-  function close() { $('otto').hidden = true; $('shell').classList.remove('ad-open'); busy = false; }
   document.addEventListener('click', function (e) {
     if (!D) return;
     var q = function (s) { return e.target.closest && e.target.closest(s); };
-    if (q('[data-approve]')) { start(); return; }
-    if (q('#otto-close')) { close(); return; }
-    var pick = q('[data-pick]');
-    if (pick && !busy) {
-      busy = true; var k = +pick.dataset.pick, v = D.convert.steps[k].opts[+pick.dataset.o];
-      replies(''); chosen[k] = v; user(v);
-      if (k + 1 < D.convert.steps.length) ask(k + 1); else review();
-      return;
-    }
-    if (q('[data-create]') && !busy) { busy = true; replies(''); user(D.convert.create); (async function () { var t = think(D.convert.think[1]); await Otto.wait(900); t.remove(); finish(); busy = false; })(); return; }
-    if (q('[data-restart]') && !busy) { replies(''); busy = true; chosen = []; ask(0); return; }
+    if (q('[data-approve]')) { finish(); return; }
     var mo = q('[data-more]');
     if (mo) { return; }
     if (q('[data-open]')) { toast(D.decision.next); return; }

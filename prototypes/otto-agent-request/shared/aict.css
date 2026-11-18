@@ -1,4 +1,4 @@
-/* AI Control Tower home (flow 3). Builds on otto.css; colors are theme tokens only. */
+/* SI Control Tower home (flow 3). Builds on otto.css; colors are theme tokens only. */
 .ac-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 32px; align-items: stretch; }
 .ac-span2 { grid-column: span 2; }
 .ac-sub { margin: -10px 0 14px; }
@@ -240,3 +240,14 @@
 .ad-opt aiux-icon { flex: none; color: var(--color-text-secondary); }
 .ad-opt.is-go { font-weight: 400; }
 .ad-opt.is-go aiux-icon { color: var(--ow-green); }
+
+/* AI recommendation: the decision is the focus, confidence sits beside it */
+.ad-rec { gap: 10px; padding: 20px; background: color-mix(in oklch, var(--color-success) 8%, var(--color-base-100)); border: 1px solid color-mix(in oklch, var(--color-success) 28%, transparent); }
+.ad-rec-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.ad-rec-v { font-size: 24px; line-height: 32px; font-weight: 400; color: var(--color-success); }
+.ad-conf { position: relative; display: inline-flex; align-items: center; gap: 10px; }
+.ad-meter { display: inline-flex; gap: 3px; }
+.ad-meter i { width: 18px; height: 6px; border-radius: 3px; background: var(--color-base-300); }
+.ad-meter i.on { background: var(--color-success); }
+.ad-conf[data-tip]::after { content: attr(data-tip); position: absolute; inset-inline-end: 0; top: calc(100% + 8px); width: 260px; padding: 8px 12px; border-radius: 8px; background: var(--color-neutral); color: var(--color-neutral-content); font-size: 12px; line-height: 16px; opacity: 0; pointer-events: none; transition: opacity .12s; z-index: 5; }
+.ad-conf[data-tip]:hover::after { opacity: 1; }

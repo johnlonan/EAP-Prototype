@@ -135,7 +135,7 @@ window.PROTO_DATA = {
     cards: [
       { id: 'ew', n: '1', channel: 'EmployeeWorks', hue: 'green', title: 'Josh raises the demand', blurb: 'Josh asks EmployeeWorks for an AI resume screening app. The Demand AI Specialist picks it up, checks policy and moves it to Submitted.', who: 'Josh Sutton · Requester', href: 'home.html?reset' },
       { id: 'teams', n: '2', channel: 'Teams · Moveworks', hue: 'purple', title: 'The same demand, started in Teams', blurb: 'Josh starts in Teams with Moveworks and picks Submit an IT Demand. The whole demand, from intake to policy review, happens in the Teams chat.', who: 'Josh Sutton · Requester', href: 'teams.html' },
-      { id: 'aict', n: '3', channel: 'AI Control Tower', hue: 'amber', title: 'The AI steward reviews it', blurb: 'The submitted demand reaches an AI steward in AI Control Tower, ready for review and a decision.', who: 'AI steward · Reviewer', href: 'aict.html' },
+      { id: 'aict', n: '3', channel: 'SI Control Tower', hue: 'amber', title: 'The AI steward reviews it', blurb: 'The submitted demand reaches an AI steward in SI Control Tower, ready for review and a decision.', who: 'AI steward · Reviewer', href: 'aict.html' },
       { id: 'status', n: '4', channel: 'Teams · Moveworks', hue: 'purple', title: 'Moveworks updates Josh', blurb: 'Without being asked, Moveworks messages Josh in Teams to say his demand passed review and became a project.', who: 'Josh Sutton · Requester', href: 'status.html' }
     ],
     teams: {
@@ -148,11 +148,7 @@ window.PROTO_DATA = {
       typed: 'I want to submit a request',
       stamp: '2:04 pm',
       thinking: 'Thinking…',
-      history: {
-        day: 'Friday',
-        stamp: 'Friday 7:08 am',
-        lines: ['Hi Josh,', 'A global Microsoft outage is affecting Outlook, Office, SharePoint and other services for companies around the world, including ServiceNow. We are working directly with Microsoft to restore service as soon as possible.', 'Thank you for your patience,<br>Digital Technology (DT)']
-      },
+      empty: { img: 'shared/img/moveworks-empty.webp', title: 'You\u2019re starting a new conversation', sub: 'Type your first message below.' },
       reply: {
         stamp: '2:04 pm',
         intro: 'I found a few common request options you can submit right away:',
@@ -174,7 +170,7 @@ window.PROTO_DATA = {
       polly: { homePath: 'now/aict/home', activityPath: 'now/aict/activity', apps: [
         {
           "id": "aict",
-          "label": "AI Control Tower",
+          "label": "SI Control Tower",
           "basePath": "now/aict",
           "items": [
             {
@@ -226,17 +222,26 @@ window.PROTO_DATA = {
     status: {
       day: 'Today',
       stamp: '9:41 am',
-      other: {
-        name: 'Elena Ruiz', initials: 'ER', tabs: ['Chat', 'Files'],
-        messages: [
-          { from: 'them', stamp: '9:36 am', text: 'Are you joining the HR leads sync at 10?' },
-          { from: 'me', stamp: '9:37 am', text: 'Yes, I will be there. Can you share the agenda?' },
-          { from: 'them', stamp: '9:38 am', text: 'Just sent it. Main topics are the Q1 hiring plan and the benefits refresh.' }
+      scene: {
+        team: 'Human Resources', teamInitials: 'HR', channel: 'Recruiting', tabs: ['Posts', 'Shared', 'Notes'], activeTab: 1,
+        side: { title: 'Teams', pinned: 'Pinned', yours: 'Your teams', all: 'See all channels',
+          pinnedItem: { name: 'General', sub: 'Human Resources' },
+          teams: [ { name: 'Human Resources', initials: 'HR', channels: ['General', 'Recruiting', 'Benefits'], active: 1 }, { name: 'Talent Acquisition', initials: 'TA', channels: [] } ] },
+        filters: ['All documents', 'In messages', 'Recent', 'Files', 'Links'], activeFilter: 2, filterPlaceholder: 'Filter by name or person',
+        cols: ['Name', 'Shared on', 'Shared by'],
+        files: [
+          { name: 'Q1 hiring plan', where: 'HR leads files', when: '2h ago', by: 'Elena Ruiz' },
+          { name: 'Benefits refresh timeline', where: 'Benefits team', when: 'Yesterday at 4:12 PM', by: 'Marcus Webb' },
+          { name: 'Recruiter capacity report', where: 'Talent Acquisition', when: 'Yesterday at 9:30 AM', by: 'Priya Nair' },
+          { name: 'Job requisition tracker', where: 'Recruiting files', when: 'Mon at 5:46 PM', by: 'Dana Okafor' },
+          { name: 'Interview panel guide', where: 'HR leads files', when: '16 Nov', by: 'You' },
+          { name: 'Onboarding checklist', where: 'People operations', when: '12 Nov', by: 'Elena Ruiz' },
+          { name: 'HR leads sync agenda', where: 'HR leads files', when: '9 Nov', by: 'Elena Ruiz' }
         ]
       },
       past: { day: 'Sunday', stamp: '2:04 pm', doneStamp: '2:10 pm', lead: 'Done. I started the request for you:' },
       composerHint: 'Type a message',
-      banner: { app: 'Moveworks', text: 'Your demand is now a project' },
+      banner: { source: 'Microsoft Teams', app: 'Moveworks', text: 'Your demand is now a project' },
       intro: 'Hi Josh, good news. Your demand <strong>AI resume screening app</strong> passed review and has been converted to a project.',
       project: {
         pill: 'Converted to project', number: 'PRJ0010231', title: 'AI resume screening app',
@@ -262,12 +267,12 @@ window.PROTO_DATA = {
     },
     stories: {
       aict: {
-        n: '3', channel: 'AI Control Tower', title: 'The AI steward reviews it',
-        intro: 'The review of the submitted demand, seen from the AI steward in AI Control Tower.',
+        n: '3', channel: 'SI Control Tower', title: 'The AI steward reviews it',
+        intro: 'The review of the submitted demand, seen from the AI steward in SI Control Tower.',
         source: 'Draft outline, to confirm with the PM',
         parts: [
           { h: 'Outline', steps: [
-            'The AI steward opens the submitted demand in AI Control Tower.',
+            'The AI steward opens the submitted demand in SI Control Tower.',
             'They see what the Demand AI Specialist checked and the policy details Josh supplied.',
             'They decide: approve, ask for changes, or reject.' ] }
         ]
@@ -291,10 +296,10 @@ window.PROTO_DATA = {
     aict: {
       steward: { first: 'Polly', initials: 'P' },
       greeting: 'Welcome back, {name}',
-      otto: { name: 'Otto', placeholder: 'Ask Otto or search AI Control Tower' },
+      otto: { name: 'Otto', placeholder: 'Ask Otto or search SI Control Tower' },
       toast: 'Only the AI resume screening demand is part of this demo.',
       glance: [
-        { label: 'Pending work items', value: '24', note: 'Across AI Control Tower' },
+        { label: 'Pending work items', value: '24', note: 'Across SI Control Tower' },
         { label: 'Intake requests', value: '3', note: '1 new in the last 2 hours' },
         { label: 'Critical recommendations', value: '3', note: 'Need action this week', tone: 'error' },
         { label: 'Managed AI assets', value: '1,383', note: '90% of 1,539 assets' }
@@ -379,6 +384,7 @@ window.PROTO_DATA = {
         recLabel: 'AI recommendation',
         rec: 'Approve with conditions',
         recTone: 'success',
+        confidence: { label: 'Confidence', level: 'High', filled: 3, of: 3, tip: 'High: the demand, the policy and similar demands all point to the same decision.' },
         recBody: 'The business case is clear and every policy detail is in place. The app ranks candidates, which the policy treats as high risk, so approval should depend on the assessments listed under Required before approval.'
       },
       policy: {

@@ -20,16 +20,13 @@
   function add(html, cls) { var el = document.createElement('div'); el.className = 'tm-row ' + (cls || ''); el.innerHTML = html; feed.appendChild(el); scroll(); return el; }
   function botMsg(body, stamp) { return add(bot + '<div class="tm-col"><div class="tm-meta">' + E(T.app) + ' &nbsp;' + E(stamp) + '</div><div class="tm-card">' + body + '</div></div>'); }
 
-  var h = T.history;
-  feed.insertAdjacentHTML('beforeend', '<div class="tm-day">' + E(h.day) + '</div>');
-  botMsg('<p>' + h.lines.join('</p><p>') + '</p>', h.stamp);
-  feed.scrollTop = feed.scrollHeight;
+  feed.innerHTML = '<div class="tm-empty" id="tm-empty"><img src="' + T.empty.img + '" alt="' + E(T.empty.title + '. ' + T.empty.sub) + '"></div>';
 
   var out = $('tm-text'), send = $('tm-send');
   function ph() { out.innerHTML = '<span class="ph">' + E(T.placeholder) + '</span>'; } ph();
   var busy = false;
   Otto.typer({ box: $('tm-box'), out: out, send: send, text: T.typed, onSend: async function (text) {
-    busy = true; out.innerHTML = ''; ph(); $('tm-box').classList.remove('is-active');
+    busy = true; var em = $('tm-empty'); if (em) em.remove(); out.innerHTML = ''; ph(); $('tm-box').classList.remove('is-active');
     feed.insertAdjacentHTML('beforeend', '<div class="tm-day">' + E(T.today) + '</div>');
     add('<div class="tm-col tm-me"><div class="tm-meta">' + E(T.stamp) + '</div><div class="tm-bubble">' + E(text) + '</div></div>', 'tm-right');
     await wait(500);
