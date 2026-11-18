@@ -29,6 +29,7 @@
 .ac-lvl { font-weight: 500; }
 .ac-lvl.is-error { color: var(--color-error); }
 .ac-lvl.is-warning { color: var(--color-warning); }
+.ac-lvl.is-info { color: var(--color-info); }
 
 /* Donuts */
 .ac-inv { display: flex; align-items: center; gap: 24px; padding: 8px 0 4px; }
@@ -91,7 +92,7 @@
 .ad-tbl { display: flex; flex-direction: column; }
 .ad-tr { display: grid; grid-template-columns: 20px minmax(0, 168px) minmax(0, 1fr) 128px; gap: 16px; align-items: baseline; padding: 12px 0; border-top: 1px solid var(--color-border-subtle); }
 .ad-th { border-top: 0; padding-top: 0; padding-bottom: 8px; }
-.ad-ok { color: var(--ow-green); display: inline-flex; align-self: start; padding-top: 1px; }
+.ad-ok { color: var(--color-success); display: inline-flex; align-self: start; padding-top: 1px; }
 .ad-sub { margin: 24px 0 12px; padding-top: 20px; border-top: 1px solid var(--color-border-subtle); }
 .ad-fill { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .ad-f { display: flex; flex-direction: column; gap: 4px; }
@@ -139,9 +140,9 @@
 .ad-track.is-warning > span { background: var(--color-warning); }
 .ad-track.is-info > span { background: var(--color-info); }
 
-.ad-imp { display: flex; flex-direction: column; gap: 14px; padding: 16px; border-radius: 12px; background: color-mix(in oklch, var(--color-success) 8%, var(--color-base-100)); }
+.ad-imp { display: flex; flex-direction: column; gap: 14px; padding: 16px; border-radius: 12px; background: var(--color-base-200); }
 .ad-i { display: flex; flex-direction: column; gap: 2px; }
-.ad-iv { font-size: 28px; line-height: 1.15; font-weight: 400; color: var(--color-success); }
+.ad-iv { font-size: 28px; line-height: 1.15; font-weight: 400; color: var(--color-text-primary); }
 
 @media (max-width: 1100px) { .ad-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ad-cols { grid-template-columns: minmax(0, 1fr); } .ad-glance { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ad-g:nth-child(3) { border-inline-start: 0; } .ad-fill { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) { .ad-tr { grid-template-columns: 20px minmax(0, 1fr); } .ad-tr > :nth-child(n+3) { grid-column: 2; } .ad-th { display: none; } .ad-kv > div { grid-template-columns: 1fr; gap: 2px; } }

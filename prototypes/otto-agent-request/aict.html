@@ -202,6 +202,8 @@ window.fetch = (u, o) => {
   function donut(host, total, label, parts) {
     var el = document.createElement('aiux-visualizations-composition');
     el.setAttribute('type', 'donut');
+    // slice colours are set from the data so each one carries its meaning (the chart reads these theme variables)
+    parts.forEach(function (p, k) { if (p.color) el.style.setProperty('--datavis-qualitative-' + k, p.color); });
     el.legend = { visible: false };
     el.tooltip = {};
     el.centerContent = { mode: 'custom', value: total, label: label, size: 'small' };
@@ -221,6 +223,7 @@ window.fetch = (u, o) => {
   function chart(c) {
     var el = document.createElement('aiux-visualizations-axis');
     el.setAttribute('type', 'area');
+    el.style.setProperty('--datavis-qualitative-0', 'var(--color-success)');
     el.data = { metadata: { columns: { dim: { key: 'dim', label: c.dimension, order: 0, meaning: 'dimension', type: 'categorical' }, val: { key: 'val', label: c.measure, order: 1, meaning: 'measure', type: 'numerical', groupedBy: ['dim'] } } }, rendering: { columns: {} }, data: c.rows };
     return el;
   }

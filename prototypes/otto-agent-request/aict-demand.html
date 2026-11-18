@@ -169,7 +169,7 @@ window.fetch = (u, o) => {
     var policy = card('', head(pol.title, pol.meta, bySp(d, 'policy')) + table + filled);
 
     var sim = d.similar;
-    var similar = card('', head(sim.title, sim.meta, bySp(d, 'similar'), badge({ label: sim.count, tone: 'warning' })) + '<div class="ad-list">' + sim.items.map(function (i, k) {
+    var similar = card('', head(sim.title, sim.meta, bySp(d, 'similar'), badge({ label: sim.count, tone: 'neutral' })) + '<div class="ad-list">' + sim.items.map(function (i, k) {
       return '<div class="ad-li"><div class="ad-li-main"><div class="ad-li-top"><a class="ac-link text-base" href="#" data-soon="1">' + E(i.title) + '</a><span class="aiux-divider aiux-divider-vertical ac-vd" aria-hidden="true"></span><span class="text-xs text-text-tertiary">' + E(i.ref) + '</span>' + badge({ label: i.match, tone: i.tone }) + '</div>'
         + '<span class="text-sm text-text-secondary">' + E(i.why) + '</span><span class="text-xs text-text-tertiary">' + E(i.state) + ' · ' + E(i.by) + ' · ' + E(i.dates) + '</span></div>'
         + '<div class="ad-li-act"><button class="aiux-btn aiux-btn-sm" data-soon="1">' + E(sim.view) + '</button><button class="aiux-btn aiux-btn-ghost aiux-btn-square aiux-btn-sm" data-more="' + k + '" aria-label="' + E(sim.more) + '"><aiux-icon name="ellipsis-h-outline" size="sm"></aiux-icon></button></div></div>'; }).join('') + '</div>');

@@ -318,7 +318,7 @@ window.PROTO_DATA = {
       inventory: {
         title: 'Inventory', sub: 'As of today',
         total: '1,539', totalLabel: 'Total assets',
-        parts: [{ label: 'Managed', value: 1383, shown: '1,383', color: 'var(--color-primary)' }, { label: 'Unmanaged', value: 156, shown: '156', color: 'var(--color-info)' }]
+        parts: [{ label: 'Managed', value: 1383, shown: '1,383', color: 'var(--color-success)' }, { label: 'Unmanaged', value: 156, shown: '156', color: 'var(--color-warning)' }]
       },
       regulatory: {
         title: 'Regulatory risk classification', sub: 'Risk classification of AI systems, models and datasets',
@@ -334,7 +334,7 @@ window.PROTO_DATA = {
         title: 'Governance posture', sub: 'Share of managed AI assets that meet each control',
         tiles: [
           { label: 'Quality', value: 82, tone: 'success' },
-          { label: 'Safety', value: 78, tone: 'success' },
+          { label: 'Safety', value: 78, tone: 'warning' },
           { label: 'Security', value: 91, tone: 'success' },
           { label: 'Compliance', value: 36, tone: 'error' },
           { label: 'Residual risk', value: 64, tone: 'warning' }
@@ -351,7 +351,7 @@ window.PROTO_DATA = {
           { level: '1-Critical', tone: 'error', area: 'Drive AI productivity', title: 'Critical safety failure: the agent complied with a prompt injection and a system override' },
           { level: '2-High', tone: 'warning', area: 'Drive AI productivity', title: 'Session success scoring awards 92 despite the agent fulfilling an explicit harm-enabling request' },
           { level: '2-High', tone: 'warning', area: 'Manage lifecycle', title: 'Overdue or inactive lifecycle tasks on AI assets' },
-          { level: '3-Medium', tone: 'warning', area: 'Monitor security', title: 'Medium AI asset events' }
+          { level: '3-Medium', tone: 'info', area: 'Monitor security', title: 'Medium AI asset events' }
         ]
       },
       value: {
@@ -403,8 +403,8 @@ window.PROTO_DATA = {
         more: 'More actions',
         menu: ['Merge with this demand', 'Mark as duplicate', 'Not related'],
         items: [
-          { title: 'Campus hiring candidate screening', ref: 'DMND0010391', match: '91% match', tone: 'warning', state: 'In progress', by: 'Anita Rao, Talent Acquisition', dates: 'Nov 2026 to Mar 2027', why: 'Same affected system, Workday, and the same goal of cutting hiring turnaround time.' },
-          { title: 'Interview scheduling automation', ref: 'DMND0010402', match: '74% match', tone: 'info', state: 'Approved', by: 'Tom Becker, Human Resources', dates: 'Jan 2027 to Apr 2027', why: 'Same affected system, Workday, but a different step of the hiring process.' },
+          { title: 'Campus hiring candidate screening', ref: 'DMND0010391', match: '91% match', tone: 'neutral', state: 'In progress', by: 'Anita Rao, Talent Acquisition', dates: 'Nov 2026 to Mar 2027', why: 'Same affected system, Workday, and the same goal of cutting hiring turnaround time.' },
+          { title: 'Interview scheduling automation', ref: 'DMND0010402', match: '74% match', tone: 'neutral', state: 'Approved', by: 'Tom Becker, Human Resources', dates: 'Jan 2027 to Apr 2027', why: 'Same affected system, Workday, but a different step of the hiring process.' },
           { title: 'Job description drafting assistant', ref: 'DMND0010377', match: '58% match', tone: 'neutral', state: 'Draft', by: 'Mei Lin, Talent Acquisition', dates: 'Not scheduled', why: 'Touches the same recruiter workflow. No shared data or systems.' }
         ]
       },
@@ -445,7 +445,7 @@ window.PROTO_DATA = {
           { label: 'Business value', value: 90, tone: 'success' },
           { label: 'Feasibility', value: 82, tone: 'success' },
           { label: 'Risk posture', value: 68, tone: 'warning' },
-          { label: 'Resource readiness', value: 74, tone: 'info' },
+          { label: 'Resource readiness', value: 74, tone: 'warning' },
           { label: 'Overall priority', value: 80, tone: 'success' }
         ]
       },
