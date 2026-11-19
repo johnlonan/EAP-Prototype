@@ -362,12 +362,14 @@ window.fetch = (u, o) => {
   function stepsAt(li, steps, n, el, dur, doneAll, nReplace) {
     var rows = li.querySelectorAll('.ad-st'), per = dur / steps.length, cur = -1;
     steps.forEach(function (st, i) {
-      var txtDone = st.r.replace('{n}', nReplace || ''), state = doneAll || el >= (i + 1) * per ? 'done' : (el >= i * per ? 'run' : 'queued');
+      var state = doneAll || el >= (i + 1) * per ? 'done' : (el >= i * per ? 'run' : 'queued');
       if (state === 'run') cur = i;
-      setStep(rows[i], state, state === 'done' ? txtDone : st.t);
+      setStep(rows[i], state, st.t);
     });
     return cur;
   }
+  var kvT = null;
+  function later(li) { clearTimeout(kvT); kvT = setTimeout(function () { keepVisible(li); }, 380); }
   function keepVisible(li) {
     var list = $('ag-list'), top = li.offsetTop, bot = top + li.offsetHeight;
     if (top < list.scrollTop) list.scrollTo({ top: top - 8, behavior: 'smooth' }); else if (bot > list.scrollTop + list.clientHeight) list.scrollTo({ top: bot - list.clientHeight + 8, behavior: 'smooth' });
@@ -406,7 +408,7 @@ window.fetch = (u, o) => {
         } else {
           var cur = stepsAt(li, a.d.steps, n, el, a.d.dur, false);
           setAgent(a.d.id, 'run', a.d.steps[Math.max(cur, 0)].t, (el / 1000).toFixed(1) + 's');
-          if (cur >= 0 && String(cur) !== li.dataset.cur) { li.dataset.cur = String(cur); keepVisible(li); if (a.d.stageStep && a.d.stageStep[cur]) setStage(a.d.stageStep[cur]); }
+          if (cur >= 0 && String(cur) !== li.dataset.cur) { li.dataset.cur = String(cur); if (li === focusLi) later(li); if (a.d.stageStep && a.d.stageStep[cur]) setStage(a.d.stageStep[cur]); }
         }
       });
       /* One agent is expanded at a time: the earliest one still running. The previous one folds as the next opens. */
@@ -415,7 +417,7 @@ window.fetch = (u, o) => {
         var fl = fa ? document.querySelector('.ad-ag-r[data-id="' + fa.d.id + '"]') : null;
         if (fl !== focusLi && (fl || focusLi) && (!focusLi || t - focusAt >= DWELL)) {
           if (focusLi && !focusLi.dataset.user) focusLi.classList.remove('is-open');
-          if (fl) { fl.classList.add('is-open'); keepVisible(fl); }
+          if (fl) { fl.classList.add('is-open'); later(fl); }
           focusLi = fl; focusAt = t;
         }
       }
