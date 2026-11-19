@@ -93,10 +93,10 @@ window.PROTO_DATA = {
         ]
       },
       steps1: ['Reading the demand', 'Matching it to the AI Use Case Intake Policy', 'Classifying the risk of AI that screens candidates', 'Filling in fields from the policy', 'Checking what the policy still requires'],
-      ask: "I've validated your demand against the <strong>AI Use Case Intake Policy</strong>. I filled in the affected AI system, primary goal, investment type and risk tier from policy. Because it influences hiring decisions it is <strong>high risk</strong>, so the policy needs a few more details before it can go to review.",
+      ask: "I've validated your demand against the <strong>AI Use Case Intake Policy</strong>. I filled in the affected AI system, primary goal, investment type and risk tier from the policy. Because it influences hiring decisions, it is <strong>high risk</strong>, so the policy needs a few more details before it can move on.",
       question: "Three details would complete this validation. <strong>Who will sponsor it, when do you need it live, and what result would tell you it worked?</strong>",
       steps2: ['Reading your answer', 'Recording the business sponsor', 'Checking the target go-live date', 'Confirming the success measure', 'Validating the demand again'],
-      done: "Thanks. Everything the policy requires is now in place, so this demand is complete and moving to <strong>Submitted</strong>. An AI steward or demand manager will review it next."
+      done: "Thanks. Everything the policy requires is now in place, so the demand is complete and moving to <strong>Submitted</strong>. The Demand AI Specialist will screen it next."
     },
     draft: {
       kind: 'Demand · AI demand',
@@ -117,7 +117,7 @@ window.PROTO_DATA = {
       insight: {
         draft: { title: 'Routed to Demand AI Specialist', sub: 'It will check this demand against policy and knowledge base articles.', icon: 'arrow-right-outline' },
         assigned: { title: 'Demand AI Specialist is reviewing', sub: 'It is checking this demand against policy and knowledge base articles.', icon: 'arrow-right-outline' },
-        submitted: { title: 'Complete and submitted', sub: 'Moved to Submitted for AI steward or demand manager review.', icon: 'circle-check' }
+        submitted: { title: 'Complete and submitted', sub: 'Moved to Submitted. The Demand AI Specialist will screen it next.', icon: 'circle-check' }
       }
     },
     request: { state: 'draft' }
@@ -135,8 +135,8 @@ window.PROTO_DATA = {
     cards: [
       { id: 'ew', n: '1', channel: 'EmployeeWorks', hue: 'green', title: 'Josh raises the demand', blurb: 'Josh asks EmployeeWorks for an AI resume screening app. The Demand AI Specialist picks it up, checks policy and moves it to Submitted.', who: 'Josh Sutton · Requester', href: 'home.html?reset' },
       { id: 'teams', n: '2', channel: 'Teams · Moveworks', hue: 'purple', title: 'The same demand, started in Teams', blurb: 'Josh starts in Teams with Moveworks and picks Submit an IT Demand. The whole demand, from intake to policy review, happens in the Teams chat.', who: 'Josh Sutton · Requester', href: 'teams.html' },
-      { id: 'aict', n: '3', channel: 'SI Control Tower', hue: 'amber', title: 'The AI steward reviews it', blurb: 'The submitted demand reaches an AI steward in SI Control Tower, ready for review and a decision.', who: 'AI steward · Reviewer', href: 'aict.html' },
-      { id: 'status', n: '4', channel: 'Teams · Moveworks', hue: 'purple', title: 'Moveworks updates Josh', blurb: 'Without being asked, Moveworks messages Josh in Teams to say his demand passed review and became a project.', who: 'Josh Sutton · Requester', href: 'status.html' }
+      { id: 'aict', n: '3', channel: 'SI Control Tower', hue: 'amber', title: 'The Demand AI Specialist screens it', blurb: 'The AI steward opens the demand in SI Control Tower and watches the Demand AI Specialist screen it, qualify it and convert it to a project.', who: 'AI steward · Reviewer', href: 'aict.html' },
+      { id: 'status', n: '4', channel: 'Teams · Moveworks', hue: 'purple', title: 'Moveworks updates Josh', blurb: 'Without being asked, Moveworks messages Josh in Teams to say his demand was approved and became a project.', who: 'Josh Sutton · Requester', href: 'status.html' }
     ],
     teams: {
       app: 'Moveworks',
@@ -242,7 +242,7 @@ window.PROTO_DATA = {
       past: { day: 'Sunday', stamp: '2:04 pm', doneStamp: '2:10 pm', lead: 'Done. I started the request for you:' },
       composerHint: 'Type a message',
       banner: { source: 'Microsoft Teams', app: 'Moveworks', text: 'Your demand is now a project' },
-      intro: 'Hi Josh, good news. Your demand <strong>AI resume screening app</strong> passed review and has been converted to a project.',
+      intro: 'Hi Josh, good news. Your demand <strong>AI resume screening app</strong> was approved and has been converted to a project.',
       project: {
         pill: 'Converted to project', number: 'PRJ0010231', title: 'AI resume screening app',
         sub: 'From DMND0010482 · Approved Nov 17, 2026',
@@ -297,16 +297,16 @@ window.PROTO_DATA = {
       steward: { first: 'Polly', initials: 'P' },
       greeting: 'Welcome back, {name}',
       otto: { name: 'Otto', placeholder: 'Ask Otto or search SI Control Tower' },
-      toast: 'Only the AI resume screening demand is part of this demo.',
+      toast: 'Only the intake requests are part of this demo.',
       glance: [
         { label: 'Pending work items', value: '24', note: 'Across SI Control Tower' },
-        { label: 'Intake requests', value: '3', note: '1 new a few minutes ago' },
+        { label: 'Intake requests', value: '3', note: '1 arrived a few minutes ago' },
         { label: 'Critical recommendations', value: '3', note: 'Need action this week', tone: 'error' },
         { label: 'Managed AI assets', value: '1,383', note: '90% of 1,539 assets' }
       ],
       intake: {
         title: 'Intake requests',
-        sub: 'AI use cases submitted for steward review',
+        sub: 'AI use cases submitted and screened by the Demand AI Specialist',
         seeAll: 'See all intake requests (3)',
         confLabel: 'Confidence',
         items: [
@@ -366,7 +366,7 @@ window.PROTO_DATA = {
     },
     'aict-demand': {
       steward: { first: 'Polly', initials: 'P' },
-      toast: 'Only the Overview is part of this demo.',
+      toast: 'Only the Overview tab is part of this demo.',
       back: { label: 'Intake requests' },
       title: 'AI resume screening app',
       ref: 'DMND0010482',
